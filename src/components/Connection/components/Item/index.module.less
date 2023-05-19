@@ -1,0 +1,53 @@
+.item {
+  .icon {
+    font-size: 10px;
+    margin-right: 5px;
+    color: #666666;
+    &.big {
+      font-size: 16px;
+    }
+  }
+  .header {
+    display: flex;
+    padding: 10px 5px;
+    justify-content: space-between;
+    background-color: #fbfbfb;
+    .info {
+      display: flex;
+    }
+    .action{
+      padding-right: 10px;
+    }
+    &:hover {
+      background-color: #f5f5f5;
+      cursor: pointer;
+    }
+  }
+  .content {
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 0;
+    transition: height 0.3s;
+    &.open {
+      height: 340px;
+    }
+    .dbItem {
+      padding: 0 5px;
+      border-radius: 4px;
+      height: 20px;
+      display: flex;
+      font-size: 12px;
+      align-items: center;
+      &:hover {
+        cursor: pointer;
+        background-color: #f5f5f5;
+      }
+      &.active{
+        color: #1677ff;
+        background-color: #e6f4ff;
+      }
+    }
+  }
+}
