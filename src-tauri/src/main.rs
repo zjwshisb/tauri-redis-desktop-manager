@@ -5,9 +5,11 @@ mod err;
 mod response;
 mod utils;
 mod redis_conn;
+mod sqlite;
 
 
 fn main() {
+    dbg!(sqlite::init_sqlite());
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             route::dispatch

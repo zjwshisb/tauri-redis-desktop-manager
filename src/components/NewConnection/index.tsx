@@ -37,7 +37,7 @@ const Index: React.FC<{
             }}>test</Button>
             <Button type="primary" onClick={() => {
               form.validateFields().then(v => {
-                request('add_connection', v).then(r => {
+                request('connections/add', v).then(r => {
                   message.success('操作成功')
                   props.onSuccess()
                   setVisible(false)

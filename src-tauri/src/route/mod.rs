@@ -10,7 +10,10 @@ pub mod key;
 pub fn dispatch(path: &str, payload: &str) -> Result<String, CusError>{
     let r = match path {
         "connections/get" => {
-            Response::new(connection::get_connections()?)
+            Response::new(connection::get()?)
+        },
+        "connections/add" => {
+            Response::new(connection::add(payload)?)
         },
         "server/ping" => {
             Response::new(server::ping(payload)?)
@@ -28,7 +31,7 @@ pub fn dispatch(path: &str, payload: &str) -> Result<String, CusError>{
             Response::new(key::get(payload)?)
         }
         _ => {
-            Err(CusError::App("not found".into()))
+            Err(CusError::App(format!("{} not found", path)))
         }
     };
     dbg!(&r);

@@ -1,12 +1,11 @@
 import React from 'react'
-import styles from './index.module.less'
 import { observer } from 'mobx-react-lite'
-import request from '../../utils/request'
+import request from '@/utils/request'
 import { Button, Input, Tooltip, Typography, Affix, Empty } from 'antd'
 import { useDebounceFn, useMount } from 'ahooks'
-import { type DB } from '../../store/db'
-import { SearchOutlined } from '@ant-design/icons'
-import { store } from '../../store'
+import { type DB } from '@/store/db'
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
+import { store } from '@/store'
 import Key from '../Page/Key'
 
 interface ScanResp {
@@ -25,6 +24,8 @@ const Index: React.FC<{
 
   const [more, setMore] = React.useState(true)
 
+  const [loading, setLoading] = React.useState(false)
+
   const id = React.useId()
 
   const onSearchChange = useDebounceFn((s: string) => {
@@ -33,6 +34,9 @@ const Index: React.FC<{
   })
 
   const getKeys = React.useCallback((s: string, i: string, reset: boolean = false) => {
+    if (reset) {
+      setLoading(true)
+    }
     request<ScanResp>('key/scan', {
       cursor: i,
       search: s,
@@ -49,8 +53,15 @@ const Index: React.FC<{
           return [...pre].concat(res.data.keys)
         })
       }
+    }).finally(() => {
+      setLoading(false)
     })
   }, [db.db])
+
+  const reload = React.useCallback(() => {
+    setCursor('0')
+    getKeys(search, '0', true)
+  }, [search, getKeys])
 
   useMount(() => {
     getKeys(search, cursor, true)
@@ -60,7 +71,7 @@ const Index: React.FC<{
     <Affix offsetTop={0} target={() => {
       return document.getElementById(id)
     }}>
-        <div className="py-2 bg-white">
+        <div className="py-2 bg-white flex item-center">
           <Input
               prefix={<SearchOutlined />}
               placeholder={'search'}
@@ -70,7 +81,10 @@ const Index: React.FC<{
                 setSearch(e.target.value)
                 onSearchChange.run(e.target.value)
               }}
-              />
+         />
+         <div className='w-[20px] flex-shrink-0 flex item-center pl-2 justify-center'>
+           <ReloadOutlined className='hover:cursor-pointer blue-sky' onClick={reload}/>
+         </div>
         </div>
     </Affix>
     {

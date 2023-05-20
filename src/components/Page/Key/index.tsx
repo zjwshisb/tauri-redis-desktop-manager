@@ -1,8 +1,9 @@
 import React from 'react'
-import { Input } from 'antd'
-import styles from './index.module.less'
+import { Button, Input } from 'antd'
 import StringValue from './components/StringValue'
 import HashValue from './components/HashValue'
+import { ReloadOutlined, DeleteOutlined } from '@ant-design/icons'
+import Copy from '@/components/Copy'
 
 const Index: React.FC<{
   item: APP.Key
@@ -20,11 +21,29 @@ const Index: React.FC<{
   }, [item])
 
   return <div>
-        <div className={styles.info}>
-            <Input addonBefore={item.types} value={item.name} readOnly className={styles.item}></Input>
-                <Input addonBefore={'ttl'} value={item.ttl} readOnly className={styles.item}></Input>
-            </div>
-        <div className={styles.content}>
+        <div className={'flex pb-4'}>
+          <div className='w-[300px]'>
+            <Input addonBefore={item.types} value={item.name} readOnly
+            addonAfter={
+              <Copy content={item.name} />
+            }
+            ></Input>
+          </div>
+          <div className='w-[300px] ml-4'>
+            <Input addonBefore={'ttl'} value={item.ttl} readOnly></Input>
+          </div>
+          <div>
+            <Button className='ml-2' icon={
+              <ReloadOutlined />
+            }>
+            </Button>
+            <Button className='ml-2' danger type='primary' icon={
+              <DeleteOutlined />
+            }>
+            </Button>
+          </div>
+        </div>
+        <div className={''}>
             {v}
          </div>
     </div>

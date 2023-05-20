@@ -1,7 +1,9 @@
 
+use std::env::args;
+
 use rusqlite::{self};
 
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use crate::err::CusError;
 use super::{sqlite};
 
@@ -9,7 +11,7 @@ use super::{sqlite};
 pub struct Connection {
     pub id: u16,
     pub host: String,
-    pub port: u16,
+    pub port: i32,
     pub auth: String,
 }
 
@@ -27,21 +29,29 @@ pub fn get_sqlite_client() {
 
 }
 
-// #[tauri::command]
-// pub fn add_connection(host: String, port: u16, auth: String ) -> Result<Connection, CusError> {
-//     let conn = sqlite::get_sqlite_client()?;
-//     let connection = Connection{
-//         id: 0,
-//         host,
-//         port,
-//         auth,
-//     };
-//     conn.execute("insert into connections (host, port, auth) values(?1, ?2, ?3)", (&connection.host, &connection.port, &connection.auth))?;
-//     Ok(connection)
-// }
-//
+#[derive(Deserialize)]
+struct AddArgs {
+    host: String,
+    port: i32,
+    auth: String
+}
+
 #[tauri::command]
-pub fn get_connections() -> Result<Vec<Connection>, CusError> {
+pub fn add(payload : &str) -> Result<Connection, CusError> {
+    let conn = sqlite::get_sqlite_client()?;
+    let args: AddArgs = serde_json::from_str(&payload)?;
+    let connection = Connection{
+        id: 0,
+        host: args.host,
+        port: args.port,
+        auth: args.auth
+    };
+    conn.execute("insert into connections (host, port, auth) values(?1, ?2, ?3)", (&connection.host, &connection.port, &connection.auth))?;
+    Ok(connection)
+}
+
+#[tauri::command]
+pub fn get() -> Result<Vec<Connection>, CusError> {
     let conn = sqlite::get_sqlite_client()?;
     let mut stmt = conn.prepare("select id, host, port, auth from connections")?;
     let connections_iter = stmt.query_map([], |row| {

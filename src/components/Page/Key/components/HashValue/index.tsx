@@ -1,8 +1,8 @@
 import React from 'react'
-import request from '../../../../../utils/request'
+import request from '@/utils/request'
 import { Button, Space, Table, Tooltip } from 'antd'
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
-import useStore from '../../../../../hooks/useStore'
+import useStore from '@/hooks/useStore'
 import { useMount } from 'ahooks'
 
 const Index: React.FC<{

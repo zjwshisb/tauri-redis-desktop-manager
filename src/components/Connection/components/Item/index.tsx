@@ -9,9 +9,9 @@ import {
 import styles from './index.module.less'
 import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
-import useStore from '../../../../hooks/useStore'
-import request from '../../../../utils/request'
-import Info from '../../../Page/Info'
+import useStore from '@/hooks/useStore'
+import request from '@/utils/request'
+import Info from '@/components/Page/Info'
 
 const Index: React.FC<{
   connection: APP.Connection

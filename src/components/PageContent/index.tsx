@@ -11,7 +11,7 @@ const Index: React.FC = () => {
   const store = useStore()
 
   const { data } = useRequest<APP.Key>('key/get', {
-    key: 'horizon:678929'
+    key: 'book_test_cache:live:token'
   })
 
   const items = React.useMemo(() => {
