@@ -10,7 +10,7 @@ import FieldView from '../FieldView'
 const Index: React.FC = () => {
   const store = useStore()
 
-  const { data } = useRequest<APP.Key>('key/get', {
+  const { data } = useRequest<APP.Key>('key/get', 11, {
     key: 'book_test_cache:live:token'
   })
 

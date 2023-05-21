@@ -1,7 +1,6 @@
 import { Button, Form, Input, Modal, InputNumber, Space, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import React from 'react'
-import styles from './index.module.less'
 import request from '../../utils/request'
 
 const Index: React.FC<{
@@ -10,7 +9,7 @@ const Index: React.FC<{
   const [visible, setVisible] = React.useState(false)
 
   const [form] = useForm()
-  return <div className={styles.content}>
+  return <div className={'p-2'}>
         <Button block onClick={() => {
           setVisible(true)
         }}>new Connection</Button>

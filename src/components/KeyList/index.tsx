@@ -37,7 +37,7 @@ const Index: React.FC<{
     if (reset) {
       setLoading(true)
     }
-    request<ScanResp>('key/scan', {
+    request<ScanResp>('key/scan', db.connection.id, {
       cursor: i,
       search: s,
       db: db.db
@@ -56,7 +56,7 @@ const Index: React.FC<{
     }).finally(() => {
       setLoading(false)
     })
-  }, [db.db])
+  }, [db.connection.id, db.db])
 
   const reload = React.useCallback(() => {
     setCursor('0')
@@ -92,7 +92,7 @@ const Index: React.FC<{
         return <Tooltip key={v} mouseEnterDelay={0.5} title={v} >
             <Typography.Text className="flex-shrink-0 rounded hover:white
             hover:cursor-pointer hover:bg-sky-200" ellipsis={true} onClick={e => {
-              request<APP.Key>('key/get', {
+              request<APP.Key>('key/get', db.connection.id, {
                 key: v
               }).then(res => {
                 store.page.addPage({

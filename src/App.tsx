@@ -18,7 +18,7 @@ const App: React.FC = () => {
     locale: i18n.language
   }}>
     <StyleProvider hashPriority="high">
-      <Layout className='h-full bg-[#FFF]'>
+      <Layout className='h-full bg-[#FFF] border-t'>
           <Layout.Sider theme="light" width={250}>
             <Connection/>
           </Layout.Sider>

@@ -4,9 +4,9 @@ import {
   SettingOutlined,
   RightOutlined,
   DatabaseOutlined,
-  DownOutlined
+  DownOutlined,
+  DisconnectOutlined
 } from '@ant-design/icons'
-import styles from './index.module.less'
 import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
@@ -20,35 +20,70 @@ const Index: React.FC<{
 }> = ({ connection, onDeleteClick }) => {
   const store = useStore()
 
+  const [collapse, setCollapse] = React.useState(false)
+  const [databaseSize, setDatabaseSize] = React.useState(0)
+
+  const isOpen = React.useMemo(() => {
+    return !!store.connection.openIds[connection.id]
+  }, [connection.id, store.connection.openIds])
+
+  const icon = React.useMemo(() => {
+    if (isOpen) {
+      if (collapse) {
+        return <DownOutlined className='text-sm' />
+      } else {
+        return <RightOutlined className='text-sm'/>
+      }
+    } else {
+      return <DisconnectOutlined className='text-sm'/>
+    }
+  }, [collapse, isOpen])
+
   const db = React.useMemo(() => {
-    return new Array(16).fill(1)
-  }, [])
+    return new Array(databaseSize).fill(1)
+  }, [databaseSize])
 
-  const [isOpen, setIsOpen] = React.useState(false)
+  const onItemClick = React.useCallback(() => {
+    if (isOpen) {
+      setCollapse(p => !p)
+    } else {
+      request<string>('config/databases', connection.id).then(res => {
+        setDatabaseSize(parseInt(res.data))
+        setCollapse(true)
+        store.connection.open(connection.id)
+      })
+    }
+  }, [connection.id, isOpen, store.connection])
 
-  return <div className={styles.item}>
-        <div className={styles.header} onClick={() => {
-          setIsOpen(p => !p)
-        }}>
-            <div className={styles.info}>
-                {
-                    isOpen ? <DownOutlined className={styles.icon} /> : <RightOutlined className={styles.icon} />
-                }
+  const height = React.useMemo(() => {
+    if (isOpen && collapse) {
+      return (22 * (databaseSize + 1)).toString() + 'px'
+    } else {
+      return 0
+    }
+  }, [collapse, databaseSize, isOpen])
+
+  return <div className={'my-1 px-2 box-border'}>
+        <div className={'flex justify-between rounded hover:bg-sky-50 hover:cursor-pointer'} onClick={onItemClick}>
+            <div className={'flex'}>
+                {icon}
                 <div>
-                {connection.host}:{connection.port}
+                  {connection.host}:{connection.port}
                 </div>
             </div>
-            <div className={styles.action}>
-                <DeleteOutlined className={classnames(styles.icon, styles.big)} onClick={(e) => {
+            <div className={''}>
+                <DeleteOutlined className={''} onClick={(e) => {
                   e.stopPropagation()
                   onDeleteClick(connection)
                 }}
                 />
             </div>
         </div>
-        <div className={classnames(styles.content, isOpen ? styles.open : null)}>
-            <div className={styles.dbItem} onClick={() => {
-              request<string>('server/info', {
+        <div className={classnames(['overflow-hidden transition-all'])} style={{
+          height
+        }}>
+            <div className={'h-[22px] flex items-center px-2 rounded'} onClick={() => {
+              request<string>('server/info', connection.id, {
               }).then((res) => {
                 store.page.addPage({
                   label: 'info',
@@ -57,7 +92,7 @@ const Index: React.FC<{
                 })
               })
             }}>
-                <SettingOutlined className={styles.icon}></SettingOutlined>
+                <SettingOutlined className={'mr-1 text-sm'}></SettingOutlined>
                 <div>info</div>
             </div>
             {
@@ -75,8 +110,8 @@ const Index: React.FC<{
                         store.db.add(connection, index)
                       }
                     }}
-                    className={classnames(styles.dbItem, active > -1 ? styles.active : '')}>
-                    <DatabaseOutlined className={styles.icon}></DatabaseOutlined>
+                    className={classnames(['h-[22px] flex items-center px-2 rounded', active > -1 ? 'bg-sky-200' : ''])} >
+                    <DatabaseOutlined className={'mr-1 text-sm'}></DatabaseOutlined>
                     <div>{index}</div>
                 </div>
                 })

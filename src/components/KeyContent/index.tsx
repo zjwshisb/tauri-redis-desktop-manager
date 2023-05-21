@@ -15,7 +15,7 @@ const Index: React.FC = () => {
   }
 
   return <Resizable
-    className={'h-screen'}
+    className={'h-screen border-r'}
     minWidth={'200px'}
     onResizeStop={(e, direction, ref, d) => {
       setWidth(p => p + d.width)
@@ -24,8 +24,7 @@ const Index: React.FC = () => {
       right: true
     }}
    size={{
-     width,
-     height: '100%'
+     width
    }}>
     {
       store.db.db.length === 1

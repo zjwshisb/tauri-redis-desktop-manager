@@ -1,8 +1,29 @@
 use redis::{Client, Connection};
+use crate::err::CusError;
+use crate::model::{Connection as Conn};
+use crate::sqlite;
 
-pub fn get_connection(id: usize) -> Connection {
-    let client = Client::open("redis://47.115.162.231:6379").unwrap();
-    let mut connection = client.get_connection().unwrap();
-    redis::cmd("auth").arg("weisong123456").query::<redis::Value>(& mut connection).unwrap();
-    return connection
+pub fn get_connection(connection_id: u8) -> Result<Connection, CusError> {
+    let conn = sqlite::get_sqlite_client().unwrap();
+    let mut stmt = conn.prepare("select id, host, port, auth from connections where id= ?").unwrap();
+    return match stmt.query_row([connection_id], |r| {
+        Ok(Conn{
+            id: r.get(0).unwrap(),
+            host: r.get(1).unwrap(),
+            port: r.get(2).unwrap(),
+            auth: r.get(3).unwrap(),
+        })
+    }) {
+        Ok(c) => {
+            let client = Client::open(format!("redis://{}:{}", c.host, c.port)).unwrap();
+            let mut connection = client.get_connection().unwrap();
+            if c.auth != "" {
+                redis::cmd("auth").arg(c.auth).query::<redis::Value>(& mut connection).unwrap();
+            } 
+            Ok(connection)
+        }
+        Err(e) => {
+            Err(CusError::App("connection not found".to_string()))
+        }
+    }
 }

@@ -4,7 +4,6 @@ declare namespace APP {
     host: string
     port: number
     auth: string
-    is_open: boolean
   }
 
   interface BaseKey<T, V> {

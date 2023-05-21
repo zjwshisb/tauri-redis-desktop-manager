@@ -9,9 +9,9 @@ struct P {
     auth: String
 }
 
-pub fn info(payload: &str) -> Result<String, CusError> {
+pub fn info(payload: &str, cid: u8) -> Result<String, CusError> {
   
-    let mut connection = redis_conn::get_connection(1);
+    let mut connection = redis_conn::get_connection(cid)?;
     let v: Value = redis::cmd("info").query(&mut connection)?;
     match v {
         Value::Data(ve) => {

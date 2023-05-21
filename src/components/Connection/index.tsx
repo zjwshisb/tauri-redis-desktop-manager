@@ -1,7 +1,6 @@
 import React from 'react'
 import NewConnection from '../NewConnection'
 import Item from './components/Item'
-import styles from './index.module.less'
 import { Modal, message } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { observer } from 'mobx-react-lite'
@@ -22,7 +21,7 @@ const Index: React.FC = () => {
       title: t('notice'),
       content: '确定删除该连接?',
       async onOk () {
-        await request('delete_connection', {
+        await request('delete_connection', conn.id, {
           id: conn.id
         })
         store.connection.fetchConnections().then()
@@ -32,26 +31,26 @@ const Index: React.FC = () => {
   }, [store.connection, t])
 
   return (
-    <div className={styles.list} id="connection">
-      <NewConnection
-        onSuccess={() => {
-          store.connection.fetchConnections()
-        }}
-      />
-      <div className={styles.connectionContent}>
-        <div className={styles.items}>
-          {store.connection.connections.map((v) => {
-            return (
-              <Item
-                onDeleteClick={handleDelete}
-                connection={v}
-                key={v.id}
-              ></Item>
-            )
-          })}
+      <div className="border-r h-full overflow-y-auto" id="connection">
+        <NewConnection
+          onSuccess={() => {
+            store.connection.fetchConnections()
+          }}
+        />
+        <div className={''}>
+          <div className={''}>
+            {store.connection.connections.map((v) => {
+              return (
+                <Item
+                  onDeleteClick={handleDelete}
+                  connection={v}
+                  key={v.id}
+                ></Item>
+              )
+            })}
+          </div>
         </div>
       </div>
-    </div>
   )
 }
 export default observer(Index)

@@ -89,9 +89,10 @@ pub struct ScanResp<T> {
     keys: Vec<T>
 }
 
-pub fn scan(payload : &str) -> Result<ScanResp<String>, CusError>{
-    let mut connection = redis_conn::get_connection(1);
+pub fn scan(payload : &str, cid: u8) -> Result<ScanResp<String>, CusError>{
+    let mut connection = redis_conn::get_connection(cid)?;
     let args: ScanArgs = serde_json::from_str(&payload)?;
+
     redis::cmd("select").arg(args.db).query(& mut connection)?;
     let mut cmd = redis::cmd("scan");
     cmd.arg(&args.cursor).arg(&["count", "100"]);
@@ -114,13 +115,8 @@ pub fn scan(payload : &str) -> Result<ScanResp<String>, CusError>{
             if let Some(s)  = keys_vec {
                 if let Value::Bulk(s)  = s {
                     for v in s {
-                        match v {
-                            Value::Data(vv) => {
-                              keys.push(std::str::from_utf8(vv).unwrap().into());
-                            }
-                            _ => {
-          
-                            }
+                        if let Value::Data(vv)  = v {
+                            keys.push(std::str::from_utf8(vv).unwrap().into());
                         }
                       }
                 };
@@ -147,8 +143,8 @@ pub struct HScanResp {
     fields: Vec<Field>
 }
 
-pub fn hscan(payload : &str) -> Result<HScanResp, CusError> {
-    let mut connection = redis_conn::get_connection(1);
+pub fn hscan(payload : &str, cid: u8) -> Result<HScanResp, CusError> {
+    let mut connection = redis_conn::get_connection(cid)?;
     let args: HScanArgs = serde_json::from_str(&payload)?;
     let value: Value = redis::cmd("hscan")
     .arg(args.key).arg(args.cursor)
@@ -166,7 +162,6 @@ pub fn hscan(payload : &str) -> Result<HScanResp, CusError> {
          if let Some(s)  = keys_vec {
                 if let Value::Bulk(vec)  = s {
                     let length = vec.len();
-                    dbg!(length);
                     let mut current: usize = 0;
                     while current < length {
                         let mut field : Field = Field { 
@@ -202,8 +197,8 @@ pub fn hscan(payload : &str) -> Result<HScanResp, CusError> {
 struct GetArgs{
     key: String,
 }
-pub fn get(payload : &str) -> Result<Key, CusError>{
-    let mut conn: redis::Connection = redis_conn::get_connection(1);
+pub fn get(payload : &str, cid: u8) -> Result<Key, CusError>{
+    let mut conn: redis::Connection = redis_conn::get_connection(cid)?;
     let args: GetArgs = serde_json::from_str(&payload)?;
     let mut key: Key = Key::new(args.key, &mut conn)?;
     match &key.types[..] {
