@@ -38,17 +38,15 @@ const Index: React.FC = () => {
           }}
         />
         <div className={''}>
-          <div className={''}>
-            {store.connection.connections.map((v) => {
-              return (
-                <Item
-                  onDeleteClick={handleDelete}
-                  connection={v}
-                  key={v.id}
-                ></Item>
-              )
-            })}
-          </div>
+          {store.connection.connections.map((v) => {
+            return (
+                  <Item
+                    onDeleteClick={handleDelete}
+                    connection={v}
+                    key={v.id}
+                  ></Item>
+            )
+          })}
         </div>
       </div>
   )

@@ -2,72 +2,97 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import request from '@/utils/request'
 import { Button, Input, Tooltip, Typography, Affix, Empty } from 'antd'
-import { useDebounceFn, useMount } from 'ahooks'
-import { type DB } from '@/store/db'
+import { useDebounceFn } from 'ahooks'
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
-import { store } from '@/store'
+import { Resizable } from 're-resizable'
 import Key from '../Page/Key'
+import useStore from '@/hooks/useStore'
+import { type DB } from '@/store/db'
 
 interface ScanResp {
   cursor: string
   keys: string[]
 }
 
-const Index: React.FC<{
-  db: DB
-}> = ({ db }) => {
-  const [cursor, setCursor] = React.useState('0')
+const Index: React.FC = () => {
+  const store = useStore()
+
+  const cursor = React.useRef('0')
 
   const [keys, setKeys] = React.useState<string[]>([])
 
-  const [search, setSearch] = React.useState('')
+  const search = React.useRef('')
 
   const [more, setMore] = React.useState(true)
 
-  const [loading, setLoading] = React.useState(false)
+  const [width, setWidth] = React.useState(250)
 
   const id = React.useId()
 
+  const db = React.useMemo(() => {
+    if (store.db.db.length > 0) {
+      return store.db.db[0]
+    } else {
+      return null
+    }
+  }, [store.db.db])
+
   const onSearchChange = useDebounceFn((s: string) => {
-    setCursor('0')
-    getKeys(s, cursor, true)
+    search.current = s
+    cursor.current = '0'
+    getKeys(db, true)
   })
 
-  const getKeys = React.useCallback((s: string, i: string, reset: boolean = false) => {
-    if (reset) {
-      setLoading(true)
-    }
-    request<ScanResp>('key/scan', db.connection.id, {
-      cursor: i,
-      search: s,
-      db: db.db
-    }).then(res => {
-      if (res.data.cursor === '0') {
-        setMore(false)
-      }
-      setCursor(res.data.cursor)
+  const getKeys = React.useCallback((current: DB | null, reset: boolean = false) => {
+    if (current !== null) {
       if (reset) {
-        setKeys(res.data.keys)
-      } else {
-        setKeys(pre => {
-          return [...pre].concat(res.data.keys)
-        })
+        cursor.current = '0'
       }
-    }).finally(() => {
-      setLoading(false)
-    })
-  }, [db.connection.id, db.db])
+      request<ScanResp>('key/scan', current.connection.id, {
+        cursor: cursor.current,
+        search: search.current,
+        db: current.db
+      }).then(res => {
+        if (res.data.cursor === '0') {
+          setMore(false)
+        }
+        cursor.current = res.data.cursor
+        if (reset) {
+          setKeys(res.data.keys)
+        } else {
+          setKeys(pre => {
+            return [...pre].concat(res.data.keys)
+          })
+        }
+      }).finally(() => {
+      })
+    }
+  }, [])
 
   const reload = React.useCallback(() => {
-    setCursor('0')
-    getKeys(search, '0', true)
-  }, [search, getKeys])
+    cursor.current = '0'
+    getKeys(db, true)
+  }, [getKeys, db])
 
-  useMount(() => {
-    getKeys(search, cursor, true)
-  })
+  React.useEffect(() => {
+    getKeys(db, true)
+  }, [getKeys, db])
 
-  return <div className="flex flex-col px-2  overflow-hidden h-[100vh] overflow-y-auto bg-white" id={id}>
+  return <Resizable
+  className={'h-screen border-r'}
+  minWidth={'200px'}
+  onResizeStop={(e, direction, ref, d) => {
+    setWidth(p => p + d.width)
+  }}
+  enable={{
+    right: true
+  }}
+ size={{
+   width,
+   height: '100%'
+ }}>
+  <div>
+  <div className="flex flex-col px-2  overflow-hidden h-[100vh] overflow-y-auto bg-white" id={id}>
     <Affix offsetTop={0} target={() => {
       return document.getElementById(id)
     }}>
@@ -75,16 +100,15 @@ const Index: React.FC<{
           <Input
               prefix={<SearchOutlined />}
               placeholder={'search'}
-              value={search}
+              value={search.current}
               allowClear
               onChange={e => {
-                setSearch(e.target.value)
                 onSearchChange.run(e.target.value)
               }}
-         />
-         <div className='w-[20px] flex-shrink-0 flex item-center pl-2 justify-center'>
-           <ReloadOutlined className='hover:cursor-pointer blue-sky' onClick={reload}/>
-         </div>
+          />
+          <div className='w-[20px] flex-shrink-0 flex item-center pl-2 justify-center'>
+            <ReloadOutlined className='hover:cursor-pointer blue-sky' onClick={reload}/>
+          </div>
         </div>
     </Affix>
     {
@@ -92,31 +116,36 @@ const Index: React.FC<{
         return <Tooltip key={v} mouseEnterDelay={0.5} title={v} >
             <Typography.Text className="flex-shrink-0 rounded hover:white
             hover:cursor-pointer hover:bg-sky-200" ellipsis={true} onClick={e => {
-              request<APP.Key>('key/get', db.connection.id, {
-                key: v
-              }).then(res => {
+              if (db !== null) {
                 store.page.addPage({
-                  key: res.data.name,
-                  label: res.data.name,
-                  children: <Key item={res.data}></Key>
+                  key: v,
+                  label: v,
+                  children: <Key
+                  name={v} db={db.db}
+                  connection={db.connection}
+                  pageKey={v}
+                  ></Key>
                 })
-              })
-              e.stopPropagation()
+                e.stopPropagation()
+              }
             }}>
               {v}
             </Typography.Text>
           </Tooltip>
       })
       }
-      {
-        more && keys.length > 0 && <div className='mb-4'><Button block onClick={() => {
-          getKeys(search, cursor)
-        }}>load more</Button></div>
-      }
-      {
-        keys.length === 0 && <Empty />
-      }
+        {
+          more && keys.length > 0 && <div className='mb-4'><Button block onClick={() => {
+            getKeys(db)
+          }}>load more</Button></div>
+        }
+        {
+          keys.length === 0 && <Empty />
+        }
     </div>
+  </div>
+
+  </Resizable>
 }
 
 export default observer(Index)

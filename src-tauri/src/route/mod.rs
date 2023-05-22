@@ -6,9 +6,10 @@ pub mod connection;
 pub mod server;
 pub mod key;
 pub mod config;
+pub mod hash;
 
 #[tauri::command]
-pub fn dispatch(path: &str, cid: u8, payload: &str) -> Result<String, CusError>{
+pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>{
     let r = match path {
         "connections/get" => {
             Response::new(connection::get()?)
@@ -25,8 +26,17 @@ pub fn dispatch(path: &str, cid: u8, payload: &str) -> Result<String, CusError>{
         "key/scan" => {
             Response::new(key::scan(payload, cid)?)
         }
-        "key/hscan" => {
-            Response::new(key::hscan(payload, cid)?)
+        "key/hash/hscan" => {
+            Response::new(hash::hscan(payload, cid)?)
+        }
+        "key/hash/hset" => {
+            Response::new(hash::hset(payload, cid)?)
+        }
+        "key/hash/hdel" => {
+            Response::new(hash::hdel(payload, cid)?)
+        }
+        "key/del" => {
+            Response::new(key::del(payload, cid)?)
         }
         "key/get" => {
             Response::new(key::get(payload, cid)?)

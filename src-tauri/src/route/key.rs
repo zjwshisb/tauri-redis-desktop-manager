@@ -1,13 +1,7 @@
-use redis::{Client, Value, cmd, RedisError};
+use redis::{Value, cmd, RedisError};
 use serde::{Serialize, Deserialize};
 use crate::{err::CusError, redis_conn};
 
-
-#[derive(Serialize)]
-pub struct Field {
-    name: String,
-    value: String
-}
 
 
 #[derive(Debug)]
@@ -40,15 +34,21 @@ pub struct Key {
     name: String,
     types: String,
     ttl: i64,
-    data: CusRedisValue
+    data: CusRedisValue,
+    connection_id: u32,
+    db: u8,
+    memory: u64,
 }
 impl Key {
-    fn new(name: String,  conn: &mut redis::Connection) -> Result<Key, RedisError> {
+    fn new(name: String, db: u8, cid: u32, conn: &mut redis::Connection) -> Result<Key, RedisError> {
         let mut key: Key = Key{
             name: name,
             types: "".into(),
             ttl: -2,
-            data: CusRedisValue::NONE(),
+            data: CusRedisValue::NONE(), 
+            connection_id: cid,
+            db,
+            memory: 0
         };
         let types_value: Value =  cmd("type").arg(&key.name).query(conn)?;
         if let Value::Status(types) = types_value {
@@ -58,6 +58,10 @@ impl Key {
             let ttl_value : Value = cmd("ttl").arg(&key.name).query(conn)?;
             if let Value::Int(ttl) = ttl_value {
                 key.ttl = ttl
+            }
+            let memory_value: Value = cmd("MEMORY USAGE").arg(&key.name).query(conn)?;
+            if let Value::Int(memory) = memory_value {
+                key.memory = memory
             }
         }
         Ok(key)
@@ -89,11 +93,12 @@ pub struct ScanResp<T> {
     keys: Vec<T>
 }
 
-pub fn scan(payload : &str, cid: u8) -> Result<ScanResp<String>, CusError>{
-    let mut connection = redis_conn::get_connection(cid)?;
+pub fn scan(payload : &str, cid: u32) -> Result<ScanResp<String>, CusError>{
     let args: ScanArgs = serde_json::from_str(&payload)?;
 
-    redis::cmd("select").arg(args.db).query(& mut connection)?;
+    let mut connection = redis_conn::get_connection(cid, args.db)?;
+
+ 
     let mut cmd = redis::cmd("scan");
     cmd.arg(&args.cursor).arg(&["count", "100"]);
     if args.search != "" {
@@ -132,75 +137,17 @@ pub fn scan(payload : &str, cid: u8) -> Result<ScanResp<String>, CusError>{
     }
 }
 
-#[derive(Deserialize)]
-struct HScanArgs {
-    key: String,
-    cursor: String
-}
-#[derive(Serialize)]
-pub struct HScanResp {
-    cursor: String,
-    fields: Vec<Field>
-}
-
-pub fn hscan(payload : &str, cid: u8) -> Result<HScanResp, CusError> {
-    let mut connection = redis_conn::get_connection(cid)?;
-    let args: HScanArgs = serde_json::from_str(&payload)?;
-    let value: Value = redis::cmd("hscan")
-    .arg(args.key).arg(args.cursor)
-    .arg(&["COUNT", "2"])
-    .query(& mut connection)?;
-    if let Value::Bulk(s) = value {
-        let cursor_value = s.get(0).unwrap();
-        let mut cursor   = String::from("0");
-        let mut fields : Vec<Field>= vec![];
-        dbg!(&s);
-        if let Value::Data(vv) = cursor_value {
-             cursor = std::str::from_utf8(&vv).unwrap().into()
-        }
-        let keys_vec = s.get(1);
-         if let Some(s)  = keys_vec {
-                if let Value::Bulk(vec)  = s {
-                    let length = vec.len();
-                    let mut current: usize = 0;
-                    while current < length {
-                        let mut field : Field = Field { 
-                            name: String::from(""), 
-                            value: String::from("")
-                         };
-                        let key_value = vec.get(current).unwrap();
-                        if let Value::Data(key) = key_value {
-                            field.name = std::str::from_utf8(key).unwrap().into()
-                        }
-                        current = current + 1;
-                        let value_value = vec.get(current).unwrap();
-                        if let Value::Data(value) = value_value {
-                            field.value = std::str::from_utf8(value).unwrap().into()
-                        }
-                        current = current + 1;
-                        fields.push(field);
-                    }
-                   
-                };
-            };
-            Ok(HScanResp{
-                cursor, 
-                fields
-            })
-    } else {
-        Err(CusError::App(("not a hash key").into()))
-
-    }
-}
 
 #[derive(Deserialize)]
 struct GetArgs{
-    key: String,
+    name: String,
+    db: u8
 }
-pub fn get(payload : &str, cid: u8) -> Result<Key, CusError>{
-    let mut conn: redis::Connection = redis_conn::get_connection(cid)?;
+pub fn get(payload : &str, cid: u32) -> Result<Key, CusError>{
     let args: GetArgs = serde_json::from_str(&payload)?;
-    let mut key: Key = Key::new(args.key, &mut conn)?;
+    let mut conn: redis::Connection = redis_conn::get_connection(cid, args.db)?;
+    let _ : redis::Value = redis::cmd("select").arg(args.db).query(&mut conn)?;
+    let mut key: Key = Key::new(args.name, args.db, cid , &mut conn)?;
     match &key.types[..] {
         "hash" => {
         }
@@ -216,3 +163,17 @@ pub fn get(payload : &str, cid: u8) -> Result<Key, CusError>{
     }
 }
 
+#[derive(Deserialize)]
+struct  DelArgs {
+    names: Vec<String>,
+    db: u8
+}
+pub fn del(payload : &str, cid: u32) ->Result<i64, CusError> {
+    let args: DelArgs = serde_json::from_str(&payload)?;
+    let mut conn: redis::Connection = redis_conn::get_connection(cid, args.db)?;
+    let value : Value = redis::cmd("del").arg(&args.names).query(&mut conn)?;
+    if let Value::Int(c) = value {
+        return Ok(c);
+    }
+    Err(CusError::App(String::from("something go wrong")))
+}

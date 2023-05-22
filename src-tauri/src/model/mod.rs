@@ -9,3 +9,11 @@ pub struct Connection {
     pub port: i32,
     pub auth: String,
 }
+
+
+
+#[derive(Serialize, Debug)]
+pub struct Field {
+    pub name: String,
+    pub value: String
+}

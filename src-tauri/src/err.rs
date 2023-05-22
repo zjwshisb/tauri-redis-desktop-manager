@@ -17,6 +17,7 @@ pub enum CusError {
 }
 
 
+
 // we must manually implement serde::Serialize
 impl serde::Serialize for CusError {
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

@@ -1,28 +1,31 @@
 import React from 'react'
 import request from '@/utils/request'
 import { Button, Space, Table, Tooltip } from 'antd'
-import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
+import { EyeOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
-import { useMount } from 'ahooks'
+import EditField from './components/EditField'
+import DeleteField from './components/DeleteField'
+import { actionIconStyle } from '@/utils/styles'
 
 const Index: React.FC<{
-  item: APP.HashKey
-}> = ({ item }) => {
+  keys: APP.HashKey
+}> = ({ keys }) => {
   const store = useStore()
 
   const [fields, setFields] = React.useState<APP.Field[]>([])
-  const [cursor, setCursor] = React.useState('0')
+  const cursor = React.useRef('0')
   const [more, setMore] = React.useState(true)
 
-  const getFields = React.useCallback((c: string, reset = false) => {
+  const getFields = React.useCallback((reset = false) => {
     request<{
       cursor: string
       fields: APP.Field[]
-    }>('key/hscan', {
-      key: item.name,
-      cursor: c
+    }>('key/hash/hscan', keys.connection_id, {
+      name: keys.name,
+      db: keys.db,
+      cursor: cursor.current
     }).then(res => {
-      setCursor(res.data.cursor)
+      cursor.current = res.data.cursor
       if (res.data.cursor === '0') {
         setMore(false)
       }
@@ -32,11 +35,13 @@ const Index: React.FC<{
         setFields(p => [...p].concat(res.data.fields))
       }
     })
-  }, [item.name])
+  }, [keys])
 
-  useMount(() => {
-    getFields(cursor, true)
-  })
+  React.useEffect(() => {
+    cursor.current = '0'
+    setMore(true)
+    getFields(true)
+  }, [getFields])
 
   return <div>
     <Table
@@ -71,11 +76,24 @@ const Index: React.FC<{
           title: 'action',
           width: '300px',
           fixed: 'right',
-          render (_, record) {
+          render (_, record, index) {
             return <Space>
-              <EditOutlined className='hover:cursor-pointer' />
-              <DeleteOutlined className='hover:cursor-pointer' />
-              <EyeOutlined className='hover:cursor-pointer' onClick={() => {
+              <EditField keys={keys} field={record} onSuccess={f => {
+                setFields(prev => {
+                  const newFields = [...prev]
+                  newFields[index] = f
+                  return newFields
+                })
+                console.log(f)
+              }} />
+              <DeleteField keys={keys} field={record} onSuccess={() => {
+                setFields(prev => {
+                  const newFields = [...prev]
+                  newFields.splice(index, 1)
+                  return newFields
+                })
+              }}/>
+              <EyeOutlined style={actionIconStyle} className='hover:cursor-pointer' key={'view'} onClick={() => {
                 store.fieldView.show({
                   title: record.name,
                   content: record.value
@@ -86,7 +104,7 @@ const Index: React.FC<{
         }
       ]}></Table>
       {more && <Button block className='my-4' onClick={() => {
-        getFields(cursor)
+        getFields()
       }}>load more</Button>}
     </div>
 }

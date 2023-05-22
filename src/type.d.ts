@@ -11,6 +11,8 @@ declare namespace APP {
     types: T
     ttl: number
     data: V
+    db: number
+    connection_id: number
   }
 
   interface Field {

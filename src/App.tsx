@@ -9,7 +9,7 @@ import { StyleProvider } from '@ant-design/cssinjs'
 import './i18n'
 import './App.css'
 import 'antd/dist/reset.css'
-import KeyContent from './components/KeyContent'
+import KeyList from './components/KeyList'
 
 const App: React.FC = () => {
   const { i18n } = useTranslation()
@@ -23,7 +23,7 @@ const App: React.FC = () => {
             <Connection/>
           </Layout.Sider>
           <Layout.Content className='flex'>
-            <KeyContent />
+            <KeyList />
             <PageContent />
           </Layout.Content>
       </Layout>

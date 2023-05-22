@@ -1,22 +1,16 @@
 import React from 'react'
-import useRequest from '../../../hooks/useRequest'
+import useRequest from '@/hooks/useRequest'
 import { Descriptions } from 'antd'
 
 const Index: React.FC<{
-  content?: string
+  connection: APP.Connection
 }> = (props) => {
-  const { data } = useRequest<string>('server/info', {
-    id: 1,
-    command: 'info',
-    args: []
-  })
+  const { data } = useRequest<string>('server/info', props.connection.id)
 
   const info = React.useMemo(() => {
     if (data == null) {
       return []
     }
-    // console.log(data)
-    // return []
     return data?.split('#').filter(v => v !== '').map(v => {
       const info = v.split('\r\n')
       return {

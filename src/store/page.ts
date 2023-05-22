@@ -3,8 +3,8 @@ import type React from 'react'
 
 export interface Page {
   label: string
-  children: React.ReactNode
   key: string
+  children: React.ReactNode
 }
 
 class PageStore {
@@ -22,6 +22,14 @@ class PageStore {
     const index = this.pages.findIndex(v => v.key === key)
     if (index > -1) {
       this.pages.splice(index, 1)
+      this.pages = [...this.pages]
+      if (key === this.active) {
+        if (this.pages.length >= index + 1) {
+          this.active = this.pages[index].key
+        } else if (this.pages.length > 0) {
+          this.active = this.pages[this.pages.length - 1].key
+        }
+      }
     }
   }
 

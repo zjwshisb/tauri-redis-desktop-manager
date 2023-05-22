@@ -24,18 +24,18 @@ const Index: React.FC<{
   const [databaseSize, setDatabaseSize] = React.useState(0)
 
   const isOpen = React.useMemo(() => {
-    return !!store.connection.openIds[connection.id]
+    return store.connection.openIds[connection.id] === true
   }, [connection.id, store.connection.openIds])
 
   const icon = React.useMemo(() => {
     if (isOpen) {
       if (collapse) {
-        return <DownOutlined className='text-sm' />
+        return <DownOutlined className='text-sm mr-1' />
       } else {
-        return <RightOutlined className='text-sm'/>
+        return <RightOutlined className='text-sm mr-1'/>
       }
     } else {
-      return <DisconnectOutlined className='text-sm'/>
+      return <DisconnectOutlined className='text-sm mr-1'/>
     }
   }, [collapse, isOpen])
 
@@ -64,59 +64,56 @@ const Index: React.FC<{
   }, [collapse, databaseSize, isOpen])
 
   return <div className={'my-1 px-2 box-border'}>
-        <div className={'flex justify-between rounded hover:bg-sky-50 hover:cursor-pointer'} onClick={onItemClick}>
-            <div className={'flex'}>
-                {icon}
-                <div>
-                  {connection.host}:{connection.port}
-                </div>
-            </div>
-            <div className={''}>
-                <DeleteOutlined className={''} onClick={(e) => {
-                  e.stopPropagation()
-                  onDeleteClick(connection)
-                }}
-                />
-            </div>
-        </div>
-        <div className={classnames(['overflow-hidden transition-all'])} style={{
-          height
-        }}>
-            <div className={'h-[22px] flex items-center px-2 rounded'} onClick={() => {
-              request<string>('server/info', connection.id, {
-              }).then((res) => {
+          <div className={'flex justify-between rounded hover:bg-gray-100 hover:cursor-pointer'} onClick={onItemClick}>
+              <div className={'flex'}>
+                  {icon}
+                  <div>
+                    {connection.host}:{connection.port}
+                  </div>
+              </div>
+              <div className={''}>
+                  <DeleteOutlined className={''} onClick={(e) => {
+                    e.stopPropagation()
+                    onDeleteClick(connection)
+                  }}
+                  />
+              </div>
+          </div>
+          <div className={classnames(['overflow-hidden transition-all'])} style={{
+            height
+          }}>
+              <div className={'h-[22px] flex items-center px-2 rounded hover:cursor-pointer hover:bg-gray-100'} onClick={() => {
                 store.page.addPage({
                   label: 'info',
                   key: '1',
-                  children: <Info content={res.data}></Info>
+                  children: <Info connection={connection}></Info>
                 })
-              })
-            }}>
-                <SettingOutlined className={'mr-1 text-sm'}></SettingOutlined>
-                <div>info</div>
-            </div>
-            {
-                db.map((v, index) => {
-                  const key = connection.host + index.toString()
-                  const active = store.db.db.findIndex(v => {
-                    return v.connection.id === connection.id && v.db === index
+              }}>
+                  <SettingOutlined className={'mr-1 text-sm'}></SettingOutlined>
+                  <div>info</div>
+              </div>
+              {
+                  db.map((v, index) => {
+                    const key = connection.host + index.toString()
+                    const active = store.db.db.findIndex(v => {
+                      return v.connection.id === connection.id && v.db === index
+                    })
+                    return <div
+                      key ={key}
+                      onClick={() => {
+                        if (active > -1) {
+                          store.db.remove(key)
+                        } else {
+                          store.db.add(connection, index)
+                        }
+                      }}
+                      className={classnames(['h-[22px] flex items-center px-2 rounded hover:cursor-pointer', active > -1 ? 'bg-sky-200' : ' hover:bg-gray-100'])} >
+                      <DatabaseOutlined className={'mr-1 text-sm'}></DatabaseOutlined>
+                      <div>{index}</div>
+                  </div>
                   })
-                  return <div
-                    key ={key}
-                    onClick={() => {
-                      if (active > -1) {
-                        store.db.remove(key)
-                      } else {
-                        store.db.add(connection, index)
-                      }
-                    }}
-                    className={classnames(['h-[22px] flex items-center px-2 rounded', active > -1 ? 'bg-sky-200' : ''])} >
-                    <DatabaseOutlined className={'mr-1 text-sm'}></DatabaseOutlined>
-                    <div>{index}</div>
-                </div>
-                })
-            }
-        </div>
+              }
+          </div>
     </div>
 }
 export default observer(Index)

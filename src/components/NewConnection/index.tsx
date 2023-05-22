@@ -25,7 +25,7 @@ const Index: React.FC<{
             }}>cancel</Button>
             <Button onClick={() => {
               form.validateFields().then(v => {
-                request<string>('server/ping', v).then(res => {
+                request<string>('server/ping', 0, v).then(res => {
                   if (res.data === 'PONG') {
                     message.success('connect success').then(() => {})
                   }
@@ -36,7 +36,7 @@ const Index: React.FC<{
             }}>test</Button>
             <Button type="primary" onClick={() => {
               form.validateFields().then(v => {
-                request('connections/add', v).then(r => {
+                request('connections/add', 0, v).then(r => {
                   message.success('操作成功')
                   props.onSuccess()
                   setVisible(false)
@@ -56,11 +56,6 @@ const Index: React.FC<{
               port: 6379,
               host: '127.0.0.1',
               auth: ''
-            }}
-            onFinish={e => {
-              form.validateFields().then(() => {
-                console.log(e)
-              })
             }}>
             <Form.Item name="host" label="host" rules={[{ required: true }]}>
                 <Input></Input>
