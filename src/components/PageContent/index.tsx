@@ -8,7 +8,7 @@ import FieldView from '../FieldView'
 const Index: React.FC = () => {
   const store = useStore()
 
-  return <div className={'flex-1 h-screen bg-white p-2 pb-20 box-border overflow-x-auto'}>
+  return <div className={'flex-1 h-screen bg-white p-2 pb-20 box-border overflow-x-hidden'}>
     <FieldView />
    <Setting />
    <Tabs

@@ -35,11 +35,17 @@ pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>
         "key/hash/hdel" => {
             Response::new(hash::hdel(payload, cid)?)
         }
+        "key/rename" => {
+            Response::new(key::rename(payload, cid)?)
+        }
         "key/del" => {
             Response::new(key::del(payload, cid)?)
         }
         "key/get" => {
             Response::new(key::get(payload, cid)?)
+        }
+        "key/expire"=> {
+            Response::new(key::expire(payload, cid)?)
         }
         "config/databases" => {
             Response::new(config::get_database(cid)?)

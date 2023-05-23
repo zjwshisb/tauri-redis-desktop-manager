@@ -10,6 +10,7 @@ declare namespace APP {
     name: string
     types: T
     ttl: number
+    memory: number
     data: V
     db: number
     connection_id: number

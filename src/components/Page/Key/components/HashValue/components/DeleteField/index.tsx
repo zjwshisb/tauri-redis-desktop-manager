@@ -9,23 +9,21 @@ const Index: React.FC<{
   field: APP.Field
   onSuccess: (f: APP.Field) => void
 }> = ({ field, keys, onSuccess }) => {
-  return <DeleteOutlined
-    style={actionIconStyle}
-   className='hover:cursor-pointer' key={'delete'} onClick={() => {
-     Modal.confirm({
-       title: 'notice',
-       content: `confirm delete <${field.name}>?`,
-       onOk () {
-         return request('key/hash/hdel', keys.connection_id, {
-           name: keys.name,
-           fields: [field.name],
-           db: keys.db
-         }).then(() => {
-           message.success('success')
-           onSuccess(field)
-         })
-       }
-     })
-   }} />
+  return <DeleteOutlined className='hover:cursor-pointer' style={actionIconStyle} key={'delete'} onClick={() => {
+    Modal.confirm({
+      title: 'notice',
+      content: `confirm delete <${field.name}>?`,
+      onOk () {
+        return request('key/hash/hdel', keys.connection_id, {
+          name: keys.name,
+          fields: [field.name],
+          db: keys.db
+        }).then(() => {
+          message.success('success')
+          onSuccess(field)
+        })
+      }
+    })
+  }} />
 }
 export default Index

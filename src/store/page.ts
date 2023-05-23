@@ -33,6 +33,17 @@ class PageStore {
     }
   }
 
+  updatePage (key: string, page: Page) {
+    const index = this.pages.findIndex(v => v.key === key)
+    if (index > -1) {
+      this.pages[index] = page
+      this.pages = [...this.pages]
+      if (this.active === key) {
+        this.active = page.key
+      }
+    }
+  }
+
   addPage (page: Page) {
     const exist = this.pages.find(v => v.key === page.key)
     if (exist != null) {

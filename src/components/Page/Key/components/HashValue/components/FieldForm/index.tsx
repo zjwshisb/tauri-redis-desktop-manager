@@ -1,14 +1,12 @@
 import { Form, Input, Modal, message } from 'antd'
 import React from 'react'
-import { EditOutlined } from '@ant-design/icons'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
-import { blue } from '@ant-design/colors'
-import { actionIconStyle } from '@/utils/styles'
 
 const Index: React.FC<{
   keys: APP.HashKey
-  field: APP.Field
+  field?: APP.Field
+  trigger: React.ReactElement
   onSuccess: (newField: APP.Field) => void
 }> = (props) => {
   const [open, setOpen] = React.useState(false)
@@ -17,12 +15,20 @@ const Index: React.FC<{
 
   const [loading, setLoading] = React.useState(false)
 
+  const title = React.useMemo(() => {
+    return (props.field != null) ? 'edit field' : 'add field'
+  }, [props.field])
+
+  const trigger = React.cloneElement(props.trigger, {
+    onClick () {
+      setOpen(true)
+    }
+  })
+
   return <>
-      <EditOutlined
-       style={actionIconStyle}
-       className='hover:cursor-pointer blue-6' key={'edit'} onClick={() => {
-         setOpen(true)
-       }} />
+      {
+        trigger
+      }
       <Modal
       confirmLoading={loading}
       onOk={() => {
@@ -40,16 +46,18 @@ const Index: React.FC<{
           setLoading(false)
         })
       }}
-       open={open} title={'edit'} onCancel={() => {
-         setOpen(false)
-       }}>
+       open={open} title={title}
+        onCancel={() => {
+          setOpen(false)
+          form.resetFields()
+        }}>
         <Form
           form={form}
         layout='vertical' initialValues={{
           ...props.field
         }}>
           <Form.Item name={'name'} label={'name'}>
-            <Input readOnly></Input>
+            <Input readOnly={!(props.field == null)}></Input>
           </Form.Item>
           <Form.Item name={'value'} label={'value'}>
             <Input.TextArea rows={20}></Input.TextArea>

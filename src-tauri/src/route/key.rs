@@ -37,7 +37,7 @@ pub struct Key {
     data: CusRedisValue,
     connection_id: u32,
     db: u8,
-    memory: u64,
+    memory: i64,
 }
 impl Key {
     fn new(name: String, db: u8, cid: u32, conn: &mut redis::Connection) -> Result<Key, RedisError> {
@@ -59,7 +59,10 @@ impl Key {
             if let Value::Int(ttl) = ttl_value {
                 key.ttl = ttl
             }
-            let memory_value: Value = cmd("MEMORY USAGE").arg(&key.name).query(conn)?;
+            let memory_value: Value = cmd("memory").arg("usage")
+            .arg(&key.name)
+            .arg(&["SAMPLES", "0"]) 
+            .query(conn)?;
             if let Value::Int(memory) = memory_value {
                 key.memory = memory
             }
@@ -148,6 +151,9 @@ pub fn get(payload : &str, cid: u32) -> Result<Key, CusError>{
     let mut conn: redis::Connection = redis_conn::get_connection(cid, args.db)?;
     let _ : redis::Value = redis::cmd("select").arg(args.db).query(&mut conn)?;
     let mut key: Key = Key::new(args.name, args.db, cid , &mut conn)?;
+    if key.is_none() {
+        return Err(CusError::App(format!("{} is not exist", &key.name)));
+    } 
     match &key.types[..] {
         "hash" => {
         }
@@ -156,11 +162,7 @@ pub fn get(payload : &str, cid: u32) -> Result<Key, CusError>{
         }
         _ => ()
     }
-    if key.is_none() {
-        Err(CusError::App("key not exist".into()))
-    } else {
-        Ok(key)
-    }
+    Ok(key)
 }
 
 #[derive(Deserialize)]
@@ -174,6 +176,52 @@ pub fn del(payload : &str, cid: u32) ->Result<i64, CusError> {
     let value : Value = redis::cmd("del").arg(&args.names).query(&mut conn)?;
     if let Value::Int(c) = value {
         return Ok(c);
+    }
+    Err(CusError::App(String::from("something go wrong")))
+}
+#[derive(Deserialize)]
+struct  ExpireArgs {
+    name: String,
+    ttl: i64,
+    db: u8
+}
+pub fn expire(payload : &str, cid: u32) ->Result<i64, CusError> {
+    let args: ExpireArgs = serde_json::from_str(&payload)?;
+    let mut conn: redis::Connection = redis_conn::get_connection(cid, args.db)?;
+    let value : Value = redis::cmd("expire")
+    .arg(&args.name)
+    .arg(args.ttl)
+    .query(&mut conn)?;
+    if let Value::Int(r) = value {
+        match r {
+           1 => {
+            return Ok(r);
+           }
+           0 => {
+            return Err(CusError::App(String::from("invalid args")));
+           }
+           _ => {}
+        }
+    }
+    Err(CusError::App(String::from("something go wrong")))
+}
+
+#[derive(Deserialize)]
+struct RenameArgs {
+    name: String,
+    new_name: String,
+    db: u8
+}
+
+pub fn rename(payload : &str, cid: u32) ->Result<String, CusError> {
+    let args: RenameArgs = serde_json::from_str(&payload)?;
+    let mut conn: redis::Connection = redis_conn::get_connection(cid, args.db)?;
+    let value : Value = redis::cmd("rename")
+    .arg(&args.name)
+    .arg(&args.new_name)
+    .query(&mut conn)?;
+    if let Value::Okay = value {
+       return Ok(String::from("OK"));
     }
     Err(CusError::App(String::from("something go wrong")))
 }

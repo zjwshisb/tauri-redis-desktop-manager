@@ -1,9 +1,9 @@
 import React from 'react'
 import request from '@/utils/request'
 import { Button, Space, Table, Tooltip } from 'antd'
-import { EyeOutlined } from '@ant-design/icons'
+import { EyeOutlined, EditOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
-import EditField from './components/EditField'
+import FieldForm from './components/FieldForm'
 import DeleteField from './components/DeleteField'
 import { actionIconStyle } from '@/utils/styles'
 
@@ -44,13 +44,25 @@ const Index: React.FC<{
   }, [getFields])
 
   return <div>
+    <div>
+      <FieldForm
+        keys={keys}
+        onSuccess={(f) => {
+          setFields(p => {
+            return [...p].concat([f])
+          })
+        }}
+        trigger={
+        <Button type='primary' className='mb-4'>new </Button>
+      } />
+    </div>
     <Table
       pagination={false}
       className='w-100'
       scroll={{
         x: 'auto'
       }}
-      key={'name'}
+      rowKey={'name'}
       dataSource={fields} bordered columns={[
         {
           title: '#',
@@ -78,14 +90,16 @@ const Index: React.FC<{
           fixed: 'right',
           render (_, record, index) {
             return <Space>
-              <EditField keys={keys} field={record} onSuccess={f => {
-                setFields(prev => {
-                  const newFields = [...prev]
-                  newFields[index] = f
-                  return newFields
-                })
-                console.log(f)
-              }} />
+              <FieldForm
+               trigger={<EditOutlined className='hover:cursor-pointer' style={actionIconStyle}></EditOutlined>}
+               keys={keys} field={record} onSuccess={f => {
+                 setFields(prev => {
+                   const newFields = [...prev]
+                   newFields[index] = f
+                   return newFields
+                 })
+                 console.log(f)
+               }} />
               <DeleteField keys={keys} field={record} onSuccess={() => {
                 setFields(prev => {
                   const newFields = [...prev]
