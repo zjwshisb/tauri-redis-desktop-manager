@@ -1,4 +1,4 @@
-use crate::{redis_conn, err::CusError};
+use crate::{redis_conn, err::{CusError, self}};
 use redis::{Value};
 
 
@@ -13,5 +13,5 @@ pub fn get_database(cid: u32) -> Result<String, CusError> {
            }
         }
     }
-    Err(CusError::App("error".into()))
+    Err(err::new_normal())
 }

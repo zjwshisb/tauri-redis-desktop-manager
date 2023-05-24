@@ -1,6 +1,11 @@
-use std::fmt;
-use std::fmt::Formatter;
 use thiserror;
+
+
+
+pub fn new_normal() -> CusError {
+  CusError::App("something go wrong".into())
+}
+
 
 #[derive(Debug, thiserror::Error)]
 pub enum CusError {
@@ -15,7 +20,6 @@ pub enum CusError {
   #[error("{0}")]
   App(String)
 }
-
 
 
 // we must manually implement serde::Serialize

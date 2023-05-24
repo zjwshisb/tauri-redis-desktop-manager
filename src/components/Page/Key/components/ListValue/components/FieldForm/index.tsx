@@ -1,18 +1,23 @@
-import { Form, InputNumber, Modal, message } from 'antd'
+import { Form, Input, Modal, message } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 
 const Index: React.FC<{
-  keys: APP.Key
+  keys: APP.HashKey
+  field?: APP.Field
   trigger: React.ReactElement
-  onSuccess: (ttl: number) => void
+  onSuccess: (newField: APP.Field) => void
 }> = (props) => {
   const [open, setOpen] = React.useState(false)
 
   const [form] = useForm(undefined)
 
   const [loading, setLoading] = React.useState(false)
+
+  const title = React.useMemo(() => {
+    return (props.field != null) ? 'edit field' : 'add field'
+  }, [props.field])
 
   const trigger = React.cloneElement(props.trigger, {
     onClick () {
@@ -26,33 +31,36 @@ const Index: React.FC<{
       }
       <Modal
       confirmLoading={loading}
-      onOk={() => {
+      onOk={async () => {
         setLoading(true)
-        const ttl: number = form.getFieldValue('ttl')
-        request<number>('key/expire', props.keys.connection_id, {
+        await request<number>('key/hash/hset', props.keys.connection_id, {
           name: props.keys.name,
-          ttl,
+          field: form.getFieldValue('name'),
+          value: form.getFieldValue('value'),
           db: props.keys.db
         }).then(() => {
           message.success('success')
-          props.onSuccess(ttl)
+          props.onSuccess(form.getFieldsValue())
           setOpen(false)
         }).finally(() => {
           setLoading(false)
         })
       }}
-       open={open} title={'EXPIRE'}
+       open={open} title={title}
         onCancel={() => {
           setOpen(false)
           form.resetFields()
         }}>
         <Form
           form={form}
-           initialValues={{
-             ttl: props.keys.ttl
-           }}>
-          <Form.Item name={'ttl'} label={'ttl'}>
-            <InputNumber min={-1}></InputNumber>
+        layout='vertical' initialValues={{
+          ...props.field
+        }}>
+          <Form.Item name={'name'} label={'name'}>
+            <Input readOnly={!(props.field == null)}></Input>
+          </Form.Item>
+          <Form.Item name={'value'} label={'value'}>
+            <Input.TextArea rows={20}></Input.TextArea>
           </Form.Item>
         </Form>
       </Modal>

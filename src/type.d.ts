@@ -14,6 +14,7 @@ declare namespace APP {
     data: V
     db: number
     connection_id: number
+    length: number
   }
 
   interface Field {
@@ -21,9 +22,12 @@ declare namespace APP {
     value: string
   }
 
-  type Key = StringKey | HashKey
+  type Key = StringKey | HashKey | ListKey
 
   type StringKey = BaseKey<'string', string>
 
-  type HashKey = BaseKey<'hash', string[]>
+  type HashKey = BaseKey<'hash', Field[]>
+
+  type ListKey = BaseKey<'list', string[]>
+
 }

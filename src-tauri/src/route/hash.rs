@@ -1,5 +1,6 @@
 use redis::{Value};
 use serde::{Serialize, Deserialize};
+use crate::err;
 use crate::{err::CusError, redis_conn};
 use crate::model::{Field};
 
@@ -27,7 +28,6 @@ pub fn hscan(payload : &str, cid: u32) -> Result<HScanResp, CusError> {
         let cursor_value = s.get(0).unwrap();
         let mut cursor   = String::from("0");
         let mut fields : Vec<Field>= vec![];
-        dbg!(&s);
         if let Value::Data(vv) = cursor_value {
              cursor = std::str::from_utf8(&vv).unwrap().into()
         }
@@ -61,8 +61,7 @@ pub fn hscan(payload : &str, cid: u32) -> Result<HScanResp, CusError> {
                 fields
             })
     } else {
-        Err(CusError::App(("not a hash key").into()))
-
+        Err(err::new_normal())
     }
 }
 
@@ -80,7 +79,7 @@ pub fn hset(payload: &str, cid: u32) -> Result<i64, CusError> {
     if let Value::Int(count) = value {
         return Ok(count);
     }
-    Err(CusError::App(String::from("something wrong")))
+    Err(err::new_normal())
 }
 #[derive(Deserialize)]
 struct  HDelArgs{
@@ -96,5 +95,5 @@ pub fn hdel(payload: &str, cid: u32) ->Result<i64, CusError> {
     if let Value::Int(count) = value {
         return Ok(count);
     }
-    Err(CusError::App(String::from("something wrong")))
+    Err(err::new_normal())
 }

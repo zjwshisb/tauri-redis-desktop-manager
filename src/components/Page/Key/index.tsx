@@ -2,6 +2,7 @@ import React from 'react'
 import { Button, Col, Input, Modal, Result, Row, Spin, message } from 'antd'
 import StringValue from './components/StringValue'
 import HashValue from './components/HashValue'
+import ListValue from './components/ListValue'
 import { ReloadOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import Copy from '@/components/Copy'
 import useRequest from '@/hooks/useRequest'
@@ -31,6 +32,9 @@ const Index: React.FC<{
         case 'hash': {
           return <HashValue keys={item} />
         }
+        case 'list': {
+          return <ListValue keys={item} />
+        }
       }
     }
     return <></>
@@ -40,9 +44,9 @@ const Index: React.FC<{
     if (item !== undefined) {
       Modal.confirm({
         title: 'notice',
-        content: `are sure delete key ${item.name as string}?`,
-        onOk () {
-          return request('key/del', item?.connection_id, {
+        content: `are sure delete key ${item.name}?`,
+        async onOk () {
+          await request('key/del', item?.connection_id, {
             db: item?.db,
             names: [item?.name]
           }).then(() => {
@@ -81,7 +85,7 @@ const Index: React.FC<{
             </Col>
           </Row>
           <Row gutter={20} >
-            <Col xs={24} xl={8} className='mb-2'>
+            <Col xs={24} xl={6} className='mb-2'>
               <Input addonBefore={'ttl'} value={item.ttl}
                 addonAfter={
                   <Expire keys={item}
@@ -90,10 +94,13 @@ const Index: React.FC<{
               }
               readOnly></Input>
             </Col>
-            <Col xs={24} xl={8} className='mb-2'>
+            <Col xs={24} xl={6} className='mb-2'>
               <Input addonBefore={'memory'} value={item.memory} readOnly suffix={'bytes'}></Input>
             </Col>
-            <Col xs={24} xl={8} className='mb-2'>
+            <Col xs={24} xl={6} className='mb-2'>
+              <Input addonBefore={'length'} value={item.length} readOnly></Input>
+            </Col>
+            <Col xs={24} xl={6} className='mb-2'>
               <Button className='mr-1 mb-2' icon={
                 <ReloadOutlined onClick={fetch} />
               }>

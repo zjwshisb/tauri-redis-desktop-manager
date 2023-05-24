@@ -12,6 +12,25 @@ import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import Info from '@/components/Page/Info'
+import Client from '@/components/Page/Client'
+
+const Item: React.FC<React.PropsWithChildren<{
+  onClick: () => void
+  icon: React.ReactElement
+  active: boolean
+}>> = (props) => {
+  const icon = React.cloneElement(props.icon, {
+    className: 'mr-1 text-sm'
+  })
+
+  return <div
+  className={classnames(['h-[22px] flex items-center px-2 rounded hover:cursor-pointer ',
+    props.active ? 'bg-blue-50' : 'hover:bg-gray-100'])}
+  onClick={props.onClick}>
+      {icon}
+      <div>{props.children}</div>
+  </div>
+}
 
 const Index: React.FC<{
   connection: APP.Connection
@@ -24,7 +43,7 @@ const Index: React.FC<{
   const [databaseSize, setDatabaseSize] = React.useState(0)
 
   const isOpen = React.useMemo(() => {
-    return store.connection.openIds[connection.id] === true
+    return store.connection.openIds[connection.id]
   }, [connection.id, store.connection.openIds])
 
   const icon = React.useMemo(() => {
@@ -57,7 +76,7 @@ const Index: React.FC<{
 
   const height = React.useMemo(() => {
     if (isOpen && collapse) {
-      return (22 * (databaseSize + 1)).toString() + 'px'
+      return (22 * (databaseSize + 2)).toString() + 'px'
     } else {
       return 0
     }
@@ -82,35 +101,48 @@ const Index: React.FC<{
           <div className={classnames(['overflow-hidden transition-all'])} style={{
             height
           }}>
-              <div className={'h-[22px] flex items-center px-2 rounded hover:cursor-pointer hover:bg-gray-100'} onClick={() => {
+            <Item
+              active={false}
+              icon={ <SettingOutlined ></SettingOutlined>}
+              onClick={() => {
                 store.page.addPage({
                   label: 'info',
                   key: '1',
                   children: <Info connection={connection}></Info>
                 })
-              }}>
-                  <SettingOutlined className={'mr-1 text-sm'}></SettingOutlined>
-                  <div>info</div>
-              </div>
+              }} >
+                info
+            </Item>
+            <Item
+              active={false}
+              icon={ <SettingOutlined ></SettingOutlined>}
+              onClick={() => {
+                store.page.addPage({
+                  label: 'client',
+                  key: '1',
+                  children: <Client connection={connection}></Client>
+                })
+              }} >
+                client
+            </Item>
               {
                   db.map((v, index) => {
                     const key = connection.host + index.toString()
                     const active = store.db.db.findIndex(v => {
                       return v.connection.id === connection.id && v.db === index
                     })
-                    return <div
-                      key ={key}
-                      onClick={() => {
-                        if (active > -1) {
-                          store.db.remove(key)
-                        } else {
-                          store.db.add(connection, index)
-                        }
-                      }}
-                      className={classnames(['h-[22px] flex items-center px-2 rounded hover:cursor-pointer', active > -1 ? 'bg-sky-200' : ' hover:bg-gray-100'])} >
-                      <DatabaseOutlined className={'mr-1 text-sm'}></DatabaseOutlined>
-                      <div>{index}</div>
-                  </div>
+                    return <Item
+                     active={active > -1}
+                     key={index}
+                     onClick={() => {
+                       if (active > -1) {
+                         store.db.remove(key)
+                       } else {
+                         store.db.add(connection, index)
+                       }
+                     }} icon={ <DatabaseOutlined />}>
+                      {index}
+                    </Item>
                   })
               }
           </div>

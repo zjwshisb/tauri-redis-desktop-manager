@@ -7,6 +7,8 @@ pub mod server;
 pub mod key;
 pub mod config;
 pub mod hash;
+pub mod client;
+pub mod list;
 
 #[tauri::command]
 pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>{
@@ -35,6 +37,15 @@ pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>
         "key/hash/hdel" => {
             Response::new(hash::hdel(payload, cid)?)
         }
+        "key/list/lrange" => {
+            Response::new(list::lrange(payload, cid)?)
+        }
+        "key/list/lset" => {
+            Response::new(list::lset(payload, cid)?)
+        }
+        "key/list/ltrim" => {
+            Response::new(list::ltrim(payload, cid)?)
+        }
         "key/rename" => {
             Response::new(key::rename(payload, cid)?)
         }
@@ -46,6 +57,12 @@ pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>
         }
         "key/expire"=> {
             Response::new(key::expire(payload, cid)?)
+        }
+        "client/list" => {
+            Response::new(client::list(payload, cid)?)
+        }
+        "client/kill" => {
+            Response::new(client::kill(payload, cid)?)
         }
         "config/databases" => {
             Response::new(config::get_database(cid)?)

@@ -1,6 +1,6 @@
 use redis::{Value, cmd, RedisError};
 use serde::{Serialize, Deserialize};
-use crate::{err::CusError, redis_conn};
+use crate::{err::{CusError, self}, redis_conn};
 
 
 
@@ -38,9 +38,10 @@ pub struct Key {
     connection_id: u32,
     db: u8,
     memory: i64,
+    length: i64,
 }
 impl Key {
-    fn new(name: String, db: u8, cid: u32, conn: &mut redis::Connection) -> Result<Key, RedisError> {
+    fn new(name: String, db: u8, cid: u32, conn: &mut redis::Connection) -> Result<Key, CusError> {
         let mut key: Key = Key{
             name: name,
             types: "".into(),
@@ -48,35 +49,71 @@ impl Key {
             data: CusRedisValue::NONE(), 
             connection_id: cid,
             db,
-            memory: 0
+            memory: 0,
+            length: 0
         };
         let types_value: Value =  cmd("type").arg(&key.name).query(conn)?;
         if let Value::Status(types) = types_value {
             key.types = types
         }
         if !key.is_none() {
-            let ttl_value : Value = cmd("ttl").arg(&key.name).query(conn)?;
-            if let Value::Int(ttl) = ttl_value {
-                key.ttl = ttl
-            }
-            let memory_value: Value = cmd("memory").arg("usage")
-            .arg(&key.name)
-            .arg(&["SAMPLES", "0"]) 
-            .query(conn)?;
-            if let Value::Int(memory) = memory_value {
-                key.memory = memory
-            }
+            key.get_ttl(conn)?;
+            key.get_memory(conn)?;
+            key.get_length(conn)?;
         }
         Ok(key)
     }
-    fn get_string_value(& mut self, conn: & mut redis::Connection) {
+    fn get_memory(&mut self, conn: &mut redis::Connection) -> Result<(), CusError>  {
+        let memory_value: Value = cmd("memory").arg("usage")
+        .arg(&self.name)
+        .arg(&["SAMPLES", "0"]) 
+        .query(conn)?;
+        if let Value::Int(memory) = memory_value {
+            self.memory = memory
+        }
+        Ok(())
+    }
+    fn get_ttl(&mut self, conn: &mut redis::Connection) -> Result<(), CusError> {
+        let ttl_value : Value = cmd("ttl").arg(&self.name).query(conn)?;
+        if let Value::Int(ttl) = ttl_value {
+            self.ttl = ttl
+        }
+        Ok(())
+    }
+    fn get_string_value(& mut self, conn: & mut redis::Connection)  {
         let value: redis::Value = cmd("get").arg(&self.name).query(conn).unwrap();
-        dbg!(&value);
         if let redis::Value::Data(s) = value {
             let v = std::str::from_utf8(&s).unwrap();
             dbg!(&v);
             self.data  = CusRedisValue::STRING(String::from(v));            
         }
+    }
+    fn get_length(&mut self, conn : & mut redis::Connection) -> Result<(), CusError> {
+        let cmd = match &self.types[..] {
+            "string" => {
+                "STRLEN"
+            }
+            "hash" => {
+               "HLEN"
+            }
+            "list" => {
+                "LLEN"
+            },
+            "set" => {
+                "SCARD"
+            }
+            "szet" => {
+                "ZCARD"
+            }
+            _ => ""
+        };
+        if cmd != "" {
+            let length_value: Value = redis::cmd(cmd).arg(&self.name).query(conn)?;
+            if let Value::Int(length) = length_value {
+                self.length = length
+            }
+        }
+        Ok(())
     }
     fn is_none(&self) -> bool {
         self.types == "none"
@@ -135,7 +172,7 @@ pub fn scan(payload : &str, cid: u32) -> Result<ScanResp<String>, CusError>{
             });
        }
        _ => {
-         Err(CusError::App("err".into()))
+         Err(err::new_normal())
        }
     }
 }
@@ -177,7 +214,7 @@ pub fn del(payload : &str, cid: u32) ->Result<i64, CusError> {
     if let Value::Int(c) = value {
         return Ok(c);
     }
-    Err(CusError::App(String::from("something go wrong")))
+    Err(err::new_normal())
 }
 #[derive(Deserialize)]
 struct  ExpireArgs {
@@ -203,7 +240,7 @@ pub fn expire(payload : &str, cid: u32) ->Result<i64, CusError> {
            _ => {}
         }
     }
-    Err(CusError::App(String::from("something go wrong")))
+    Err(err::new_normal())
 }
 
 #[derive(Deserialize)]
@@ -223,5 +260,5 @@ pub fn rename(payload : &str, cid: u32) ->Result<String, CusError> {
     if let Value::Okay = value {
        return Ok(String::from("OK"));
     }
-    Err(CusError::App(String::from("something go wrong")))
+    Err(err::new_normal())
 }
