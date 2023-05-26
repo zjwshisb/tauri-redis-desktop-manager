@@ -17,12 +17,17 @@ declare namespace APP {
     length: number
   }
 
-  interface Field {
+  interface HashField {
     name: string
     value: string
   }
 
-  type Key = StringKey | HashKey | ListKey
+  interface ZSetField {
+    value: string
+    score: string
+  }
+
+  type Key = StringKey | HashKey | ListKey | ZSetKey | SetKey
 
   type StringKey = BaseKey<'string', string>
 
@@ -30,4 +35,7 @@ declare namespace APP {
 
   type ListKey = BaseKey<'list', string[]>
 
+  type ZSetKey = BaseKey<'zset', ZSetField[]>
+
+  type SetKey = BaseKey<'set', string[]>
 }

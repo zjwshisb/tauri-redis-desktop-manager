@@ -23,6 +23,8 @@ module.exports = {
     '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'error'
+    'react-hooks/exhaustive-deps': 'error',
+    '@typescript-eslint/space-before-function-paren': 'off',
+    '@typescript-eslint/indent': 'off'
   }
 }

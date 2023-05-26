@@ -9,12 +9,12 @@ export interface DB {
 class DBStore {
   db: DB[] = []
   active = ''
-  constructor () {
+  constructor() {
     makeAutoObservable(this)
   }
 
-  remove (key: string) {
-    const index = this.db.findIndex(v => {
+  remove(key: string) {
+    const index = this.db.findIndex((v) => {
       return v.key === key
     })
     if (index > -1) {
@@ -23,17 +23,19 @@ class DBStore {
     this.db = [...this.db]
   }
 
-  switch (active: string) {
+  switch(active: string) {
     this.active = active
   }
 
-  add (conn: APP.Connection, db: number) {
+  add(conn: APP.Connection, db: number) {
     const key = conn.host + db.toString()
-    this.db = [{
-      db,
-      connection: conn,
-      key
-    }]
+    this.db = [
+      {
+        db,
+        connection: conn,
+        key
+      }
+    ]
     // const key = conn.host + db.toString()
     // this.active = key
     // const index = this.db.findIndex(v => {

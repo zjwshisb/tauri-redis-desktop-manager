@@ -10,7 +10,7 @@ class Store {
   db: DBStore
   fieldView: FieldView
 
-  constructor () {
+  constructor() {
     this.connection = new ConnectionStore()
     this.page = new PageStore()
     this.db = new DBStore()

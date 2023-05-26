@@ -6,9 +6,9 @@ import { actionIconStyle } from '@/utils/styles'
 
 const Index: React.FC<{
   keys: APP.Key
-  field: APP.HashField
-  onSuccess: (f: APP.HashField) => void
-}> = ({ field, keys, onSuccess }) => {
+  value: string
+  onSuccess: (f: string) => void
+}> = ({ value, keys, onSuccess }) => {
   return (
     <DeleteOutlined
       className="hover:cursor-pointer"
@@ -17,15 +17,15 @@ const Index: React.FC<{
       onClick={() => {
         Modal.confirm({
           title: 'notice',
-          content: `confirm delete <${field.name}>?`,
+          content: `confirm delete <${value}>?`,
           async onOk() {
-            await request('key/hash/hdel', keys.connection_id, {
+            await request('key/set/srem', keys.connection_id, {
               name: keys.name,
-              fields: [field.name],
+              value,
               db: keys.db
             })
             message.success('success')
-            onSuccess(field)
+            onSuccess(value)
           }
         })
       }}

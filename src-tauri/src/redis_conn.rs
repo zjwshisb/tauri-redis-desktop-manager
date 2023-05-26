@@ -1,4 +1,4 @@
-use redis::{Client, Connection};
+use redis::{Client, Connection, Commands};
 use crate::err::CusError;
 use crate::model::{Connection as Conn};
 use crate::sqlite;
@@ -21,6 +21,9 @@ pub fn get_connection(connection_id: u32, db: u8) -> Result<Connection, CusError
                 redis::cmd("auth").arg(c.auth).query::<redis::Value>(& mut connection).unwrap();
             } 
             redis::cmd("select").arg(db).query(& mut connection)?;
+            redis::cmd("CLIENT")
+            .arg("SETNAME")
+            .arg(format!("{}:{}", c.host, c.port)).query(& mut  connection)?;
             Ok(connection)
         }
         Err(_) => {

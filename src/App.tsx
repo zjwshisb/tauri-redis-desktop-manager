@@ -14,22 +14,23 @@ import KeyList from './components/KeyList'
 const App: React.FC = () => {
   const { i18n } = useTranslation()
 
-  return <ConfigProvider locale={{
-    locale: i18n.language
-  }}>
-    <StyleProvider hashPriority="high">
-      <Layout className='h-full bg-[#FFF] border-t'>
-          <Layout.Sider theme="light" width={250}>
-            <Connection/>
-          </Layout.Sider>
-          <Layout.Content className='flex'>
+  return (
+    <ConfigProvider
+      locale={{
+        locale: i18n.language
+      }}
+    >
+      <StyleProvider hashPriority="high">
+        <Layout className="h-full bg-[#FFF] border-t">
+          <Layout.Content className="flex">
+            <Connection />
             <KeyList />
             <PageContent />
           </Layout.Content>
-      </Layout>
-    </StyleProvider>
-
-  </ConfigProvider>
+        </Layout>
+      </StyleProvider>
+    </ConfigProvider>
+  )
 }
 
 export default observer(App)

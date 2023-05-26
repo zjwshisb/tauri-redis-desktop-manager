@@ -1,6 +1,7 @@
-use redis::{Value, cmd, RedisError};
+use redis::{Value, cmd, RedisError, Commands};
 use serde::{Serialize, Deserialize};
 use crate::{err::{CusError, self}, redis_conn};
+
 
 
 
@@ -74,19 +75,13 @@ impl Key {
         Ok(())
     }
     fn get_ttl(&mut self, conn: &mut redis::Connection) -> Result<(), CusError> {
-        let ttl_value : Value = cmd("ttl").arg(&self.name).query(conn)?;
-        if let Value::Int(ttl) = ttl_value {
-            self.ttl = ttl
-        }
+        self.ttl = conn.ttl(&self.name).unwrap();
         Ok(())
     }
     fn get_string_value(& mut self, conn: & mut redis::Connection)  {
-        let value: redis::Value = cmd("get").arg(&self.name).query(conn).unwrap();
-        if let redis::Value::Data(s) = value {
-            let v = std::str::from_utf8(&s).unwrap();
-            dbg!(&v);
-            self.data  = CusRedisValue::STRING(String::from(v));            
-        }
+        let s: Vec<u8> = conn.get(&self.name).unwrap();
+        let v = std::str::from_utf8(&s).unwrap();
+        self.data  = CusRedisValue::STRING(String::from(v));    
     }
     fn get_length(&mut self, conn : & mut redis::Connection) -> Result<(), CusError> {
         let cmd = match &self.types[..] {
@@ -102,7 +97,7 @@ impl Key {
             "set" => {
                 "SCARD"
             }
-            "szet" => {
+            "zset" => {
                 "ZCARD"
             }
             _ => ""

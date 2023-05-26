@@ -19,7 +19,6 @@ pub struct HScanResp {
 pub fn hscan(payload : &str, cid: u32) -> Result<HScanResp, CusError> {
     let args: HScanArgs = serde_json::from_str(&payload)?;
     let mut connection = redis_conn::get_connection(cid, args.db)?;
-    let _ : Value = redis::cmd("select").arg(args.db).query(&mut connection)?;
     let value: Value = redis::cmd("hscan")
     .arg(args.name).arg(args.cursor)
     .arg(&["COUNT", "100"])
@@ -57,7 +56,7 @@ pub fn hscan(payload : &str, cid: u32) -> Result<HScanResp, CusError> {
                 };
             };
             Ok(HScanResp{
-                cursor, 
+                cursor,     
                 fields
             })
     } else {

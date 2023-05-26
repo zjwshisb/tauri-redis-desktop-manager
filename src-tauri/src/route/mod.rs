@@ -9,6 +9,9 @@ pub mod config;
 pub mod hash;
 pub mod client;
 pub mod list;
+pub mod zset;
+pub mod set;
+pub mod db;
 
 #[tauri::command]
 pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>{
@@ -46,6 +49,24 @@ pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>
         "key/list/ltrim" => {
             Response::new(list::ltrim(payload, cid)?)
         }
+        "key/list/linsert" => {
+            Response::new(list::linsert(payload, cid)?)
+        }
+        "key/zset/zscan" => {
+            Response::new(zset::zscan(payload, cid)?)
+        }
+        "key/zset/zrem" => {
+            Response::new(zset::zrem(payload, cid)?)
+        }
+        "key/set/sscan" => {
+            Response::new(set::sscan(payload, cid)?)
+        }
+        "key/set/sadd" => {
+            Response::new(set::sadd(payload, cid)?)
+        }
+        "key/set/srem" => {
+            Response::new(set::srem(payload, cid)?)
+        }
         "key/rename" => {
             Response::new(key::rename(payload, cid)?)
         }
@@ -57,6 +78,9 @@ pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>
         }
         "key/expire"=> {
             Response::new(key::expire(payload, cid)?)
+        }
+        "db/dbsize" => {
+            Response::new(db::dbsize(payload, cid)?)
         }
         "client/list" => {
             Response::new(client::list(payload, cid)?)

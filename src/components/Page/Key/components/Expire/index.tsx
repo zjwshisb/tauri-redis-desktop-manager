@@ -15,47 +15,52 @@ const Index: React.FC<{
   const [loading, setLoading] = React.useState(false)
 
   const trigger = React.cloneElement(props.trigger, {
-    onClick () {
+    onClick() {
       setOpen(true)
     }
   })
 
-  return <>
-      {
-        trigger
-      }
+  return (
+    <>
+      {trigger}
       <Modal
-      confirmLoading={loading}
-      onOk={() => {
-        setLoading(true)
-        const ttl: number = form.getFieldValue('ttl')
-        request<number>('key/expire', props.keys.connection_id, {
-          name: props.keys.name,
-          ttl,
-          db: props.keys.db
-        }).then(() => {
-          message.success('success')
-          props.onSuccess(ttl)
-          setOpen(false)
-        }).finally(() => {
-          setLoading(false)
-        })
-      }}
-       open={open} title={'EXPIRE'}
+        confirmLoading={loading}
+        onOk={() => {
+          setLoading(true)
+          const ttl: number = form.getFieldValue('ttl')
+          request<number>('key/expire', props.keys.connection_id, {
+            name: props.keys.name,
+            ttl,
+            db: props.keys.db
+          })
+            .then(() => {
+              message.success('success')
+              props.onSuccess(ttl)
+              setOpen(false)
+            })
+            .finally(() => {
+              setLoading(false)
+            })
+        }}
+        open={open}
+        title={'EXPIRE'}
         onCancel={() => {
           setOpen(false)
           form.resetFields()
-        }}>
+        }}
+      >
         <Form
           form={form}
-           initialValues={{
-             ttl: props.keys.ttl
-           }}>
+          initialValues={{
+            ttl: props.keys.ttl
+          }}
+        >
           <Form.Item name={'ttl'} label={'ttl'}>
             <InputNumber min={-1}></InputNumber>
           </Form.Item>
         </Form>
       </Modal>
     </>
+  )
 }
 export default Index

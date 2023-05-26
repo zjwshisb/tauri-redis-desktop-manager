@@ -4,8 +4,17 @@ import { message } from 'antd'
 export interface Response<T> {
   data: T
 }
-export default async function request<T> (path: string, cid: number | null = 0, args: Record<string, any> = {}): Promise<Response<T>> {
+export default async function request<T>(
+  path: string,
+  cid: number | null = 0,
+  args: Record<string, any> = {}
+): Promise<Response<T>> {
   try {
+    console.log({
+      path,
+      cid,
+      payload: JSON.stringify(args)
+    })
     const res = await invoke('dispatch', {
       path,
       cid,
@@ -16,6 +25,6 @@ export default async function request<T> (path: string, cid: number | null = 0, 
     return data as Response<T>
   } catch (err) {
     message.error(err as string)
-    throw (err)
+    throw err
   }
-};
+}

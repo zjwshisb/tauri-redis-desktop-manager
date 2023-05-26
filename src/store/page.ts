@@ -10,16 +10,16 @@ export interface Page {
 class PageStore {
   pages: Page[] = []
   active: string = ''
-  constructor () {
+  constructor() {
     makeAutoObservable(this)
   }
 
-  switch (active: string) {
+  switch(active: string) {
     this.active = active
   }
 
-  removePage (key: string) {
-    const index = this.pages.findIndex(v => v.key === key)
+  removePage(key: string) {
+    const index = this.pages.findIndex((v) => v.key === key)
     if (index > -1) {
       this.pages.splice(index, 1)
       this.pages = [...this.pages]
@@ -33,8 +33,8 @@ class PageStore {
     }
   }
 
-  updatePage (key: string, page: Page) {
-    const index = this.pages.findIndex(v => v.key === key)
+  updatePage(key: string, page: Page) {
+    const index = this.pages.findIndex((v) => v.key === key)
     if (index > -1) {
       this.pages[index] = page
       this.pages = [...this.pages]
@@ -44,8 +44,8 @@ class PageStore {
     }
   }
 
-  addPage (page: Page) {
-    const exist = this.pages.find(v => v.key === page.key)
+  addPage(page: Page) {
+    const exist = this.pages.find((v) => v.key === page.key)
     if (exist != null) {
       this.active = exist.key
     } else {

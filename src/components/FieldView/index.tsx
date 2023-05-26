@@ -26,26 +26,30 @@ const Index: React.FC = () => {
     console.log(isJson)
   }, [isJson])
 
-  return <Modal
-     width={'800px'}
-     bodyStyle={{
-       overflow: 'auto',
-       overflowY: 'auto',
-       height: 800
-     }}
-    footer={false}
-    title={store.fieldView.args?.title}
-    open={store.fieldView.active} onCancel={() => {
-      store.fieldView.hidden()
-    }}>
-    {
-        isJson !== false && <ReactJson
-        name={null}
-        src={isJson}
-         collapsed={false}
-         collapseStringsAfterLength={false}></ReactJson>
-    }
-
+  return (
+    <Modal
+      width={'800px'}
+      bodyStyle={{
+        overflow: 'auto',
+        overflowY: 'auto',
+        height: 800
+      }}
+      footer={false}
+      title={store.fieldView.args?.title}
+      open={store.fieldView.active}
+      onCancel={() => {
+        store.fieldView.hidden()
+      }}
+    >
+      {isJson !== false && (
+        <ReactJson
+          name={null}
+          src={isJson}
+          collapsed={false}
+          collapseStringsAfterLength={false}
+        ></ReactJson>
+      )}
     </Modal>
+  )
 }
 export default observer(Index)

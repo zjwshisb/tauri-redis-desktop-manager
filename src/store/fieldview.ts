@@ -8,16 +8,16 @@ interface FieldViewArgs {
 class FieldView {
   args: FieldViewArgs | null = null
   active: boolean = false
-  constructor () {
+  constructor() {
     makeAutoObservable(this)
   }
 
-  show (args: FieldViewArgs) {
+  show(args: FieldViewArgs) {
     this.args = args
     this.active = true
   }
 
-  hidden () {
+  hidden() {
     this.active = false
   }
 }

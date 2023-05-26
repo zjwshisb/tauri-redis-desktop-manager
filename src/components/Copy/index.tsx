@@ -11,15 +11,20 @@ const Index: React.FC<{
   if (showSuccess) {
     return <CheckOutlined style={{ color: green.primary }} />
   }
-  return <CopyToClipboard text={content} onCopy={(e, r: boolean) => {
-    if (r) {
-      setShowSuccess(true)
-      setTimeout(() => {
-        setShowSuccess(false)
-      }, 2000)
-    }
-  }}>
-       <CopyOutlined/>
+  return (
+    <CopyToClipboard
+      text={content}
+      onCopy={(e, r: boolean) => {
+        if (r) {
+          setShowSuccess(true)
+          setTimeout(() => {
+            setShowSuccess(false)
+          }, 2000)
+        }
+      }}
+    >
+      <CopyOutlined />
     </CopyToClipboard>
+  )
 }
 export default Index

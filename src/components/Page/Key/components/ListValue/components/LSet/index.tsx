@@ -1,13 +1,15 @@
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input, Modal, message, InputNumber } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
+import { EditOutlined } from '@ant-design/icons'
+import { actionIconStyle } from '@/utils/styles'
 
 const Index: React.FC<{
-  keys: APP.HashKey
-  field?: APP.Field
-  trigger: React.ReactElement
-  onSuccess: (newField: APP.Field) => void
+  keys: APP.ListKey
+  index: number
+  value: string
+  onSuccess: (value: string, index: number) => void
 }> = (props) => {
   const [open, setOpen] = React.useState(false)
 
@@ -15,32 +17,28 @@ const Index: React.FC<{
 
   const [loading, setLoading] = React.useState(false)
 
-  const title = React.useMemo(() => {
-    return props.field != null ? 'edit field' : 'add field'
-  }, [props.field])
-
-  const trigger = React.cloneElement(props.trigger, {
-    onClick() {
-      setOpen(true)
-    }
-  })
-
   return (
     <>
-      {trigger}
+      <EditOutlined
+        style={actionIconStyle}
+        className="hover:cursor-pointer"
+        onClick={() => {
+          setOpen(true)
+        }}
+      />
       <Modal
         confirmLoading={loading}
-        onOk={() => {
+        onOk={async () => {
           setLoading(true)
-          return request<number>('key/hash/hset', props.keys.connection_id, {
+          const formData = form.getFieldsValue()
+          await request<number>('key/list/lset', props.keys.connection_id, {
             name: props.keys.name,
-            field: form.getFieldValue('name'),
-            value: form.getFieldValue('value'),
-            db: props.keys.db
+            db: props.keys.db,
+            ...formData
           })
             .then(() => {
               message.success('success')
-              props.onSuccess(form.getFieldsValue())
+              props.onSuccess(formData.value, formData.index)
               setOpen(false)
             })
             .finally(() => {
@@ -48,7 +46,7 @@ const Index: React.FC<{
             })
         }}
         open={open}
-        title={title}
+        title={'LSET'}
         onCancel={() => {
           setOpen(false)
           form.resetFields()
@@ -58,11 +56,12 @@ const Index: React.FC<{
           form={form}
           layout="vertical"
           initialValues={{
-            ...props.field
+            index: props.index,
+            value: props.value
           }}
         >
-          <Form.Item name={'name'} label={'name'}>
-            <Input readOnly={!(props.field == null)}></Input>
+          <Form.Item name={'index'} label={'index'}>
+            <InputNumber readOnly></InputNumber>
           </Form.Item>
           <Form.Item name={'value'} label={'value'}>
             <Input.TextArea rows={20}></Input.TextArea>
