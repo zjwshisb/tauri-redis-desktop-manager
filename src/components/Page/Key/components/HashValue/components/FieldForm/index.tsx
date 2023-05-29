@@ -2,12 +2,13 @@ import { Form, Input, Modal, message } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
+import { useTranslation } from 'react-i18next'
 
 const Index: React.FC<{
   keys: APP.HashKey
-  field?: APP.Field
+  field?: APP.HashField
   trigger: React.ReactElement
-  onSuccess: (newField: APP.Field) => void
+  onSuccess: (newField: APP.HashField) => void
 }> = (props) => {
   const [open, setOpen] = React.useState(false)
 
@@ -15,9 +16,15 @@ const Index: React.FC<{
 
   const [loading, setLoading] = React.useState(false)
 
-  const title = React.useMemo(() => {
-    return props.field != null ? 'edit field' : 'add field'
+  const { t } = useTranslation()
+
+  const isEdit = React.useMemo(() => {
+    return props.field !== undefined
   }, [props.field])
+
+  const title = React.useMemo(() => {
+    return isEdit ? t('Edit Field') : 'Add Field'
+  }, [isEdit, t])
 
   const trigger = React.cloneElement(props.trigger, {
     onClick() {
@@ -30,9 +37,9 @@ const Index: React.FC<{
       {trigger}
       <Modal
         confirmLoading={loading}
-        onOk={() => {
+        onOk={async () => {
           setLoading(true)
-          return request<number>('key/hash/hset', props.keys.connection_id, {
+          await request<number>('key/hash/hset', props.keys.connection_id, {
             name: props.keys.name,
             field: form.getFieldValue('name'),
             value: form.getFieldValue('value'),
@@ -61,10 +68,18 @@ const Index: React.FC<{
             ...props.field
           }}
         >
-          <Form.Item name={'name'} label={'name'}>
-            <Input readOnly={!(props.field == null)}></Input>
+          <Form.Item
+            name={'name'}
+            label={t('Field Name')}
+            rules={[{ required: true }]}
+          >
+            <Input readOnly={isEdit}></Input>
           </Form.Item>
-          <Form.Item name={'value'} label={'value'}>
+          <Form.Item
+            name={'value'}
+            label={t('Field Value')}
+            rules={[{ required: true }]}
+          >
             <Input.TextArea rows={20}></Input.TextArea>
           </Form.Item>
         </Form>

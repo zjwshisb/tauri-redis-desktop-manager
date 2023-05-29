@@ -12,6 +12,7 @@ import request from '@/utils/request'
 import useStore from '@/hooks/useStore'
 import Expire from './components/Expire'
 import Rename from './components/Rename'
+import { useTranslation } from 'react-i18next'
 const Index: React.FC<{
   name: string
   connection: APP.Connection
@@ -29,6 +30,8 @@ const Index: React.FC<{
   })
 
   const store = useStore()
+
+  const { t } = useTranslation()
 
   const value = React.useMemo(() => {
     if (item !== undefined) {
@@ -83,7 +86,10 @@ const Index: React.FC<{
             <Row>
               <Col span={24} className="mb-2">
                 <Input
-                  addonBefore={item.types}
+                  addonBefore={t(
+                    item.types.slice(0, 1).toUpperCase() +
+                      item.types.slice(1).toLowerCase()
+                  )}
                   value={item.name}
                   readOnly
                   addonAfter={
@@ -112,7 +118,7 @@ const Index: React.FC<{
             <Row gutter={20}>
               <Col xs={24} xl={6} className="mb-2">
                 <Input
-                  addonBefore={'ttl'}
+                  addonBefore={t('TTL')}
                   value={item.ttl}
                   addonAfter={
                     <Expire
@@ -126,7 +132,7 @@ const Index: React.FC<{
               </Col>
               <Col xs={24} xl={6} className="mb-2">
                 <Input
-                  addonBefore={'memory'}
+                  addonBefore={t('Memory')}
                   value={item.memory}
                   readOnly
                   suffix={'bytes'}
@@ -134,7 +140,7 @@ const Index: React.FC<{
               </Col>
               <Col xs={24} xl={6} className="mb-2">
                 <Input
-                  addonBefore={'length'}
+                  addonBefore={t('Length')}
                   value={item.length}
                   readOnly
                 ></Input>

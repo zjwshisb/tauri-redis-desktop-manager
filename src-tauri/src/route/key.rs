@@ -257,3 +257,36 @@ pub fn rename(payload : &str, cid: u32) ->Result<String, CusError> {
     }
     Err(err::new_normal())
 }
+
+#[derive(Deserialize)]
+struct AddArgs<'a> {
+    name: &'a str,
+    types: &'a str,
+    db: u8
+}
+
+pub fn add(payload: &str, cid: u32) -> Result<String, CusError> {
+    let args: AddArgs = serde_json::from_str(payload)?;
+    let mut conn: redis::Connection = redis_conn::get_connection(cid, args.db)?;
+    match args.types {
+        "string" => {
+
+        }
+        "hash" => {
+
+        }
+        "set" => {
+
+        }
+        "list" => {
+
+        }
+        "szet" => {
+            
+        }
+        _ => {
+
+        }
+    }
+    Err(err::new_normal())
+}

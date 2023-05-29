@@ -1,7 +1,11 @@
 import React from 'react'
-import { DatabaseOutlined, KeyOutlined } from '@ant-design/icons'
+import {
+  DatabaseOutlined,
+  KeyOutlined,
+  ReloadOutlined
+} from '@ant-design/icons'
 import classnames from 'classnames'
-import { Statistic } from 'antd'
+import { Spin, Statistic } from 'antd'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import { type DBType } from './index'
@@ -13,15 +17,34 @@ const Index: React.FC<{
 }> = (props) => {
   const [keyCount, setKeyCount] = React.useState(0)
 
+  const [loading, setLoading] = React.useState(false)
+
   const store = useStore()
 
   React.useEffect(() => {
+    setLoading(true)
     request<number>('db/dbsize', props.connection?.id, {
       db: props.db.db
-    }).then((res) => {
-      setKeyCount(res.data)
     })
+      .then((res) => {
+        setKeyCount(res.data)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [props.connection.id, props.db])
+
+  const child = React.useMemo(() => {
+    if (loading) {
+      return <ReloadOutlined spin />
+    }
+    return (
+      <>
+        <span className="">{keyCount}</span>
+        <KeyOutlined className="text-xs" />
+      </>
+    )
+  }, [keyCount, loading])
 
   const key = React.useMemo(() => {
     return `${props.db.db}|${props.connection.host}:${props.connection.port}`
@@ -45,13 +68,7 @@ const Index: React.FC<{
         <DatabaseOutlined className="mr-1 text-sm" />
         <div>{props.db.db}</div>
       </div>
-      <div className="flex">
-        <Statistic
-          value={keyCount}
-          valueStyle={{ fontSize: '12px' }}
-        ></Statistic>
-        <KeyOutlined className="text-xs" />
-      </div>
+      <div className="flex">{child}</div>
     </div>
   )
 }

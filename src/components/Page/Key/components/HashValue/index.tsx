@@ -6,6 +6,7 @@ import useStore from '@/hooks/useStore'
 import FieldForm from './components/FieldForm'
 import DeleteField from './components/DeleteField'
 import { actionIconStyle } from '@/utils/styles'
+import { useTranslation } from 'react-i18next'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -15,6 +16,8 @@ const Index: React.FC<{
   const [fields, setFields] = React.useState<APP.HashField[]>([])
   const cursor = React.useRef('0')
   const [more, setMore] = React.useState(true)
+
+  const { t } = useTranslation()
 
   const getFields = React.useCallback(
     (reset = false) => {
@@ -81,12 +84,12 @@ const Index: React.FC<{
           },
           {
             dataIndex: 'name',
-            title: 'key',
+            title: t('Field Name'),
             sorter: (a, b) => (a.name > b.name ? 1 : -1)
           },
           {
             dataIndex: 'value',
-            title: 'value',
+            title: t('Field Value'),
             render(_, record) {
               return <Tooltip title={_}>{_}</Tooltip>
             }
@@ -113,7 +116,6 @@ const Index: React.FC<{
                         newFields[index] = f
                         return newFields
                       })
-                      console.log(f)
                     }}
                   />
                   <DeleteField

@@ -70,6 +70,9 @@ pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>
         "key/rename" => {
             Response::new(key::rename(payload, cid)?)
         }
+        "key/add" => {
+            Response::new(key::add(payload, cid)?)
+        }
         "key/del" => {
             Response::new(key::del(payload, cid)?)
         }

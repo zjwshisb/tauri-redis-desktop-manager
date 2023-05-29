@@ -1,4 +1,20 @@
 {
   "test": "测试",
-  "success": "操作成功"
+  "success": "操作成功",
+  "New Key": "新增Key",
+  "Key Name": "键名",
+  "Key Type": "类型",
+  "Field Name": "字段名称",
+  "Field Value": "字段值",
+  "Edit Field": "编辑字段",
+  "Add Field": "新增字段",
+  "TTL" : "有效期",
+  "Memory": "内存",
+  "Length": "长度",
+  "String": "字符串",
+  "List": "数组",
+  "Hash": "哈希表",
+  "Set": "集合",
+  "Zset": "有序集合",
+  "Load More": "加载更多"
 }

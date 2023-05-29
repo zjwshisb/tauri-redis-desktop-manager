@@ -18,7 +18,7 @@ import request from '@/utils/request'
 import Info from '@/components/Page/Info'
 import Client from '@/components/Page/Client'
 import { useThrottleFn } from 'ahooks'
-import { Space, Dropdown, Typography } from 'antd'
+import { Space, Dropdown, Spin } from 'antd'
 import DBItem from './DBItem'
 
 export interface DBType {
@@ -35,6 +35,8 @@ const Index: React.FC<{
 
   const [collapse, setCollapse] = React.useState(false)
   const [databases, setDatabases] = React.useState<DBType[]>([])
+
+  const [loading, setLoading] = React.useState(false)
 
   const isOpen = React.useMemo(() => {
     return store.connection.openIds[connection.id]
@@ -53,22 +55,24 @@ const Index: React.FC<{
   }, [collapse, isOpen])
 
   const getDbs = React.useCallback(async () => {
-    await request<string>('config/databases', connection.id).then((res) => {
-      const dbs: DBType[] = []
-      for (let i = 0; i < parseInt(res.data); i++) {
-        dbs.push({
-          db: i,
-          count: 0
-        })
-      }
-      setDatabases(dbs)
-    })
+    setLoading(true)
+    const res = await request<string>('config/databases', connection.id)
+    const dbs: DBType[] = []
+    for (let i = 0; i < parseInt(res.data); i++) {
+      dbs.push({
+        db: i,
+        count: 0
+      })
+    }
+    setLoading(false)
+    setDatabases(dbs)
   }, [connection.id])
 
   const onItemClick = React.useCallback(() => {
     if (isOpen) {
       setCollapse((p) => !p)
     } else {
+      setLoading(true)
       getDbs().then(() => {
         setCollapse(true)
         store.connection.open(connection.id)
@@ -225,19 +229,21 @@ const Index: React.FC<{
           height
         }}
       >
-        {databases.map((item, index) => {
-          const active = store.db.db.findIndex((v) => {
-            return v.connection.id === connection.id && v.db === item.db
-          })
-          return (
-            <DBItem
-              db={item}
-              connection={connection}
-              active={active > -1}
-              key={index}
-            ></DBItem>
-          )
-        })}
+        <Spin spinning={loading}>
+          {databases.map((item, index) => {
+            const active = store.db.db.findIndex((v) => {
+              return v.connection.id === connection.id && v.db === item.db
+            })
+            return (
+              <DBItem
+                db={item}
+                connection={connection}
+                active={active > -1}
+                key={index}
+              ></DBItem>
+            )
+          })}
+        </Spin>
       </div>
     </div>
   )

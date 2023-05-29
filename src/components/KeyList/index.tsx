@@ -1,13 +1,25 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import request from '@/utils/request'
-import { Button, Input, Tooltip, Typography, Affix, Empty } from 'antd'
+import VirtualList from 'rc-virtual-list'
+import {
+  Button,
+  Input,
+  Tooltip,
+  Typography,
+  Empty,
+  Space,
+  Spin,
+  List
+} from 'antd'
 import { useDebounceFn } from 'ahooks'
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
+import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons'
 import { Resizable } from 're-resizable'
 import Key from '../Page/Key'
 import useStore from '@/hooks/useStore'
 import { type DB } from '@/store/db'
+import Plus from './components/Plus'
+import { useTranslation } from 'react-i18next'
 
 interface ScanResp {
   cursor: string
@@ -20,6 +32,8 @@ const Index: React.FC = () => {
   const cursor = React.useRef('0')
 
   const [keys, setKeys] = React.useState<string[]>([])
+
+  const [loading, setLoading] = React.useState(false)
 
   const search = React.useRef('')
 
@@ -37,15 +51,18 @@ const Index: React.FC = () => {
     }
   }, [store.db.db])
 
+  const { t } = useTranslation()
+
   const onSearchChange = useDebounceFn((s: string) => {
-    search.current = s
     cursor.current = '0'
+    search.current = s
     getKeys(db, true)
   })
 
   const getKeys = React.useCallback(
     (current: DB | null, reset: boolean = false) => {
       if (current !== null) {
+        setLoading(true)
         if (reset) {
           cursor.current = '0'
         }
@@ -69,7 +86,9 @@ const Index: React.FC = () => {
               })
             }
           })
-          .finally(() => {})
+          .finally(() => {
+            setLoading(false)
+          })
       }
     },
     []
@@ -83,6 +102,15 @@ const Index: React.FC = () => {
   React.useEffect(() => {
     getKeys(db, true)
   }, [getKeys, db])
+
+  const [height, setHeight] = React.useState(0)
+
+  React.useLayoutEffect(() => {
+    const container = document.getElementById(id)
+    if (container != null) {
+      setHeight(container.clientHeight - 46 - 32 - 10)
+    }
+  }, [id])
 
   return (
     <Resizable
@@ -99,79 +127,123 @@ const Index: React.FC = () => {
         height: '100%'
       }}
     >
-      <div>
-        <div
-          className="flex flex-col px-2  overflow-hidden h-[100vh] overflow-y-auto bg-white"
-          id={id}
-        >
-          <Affix
-            offsetTop={0}
-            target={() => {
-              return document.getElementById(id)
+      <div
+        className="flex flex-col h-screen overflow-hidden   bg-white"
+        id={id}
+      >
+        {/* <div className="py-2 px-2  bg-white flex item-center">
+          <Input
+            prefix={<SearchOutlined />}
+            placeholder={'search'}
+            allowClear
+            onChange={(e) => {
+              onSearchChange.run(e.target.value)
             }}
-          >
-            <div className="py-2 bg-white flex item-center">
+          />
+          <div className="flex-shrink-0 flex item-center px-2 justify-center">
+            <Space>
+              <ReloadOutlined
+                className="hover:cursor-pointer text-lg"
+                onClick={reload}
+              />
+              <Plus onSuccess={() => {}} db={db} />
+            </Space>
+          </div>
+        </div> */}
+        <List
+          bordered={false}
+          size="small"
+          loading={loading}
+          footer={
+            <Button
+              loading={loading}
+              icon={<PlusOutlined />}
+              block
+              onClick={() => {
+                getKeys(db)
+              }}
+            >
+              {t('Load More')}
+            </Button>
+          }
+          header={
+            <div className="py-2 px-2  bg-white flex item-center">
               <Input
                 prefix={<SearchOutlined />}
                 placeholder={'search'}
-                value={search.current}
                 allowClear
                 onChange={(e) => {
                   onSearchChange.run(e.target.value)
                 }}
               />
-              <div className="w-[20px] flex-shrink-0 flex item-center pl-2 justify-center">
-                <ReloadOutlined
-                  className="hover:cursor-pointer blue-sky"
-                  onClick={reload}
-                />
+              <div className="flex-shrink-0 flex item-center px-2 justify-center">
+                <Space>
+                  <ReloadOutlined
+                    className="hover:cursor-pointer text-lg"
+                    onClick={reload}
+                  />
+                  <Plus onSuccess={() => {}} db={db} />
+                </Space>
               </div>
             </div>
-          </Affix>
-          {keys.map((v) => {
-            return (
-              <Tooltip key={v} mouseEnterDelay={0.5} title={v}>
-                <Typography.Text
-                  className="flex-shrink-0 rounded hover:white hover:cursor-pointer hover:bg-sky-200"
-                  ellipsis={true}
-                  onClick={(e) => {
-                    if (db !== null) {
-                      const key = `${v}|${db.connection.host}:${db.connection.port}`
-                      store.page.addPage({
-                        key,
-                        label: key,
-                        children: (
-                          <Key
-                            name={v}
-                            db={db.db}
-                            connection={db.connection}
-                            pageKey={key}
-                          ></Key>
-                        )
-                      })
-                      e.stopPropagation()
-                    }
-                  }}
+          }
+        >
+          <VirtualList
+            data={keys}
+            itemKey={(v) => v}
+            itemHeight={47}
+            height={height}
+          >
+            {(v) => {
+              return (
+                <List.Item
+                  key={v}
+                  className="hover:white hover:cursor-pointer hover:bg-sky-200"
                 >
-                  {v}
-                </Typography.Text>
-              </Tooltip>
-            )
-          })}
-          {more && keys.length > 0 && (
-            <div className="mb-4">
-              <Button
-                block
-                onClick={() => {
-                  getKeys(db)
-                }}
-              >
-                load more
-              </Button>
-            </div>
-          )}
-          {keys.length === 0 && <Empty />}
-        </div>
+                  <Typography.Text
+                    ellipsis={true}
+                    onClick={(e) => {
+                      if (db !== null) {
+                        const key = `${v}|${db.connection.host}:${db.connection.port}`
+                        store.page.addPage({
+                          key,
+                          label: key,
+                          children: (
+                            <Key
+                              name={v}
+                              db={db.db}
+                              connection={db.connection}
+                              pageKey={key}
+                            ></Key>
+                          )
+                        })
+                        e.stopPropagation()
+                      }
+                    }}
+                  >
+                    {v}
+                  </Typography.Text>
+                </List.Item>
+              )
+            }}
+          </VirtualList>
+        </List>
+
+        {more && keys.length > 0 && (
+          <div className="px-2">
+            <Button
+              loading={loading}
+              icon={<PlusOutlined />}
+              block
+              onClick={() => {
+                getKeys(db)
+              }}
+            >
+              {t('Load More')}
+            </Button>
+          </div>
+        )}
+        {/* {keys.length === 0 && <Empty />} */}
       </div>
     </Resizable>
   )
