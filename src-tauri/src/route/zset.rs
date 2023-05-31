@@ -2,12 +2,13 @@ use serde::{Deserialize,Serialize};
 use redis::{Value};
 use crate::{err::{CusError, self}, redis_conn};
 
-#[derive(Deserialize)]
-struct ZScanArgs<'a> {
-    cursor: &'a str,
-    name: &'a str,
-    search: &'a str,
-    db: u8
+#[derive(Deserialize, Debug)]
+struct ZScanArgs {
+    cursor: String,
+    name: String,
+    search: String,
+    db: u8,
+    count: i64
 }
 
 #[derive(Serialize)]
@@ -19,14 +20,16 @@ struct ScoreField {
 #[derive(Serialize)]
 pub struct ZScanResp {
     cursor: String,
-    fields: Vec<ScoreField>
+    fields: Vec<ScoreField>,
 }
 
 pub fn zscan(payload: &str, cid : u32) -> Result<ZScanResp, CusError>{
     let args: ZScanArgs = serde_json::from_str(payload)?;
+    dbg!(&args);
     let mut conn = redis_conn::get_connection(cid, args.db)?;
     let mut cmd = redis::cmd("zscan");
-    cmd.arg(&args.name).arg(args.cursor);
+    cmd.arg(String::from(args.name)).arg(args.cursor)
+    .arg(&["COUNT", args.count.to_string().as_str()]);
     if args.search != "" {
         cmd.arg(&["MATCH", &format!("*{}*", args.search)]);
     }
@@ -75,10 +78,10 @@ pub fn zscan(payload: &str, cid : u32) -> Result<ZScanResp, CusError>{
 
 
 #[derive(Deserialize)]
-struct ZRemArgs<'a> {
-    name: &'a str,
+struct ZRemArgs {
+    name: String,
     db: u8,
-    value: &'a str
+    value: String
 }
 
 pub fn zrem(payload : &str, cid: u32) -> Result<i64, CusError> {

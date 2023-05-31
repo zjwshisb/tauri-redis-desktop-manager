@@ -1,26 +1,40 @@
 import { Button, Form, Input, Modal, InputNumber, Space, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import React from 'react'
-import request from '../../utils/request'
+import request from '@/utils/request'
+import { useTranslation } from 'react-i18next'
 
 const Index: React.FC<{
   onSuccess: () => void
+  connection?: APP.Connection
+  trigger: React.ReactElement
 }> = (props) => {
   const [visible, setVisible] = React.useState(false)
 
   const [form] = useForm()
+
+  const { t } = useTranslation()
+
+  const trigger = React.cloneElement(props.trigger, {
+    onClick() {
+      setVisible(true)
+    }
+  })
+  React.useEffect(() => {
+    if (props.connection != null) {
+      form.setFieldsValue({
+        ...props.connection
+      })
+    }
+  }, [form, props.connection])
+
   return (
-    <div className={'p-2'}>
-      <Button
-        block
-        onClick={() => {
-          setVisible(true)
-        }}
-      >
-        new Connection
-      </Button>
+    <div>
+      {trigger}
       <Modal
-        title="new connection"
+        title={
+          props.connection != null ? t('Edit Connection') : t('New Connection')
+        }
         bodyStyle={{
           paddingTop: '20px'
         }}
@@ -32,7 +46,7 @@ const Index: React.FC<{
                 form.resetFields()
               }}
             >
-              cancel
+              {t('Cancel')}
             </Button>
             <Button
               onClick={() => {
@@ -42,7 +56,7 @@ const Index: React.FC<{
                     request<string>('server/ping', 0, v)
                       .then((res) => {
                         if (res.data === 'PONG') {
-                          message.success('connect success').then(() => {})
+                          message.success(t('Connect Success')).then(() => {})
                         }
                       })
                       .catch((err) => {
@@ -52,7 +66,7 @@ const Index: React.FC<{
                   .catch(() => {})
               }}
             >
-              test
+              {t('Test Connection')}
             </Button>
             <Button
               type="primary"
@@ -66,7 +80,7 @@ const Index: React.FC<{
                 })
               }}
             >
-              ok
+              {t('OK')}
             </Button>
           </Space>
         }
@@ -79,20 +93,29 @@ const Index: React.FC<{
       >
         <Form
           form={form}
+          labelCol={{ span: 4 }}
           initialValues={{
             port: 6379,
             host: '127.0.0.1',
             auth: ''
           }}
         >
-          <Form.Item name="host" label="host" rules={[{ required: true }]}>
-            <Input></Input>
+          <Form.Item name="host" label="Host" rules={[{ required: true }]}>
+            <Input
+              placeholder={t('Please Enter {{name}}', {
+                name: 'Host'
+              }).toString()}
+            ></Input>
           </Form.Item>
-          <Form.Item name="port" label="port" rules={[{ required: true }]}>
+          <Form.Item name="port" label="Port" rules={[{ required: true }]}>
             <InputNumber min={0}></InputNumber>
           </Form.Item>
-          <Form.Item name="auth" label="auth">
-            <Input></Input>
+          <Form.Item name="auth" label="Password">
+            <Input
+              placeholder={t('Please Enter {{name}}', {
+                name: t('Password')
+              }).toString()}
+            ></Input>
           </Form.Item>
         </Form>
       </Modal>

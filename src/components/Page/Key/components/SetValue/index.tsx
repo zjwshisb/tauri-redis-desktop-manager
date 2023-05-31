@@ -4,6 +4,8 @@ import { Button, Input, Space, Table } from 'antd'
 import { useTranslation } from 'react-i18next'
 import SAdd from './components/SAdd'
 import SRem from './components/SRem'
+import useStore from '@/hooks/useStore'
+import { observer } from 'mobx-react-lite'
 
 interface SScanResp {
   cursor: string
@@ -14,6 +16,8 @@ const Index: React.FC<{
   keys: APP.SetKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
+  const store = useStore()
+
   const [items, setItems] = React.useState<string[]>([])
 
   const cursor = React.useRef('0')
@@ -29,7 +33,8 @@ const Index: React.FC<{
         name: keys.name,
         db: keys.db,
         cursor: cursor.current,
-        search: search.current
+        search: search.current,
+        count: store.setting.field_count
       }).then((res) => {
         if (res.data.cursor === '0') {
           setMore(false)
@@ -46,7 +51,7 @@ const Index: React.FC<{
         }
       })
     },
-    [keys]
+    [keys, store.setting.field_count]
   )
 
   React.useEffect(() => {
@@ -87,7 +92,7 @@ const Index: React.FC<{
           {
             title: (
               <div className="flex items-center justify-center">
-                <div>title</div>
+                <div>{t('Value')}</div>
                 <div
                   className="w-30 ml-2"
                   onClick={(e) => {
@@ -113,7 +118,7 @@ const Index: React.FC<{
           },
 
           {
-            title: 'action',
+            title: t('Action'),
             width: '200px',
             fixed: 'right',
             align: 'center',
@@ -147,4 +152,4 @@ const Index: React.FC<{
     </div>
   )
 }
-export default Index
+export default observer(Index)

@@ -1,7 +1,6 @@
 use crate::err::CusError;
 use crate::response::Response;
 
-pub mod sqlite;
 pub mod connection;
 pub mod server;
 pub mod key;
@@ -21,6 +20,9 @@ pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>
         },
         "connections/add" => {
             Response::new(connection::add(payload)?)
+        },
+        "connections/del" => {
+            Response::new(connection::del(payload)?)
         },
         "server/ping" => {
             Response::new(server::ping(payload)?)
@@ -78,6 +80,9 @@ pub fn dispatch(path: &str, cid: u32, payload: &str) -> Result<String, CusError>
         }
         "key/get" => {
             Response::new(key::get(payload, cid)?)
+        }
+        "key/set" => {
+            Response::new(key::set(payload, cid)?)
         }
         "key/expire"=> {
             Response::new(key::expire(payload, cid)?)

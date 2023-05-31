@@ -3,6 +3,8 @@ import request from '@/utils/request'
 import { Button, Space, Table, Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import ZRem from './components/ZRem'
+import useStore from '@/hooks/useStore'
+import { observer } from 'mobx-react-lite'
 
 interface ZScanResp {
   cursor: string
@@ -13,6 +15,8 @@ const Index: React.FC<{
   keys: APP.ZSetKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
+  const store = useStore()
+
   const [items, setItems] = React.useState<APP.ZSetField[]>([])
 
   const cursor = React.useRef('0')
@@ -30,7 +34,8 @@ const Index: React.FC<{
         name: keys.name,
         db: keys.db,
         cursor: cursor.current,
-        search: search.current
+        search: search.current,
+        count: store.setting.field_count
       }).then((res) => {
         if (res.data.cursor === '0') {
           setMore(false)
@@ -47,7 +52,7 @@ const Index: React.FC<{
         }
       })
     },
-    [keys]
+    [keys, store.setting.field_count]
   )
 
   React.useEffect(() => {
@@ -77,7 +82,7 @@ const Index: React.FC<{
           {
             title: (
               <div className="flex items-center justify-center">
-                <div>value</div>
+                <div>{t('Value')}</div>
                 <div
                   className="w-30 ml-2"
                   onClick={(e) => {
@@ -100,7 +105,7 @@ const Index: React.FC<{
           },
           {
             dataIndex: 'score',
-            title: 'score',
+            title: t('Score'),
             sorter: (a, b) => {
               if (a.score === b.score) {
                 return 0
@@ -109,7 +114,7 @@ const Index: React.FC<{
             }
           },
           {
-            title: 'action',
+            title: t('Action'),
             width: '300px',
             fixed: 'right',
             // eslint-disable-next-line @typescript-eslint/space-before-function-paren
@@ -129,20 +134,19 @@ const Index: React.FC<{
           }
         ]}
       ></Table>
-      {more && (
-        <Button
-          block
-          className="my-4"
-          onClick={() => {
-            getFields().then(() => {
-              p.current++
-            })
-          }}
-        >
-          {t('load more')}
-        </Button>
-      )}
+      <Button
+        disabled={!more}
+        block
+        className="my-4"
+        onClick={() => {
+          getFields().then(() => {
+            p.current++
+          })
+        }}
+      >
+        {t('Load More')}
+      </Button>
     </div>
   )
 }
-export default Index
+export default observer(Index)

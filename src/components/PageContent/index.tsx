@@ -1,12 +1,14 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import { Tabs, Tooltip } from 'antd'
-import Setting from '../Setting'
+import { Tabs, Dropdown, Typography } from 'antd'
 import FieldView from '../FieldView'
+import { useTranslation } from 'react-i18next'
 
 const Index: React.FC = () => {
   const store = useStore()
+
+  const { t } = useTranslation()
 
   return (
     <div
@@ -15,8 +17,11 @@ const Index: React.FC = () => {
       }
     >
       <FieldView />
-      <Setting />
-      {store.page.pages.length === 0 && <div>222</div>}
+      {store.page.pages.length === 0 && (
+        <div className="w-full h-full flex items-center justify-center">
+          <Typography.Title>Tauri Redis Desktop Manager</Typography.Title>
+        </div>
+      )}
       {store.page.pages.length > 0 && (
         <Tabs
           size="small"
@@ -31,12 +36,62 @@ const Index: React.FC = () => {
           }}
           type="editable-card"
           activeKey={store.page.active}
-          items={store.page.pages.map((v) => {
+          items={store.page.pages.map((v, index) => {
             return {
               label: (
-                <Tooltip title={v.label} mouseEnterDelay={0.6}>
+                <Dropdown
+                  trigger={['contextMenu']}
+                  menu={{
+                    onClick(e) {
+                      switch (e.key) {
+                        case 'close': {
+                          store.page.removePage(v.key)
+                          break
+                        }
+                        case 'all': {
+                          store.page.removeAllPage()
+                          break
+                        }
+                        case 'other': {
+                          store.page.removeOtherPage(index)
+                          break
+                        }
+                        case 'left': {
+                          store.page.removeLeftPage(index)
+                          break
+                        }
+                        case 'right': {
+                          store.page.removeRightPage(index)
+                          break
+                        }
+                      }
+                    },
+                    items: [
+                      {
+                        label: t('Close'),
+                        key: 'close'
+                      },
+                      {
+                        label: t('Close All Tags'),
+                        key: 'all'
+                      },
+                      {
+                        label: t('Close Other Tags'),
+                        key: 'other'
+                      },
+                      {
+                        label: t('Close Left Tags'),
+                        key: 'left'
+                      },
+                      {
+                        label: t('Close Right Tags'),
+                        key: 'right'
+                      }
+                    ]
+                  }}
+                >
                   <div className="max-w-xs truncate">{v.label}</div>
-                </Tooltip>
+                </Dropdown>
               ),
               key: v.key,
               children: v.children

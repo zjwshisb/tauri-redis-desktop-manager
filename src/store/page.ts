@@ -18,6 +18,26 @@ class PageStore {
     this.active = active
   }
 
+  removeOtherPage(index: number) {
+    if (index < this.pages.length) {
+      this.pages = [this.pages[index]]
+    }
+  }
+
+  removeAllPage() {
+    this.pages = []
+    this.active = ''
+  }
+
+  removeLeftPage(index: number) {
+    this.pages = this.pages.slice(index)
+  }
+
+  removeRightPage(index: number) {
+    this.pages.splice(index + 1)
+    this.pages = [...this.pages]
+  }
+
   removePage(key: string) {
     const index = this.pages.findIndex((v) => v.key === key)
     if (index > -1) {

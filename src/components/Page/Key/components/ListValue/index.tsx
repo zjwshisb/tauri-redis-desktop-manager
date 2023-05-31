@@ -5,41 +5,51 @@ import { useTranslation } from 'react-i18next'
 import LTrim from './components/LTrim'
 import LSet from './components/LSet'
 import LInsert from './components/LInsert'
-
-const pageSize = 30
+import { observer } from 'mobx-react-lite'
+import useStore from '@/hooks/useStore'
 
 const Index: React.FC<{
   keys: APP.ListKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
+  const store = useStore()
+
   const [items, setItems] = React.useState<string[]>([])
+
+  const [loading, setLoading] = React.useState(false)
 
   const [more, setMore] = React.useState(true)
 
   const { t } = useTranslation()
 
-  const p = React.useRef(1)
+  const index = React.useRef(0)
 
   const getFields = React.useCallback(
-    async (page: number, reset = false) => {
-      const start = pageSize * (page - 1)
-      const stop = pageSize * page - 1
+    async (reset = false) => {
+      const start = index.current
+      const stop = index.current + store.setting.field_count - 1
+      setLoading(true)
       await request<string[]>('key/list/lrange', keys.connection_id, {
         name: keys.name,
         db: keys.db,
         start,
         stop
-      }).then((res) => {
-        if (reset) {
-          setItems(res.data)
-        } else {
-          setItems((p) => {
-            return [...p].concat(res.data)
-          })
-        }
       })
+        .then((res) => {
+          index.current = stop
+          if (reset) {
+            setItems(res.data)
+          } else {
+            setItems((p) => {
+              return [...p].concat(res.data)
+            })
+          }
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     },
-    [keys]
+    [keys, store.setting.field_count]
   )
 
   React.useEffect(() => {
@@ -51,10 +61,8 @@ const Index: React.FC<{
   }, [items.length, keys.length])
 
   React.useEffect(() => {
-    p.current = 1
-    getFields(p.current, true).then(() => {
-      p.current++
-    })
+    index.current = 0
+    getFields(true)
   }, [getFields])
 
   return (
@@ -74,6 +82,7 @@ const Index: React.FC<{
         />
       </Space>
       <Table
+        loading={loading}
         pagination={false}
         scroll={{
           x: 'auto'
@@ -88,16 +97,16 @@ const Index: React.FC<{
         bordered
         columns={[
           {
-            title: 'index',
+            title: t('Index'),
             dataIndex: 'index',
             align: 'center'
           },
           {
             dataIndex: 'value',
-            title: 'value'
+            title: t('Value')
           },
           {
-            title: 'action',
+            title: t('Action'),
             width: '300px',
             fixed: 'right',
             render(_, record, index) {
@@ -123,20 +132,17 @@ const Index: React.FC<{
           }
         ]}
       ></Table>
-      {more && (
-        <Button
-          block
-          className="my-4"
-          onClick={() => {
-            getFields(p.current).then(() => {
-              p.current++
-            })
-          }}
-        >
-          {t('load more')}
-        </Button>
-      )}
+      <Button
+        block
+        disabled={!more}
+        className="my-4"
+        onClick={() => {
+          getFields()
+        }}
+      >
+        {t('Load More')}
+      </Button>
     </div>
   )
 }
-export default Index
+export default observer(Index)

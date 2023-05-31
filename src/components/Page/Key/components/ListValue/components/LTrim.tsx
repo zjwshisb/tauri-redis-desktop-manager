@@ -1,4 +1,4 @@
-import { Form, Input, Modal, message, Button, Radio } from 'antd'
+import { Form, Modal, message, InputNumber, Button } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
@@ -27,17 +27,16 @@ const Index: React.FC<{
           setOpen(true)
         }}
       >
-        LINSERT
+        LTRIM
       </Button>
       <Modal
         confirmLoading={loading}
         onOk={async () => {
           form.validateFields().then((formData) => {
             setLoading(true)
-            request<number>('key/list/linsert', props.keys.connection_id, {
+            request<number>('key/list/ltrim', props.keys.connection_id, {
               name: props.keys.name,
               db: props.keys.db,
-              types: 'BEFORE',
               ...formData
             })
               .then(() => {
@@ -51,36 +50,27 @@ const Index: React.FC<{
           })
         }}
         open={open}
-        title={'Insert'}
+        title={'LTRIM'}
         onCancel={() => {
           setOpen(false)
         }}
       >
-        <Form form={form} layout="vertical" initialValues={{}}>
+        <Form form={form} layout="horizontal" initialValues={{}}>
           <Form.Item
-            name={'pivot'}
-            label={'pivot'}
+            name={'start'}
+            label={'Start'}
             required
             rules={[{ required: true }]}
           >
-            <Input></Input>
-          </Form.Item>
-          <Form.Item name={'types'} label={'type'} rules={[{ required: true }]}>
-            <Radio.Group
-              optionType="button"
-              options={[
-                { label: 'BEFORE', value: 'BEFORE' },
-                { label: 'AFTER', value: 'AFTER' }
-              ]}
-            ></Radio.Group>
+            <InputNumber min={0}></InputNumber>
           </Form.Item>
           <Form.Item
-            name={'value'}
-            label={'value'}
+            name={'stop'}
+            label={'Stop'}
             required
             rules={[{ required: true }]}
           >
-            <Input.TextArea rows={20}></Input.TextArea>
+            <InputNumber min={0}></InputNumber>
           </Form.Item>
         </Form>
       </Modal>

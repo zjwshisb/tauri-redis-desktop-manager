@@ -15,13 +15,14 @@ const options = [
     value: 'list'
   },
   {
-    label: 'Set',
-    value: 'set'
-  },
-  {
     label: 'Hash',
     value: 'hash'
   },
+  {
+    label: 'Set',
+    value: 'set'
+  },
+
   {
     label: 'Sorted Set',
     value: 'zset'
@@ -82,7 +83,11 @@ const Plus: React.FC<{
             label={t('Key Name')}
             rules={[{ required: true }]}
           >
-            <Input placeholder={t('Please Enter Key Name') ?? ''}></Input>
+            <Input
+              placeholder={t('Please Enter {{name}}', {
+                name: t('Key Name')
+              }).toString()}
+            ></Input>
           </Form.Item>
           <Form.Item
             name="types"

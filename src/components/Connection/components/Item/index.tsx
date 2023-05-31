@@ -1,25 +1,23 @@
 import React from 'react'
 import {
-  DeleteOutlined,
-  SettingOutlined,
   RightOutlined,
   DownOutlined,
   DisconnectOutlined,
-  MenuFoldOutlined,
   ControlOutlined,
-  EditOutlined,
-  PoweroffOutlined,
   ReloadOutlined
 } from '@ant-design/icons'
 import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
-import Info from '@/components/Page/Info'
 import Client from '@/components/Page/Client'
 import { useThrottleFn } from 'ahooks'
-import { Space, Dropdown, Spin } from 'antd'
+import { Space, Spin } from 'antd'
 import DBItem from './DBItem'
+import { useTranslation } from 'react-i18next'
+import ConnectionMenu from './ConnectionMenu'
+import InfoIcon from './Info'
+import ClientIcon from './Client'
 
 export interface DBType {
   db: number
@@ -84,6 +82,8 @@ const Index: React.FC<{
     wait: 500
   })
 
+  const { t } = useTranslation()
+
   const height = React.useMemo(() => {
     if (isOpen && collapse) {
       return (22 * databases.length).toString() + 'px'
@@ -91,60 +91,6 @@ const Index: React.FC<{
       return 0
     }
   }, [collapse, databases, isOpen])
-
-  const connectionMenus = React.useMemo(() => {
-    const menus = [
-      {
-        key: 'edit',
-        label: (
-          <div
-            className="flex"
-            onClick={(e) => {
-              e.stopPropagation()
-              console.log('hahaha')
-              store.connection.close(connection.id)
-            }}
-          >
-            <EditOutlined />
-            <div className="ml-2">Edit Connection</div>
-          </div>
-        )
-      },
-      {
-        key: 'delete',
-        label: (
-          <div
-            className="flex"
-            onClick={(e) => {
-              e.stopPropagation()
-              console.log(e)
-            }}
-          >
-            <DeleteOutlined />
-            <div className="ml-2">Delete Connection</div>
-          </div>
-        )
-      }
-    ]
-    if (isOpen) {
-      menus.unshift({
-        key: 'close',
-        label: (
-          <div
-            className="flex"
-            onClick={(e) => {
-              e.stopPropagation()
-              store.connection.close(connection.id)
-            }}
-          >
-            <PoweroffOutlined />
-            <div className="ml-2">Close Connection</div>
-          </div>
-        )
-      })
-    }
-    return menus
-  }, [connection.id, isOpen, store.connection])
 
   return (
     <div className={'my-2 px-2 box-border'}>
@@ -169,57 +115,9 @@ const Index: React.FC<{
                 getDbs()
               }}
             ></ReloadOutlined>
-            <SettingOutlined
-              className="hover:text-blue-600"
-              onClick={(e) => {
-                e.stopPropagation()
-                store.page.addPage({
-                  label: `info|${connection.host}:${connection.port}`,
-                  key: `info|${connection.host}:${connection.port}`,
-                  children: <Info connection={connection}></Info>
-                })
-              }}
-            />
-            <ControlOutlined
-              className="hover:text-blue-600"
-              onClick={(e) => {
-                e.stopPropagation()
-                store.page.addPage({
-                  label: `client|${connection.host}:${connection.port}`,
-                  key: `client|${connection.host}:${connection.port}`,
-                  children: <Client connection={connection}></Client>
-                })
-              }}
-            ></ControlOutlined>
-            <Dropdown
-              className="hover:text-blue-600"
-              menu={{
-                onClick(e) {
-                  e.domEvent.stopPropagation()
-                  switch (e.key) {
-                    case 'client': {
-                      store.page.addPage({
-                        label: `client|${connection.host}:${connection.port}`,
-                        key: `client|${connection.host}:${connection.port}`,
-                        children: <Client connection={connection}></Client>
-                      })
-                      break
-                    }
-                    case 'info': {
-                      store.page.addPage({
-                        label: `info|${connection.host}:${connection.port}`,
-                        key: `info|${connection.host}:${connection.port}`,
-                        children: <Info connection={connection}></Info>
-                      })
-                      break
-                    }
-                  }
-                },
-                items: connectionMenus
-              }}
-            >
-              <MenuFoldOutlined />
-            </Dropdown>
+            <InfoIcon connection={connection} />
+            <ClientIcon connection={connection} />
+            <ConnectionMenu connection={connection} />
           </Space>
         </div>
       </div>

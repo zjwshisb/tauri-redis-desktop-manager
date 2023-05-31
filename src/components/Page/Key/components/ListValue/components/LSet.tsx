@@ -4,6 +4,7 @@ import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import { EditOutlined } from '@ant-design/icons'
 import { actionIconStyle } from '@/utils/styles'
+import { useTranslation } from 'react-i18next'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -16,6 +17,8 @@ const Index: React.FC<{
   const [form] = useForm(undefined)
 
   const [loading, setLoading] = React.useState(false)
+
+  const { t } = useTranslation()
 
   return (
     <>
@@ -60,10 +63,10 @@ const Index: React.FC<{
             value: props.value
           }}
         >
-          <Form.Item name={'index'} label={'index'}>
+          <Form.Item name={'index'} label={t('Index')}>
             <InputNumber readOnly></InputNumber>
           </Form.Item>
-          <Form.Item name={'value'} label={'value'}>
+          <Form.Item name={'value'} label={t('Value')}>
             <Input.TextArea rows={20}></Input.TextArea>
           </Form.Item>
         </Form>

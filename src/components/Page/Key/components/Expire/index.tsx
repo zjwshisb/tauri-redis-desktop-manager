@@ -55,8 +55,8 @@ const Index: React.FC<{
             ttl: props.keys.ttl
           }}
         >
-          <Form.Item name={'ttl'} label={'ttl'}>
-            <InputNumber min={-1}></InputNumber>
+          <Form.Item name={'ttl'} label={'TTL'}>
+            <InputNumber min={0}></InputNumber>
           </Form.Item>
         </Form>
       </Modal>

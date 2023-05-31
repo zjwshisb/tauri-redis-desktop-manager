@@ -1,10 +1,10 @@
-use std::{fs, error::Error};
+use std::{fs};
 use rusqlite::{self, Connection};
 use dirs_next;
 use crate::err::CusError;
 
 const DATA_NAME: &str = "data.db";
-const DATA_DIR : &str = "tauredis";
+const DATA_DIR : &str = "tauriredis";
 
 pub fn get_sqlite_client() -> Result<Connection, CusError> {
     let path = get_data_path();
@@ -12,7 +12,7 @@ pub fn get_sqlite_client() -> Result<Connection, CusError> {
     Ok(conn)
 }
 
-pub fn init_sqlite () -> Result<(), CusError> {
+pub fn init_sqlite () {
     let client  = get_sqlite_client().unwrap();
     client.execute(
         "CREATE TABLE IF NOT EXISTS connections (
@@ -22,8 +22,7 @@ pub fn init_sqlite () -> Result<(), CusError> {
             auth  TEXT
         )",
         (), // empty list of parameters.
-    )?;
-    Ok(())
+    ).unwrap();
 }
 
 fn get_data_path() -> String {
@@ -42,6 +41,6 @@ fn get_data_path() -> String {
         full_dir.push_str(DATA_NAME);
         return full_dir
     } else {
-        panic!("")
+        panic!("sqlite error: data dir not exists")
     }
 }

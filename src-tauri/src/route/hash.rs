@@ -8,7 +8,9 @@ use crate::model::{Field};
 struct HScanArgs {
     name: String,
     cursor: String,
-    db: u8
+    db: u8,
+    count: i64,
+    search: String
 }
 #[derive(Serialize)]
 pub struct HScanResp {
@@ -19,10 +21,13 @@ pub struct HScanResp {
 pub fn hscan(payload : &str, cid: u32) -> Result<HScanResp, CusError> {
     let args: HScanArgs = serde_json::from_str(&payload)?;
     let mut connection = redis_conn::get_connection(cid, args.db)?;
-    let value: Value = redis::cmd("hscan")
-    .arg(args.name).arg(args.cursor)
-    .arg(&["COUNT", "100"])
-    .query(& mut connection)?;
+    let mut cmd: redis::Cmd = redis::cmd("hscan");
+    cmd.arg(args.name).arg(args.cursor)
+    .arg(&["COUNT", &args.count.to_string()]);
+    if args.search != "" {
+        cmd.arg(&["MATCH", format!("*{}*", args.search.as_str()).as_str()]);
+    }
+    let value = cmd.query(& mut connection)?;
     if let Value::Bulk(s) = value {
         let cursor_value = s.get(0).unwrap();
         let mut cursor   = String::from("0");

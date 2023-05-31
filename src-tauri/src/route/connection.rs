@@ -5,7 +5,6 @@ use rusqlite::{self};
 
 use serde::{Serialize, Deserialize};
 use crate::err::CusError;
-use super::{sqlite};
 
 #[derive(Debug, Serialize)]
 pub struct Connection {
@@ -36,23 +35,21 @@ struct AddArgs {
     auth: String
 }
 
-#[tauri::command]
-pub fn add(payload : &str) -> Result<Connection, CusError> {
-    let conn = sqlite::get_sqlite_client()?;
+pub fn add(payload : &str) -> Result<(), CusError> {
+    let conn = crate::sqlite::get_sqlite_client()?;
     let args: AddArgs = serde_json::from_str(&payload)?;
-    let connection = Connection{
-        id: 0,
-        host: args.host,
-        port: args.port,
-        auth: args.auth
-    };
-    conn.execute("insert into connections (host, port, auth) values(?1, ?2, ?3)", (&connection.host, &connection.port, &connection.auth))?;
-    Ok(connection)
+    let exists = conn.query_row("select * from connections where host=?1 and port=?2", (&args.host, &args.port), |_row| {
+        Ok(())
+    });
+    if let Ok(()) = exists {
+        return Err(CusError::App(String::from("Same Connection Exists")))
+    }
+    conn.execute("insert into connections (host, port, auth) values(?1, ?2, ?3)", (&args.host, &args.port, &args.auth))?;
+    Ok(())
 }
 
-#[tauri::command]
 pub fn get() -> Result<Vec<Connection>, CusError> {
-    let conn = sqlite::get_sqlite_client()?;
+    let conn = crate::sqlite::get_sqlite_client()?;
     let mut stmt = conn.prepare("select id, host, port, auth from connections")?;
     let connections_iter = stmt.query_map([], |row| {
         Ok(Connection {
@@ -68,6 +65,18 @@ pub fn get() -> Result<Vec<Connection>, CusError> {
     }
     Ok(result)
 }
+
+#[derive(Deserialize)]
+struct DelArgs {
+   id: i64
+}
+
+pub fn del(payload : &str) -> Result<(), CusError> {
+    let conn = crate::sqlite::get_sqlite_client()?;
+    let args: DelArgs = serde_json::from_str(&payload)?;
+    conn.execute("delete from connections where id = ?1", [args.id])?;
+    Ok(())
+}   
 //
 // #[tauri::command]
 // pub fn delete_connection(id: u16) -> Result<String, CusError>{

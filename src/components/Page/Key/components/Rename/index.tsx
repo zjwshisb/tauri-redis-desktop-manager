@@ -26,10 +26,10 @@ const Index: React.FC<{
       <Modal
         width={'800px'}
         confirmLoading={loading}
-        onOk={() => {
+        onOk={async () => {
           setLoading(true)
           const newName: string = form.getFieldValue('name')
-          return request<number>('key/rename', props.keys.connection_id, {
+          await request<number>('key/rename', props.keys.connection_id, {
             name: props.keys.name,
             new_name: newName,
             db: props.keys.db
@@ -56,7 +56,7 @@ const Index: React.FC<{
             name: props.keys.name
           }}
         >
-          <Form.Item name={'name'} label={'name'}>
+          <Form.Item name={'name'} label={'Name'} rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Form>

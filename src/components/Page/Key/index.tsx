@@ -37,7 +37,7 @@ const Index: React.FC<{
     if (item !== undefined) {
       switch (item.types) {
         case 'string': {
-          return <StringValue value={item.data} />
+          return <StringValue keys={item} onRefresh={fetch} />
         }
         case 'hash': {
           return <HashValue keys={item} />
@@ -59,12 +59,14 @@ const Index: React.FC<{
   const handleDelete = React.useCallback(() => {
     if (item !== undefined) {
       Modal.confirm({
-        title: 'notice',
-        content: `are sure delete key ${item.name}?`,
+        title: t('Notice'),
+        content: t('Are you sure delete <{{name}}>?', {
+          name: item.name
+        }),
         async onOk() {
           await request('key/del', item?.connection_id, {
-            db: item?.db,
-            names: [item?.name]
+            db: item.db,
+            names: [item.name]
           }).then(() => {
             message.success('success')
             store.page.removePage(pageKey)
@@ -72,7 +74,7 @@ const Index: React.FC<{
         }
       })
     }
-  }, [item, pageKey, store.page])
+  }, [item, pageKey, store.page, t])
 
   if (error !== '') {
     return <Result status="warning" title={error}></Result>

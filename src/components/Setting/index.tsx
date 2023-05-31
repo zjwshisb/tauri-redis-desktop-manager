@@ -1,30 +1,83 @@
-import { Button, Select } from 'antd'
+import { Button, Form, Modal, Select, message, InputNumber } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { observer } from 'mobx-react-lite'
 import { SettingOutlined } from '@ant-design/icons'
+import useStore from '@/hooks/useStore'
+import { useForm } from 'antd/es/form/Form'
 
 const Index: React.FC = () => {
   const { i18n, t } = useTranslation()
 
+  const [open, setOpen] = React.useState(false)
+
+  const store = useStore()
+
+  const [form] = useForm()
+
   return (
-    <div className={'py-4 flex align-middle'}>
-      <Button icon={<SettingOutlined size={12} />}></Button>
-      <Select
-        style={{
-          marginLeft: '10px'
+    <>
+      <Button
+        icon={<SettingOutlined />}
+        size="large"
+        onClick={() => {
+          setOpen(true)
         }}
-        className="w-[200px]"
-        value={i18n.language}
-        placeholder={t('select language')}
-        onChange={(e) => {
-          i18n.changeLanguage(e)
+      ></Button>
+      <Modal
+        destroyOnClose
+        open={open}
+        title={t('Setting')}
+        onOk={async () => {
+          const data = await form.validateFields()
+          // i18n.changeLanguage(data.locale)
+          store.setting.update(data)
+          message.success('Success')
+          setOpen(false)
+        }}
+        onCancel={() => {
+          setOpen(false)
+          form.resetFields()
         }}
       >
-        <Select.Option key={'zh-CN'}>简体中文</Select.Option>
-        <Select.Option key={'en'}>English</Select.Option>
-      </Select>
-    </div>
+        <div className="pt-4">
+          <Form
+            form={form}
+            layout="vertical"
+            initialValues={{
+              locale: store.setting.locale,
+              key_count: store.setting.key_count,
+              field_count: store.setting.field_count
+            }}
+          >
+            <Form.Item name="locale" label={t('Language')}>
+              <Select
+                options={Object.keys(i18n.store.data).map((v) => {
+                  return {
+                    value: v,
+                    label: i18n.store.data[v].label as string
+                  }
+                })}
+              ></Select>
+            </Form.Item>
+            <Form.Item
+              name="key_count"
+              label={t('Key Load Number')}
+              tooltip={t('The COUNT option for command SCAN')}
+            >
+              <InputNumber min={1} />
+            </Form.Item>
+            <Form.Item
+              name="field_count"
+              label={t('Field Load Number')}
+              tooltip={t('The COUNT option for command HSCAN,SSCAN,ZSCAN')}
+            >
+              <InputNumber min={1} />
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
+    </>
   )
 }
 export default observer(Index)

@@ -1,4 +1,4 @@
-import { Form, Modal, message, InputNumber, Button } from 'antd'
+import { Form, Input, Modal, message, Button, Radio } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
@@ -9,7 +9,7 @@ const Index: React.FC<{
 }> = (props) => {
   const [open, setOpen] = React.useState(false)
 
-  const [form] = useForm(undefined)
+  const [form] = useForm()
 
   const [loading, setLoading] = React.useState(false)
 
@@ -27,16 +27,17 @@ const Index: React.FC<{
           setOpen(true)
         }}
       >
-        LTRIM
+        LINSERT
       </Button>
       <Modal
         confirmLoading={loading}
         onOk={async () => {
           form.validateFields().then((formData) => {
             setLoading(true)
-            request<number>('key/list/ltrim', props.keys.connection_id, {
+            request<number>('key/list/linsert', props.keys.connection_id, {
               name: props.keys.name,
               db: props.keys.db,
+              types: 'BEFORE',
               ...formData
             })
               .then(() => {
@@ -50,27 +51,36 @@ const Index: React.FC<{
           })
         }}
         open={open}
-        title={'Insert'}
+        title={'LINSERT'}
         onCancel={() => {
           setOpen(false)
         }}
       >
-        <Form form={form} layout="horizontal" initialValues={{}}>
+        <Form form={form} layout="vertical" initialValues={{}}>
           <Form.Item
-            name={'start'}
-            label={'start'}
+            name={'pivot'}
+            label={'Pivot'}
             required
             rules={[{ required: true }]}
           >
-            <InputNumber min={0}></InputNumber>
+            <Input></Input>
+          </Form.Item>
+          <Form.Item name={'types'} label={'Type'} rules={[{ required: true }]}>
+            <Radio.Group
+              optionType="button"
+              options={[
+                { label: 'BEFORE', value: 'BEFORE' },
+                { label: 'AFTER', value: 'AFTER' }
+              ]}
+            ></Radio.Group>
           </Form.Item>
           <Form.Item
-            name={'stop'}
-            label={'stop'}
+            name={'value'}
+            label={'Value'}
             required
             rules={[{ required: true }]}
           >
-            <InputNumber min={0}></InputNumber>
+            <Input.TextArea rows={20}></Input.TextArea>
           </Form.Item>
         </Form>
       </Modal>

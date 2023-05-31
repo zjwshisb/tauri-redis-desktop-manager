@@ -6,11 +6,13 @@ use crate::err::{CusError, self};
 use redis::{Value, Commands};
 
 #[derive(Deserialize)]
-struct SScanArgs<'a> {
-    cursor: &'a str,
-    name: &'a str,
-    search: &'a str,
-    db: u8
+struct SScanArgs{
+    cursor: String,
+    name: String,
+    search: String,
+    db: u8,
+    count: i64
+
 }
 #[derive(Serialize)]
 pub struct SScanResp {
@@ -22,7 +24,7 @@ pub fn sscan(payload : &str, cid: u32) -> Result<SScanResp, CusError> {
     let args: SScanArgs = serde_json::from_str(payload)?;
     let mut conn  = redis_conn::get_connection(cid, args.db)?;
     let mut cmd  = redis::cmd("sscan");
-    cmd.arg(&args.name) .arg(&args.cursor);
+    cmd.arg(&args.name) .arg(&args.cursor).arg(&["COUNT", &args.count.to_string()]);
     if args.search != "" {
         cmd.arg(&["MATCH", &format!("*{}*", args.search)]);
     }
@@ -54,10 +56,10 @@ pub fn sscan(payload : &str, cid: u32) -> Result<SScanResp, CusError> {
 }
 
 #[derive(Deserialize)]
-struct SAddArgs<'a> {
-    name: &'a str,
+struct SAddArgs {
+    name: String,
     db: u8,
-    value: &'a str
+    value: String
 }
 
 pub fn sadd(payload : &str, cid: u32) -> Result<i64, CusError> {
@@ -66,7 +68,7 @@ pub fn sadd(payload : &str, cid: u32) -> Result<i64, CusError> {
     let v : i64 = conn.sadd(args.name, args.value)?;
     match v {
         0 => {
-            return Err(CusError::App(format!("{} exists in {}", args.value, args.name)));
+            return Err(CusError::App(String::from("value already exists in Set")));
         }
         _ => {}
     }
@@ -74,10 +76,10 @@ pub fn sadd(payload : &str, cid: u32) -> Result<i64, CusError> {
 }
 
 #[derive(Deserialize)]
-struct SRemArgs<'a> {
-    name: &'a str,
+struct SRemArgs {
+    name: String,
     db: u8,
-    value: &'a str
+    value: String
 }
 
 pub fn srem(payload : &str, cid: u32) -> Result<i64, CusError> {
@@ -86,7 +88,7 @@ pub fn srem(payload : &str, cid: u32) -> Result<i64, CusError> {
     let v : i64 = conn.srem(args.name, args.value)?;
     match v {
         0 => {
-            return Err(CusError::App(format!("{} exists in {}", args.value, args.name)));
+            return Err(CusError::App(String::from("value not exists in Set")));
         }
         _ => {}
     }

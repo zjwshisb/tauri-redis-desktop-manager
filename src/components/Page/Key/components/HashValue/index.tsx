@@ -1,6 +1,6 @@
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Space, Table, Tooltip } from 'antd'
+import { Button, Space, Table, Tooltip, Input } from 'antd'
 import { EyeOutlined, EditOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
 import FieldForm from './components/FieldForm'
@@ -16,22 +16,30 @@ const Index: React.FC<{
   const [fields, setFields] = React.useState<APP.HashField[]>([])
   const cursor = React.useRef('0')
   const [more, setMore] = React.useState(true)
+  const search = React.useRef('')
 
   const { t } = useTranslation()
 
   const getFields = React.useCallback(
     (reset = false) => {
+      if (reset) {
+        cursor.current = '0'
+      }
       request<{
         cursor: string
         fields: APP.HashField[]
       }>('key/hash/hscan', keys.connection_id, {
         name: keys.name,
         db: keys.db,
-        cursor: cursor.current
+        cursor: cursor.current,
+        count: store.setting.field_count,
+        search: search.current
       }).then((res) => {
         cursor.current = res.data.cursor
         if (res.data.cursor === '0') {
           setMore(false)
+        } else {
+          setMore(true)
         }
         if (reset) {
           setFields(res.data.fields)
@@ -40,7 +48,7 @@ const Index: React.FC<{
         }
       })
     },
-    [keys]
+    [keys, store.setting.field_count]
   )
 
   React.useEffect(() => {
@@ -61,14 +69,13 @@ const Index: React.FC<{
           }}
           trigger={
             <Button type="primary" className="mb-4">
-              new{' '}
+              {t('Add Field')}
             </Button>
           }
         />
       </div>
       <Table
         pagination={false}
-        className="w-100"
         scroll={{
           x: 'auto'
         }}
@@ -84,18 +91,38 @@ const Index: React.FC<{
           },
           {
             dataIndex: 'name',
-            title: t('Field Name'),
-            sorter: (a, b) => (a.name > b.name ? 1 : -1)
+
+            title: (
+              <div className="flex items-center justify-center">
+                <div>{t('Field Name')}</div>
+                <div
+                  className="ml-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                >
+                  <Input.Search
+                    allowClear
+                    size="small"
+                    onSearch={(e) => {
+                      search.current = e
+                      getFields(true)
+                    }}
+                  />
+                </div>
+              </div>
+            )
           },
           {
             dataIndex: 'value',
+            width: 500,
             title: t('Field Value'),
             render(_, record) {
               return <Tooltip title={_}>{_}</Tooltip>
             }
           },
           {
-            title: 'action',
+            title: t('Action'),
             width: '300px',
             fixed: 'right',
             render(_, record, index) {
@@ -146,17 +173,16 @@ const Index: React.FC<{
           }
         ]}
       ></Table>
-      {more && (
-        <Button
-          block
-          className="my-4"
-          onClick={() => {
-            getFields()
-          }}
-        >
-          load more
-        </Button>
-      )}
+      <Button
+        disabled={!more}
+        block
+        className="my-4"
+        onClick={() => {
+          getFields()
+        }}
+      >
+        {t('Load More')}
+      </Button>
     </div>
   )
 }

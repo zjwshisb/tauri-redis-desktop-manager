@@ -5,7 +5,6 @@ import {
   ReloadOutlined
 } from '@ant-design/icons'
 import classnames from 'classnames'
-import { Spin, Statistic } from 'antd'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import { type DBType } from './index'
