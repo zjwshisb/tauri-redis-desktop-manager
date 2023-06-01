@@ -20,6 +20,7 @@ import {
 import { type ColumnType } from 'antd/es/table'
 import { actionIconStyle } from '@/utils/styles'
 import request from '@/utils/request'
+import { useTranslation } from 'react-i18next'
 
 interface Client {
   id: string
@@ -71,6 +72,8 @@ const Index: React.FC<{
     loading,
     fetch
   } = useRequest<string>('client/list', connection.id)
+
+  const { t } = useTranslation()
 
   const clients = React.useMemo(() => {
     if (clientStr !== undefined) {
@@ -199,7 +202,7 @@ const Index: React.FC<{
                 'client RESP protocol version. Added in Redis 7.0'
               ),
               {
-                title: 'action',
+                title: t('Action'),
                 fixed: 'right',
                 align: 'center',
                 render(_, record) {

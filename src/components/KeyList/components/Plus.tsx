@@ -1,9 +1,12 @@
+import useStore from '@/hooks/useStore'
 import { type DB } from '@/store/db'
+import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
 import { Form, Input, Modal, Select, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import Key from '@/components/Page/Key'
 
 const options = [
   {
@@ -30,8 +33,8 @@ const options = [
 ]
 
 const Plus: React.FC<{
-  onSuccess: () => void
-  db: DB | null
+  onSuccess: (name: string) => void
+  db: DB
 }> = (props) => {
   const [open, setOpen] = React.useState(false)
 
@@ -56,15 +59,21 @@ const Plus: React.FC<{
           loading
         }}
         onOk={() => {
-          form
-            .validateFields()
-            .then((res) => {
-              setLoading(true)
-              message.success(t('Success'))
+          form.validateFields().then((res) => {
+            request('key/add', props.db.connection.id, {
+              ...res,
+              db: props.db?.db
             })
-            .finally(() => {
-              setLoading(false)
-            })
+              .then(() => {
+                props.onSuccess(res.name)
+                setLoading(true)
+                setOpen(false)
+                message.success(t('Success'))
+              })
+              .finally(() => {
+                setLoading(false)
+              })
+          })
         }}
         onCancel={() => {
           form.resetFields()

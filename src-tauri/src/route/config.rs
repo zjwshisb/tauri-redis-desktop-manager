@@ -3,9 +3,9 @@ use redis::{Value};
 
 
 
-pub fn get_database(cid: u32) -> Result<String, CusError> {
-    let mut conn = redis_conn::get_connection(cid, 0)?;
-    let value: Value = redis::cmd("config").arg("get").arg("databases").query(&mut conn)?;
+pub async fn get_database(cid: u32) -> Result<String, CusError> {
+    let mut conn = redis_conn::get_connection(cid, 0).await?;
+    let value: Value = redis::cmd("config").arg("get").arg("databases").query_async(&mut conn).await?;
     if let Value::Bulk(s) = value {
         if let Some(size) = s.get(1) {
            if let Value::Data(vv) = size {

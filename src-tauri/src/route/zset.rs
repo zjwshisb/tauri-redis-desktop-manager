@@ -23,10 +23,10 @@ pub struct ZScanResp {
     fields: Vec<ScoreField>,
 }
 
-pub fn zscan(payload: &str, cid : u32) -> Result<ZScanResp, CusError>{
+pub async fn zscan(payload: &str, cid : u32) -> Result<ZScanResp, CusError>{
     let args: ZScanArgs = serde_json::from_str(payload)?;
     dbg!(&args);
-    let mut conn = redis_conn::get_connection(cid, args.db)?;
+    let mut conn = redis_conn::get_connection(cid, args.db).await?;
     let mut cmd = redis::cmd("zscan");
     cmd.arg(String::from(args.name)).arg(args.cursor)
     .arg(&["COUNT", args.count.to_string().as_str()]);
@@ -84,9 +84,9 @@ struct ZRemArgs {
     value: String
 }
 
-pub fn zrem(payload : &str, cid: u32) -> Result<i64, CusError> {
+pub async fn zrem(payload : &str, cid: u32) -> Result<i64, CusError> {
     let args: ZRemArgs = serde_json::from_str(payload)?;
-    let mut conn  = redis_conn::get_connection(cid, args.db)?;
+    let mut conn  = redis_conn::get_connection(cid, args.db).await?;
     let v : redis::Value = redis::cmd("zrem").arg(args.name).arg(args.value).query(&mut conn)?;
     if let Value::Int(i) = v {
         return Ok(i);

@@ -7,10 +7,10 @@ struct DBSizeArgs{
     db: u8
 }
 
-pub fn dbsize(payload : &str,cid : u32) -> Result<i64, CusError> {
+pub async fn dbsize(payload : &str,cid : u32) -> Result<i64, CusError> {
     let args: DBSizeArgs = serde_json::from_str(payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db)?;
-    let value: redis::Value = redis::cmd("dbsize").query(&mut conn)?;
+    let mut conn = redis_conn::get_connection(cid, args.db).await?;
+    let value: redis::Value = redis::cmd("dbsize").query_async(&mut conn).await?;
     if let redis::Value::Int(count) = value {
         return Ok(count);
     }

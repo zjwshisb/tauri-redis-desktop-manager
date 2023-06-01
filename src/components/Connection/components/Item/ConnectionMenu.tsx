@@ -8,7 +8,7 @@ import {
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
-import { Dropdown, Modal, message } from 'antd'
+import { Dropdown, Modal, Tooltip, message } from 'antd'
 import { useTranslation } from 'react-i18next'
 import ConnectionForm from '../Form'
 
@@ -77,6 +77,7 @@ const Index: React.FC<{
 
   return (
     <Dropdown
+      trigger={['click']}
       className="hover:text-blue-600"
       menu={{
         onClick(e) {
@@ -107,7 +108,13 @@ const Index: React.FC<{
         items: connectionMenus
       }}
     >
-      <MenuFoldOutlined />
+      <Tooltip title={t('Connection')}>
+        <MenuFoldOutlined
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+        />
+      </Tooltip>
     </Dropdown>
   )
 }

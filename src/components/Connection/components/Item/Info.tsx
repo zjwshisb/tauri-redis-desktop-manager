@@ -1,19 +1,21 @@
 import React from 'react'
-import { SettingOutlined } from '@ant-design/icons'
+import { InfoCircleOutlined } from '@ant-design/icons'
 
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import Info from '@/components/Page/Info'
 import { Tooltip } from 'antd'
+import { useTranslation } from 'react-i18next'
 
 const Index: React.FC<{
   connection: APP.Connection
 }> = ({ connection }) => {
   const store = useStore()
+  const { t } = useTranslation()
 
   return (
-    <Tooltip title="Info">
-      <SettingOutlined
+    <Tooltip title={t('Info')}>
+      <InfoCircleOutlined
         className="hover:text-blue-600"
         onClick={(e) => {
           e.stopPropagation()

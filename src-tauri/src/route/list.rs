@@ -10,9 +10,9 @@ struct LRangeArgs {
     db: u8
 }
 
-pub fn lrange(payload : &str, cid: u32) -> Result<Vec<String>, CusError> {
+pub async fn lrange(payload : &str, cid: u32) -> Result<Vec<String>, CusError> {
     let args: LRangeArgs = serde_json::from_str(payload)?;
-    let mut conn  = redis_conn::get_connection(cid, args.db)?;
+    let mut conn  = redis_conn::get_connection(cid, args.db).await?;
     let values : redis::Value = redis::cmd("lrange")
     .arg(&args.name)
     .arg(&args.start).arg(&args.stop).query(&mut conn)?;
@@ -35,9 +35,9 @@ struct LSetArgs {
     value: String,
     db: u8
 }
-pub fn lset(payload : &str, cid: u32) -> Result<String, CusError> {
+pub async fn lset(payload : &str, cid: u32) -> Result<String, CusError> {
     let args : LSetArgs = serde_json::from_str(payload)?;
-    let mut conn  = redis_conn::get_connection(cid, args.db)?;
+    let mut conn  = redis_conn::get_connection(cid, args.db).await?;
     let value : redis::Value = redis::cmd("lset")
     .arg(&args.name)
     .arg(args.index).arg(&args.value).query(&mut conn)?;
@@ -55,9 +55,9 @@ struct LTrimArgs {
     stop: i64,
 }
 
-pub fn ltrim(payload : &str, cid: u32) -> Result<String, CusError> {
+pub async fn ltrim(payload : &str, cid: u32) -> Result<String, CusError> {
     let args : LTrimArgs = serde_json::from_str(payload)?;
-    let mut conn  = redis_conn::get_connection(cid, args.db)?;
+    let mut conn  = redis_conn::get_connection(cid, args.db).await?;
     let value : redis::Value = redis::cmd("ltrim")
     .arg(&args.name)
     .arg(args.start).arg(args.stop).query(&mut conn)?;
@@ -75,9 +75,9 @@ struct InsertArgs {
     value: String,
     pivot: String
 }
-pub fn linsert(payload : &str, cid: u32) -> Result<i64, CusError> {
+pub async fn linsert(payload : &str, cid: u32) -> Result<i64, CusError> {
     let args : InsertArgs = serde_json::from_str(payload)?;
-    let mut conn  = redis_conn::get_connection(cid, args.db)?;
+    let mut conn  = redis_conn::get_connection(cid, args.db).await?;
     let value : redis::Value = redis::cmd("linsert")
     .arg(&args.name)
     .arg(&args.types)

@@ -3,18 +3,15 @@ import {
   RightOutlined,
   DownOutlined,
   DisconnectOutlined,
-  ControlOutlined,
   ReloadOutlined
 } from '@ant-design/icons'
 import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
-import Client from '@/components/Page/Client'
 import { useThrottleFn } from 'ahooks'
 import { Space, Spin } from 'antd'
 import DBItem from './DBItem'
-import { useTranslation } from 'react-i18next'
 import ConnectionMenu from './ConnectionMenu'
 import InfoIcon from './Info'
 import ClientIcon from './Client'
@@ -82,8 +79,6 @@ const Index: React.FC<{
     wait: 500
   })
 
-  const { t } = useTranslation()
-
   const height = React.useMemo(() => {
     if (isOpen && collapse) {
       return (22 * databases.length).toString() + 'px'
@@ -108,15 +103,20 @@ const Index: React.FC<{
         </div>
         <div className={'flex-shrink-0 pl-2'}>
           <Space>
-            <ReloadOutlined
-              className="hover:text-blue-600"
-              onClick={(e) => {
-                e.stopPropagation()
-                getDbs()
-              }}
-            ></ReloadOutlined>
-            <InfoIcon connection={connection} />
-            <ClientIcon connection={connection} />
+            {isOpen && (
+              <>
+                <ReloadOutlined
+                  className="hover:text-blue-600"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    getDbs()
+                  }}
+                ></ReloadOutlined>
+                <InfoIcon connection={connection} />
+                <ClientIcon connection={connection} />
+              </>
+            )}
+
             <ConnectionMenu connection={connection} />
           </Space>
         </div>

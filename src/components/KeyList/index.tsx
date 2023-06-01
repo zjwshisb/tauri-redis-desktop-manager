@@ -146,7 +146,26 @@ const Index: React.FC = () => {
                   className="hover:cursor-pointer text-lg"
                   onClick={reload}
                 />
-                <Plus onSuccess={() => {}} db={db} />
+                {db != null && (
+                  <Plus
+                    onSuccess={(name: string) => {
+                      const key = `${name}|${db.connection.host}:${db.connection.port}`
+                      store.page.addPage({
+                        key,
+                        label: key,
+                        children: (
+                          <Key
+                            name={name}
+                            db={db.db}
+                            connection={db.connection}
+                            pageKey={key}
+                          ></Key>
+                        )
+                      })
+                    }}
+                    db={db}
+                  />
+                )}
               </Space>
             </div>
           </div>
@@ -157,7 +176,7 @@ const Index: React.FC = () => {
                 height: listHeight
               }}
             >
-              <Empty description={'No Key'} />
+              <Empty description={t('No Keys')} />
             </div>
           )}
           {keys.length > 0 && (
@@ -176,7 +195,6 @@ const Index: React.FC = () => {
                       onClick={(e) => {
                         if (db !== null) {
                           const key = `${v}|${db.connection.host}:${db.connection.port}`
-                          console.log('v')
                           store.page.addPage({
                             key,
                             label: key,
@@ -201,7 +219,6 @@ const Index: React.FC = () => {
               </VirtualList>
             </List>
           )}
-
           <div className="p-2 border-t">
             <Button
               disabled={!more}
@@ -215,7 +232,6 @@ const Index: React.FC = () => {
               {t('Load More')}
             </Button>
           </div>
-          {/* {keys.length === 0 && <Empty />} */}
         </div>
       </Spin>
     </ResizableDiv>

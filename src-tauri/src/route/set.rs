@@ -20,9 +20,9 @@ pub struct SScanResp {
     fields: Vec<String>
 }
 
-pub fn sscan(payload : &str, cid: u32) -> Result<SScanResp, CusError> {
+pub async fn sscan(payload : &str, cid: u32) -> Result<SScanResp, CusError> {
     let args: SScanArgs = serde_json::from_str(payload)?;
-    let mut conn  = redis_conn::get_connection(cid, args.db)?;
+    let mut conn  = redis_conn::get_connection(cid, args.db).await?;
     let mut cmd  = redis::cmd("sscan");
     cmd.arg(&args.name) .arg(&args.cursor).arg(&["COUNT", &args.count.to_string()]);
     if args.search != "" {
@@ -62,9 +62,9 @@ struct SAddArgs {
     value: String
 }
 
-pub fn sadd(payload : &str, cid: u32) -> Result<i64, CusError> {
+pub async fn sadd(payload : &str, cid: u32) -> Result<i64, CusError> {
     let args: SAddArgs = serde_json::from_str(payload)?;
-    let mut conn  = redis_conn::get_connection(cid, args.db)?;
+    let mut conn  = redis_conn::get_connection(cid, args.db).await?;
     let v : i64 = conn.sadd(args.name, args.value)?;
     match v {
         0 => {
@@ -82,9 +82,9 @@ struct SRemArgs {
     value: String
 }
 
-pub fn srem(payload : &str, cid: u32) -> Result<i64, CusError> {
+pub async fn srem(payload : &str, cid: u32) -> Result<i64, CusError> {
     let args: SAddArgs = serde_json::from_str(payload)?;
-    let mut conn  = redis_conn::get_connection(cid, args.db)?;
+    let mut conn  = redis_conn::get_connection(cid, args.db).await?;
     let v : i64 = conn.srem(args.name, args.value)?;
     match v {
         0 => {

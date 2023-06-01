@@ -4,7 +4,7 @@ use dirs_next;
 use crate::err::CusError;
 
 const DATA_NAME: &str = "data.db";
-const DATA_DIR : &str = "tauriredis";
+const DATA_DIR : &str = "redis";
 
 pub fn get_sqlite_client() -> Result<Connection, CusError> {
     let path = get_data_path();
@@ -19,7 +19,7 @@ pub fn init_sqlite () {
             id    INTEGER PRIMARY KEY,
             host  TEXT NOT NULL,
             port  INTEGER NOT NULL,
-            auth  TEXT
+            password  TEXT
         )",
         (), // empty list of parameters.
     ).unwrap();

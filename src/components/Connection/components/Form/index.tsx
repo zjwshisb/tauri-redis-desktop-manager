@@ -3,6 +3,7 @@ import { useForm } from 'antd/es/form/Form'
 import React from 'react'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
+import useStore from '@/hooks/useStore'
 
 const Index: React.FC<{
   onSuccess: () => void
@@ -15,23 +16,28 @@ const Index: React.FC<{
 
   const { t } = useTranslation()
 
+  const store = useStore()
+
   const trigger = React.cloneElement(props.trigger, {
     onClick() {
       setVisible(true)
     }
   })
   React.useEffect(() => {
-    if (props.connection != null) {
+    if (visible && props.connection != null) {
       form.setFieldsValue({
         ...props.connection
       })
     }
-  }, [form, props.connection])
+  }, [form, props.connection, visible])
 
   return (
     <div>
       {trigger}
       <Modal
+        getContainer={() => {
+          return document.getElementsByTagName('body')[0]
+        }}
         title={
           props.connection != null ? t('Edit Connection') : t('New Connection')
         }
@@ -53,15 +59,11 @@ const Index: React.FC<{
                 form
                   .validateFields()
                   .then((v) => {
-                    request<string>('server/ping', 0, v)
-                      .then((res) => {
-                        if (res.data === 'PONG') {
-                          message.success(t('Connect Success')).then(() => {})
-                        }
-                      })
-                      .catch((err) => {
-                        message.error(err).then(() => {})
-                      })
+                    request<string>('server/ping', 0, v).then((res) => {
+                      if (res.data === 'PONG') {
+                        message.success(t('Connect Success')).then(() => {})
+                      }
+                    })
                   })
                   .catch(() => {})
               }}
@@ -70,14 +72,20 @@ const Index: React.FC<{
             </Button>
             <Button
               type="primary"
-              onClick={() => {
-                form.validateFields().then((v) => {
-                  request('connections/add', 0, v).then((r) => {
-                    message.success('操作成功')
-                    props.onSuccess()
-                    setVisible(false)
+              onClick={async () => {
+                const v = await form.validateFields()
+                if (props.connection == null) {
+                  await request('connections/add', 0, v)
+                } else {
+                  await request('connections/update', 0, {
+                    ...v,
+                    id: props.connection.id
                   })
-                })
+                }
+                store.connection.fetchConnections()
+                message.success('操作成功')
+                props.onSuccess()
+                setVisible(false)
               }}
             >
               {t('OK')}
@@ -97,25 +105,28 @@ const Index: React.FC<{
           initialValues={{
             port: 6379,
             host: '127.0.0.1',
-            auth: ''
+            password: ''
           }}
         >
-          <Form.Item name="host" label="Host" rules={[{ required: true }]}>
+          <Form.Item name="host" label={t('Host')} rules={[{ required: true }]}>
             <Input
               placeholder={t('Please Enter {{name}}', {
                 name: 'Host'
               }).toString()}
             ></Input>
           </Form.Item>
-          <Form.Item name="port" label="Port" rules={[{ required: true }]}>
+          <Form.Item name="port" label={t('Port')} rules={[{ required: true }]}>
             <InputNumber min={0}></InputNumber>
           </Form.Item>
-          <Form.Item name="auth" label="Password">
-            <Input
+          <Form.Item name="password" label={t('Password')}>
+            <Input.Password
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
               placeholder={t('Please Enter {{name}}', {
                 name: t('Password')
               }).toString()}
-            ></Input>
+            ></Input.Password>
           </Form.Item>
         </Form>
       </Modal>

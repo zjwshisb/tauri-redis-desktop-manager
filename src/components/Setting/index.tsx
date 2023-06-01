@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { SettingOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
 import { useForm } from 'antd/es/form/Form'
+import lodash from 'lodash'
 
 const Index: React.FC = () => {
   const { i18n, t } = useTranslation()
@@ -44,6 +45,17 @@ const Index: React.FC = () => {
           <Form
             form={form}
             layout="vertical"
+            onFieldsChange={(v) => {
+              if (v.length > 0) {
+                if (lodash.isArray(v[0].name)) {
+                  if (v[0].name.includes('locale')) {
+                    store.setting.update({
+                      locale: v[0].value
+                    })
+                  }
+                }
+              }
+            }}
             initialValues={{
               locale: store.setting.locale,
               key_count: store.setting.key_count,

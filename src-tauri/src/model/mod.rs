@@ -7,7 +7,7 @@ pub struct Connection {
     pub id: u16,
     pub host: String,
     pub port: i32,
-    pub auth: String,
+    pub password: String,
 }
 
 

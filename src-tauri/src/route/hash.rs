@@ -18,16 +18,16 @@ pub struct HScanResp {
     fields: Vec<Field>
 }
 
-pub fn hscan(payload : &str, cid: u32) -> Result<HScanResp, CusError> {
+pub async fn hscan(payload : &str, cid: u32) -> Result<HScanResp, CusError> {
     let args: HScanArgs = serde_json::from_str(&payload)?;
-    let mut connection = redis_conn::get_connection(cid, args.db)?;
+    let mut connection = redis_conn::get_connection(cid, args.db).await?;
     let mut cmd: redis::Cmd = redis::cmd("hscan");
     cmd.arg(args.name).arg(args.cursor)
     .arg(&["COUNT", &args.count.to_string()]);
     if args.search != "" {
         cmd.arg(&["MATCH", format!("*{}*", args.search.as_str()).as_str()]);
     }
-    let value = cmd.query(& mut connection)?;
+    let value = cmd.query_async(& mut connection).await?;
     if let Value::Bulk(s) = value {
         let cursor_value = s.get(0).unwrap();
         let mut cursor   = String::from("0");
@@ -76,10 +76,10 @@ struct HSetArgs {
     value: String,
     db: u8,
 }
-pub fn hset(payload: &str, cid: u32) -> Result<i64, CusError> {
+pub async fn hset(payload: &str, cid: u32) -> Result<i64, CusError> {
     let args: HSetArgs = serde_json::from_str(&payload)?;
-    let mut connection = redis_conn::get_connection(cid, args.db)?;
-    let value: Value = redis::cmd("hset").arg(&args.name).arg(&[args.field, args.value]).query(&mut connection)?;
+    let mut connection = redis_conn::get_connection(cid, args.db).await?;
+    let value: Value = redis::cmd("hset").arg(&args.name).arg(&[args.field, args.value]).query_async(&mut connection).await?;
     if let Value::Int(count) = value {
         return Ok(count);
     }
@@ -92,10 +92,10 @@ struct  HDelArgs{
     db: u8,
 }
 
-pub fn hdel(payload: &str, cid: u32) ->Result<i64, CusError> {
+pub async fn hdel(payload: &str, cid: u32) ->Result<i64, CusError> {
     let args: HDelArgs = serde_json::from_str(&payload)?;
-    let mut connection = redis_conn::get_connection(cid, args.db)?;
-    let value: Value = redis::cmd("hdel").arg(&args.name).arg(&args.fields).query(&mut connection)?;
+    let mut connection = redis_conn::get_connection(cid, args.db).await?;
+    let value: Value = redis::cmd("hdel").arg(&args.name).arg(&args.fields).query_async(&mut connection).await?;
     if let Value::Int(count) = value {
         return Ok(count);
     }
