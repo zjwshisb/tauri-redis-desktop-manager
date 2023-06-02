@@ -1,20 +1,22 @@
-import { Form, Input, Modal, message, Button } from 'antd'
+import { Form, Input, Modal, message, InputNumber } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 
 const Index: React.FC<{
-  keys: APP.SetKey
+  keys: APP.ZSetKey
+  field?: APP.ZSetField
   onSuccess: () => void
+  trigger: React.ReactElement
 }> = (props) => {
   const [open, setOpen] = React.useState(false)
 
   const [form] = useForm(undefined)
 
-  const [loading, setLoading] = React.useState(false)
-
   const { t } = useTranslation()
+
+  const [loading, setLoading] = React.useState(false)
 
   React.useEffect(() => {
     if (!open) {
@@ -22,25 +24,35 @@ const Index: React.FC<{
     }
   }, [form, open])
 
+  const trigger = React.cloneElement(props.trigger, {
+    onClick() {
+      setOpen(true)
+    }
+  })
+
+  React.useEffect(() => {
+    if (props.field != null && open) {
+      form.setFieldsValue({
+        value: props.field.value,
+        score: props.field.score
+      })
+    }
+  }, [form, open, props.field])
+
   return (
     <>
-      <Button
-        type="primary"
-        onClick={() => {
-          setOpen(true)
-        }}
-      >
-        SADD
-      </Button>
+      {trigger}
       <Modal
         confirmLoading={loading}
         onOk={async () => {
           form.validateFields().then((formData) => {
             setLoading(true)
-            request<number>('key/set/sadd', props.keys.connection_id, {
+
+            request<number>('key/zset/zadd', props.keys.connection_id, {
               name: props.keys.name,
               db: props.keys.db,
-              ...formData
+              value: formData.value,
+              score: parseFloat(formData.score)
             })
               .then(() => {
                 message.success(t('Success'))
@@ -53,7 +65,7 @@ const Index: React.FC<{
           })
         }}
         open={open}
-        title={'Insert'}
+        title={'ZADD'}
         onCancel={() => {
           setOpen(false)
         }}
@@ -65,7 +77,24 @@ const Index: React.FC<{
             required
             rules={[{ required: true }]}
           >
-            <Input.TextArea rows={20}></Input.TextArea>
+            <Input
+              readOnly={props.field != null}
+              placeholder={t('Please Enter {{name}}', {
+                name: t('Value')
+              }).toString()}
+            ></Input>
+          </Form.Item>
+          <Form.Item
+            name={'score'}
+            label={t('Score')}
+            required
+            rules={[{ required: true }]}
+          >
+            <InputNumber
+              placeholder={t('Please Enter {{name}}', {
+                name: t('Score')
+              }).toString()}
+            ></InputNumber>
           </Form.Item>
         </Form>
       </Modal>

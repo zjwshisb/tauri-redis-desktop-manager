@@ -1,5 +1,5 @@
 use crate::{redis_conn, err::{CusError, self}};
-use redis::{Value};
+use redis::Value;
 
 
 

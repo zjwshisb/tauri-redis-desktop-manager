@@ -12,6 +12,8 @@ const Index: React.FC<{
 }> = (props) => {
   const [visible, setVisible] = React.useState(false)
 
+  const [testLoading, setTestLoading] = React.useState(false)
+
   const [form] = useForm()
 
   const { t } = useTranslation()
@@ -55,15 +57,21 @@ const Index: React.FC<{
               {t('Cancel')}
             </Button>
             <Button
+              loading={testLoading}
               onClick={() => {
                 form
                   .validateFields()
                   .then((v) => {
-                    request<string>('server/ping', 0, v).then((res) => {
-                      if (res.data === 'PONG') {
-                        message.success(t('Connect Success')).then(() => {})
-                      }
-                    })
+                    setTestLoading(true)
+                    request<string>('server/ping', 0, v)
+                      .then((res) => {
+                        if (res.data === 'PONG') {
+                          message.success(t('Connect Success')).then(() => {})
+                        }
+                      })
+                      .finally(() => {
+                        setTestLoading(false)
+                      })
                   })
                   .catch(() => {})
               }}

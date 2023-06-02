@@ -5,6 +5,9 @@ import { useTranslation } from 'react-i18next'
 import ZRem from './components/ZRem'
 import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
+import Form from './components/Form'
+import { EditOutlined } from '@ant-design/icons'
+import { actionIconStyle } from '@/utils/styles'
 
 interface ZScanResp {
   cursor: string
@@ -63,7 +66,13 @@ const Index: React.FC<{
 
   return (
     <div>
-      <Space className="mb-2"></Space>
+      <Space className="mb-2">
+        <Form
+          onSuccess={onRefresh}
+          keys={keys}
+          trigger={<Button type="primary">ZAdd</Button>}
+        ></Form>
+      </Space>
       <Table
         pagination={false}
         scroll={{
@@ -117,7 +126,6 @@ const Index: React.FC<{
             title: t('Action'),
             width: '300px',
             fixed: 'right',
-            // eslint-disable-next-line @typescript-eslint/space-before-function-paren
             render(_, record, index) {
               return (
                 <Space>
@@ -128,6 +136,17 @@ const Index: React.FC<{
                       onRefresh()
                     }}
                   ></ZRem>
+                  <Form
+                    onSuccess={onRefresh}
+                    keys={keys}
+                    field={record}
+                    trigger={
+                      <EditOutlined
+                        className="hover:cursor-pointer"
+                        style={actionIconStyle}
+                      />
+                    }
+                  ></Form>
                 </Space>
               )
             }

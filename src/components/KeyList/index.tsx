@@ -8,9 +8,10 @@ import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons'
 import Key from '../Page/Key'
 import useStore from '@/hooks/useStore'
 import { type DB } from '@/store/db'
-import Plus from './components/Plus'
+import Add from './components/Add'
 import { useTranslation } from 'react-i18next'
 import ResizableDiv from '@/components/ResizableDiv'
+import classNames from 'classnames'
 
 interface ScanResp {
   cursor: string
@@ -23,6 +24,7 @@ const Index: React.FC = () => {
   const cursor = React.useRef('0')
 
   const [keys, setKeys] = React.useState<string[]>([])
+
   const [more, setMore] = React.useState(false)
 
   const [loading, setLoading] = React.useState(false)
@@ -147,7 +149,7 @@ const Index: React.FC = () => {
                   onClick={reload}
                 />
                 {db != null && (
-                  <Plus
+                  <Add
                     onSuccess={(name: string) => {
                       const key = `${name}|${db.connection.host}:${db.connection.port}`
                       store.page.addPage({
@@ -179,7 +181,7 @@ const Index: React.FC = () => {
               <Empty description={t('No Keys')} />
             </div>
           )}
-          {keys.length > 0 && (
+          {keys.length > 0 && db != null && (
             <List bordered={false} size="small">
               <VirtualList
                 ref={listRef}
@@ -189,28 +191,30 @@ const Index: React.FC = () => {
                 height={listHeight}
               >
                 {(v) => {
+                  const key = `${v}|${db.connection.host}:${db.connection.port}`
+
                   return (
                     <List.Item
-                      key={v}
+                      key={key}
                       onClick={(e) => {
-                        if (db !== null) {
-                          const key = `${v}|${db.connection.host}:${db.connection.port}`
-                          store.page.addPage({
-                            key,
-                            label: key,
-                            children: (
-                              <Key
-                                name={v}
-                                db={db.db}
-                                connection={db.connection}
-                                pageKey={key}
-                              ></Key>
-                            )
-                          })
-                          e.stopPropagation()
-                        }
+                        store.page.addPage({
+                          key,
+                          label: key,
+                          children: (
+                            <Key
+                              name={v}
+                              db={db.db}
+                              connection={db.connection}
+                              pageKey={key}
+                            ></Key>
+                          )
+                        })
+                        e.stopPropagation()
                       }}
-                      className="hover:cursor-pointer hover:bg-gray-100 border-none h-[37px]"
+                      className={classNames([
+                        'hover:cursor-pointer border-none h-[37px]',
+                        'hover:bg-gray-100 '
+                      ])}
                     >
                       <Typography.Text ellipsis={true}>{v}</Typography.Text>
                     </List.Item>

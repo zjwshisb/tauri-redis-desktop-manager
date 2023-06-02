@@ -71,6 +71,7 @@ class PageStore {
     } else {
       this.pages.push(page)
       this.active = page.key
+      this.pages = [...this.pages]
     }
   }
 }

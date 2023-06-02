@@ -1,4 +1,3 @@
-import useStore from '@/hooks/useStore'
 import { type DB } from '@/store/db'
 import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
@@ -6,7 +5,6 @@ import { Form, Input, Modal, Select, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import Key from '@/components/Page/Key'
 
 const options = [
   {

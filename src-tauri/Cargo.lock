@@ -2899,6 +2899,7 @@ name = "tauriredis"
 version = "0.0.0"
 dependencies = [
  "dirs-next",
+ "once_cell",
  "redis",
  "rusqlite",
  "serde",

@@ -1,10 +1,16 @@
-use crate::{err::{CusError, self}, redis_conn};
+use crate::{
+    err::{self, CusError},
+    redis_conn,
+};
 use redis;
 use serde::Deserialize;
 
-pub async fn list(payload: &str, cid: u32) ->Result<String, CusError> {
+pub async fn list(_payload: String, cid: u32) -> Result<String, CusError> {
     let mut conn = redis_conn::get_connection(cid, 0).await?;
-    let value: redis::Value = redis::cmd("client").arg("list").query_async(&mut conn).await?;
+    let value: redis::Value = redis::cmd("client")
+        .arg("list")
+        .query_async(&mut conn)
+        .await?;
     if let redis::Value::Data(v) = value {
         return Ok(std::str::from_utf8(&v).unwrap().into());
     }
@@ -12,19 +18,21 @@ pub async fn list(payload: &str, cid: u32) ->Result<String, CusError> {
 }
 
 #[derive(Deserialize)]
-struct  KillArgs {
-    id: String
+struct KillArgs {
+    id: String,
 }
 
-pub async fn kill(payload: &str, cid: u32) ->Result<i64, CusError> {
-    let args : KillArgs = serde_json::from_str(payload)?;
+pub async fn kill(payload: String, cid: u32) -> Result<i64, CusError> {
+    let args: KillArgs = serde_json::from_str(&payload)?;
     let mut conn = redis_conn::get_connection(cid, 0).await?;
-    let value: redis::Value = redis::cmd("CLIENT").arg("KILL").arg(&["id", &args.id]).query_async(&mut conn).await?;
+    let value: redis::Value = redis::cmd("CLIENT")
+        .arg("KILL")
+        .arg(&["id", &args.id])
+        .query_async(&mut conn)
+        .await?;
     if let redis::Value::Int(count) = value {
         match count {
-            0 => {
-                return  Err(CusError::App(String::from("Client has been kill")))
-            }
+            0 => return Err(CusError::App(String::from("Client has been kill"))),
             _ => {
                 return Ok(count);
             }

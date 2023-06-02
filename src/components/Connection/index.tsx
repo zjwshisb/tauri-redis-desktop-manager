@@ -1,5 +1,4 @@
 import React from 'react'
-import NewConnection from '../NewConnection'
 import Item from './components/Item'
 import { Button, Modal, message } from 'antd'
 import { useTranslation } from 'react-i18next'

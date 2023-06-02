@@ -3,7 +3,8 @@ import {
   RightOutlined,
   DownOutlined,
   DisconnectOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  LoadingOutlined
 } from '@ant-design/icons'
 import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
@@ -38,6 +39,11 @@ const Index: React.FC<{
   }, [connection.id, store.connection.openIds])
 
   const icon = React.useMemo(() => {
+    if (loading) {
+      return (
+        <LoadingOutlined spin={true} className="text-sm mr-1"></LoadingOutlined>
+      )
+    }
     if (isOpen) {
       if (collapse) {
         return <DownOutlined className="text-sm mr-1" />
@@ -47,27 +53,31 @@ const Index: React.FC<{
     } else {
       return <DisconnectOutlined className="text-sm mr-1" />
     }
-  }, [collapse, isOpen])
+  }, [collapse, isOpen, loading])
 
   const getDbs = React.useCallback(async () => {
     setLoading(true)
-    const res = await request<string>('config/databases', connection.id)
-    const dbs: DBType[] = []
-    for (let i = 0; i < parseInt(res.data); i++) {
-      dbs.push({
-        db: i,
-        count: 0
-      })
+    try {
+      const res = await request<string>('config/databases', connection.id)
+      const dbs: DBType[] = []
+      for (let i = 0; i < parseInt(res.data); i++) {
+        dbs.push({
+          db: i,
+          count: 0
+        })
+      }
+      setDatabases(dbs)
+      setLoading(false)
+    } catch (e) {
+      setLoading(false)
+      throw e
     }
-    setLoading(false)
-    setDatabases(dbs)
   }, [connection.id])
 
   const onItemClick = React.useCallback(() => {
     if (isOpen) {
       setCollapse((p) => !p)
     } else {
-      setLoading(true)
       getDbs().then(() => {
         setCollapse(true)
         store.connection.open(connection.id)
