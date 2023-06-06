@@ -6,28 +6,28 @@ mod redis_conn;
 mod response;
 mod route;
 mod sqlite;
+mod state;
 mod utils;
+use redis_conn::RedisManager;
+use state::PubsubManager;
 use tauri::Menu;
-use tokio::sync;
-
-static ARRAY: sync::OnceCell<redis_conn::RedisManager> = sync::OnceCell::const_new();
 
 fn main() {
     sqlite::init_sqlite();
-    tokio::spawn(async {
-        ARRAY
-            .get_or_init(|| async { redis_conn::RedisManager::new() })
-            .await;
-        while let Some(message) = ARRAY.get_mut().unwrap().rx.recv().await {
-            dbg!(message);
-        }
-    });
+
     let app_name = "Tauri Redis Desktop Manager";
-    let menu: Menu = Menu::os_default(app_name); //
-                                                 // menu.add_submenu(submenu)
-                                                 // menu.add_submenu(Submenu::new(app_name, Menu::new()));
+    let menu: Menu = Menu::os_default(app_name);
+    let mut m = RedisManager::new();
+    // tokio::spawn(async move {
+    //     while let Some(m) = m.rx.recv().await {
+    //         dbg!(m);
+    //     }
+    // });
+
     tauri::Builder::default()
         .menu(menu)
+        .manage(m)
+        .manage(PubsubManager::new())
         .enable_macos_default_menu(true)
         .invoke_handler(tauri::generate_handler![route::dispatch])
         .run(tauri::generate_context!())

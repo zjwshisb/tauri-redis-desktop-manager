@@ -11,11 +11,12 @@ import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import { useThrottleFn } from 'ahooks'
-import { Space, Spin } from 'antd'
+import { Space, Spin, Tooltip } from 'antd'
 import DBItem from './DBItem'
 import ConnectionMenu from './ConnectionMenu'
 import InfoIcon from './Info'
 import ClientIcon from './Client'
+import { useTranslation } from 'react-i18next'
 
 export interface DBType {
   db: number
@@ -37,6 +38,7 @@ const Index: React.FC<{
   const isOpen = React.useMemo(() => {
     return store.connection.openIds[connection.id]
   }, [connection.id, store.connection.openIds])
+  const { t } = useTranslation()
 
   const icon = React.useMemo(() => {
     if (loading) {
@@ -115,13 +117,16 @@ const Index: React.FC<{
           <Space>
             {isOpen && (
               <>
-                <ReloadOutlined
-                  className="hover:text-blue-600"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    getDbs()
-                  }}
-                ></ReloadOutlined>
+                <Tooltip title={t('Refresh')}>
+                  <ReloadOutlined
+                    className="hover:text-blue-600"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      getDbs()
+                    }}
+                  ></ReloadOutlined>
+                </Tooltip>
+
                 <InfoIcon connection={connection} />
                 <ClientIcon connection={connection} />
               </>

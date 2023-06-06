@@ -1,12 +1,9 @@
 import React from 'react'
-import {
-  DatabaseOutlined,
-  KeyOutlined,
-  ReloadOutlined
-} from '@ant-design/icons'
+import { DatabaseOutlined, ReloadOutlined } from '@ant-design/icons'
 import classnames from 'classnames'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
+import Subscribe from './Subscribe'
 import { type DBType } from './index'
 
 const Index: React.FC<{
@@ -39,8 +36,7 @@ const Index: React.FC<{
     }
     return (
       <>
-        <span className="">{keyCount}</span>
-        <KeyOutlined className="text-xs" />
+        <span className="">({keyCount})</span>
       </>
     )
   }, [keyCount, loading])
@@ -55,19 +51,24 @@ const Index: React.FC<{
         'h-[22px] flex items-center px-2 rounded hover:cursor-pointer justify-between',
         props.active ? 'bg-blue-50' : 'hover:bg-gray-100'
       ])}
-      onClick={() => {
-        if (props.active) {
-          store.db.remove(key)
-        } else {
-          store.db.add(props.connection, props.db.db)
-        }
-      }}
     >
-      <div className="flex">
+      <div
+        className="flex flex-1"
+        onClick={() => {
+          if (props.active) {
+            store.db.remove(key)
+          } else {
+            store.db.add(props.connection, props.db.db)
+          }
+        }}
+      >
         <DatabaseOutlined className="mr-1 text-sm" />
-        <div>{props.db.db}</div>
+        <div className="w-6">{props.db.db}</div>
+        <div>{child}</div>
       </div>
-      <div className="flex">{child}</div>
+      <div className="flex pl-2">
+        <Subscribe connection={props.connection} db={props.db.db} />
+      </div>
     </div>
   )
 }

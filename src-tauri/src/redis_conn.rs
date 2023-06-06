@@ -1,28 +1,27 @@
-use std::collections::HashMap;
+use std::sync::Arc;
 use std::time::Duration;
+use std::{collections::HashMap, sync::Mutex};
 
 use crate::err::CusError;
 use crate::model::Connection as Conn;
 use redis::aio::Connection;
 use redis::Client;
-use tokio::sync::{mpsc, oneshot};
-use tokio::time::timeout;
+use tokio::{sync::mpsc, time::timeout};
 
-#[derive(Debug)]
 pub struct RedisManager {
-    pub tx: mpsc::Sender<Message>,
-    pub rx: mpsc::Receiver<Message>,
-}
-#[derive(Debug)]
-pub struct Message {
-    cmd: String,
-    // resp: oneshot::Sender<redis::Value>,
+    pub conns: Mutex<HashMap<u32, Arc<Connection>>>,
+    pub rx: mpsc::Receiver<String>,
+    pub tx: mpsc::Sender<String>,
 }
 
 impl RedisManager {
     pub fn new() -> RedisManager {
-        let (tx, rx) = mpsc::channel(32);
-        RedisManager { tx: tx, rx: rx }
+        let (tx, rx) = mpsc::channel::<String>(32);
+        RedisManager {
+            conns: Mutex::new(HashMap::new()),
+            tx,
+            rx,
+        }
     }
 }
 

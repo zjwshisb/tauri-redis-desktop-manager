@@ -12,6 +12,7 @@ import Add from './components/Add'
 import { useTranslation } from 'react-i18next'
 import ResizableDiv from '@/components/ResizableDiv'
 import classNames from 'classnames'
+import { getPageKey } from '@/utils'
 
 interface ScanResp {
   cursor: string
@@ -191,7 +192,7 @@ const Index: React.FC = () => {
                 height={listHeight}
               >
                 {(v) => {
-                  const key = `${v}|${db.connection.host}:${db.connection.port}`
+                  const key = getPageKey(v, db.connection, db.db)
 
                   return (
                     <List.Item

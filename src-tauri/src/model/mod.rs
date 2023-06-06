@@ -1,4 +1,5 @@
 use crate::{err::CusError, sqlite};
+use chrono::prelude::*;
 use rusqlite::{self, params};
 use serde::Serialize;
 
@@ -116,4 +117,30 @@ impl Connection {
 pub struct Field {
     pub name: String,
     pub value: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct EventResp<T> {
+    pub data: T,
+    pub success: bool,
+    pub event: String,
+    pub time: String,
+    pub id: u32,
+}
+
+impl<T> EventResp<T>
+where
+    T: serde::Serialize,
+{
+    pub fn new(data: T, event: String) -> EventResp<T> {
+        let id = rand::random::<u32>();
+        let utc: DateTime<Utc> = Utc::now();
+        return EventResp {
+            data,
+            success: true,
+            event,
+            time: utc.format("%H:%M:%S").to_string(),
+            id,
+        };
+    }
 }

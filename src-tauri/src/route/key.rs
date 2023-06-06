@@ -1,11 +1,16 @@
+use std::{
+    borrow::{Borrow, BorrowMut},
+    cell::RefCell,
+};
+
 use crate::{
     err::{self, CusError},
-    redis_conn::{self, Message},
-    ARRAY,
+    redis_conn::{self, RedisManager},
 };
 use redis::aio::Connection;
 use redis::{cmd, Value};
 use serde::{Deserialize, Serialize};
+use tauri::State;
 
 #[derive(Serialize, Debug)]
 pub struct Key {
@@ -117,15 +122,11 @@ pub struct ScanResp<T> {
 
 pub async fn scan(payload: String, cid: u32) -> Result<ScanResp<String>, CusError> {
     let args: ScanArgs = serde_json::from_str(&payload)?;
-
     let mut connection = redis_conn::get_connection(cid, args.db).await?;
-
     let mut cmd = redis::cmd("scan");
     cmd.arg(&args.cursor)
         .arg(&["count", &args.count.to_string()]);
-    ARRAY.get().unwrap().tx.send(Message {
-        cmd: String::from("test"),
-    });
+
     if args.search != "" {
         let mut search = args.search.clone();
         search.insert_str(0, "*");

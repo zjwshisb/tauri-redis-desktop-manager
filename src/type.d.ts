@@ -38,4 +38,17 @@ declare namespace APP {
   type ZSetKey = BaseKey<'zset', ZSetField[]>
 
   type SetKey = BaseKey<'set', string[]>
+
+  interface EventPayload<T> {
+    time: string
+    data: T
+    success: boolean
+    event: string
+    id: number
+  }
+
+  interface PubsubMessage {
+    payload: string
+    channel: string
+  }
 }

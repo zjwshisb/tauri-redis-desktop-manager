@@ -1,5 +1,8 @@
+use tauri::{State, Window};
+
 use crate::err::CusError;
 use crate::response::Response;
+use crate::state::PubsubManager;
 
 pub mod client;
 pub mod config;
@@ -8,12 +11,19 @@ pub mod db;
 pub mod hash;
 pub mod key;
 pub mod list;
+pub mod pubsub;
 pub mod server;
 pub mod set;
 pub mod zset;
 
 #[tauri::command]
-pub async fn dispatch(path: String, cid: u32, payload: String) -> Result<String, CusError> {
+pub async fn dispatch<'r>(
+    pubsub: tauri::State<'r, PubsubManager>,
+    window: Window,
+    path: String,
+    cid: u32,
+    payload: String,
+) -> Result<String, CusError> {
     let r = match path.as_str() {
         "connections/get" => Response::new(connection::get()?),
         "connections/add" => Response::new(connection::add(payload)?),
@@ -45,6 +55,8 @@ pub async fn dispatch(path: String, cid: u32, payload: String) -> Result<String,
         "client/list" => Response::new(client::list(payload, cid).await?),
         "client/kill" => Response::new(client::kill(payload, cid).await?),
         "config/databases" => Response::new(config::get_database(cid).await?),
+        "pubsub/subscribe" => Response::new(pubsub::subscribe(window, pubsub, payload, cid).await?),
+        "pubsub/publish" => Response::new(pubsub::publish(payload, cid).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r
