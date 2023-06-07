@@ -1,9 +1,8 @@
 use crate::{
     err::{self, CusError},
-    redis_conn::{self, RedisManager},
+    redis_conn,
 };
 use redis::Value;
-use tauri::State;
 
 pub async fn get_database(cid: u32) -> Result<String, CusError> {
     let mut conn = redis_conn::get_connection(cid, 0).await?;

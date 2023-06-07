@@ -1,6 +1,4 @@
 import useStore from '@/hooks/useStore'
-import request from '@/utils/request'
-import { CloseCircleFilled } from '@ant-design/icons'
 import { Form, Modal, Select, Tooltip } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -20,6 +18,12 @@ const Subscribe: React.FC<{
 
   const [form] = useForm()
 
+  React.useEffect(() => {
+    if (!open) {
+      form.resetFields()
+    }
+  }, [form, open])
+
   return (
     <Tooltip title={t('Pubsub')}>
       <Modal
@@ -30,37 +34,31 @@ const Subscribe: React.FC<{
         }}
         onCancel={(e) => {
           e.stopPropagation()
-          form.resetFields()
           setOpen(false)
         }}
         onOk={(e) => {
           e.stopPropagation()
           form.validateFields().then((data) => {
             setLoading(true)
-            const channels = data.channels
-            request<string>('pubsub/subscribe', props.connection.id, {
-              db: props.db,
-              channels
+            const channels = data.channels as string[]
+            const key = getPageKey(
+              `pubsub:${channels.join(',')}`,
+              props.connection,
+              props.db
+            )
+            store.page.addPage({
+              key,
+              label: key,
+              children: (
+                <Pubsub
+                  connection={props.connection}
+                  db={props.db}
+                  channels={channels}
+                ></Pubsub>
+              )
             })
-              .then((res) => {
-                const key = getPageKey('pubsub', props.connection, props.db)
-                store.page.addPage({
-                  key,
-                  label: key,
-                  children: (
-                    <Pubsub
-                      connection={props.connection}
-                      db={props.db}
-                      channels={channels}
-                      eventName={res.data}
-                    ></Pubsub>
-                  )
-                })
-                setOpen(false)
-              })
-              .finally(() => {
-                setLoading(false)
-              })
+            setLoading(false)
+            setOpen(false)
           })
         }}
       >
@@ -81,12 +79,14 @@ const Subscribe: React.FC<{
           </Form>
         </div>
       </Modal>
-      <CloseCircleFilled
-        onClick={(e) => {
-          e.stopPropagation()
+      <div
+        className="font-bold italic"
+        onClick={() => {
           setOpen(true)
         }}
-      ></CloseCircleFilled>
+      >
+        P
+      </div>
     </Tooltip>
   )
 }

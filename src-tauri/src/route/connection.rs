@@ -1,5 +1,3 @@
-use rusqlite::{self, params};
-
 use crate::{err::CusError, model::Connection};
 use serde::Deserialize;
 

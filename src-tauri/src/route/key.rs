@@ -1,16 +1,10 @@
-use std::{
-    borrow::{Borrow, BorrowMut},
-    cell::RefCell,
-};
-
 use crate::{
     err::{self, CusError},
-    redis_conn::{self, RedisManager},
+    redis_conn::{self},
 };
-use redis::aio::Connection;
+use redis::{aio::Connection, FromRedisValue};
 use redis::{cmd, Value};
 use serde::{Deserialize, Serialize};
-use tauri::State;
 
 #[derive(Serialize, Debug)]
 pub struct Key {
@@ -38,9 +32,7 @@ impl Key {
             extra_type: String::from(""),
         };
         let types_value: Value = cmd("type").arg(&key.name).query_async(conn).await?;
-        if let Value::Status(types) = types_value {
-            key.types = types
-        }
+        key.types = String::from_redis_value(&types_value)?;
         if !key.is_none() {
             key.get_ttl(conn).await?;
             key.get_memory(conn).await?;
@@ -55,16 +47,12 @@ impl Key {
             .arg(&["SAMPLES", "0"])
             .query_async(conn)
             .await?;
-        if let Value::Int(memory) = memory_value {
-            self.memory = memory
-        }
+        self.memory = i64::from_redis_value(&memory_value)?;
         Ok(())
     }
     async fn get_ttl(&mut self, conn: &mut Connection) -> Result<(), CusError> {
         let ttl_result: Value = cmd("ttl").arg(&self.name).query_async(conn).await?;
-        if let Value::Int(ttl) = ttl_result {
-            self.ttl = ttl
-        }
+        self.ttl = i64::from_redis_value(&ttl_result)?;
         Ok(())
     }
     async fn get_string_value(&mut self, conn: &mut Connection) -> Result<(), CusError> {
@@ -96,9 +84,7 @@ impl Key {
         };
         if cmd != "" {
             let length_value: Value = redis::cmd(cmd).arg(&self.name).query_async(conn).await?;
-            if let Value::Int(length) = length_value {
-                self.length = length
-            }
+            self.length = i64::from_redis_value(&length_value)?;
         }
         Ok(())
     }
@@ -137,20 +123,11 @@ pub async fn scan(payload: String, cid: u32) -> Result<ScanResp<String>, CusErro
     return match value {
         Value::Bulk(s) => {
             let mut keys: Vec<String> = vec![];
-            let cursor_value = s.get(0).unwrap();
-            let mut cursor = String::from("0");
-            if let Value::Data(vv) = cursor_value {
-                cursor = std::str::from_utf8(&vv).unwrap().into()
-            }
+            let cursor = String::from_redis_value(s.get(0).unwrap())?;
+
             let keys_vec = s.get(1);
             if let Some(s) = keys_vec {
-                if let Value::Bulk(s) = s {
-                    for v in s {
-                        if let Value::Data(vv) = v {
-                            keys.push(std::str::from_utf8(vv).unwrap().into());
-                        }
-                    }
-                };
+                keys = Vec::from_redis_value(&s)?;
             };
             return Ok(ScanResp {
                 cursor: cursor,
@@ -199,10 +176,7 @@ pub async fn del(payload: String, cid: u32) -> Result<i64, CusError> {
         .arg(&args.names)
         .query_async(&mut conn)
         .await?;
-    if let Value::Int(c) = value {
-        return Ok(c);
-    }
-    Err(err::new_normal())
+    Ok(i64::from_redis_value(&value)?)
 }
 #[derive(Deserialize)]
 struct ExpireArgs {
@@ -218,18 +192,7 @@ pub async fn expire(payload: String, cid: u32) -> Result<i64, CusError> {
         .arg(args.ttl)
         .query_async(&mut conn)
         .await?;
-    if let Value::Int(r) = value {
-        match r {
-            1 => {
-                return Ok(r);
-            }
-            0 => {
-                return Err(CusError::App(String::from("invalid args")));
-            }
-            _ => {}
-        }
-    }
-    Err(err::new_normal())
+    Ok(i64::from_redis_value(&value)?)
 }
 
 #[derive(Deserialize)]
@@ -247,10 +210,7 @@ pub async fn rename(payload: String, cid: u32) -> Result<String, CusError> {
         .arg(&args.new_name)
         .query_async(&mut conn)
         .await?;
-    if let Value::Okay = value {
-        return Ok(String::from("OK"));
-    }
-    Err(err::new_normal())
+    Ok(String::from_redis_value(&value)?)
 }
 
 #[derive(Deserialize)]
@@ -264,14 +224,11 @@ pub async fn set(payload: String, cid: u32) -> Result<String, CusError> {
     let args: SetArgs = serde_json::from_str(&payload)?;
     let mut conn = redis_conn::get_connection(cid, args.db).await?;
     let v: Value = redis::cmd("set")
-        .arg(&args.value)
+        .arg(&args.name)
         .arg(&args.value)
         .query_async(&mut conn)
         .await?;
-    if let Value::Okay = v {
-        return Ok(String::from("OK"));
-    }
-    Err(err::new_normal())
+    Ok(String::from_redis_value(&v)?)
 }
 
 #[derive(Deserialize)]
@@ -290,9 +247,7 @@ pub async fn add(payload: String, cid: u32) -> Result<String, CusError> {
                 .arg("Hello World")
                 .query_async(&mut conn)
                 .await?;
-            if let Value::Okay = v {
-                return Ok(String::from("OK"));
-            }
+            return Ok(String::from_redis_value(&v)?);
         }
         "hash" => {
             let v: Value = redis::cmd("hset")
@@ -301,9 +256,7 @@ pub async fn add(payload: String, cid: u32) -> Result<String, CusError> {
                 .arg("Hello World")
                 .query_async(&mut conn)
                 .await?;
-            if let Value::Int(count) = v {
-                return Ok(count.to_string());
-            }
+            return Ok(i64::from_redis_value(&v)?.to_string());
         }
         "set" => {
             let v: Value = redis::cmd("sadd")
@@ -311,9 +264,7 @@ pub async fn add(payload: String, cid: u32) -> Result<String, CusError> {
                 .arg("rust")
                 .query_async(&mut conn)
                 .await?;
-            if let Value::Int(count) = v {
-                return Ok(count.to_string());
-            }
+            return Ok(i64::from_redis_value(&v)?.to_string());
         }
         "list" => {
             let v: Value = redis::cmd("lpush")
@@ -321,9 +272,7 @@ pub async fn add(payload: String, cid: u32) -> Result<String, CusError> {
                 .arg("Hello World")
                 .query_async(&mut conn)
                 .await?;
-            if let Value::Int(count) = v {
-                return Ok(count.to_string());
-            }
+            return Ok(i64::from_redis_value(&v)?.to_string());
         }
         "zset" => {
             let v: Value = redis::cmd("zadd")
@@ -332,9 +281,7 @@ pub async fn add(payload: String, cid: u32) -> Result<String, CusError> {
                 .arg("rust")
                 .query_async(&mut conn)
                 .await?;
-            if let Value::Int(count) = v {
-                return Ok(count.to_string());
-            }
+            return Ok(i64::from_redis_value(&v)?.to_string());
         }
         _ => {}
     }

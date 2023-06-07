@@ -1,5 +1,5 @@
 use crate::{err::CusError, redis_conn};
-use redis::{Client, Value};
+use redis::{Client, FromRedisValue, Value};
 use serde::Deserialize;
 use tokio::time::{timeout, Duration};
 
@@ -13,17 +13,8 @@ struct P {
 pub async fn info(cid: u32) -> Result<String, CusError> {
     let mut connection = redis_conn::get_connection(cid, 0).await?;
     let v: Value = redis::cmd("info").query_async(&mut connection).await?;
-    match v {
-        Value::Data(ve) => {
-            let s = std::str::from_utf8(&ve).unwrap();
-            return Ok(String::from(s));
-        }
-        Value::Status(s) => {
-            return Ok(s);
-        }
-        _ => {}
-    }
-    Ok(String::from("OK"))
+
+    Ok(String::from_redis_value(&v)?)
 }
 
 pub async fn ping(payload: String) -> Result<String, CusError> {
@@ -42,22 +33,13 @@ pub async fn ping(payload: String) -> Result<String, CusError> {
                         .await?;
                 }
                 let v: Value = redis::cmd("ping").query_async(&mut connection).await?;
-                match v {
-                    Value::Data(ve) => {
-                        let s = std::str::from_utf8(&ve).unwrap();
-                        return Ok(String::from(s));
-                    }
-                    Value::Status(s) => {
-                        return Ok(s);
-                    }
-                    _ => Ok(String::from("OK")),
-                }
+                Ok(String::from_redis_value(&v)?)
             }
             Err(r) => {
                 return Err(CusError::App(r.to_string()));
             }
         },
-        Err(e) => {
+        Err(_) => {
             return Err(CusError::App(String::from("Connected Timeout")));
         }
     }

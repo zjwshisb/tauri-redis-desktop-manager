@@ -134,12 +134,12 @@ where
 {
     pub fn new(data: T, event: String) -> EventResp<T> {
         let id = rand::random::<u32>();
-        let utc: DateTime<Utc> = Utc::now();
+        let now: DateTime<Local> = Local::now();
         return EventResp {
             data,
             success: true,
             event,
-            time: utc.format("%H:%M:%S").to_string(),
+            time: now.format("%H:%M:%S").to_string(),
             id,
         };
     }

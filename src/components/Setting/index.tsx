@@ -38,7 +38,6 @@ const Index: React.FC = () => {
         }}
         onCancel={() => {
           setOpen(false)
-          form.resetFields()
         }}
       >
         <div className="pt-4">

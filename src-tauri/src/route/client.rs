@@ -1,8 +1,5 @@
-use crate::{
-    err::{self, CusError},
-    redis_conn,
-};
-use redis;
+use crate::{err::CusError, redis_conn};
+use redis::{self, FromRedisValue};
 use serde::Deserialize;
 
 pub async fn list(_payload: String, cid: u32) -> Result<String, CusError> {
@@ -11,10 +8,7 @@ pub async fn list(_payload: String, cid: u32) -> Result<String, CusError> {
         .arg("list")
         .query_async(&mut conn)
         .await?;
-    if let redis::Value::Data(v) = value {
-        return Ok(std::str::from_utf8(&v).unwrap().into());
-    }
-    Err(err::new_normal())
+    Ok(String::from_redis_value(&value)?)
 }
 
 #[derive(Deserialize)]
@@ -30,13 +24,11 @@ pub async fn kill(payload: String, cid: u32) -> Result<i64, CusError> {
         .arg(&["id", &args.id])
         .query_async(&mut conn)
         .await?;
-    if let redis::Value::Int(count) = value {
-        match count {
-            0 => return Err(CusError::App(String::from("Client has been kill"))),
-            _ => {
-                return Ok(count);
-            }
+    let count = i64::from_redis_value(&value)?;
+    match count {
+        0 => return Err(CusError::App(String::from("Client has been kill"))),
+        _ => {
+            return Ok(count);
         }
     }
-    Err(err::new_normal())
 }

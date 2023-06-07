@@ -10,7 +10,7 @@ const Index: React.FC<{
 }> = (props) => {
   const [open, setOpen] = React.useState(false)
 
-  const [form] = useForm(undefined)
+  const [form] = useForm()
 
   const [loading, setLoading] = React.useState(false)
 

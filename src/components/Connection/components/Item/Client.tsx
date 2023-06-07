@@ -6,6 +6,7 @@ import useStore from '@/hooks/useStore'
 import Client from '@/components/Page/Client'
 import { Tooltip } from 'antd'
 import { useTranslation } from 'react-i18next'
+import { getPageKey } from '@/utils'
 
 const Index: React.FC<{
   connection: APP.Connection
@@ -20,9 +21,10 @@ const Index: React.FC<{
         className="hover:text-blue-600"
         onClick={(e) => {
           e.stopPropagation()
+          const key = getPageKey('client', connection)
           store.page.addPage({
-            label: `client|${connection.host}:${connection.port}`,
-            key: `client|${connection.host}:${connection.port}`,
+            label: key,
+            key,
             children: <Client connection={connection}></Client>
           })
         }}

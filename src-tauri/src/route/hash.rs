@@ -1,7 +1,7 @@
 use crate::err;
 use crate::model::Field;
 use crate::{err::CusError, redis_conn};
-use redis::Value;
+use redis::{FromRedisValue, Value};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
@@ -30,35 +30,20 @@ pub async fn hscan(payload: String, cid: u32) -> Result<HScanResp, CusError> {
     }
     let value = cmd.query_async(&mut connection).await?;
     if let Value::Bulk(s) = value {
-        let cursor_value = s.get(0).unwrap();
-        let mut cursor = String::from("0");
+        let cursor = String::from_redis_value(s.get(0).unwrap())?;
         let mut fields: Vec<Field> = vec![];
-        if let Value::Data(vv) = cursor_value {
-            cursor = std::str::from_utf8(&vv).unwrap().into()
-        }
         let keys_vec = s.get(1);
         if let Some(s) = keys_vec {
-            if let Value::Bulk(vec) = s {
-                let length = vec.len();
-                let mut current: usize = 0;
-                while current < length {
-                    let mut field: Field = Field {
-                        name: String::from(""),
-                        value: String::from(""),
-                    };
-                    let key_value = vec.get(current).unwrap();
-                    if let Value::Data(key) = key_value {
-                        field.name = std::str::from_utf8(key).unwrap().into()
-                    }
-                    current = current + 1;
-                    let value_value = vec.get(current).unwrap();
-                    if let Value::Data(value) = value_value {
-                        field.value = std::str::from_utf8(value).unwrap().into()
-                    }
-                    current = current + 1;
-                    fields.push(field);
-                }
-            };
+            let vec = Vec::<String>::from_redis_value(&s)?;
+            let length = vec.len();
+            let mut current: usize = 0;
+            while current < length {
+                fields.push(Field {
+                    name: vec.get(current).unwrap().clone(),
+                    value: vec.get(current + 1).unwrap().clone(),
+                });
+                current = current + 2;
+            }
         };
         Ok(HScanResp { cursor, fields })
     } else {
@@ -81,10 +66,7 @@ pub async fn hset(payload: String, cid: u32) -> Result<i64, CusError> {
         .arg(&[args.field, args.value])
         .query_async(&mut connection)
         .await?;
-    if let Value::Int(count) = value {
-        return Ok(count);
-    }
-    Err(err::new_normal())
+    Ok(i64::from_redis_value(&value)?)
 }
 #[derive(Deserialize)]
 struct HDelArgs {
@@ -101,8 +83,5 @@ pub async fn hdel(payload: String, cid: u32) -> Result<i64, CusError> {
         .arg(&args.fields)
         .query_async(&mut connection)
         .await?;
-    if let Value::Int(count) = value {
-        return Ok(count);
-    }
-    Err(err::new_normal())
+    Ok(i64::from_redis_value(&value)?)
 }

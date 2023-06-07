@@ -3,13 +3,9 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use tokio::sync::oneshot;
 
-pub struct PubsubItem(pub oneshot::Sender<()>, pub DateTime<Utc>);
+pub struct PubsubItem(pub oneshot::Sender<()>, pub DateTime<Local>);
 
-impl PubsubItem {
-    pub fn close(&mut self) {
-        &self.0.send(()).unwrap();
-    }
-}
+impl PubsubItem {}
 
 pub struct PubsubManager(pub Mutex<HashMap<String, PubsubItem>>);
 

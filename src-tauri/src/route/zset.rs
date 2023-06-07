@@ -2,7 +2,7 @@ use crate::{
     err::{self, CusError},
     redis_conn,
 };
-use redis::Value;
+use redis::{FromRedisValue, Value};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug)]
@@ -28,7 +28,6 @@ pub struct ZScanResp {
 
 pub async fn zscan(payload: String, cid: u32) -> Result<ZScanResp, CusError> {
     let args: ZScanArgs = serde_json::from_str(&payload)?;
-    dbg!(&args);
     let mut conn = redis_conn::get_connection(cid, args.db).await?;
     let mut cmd = redis::cmd("zscan");
     cmd.arg(String::from(args.name))
@@ -39,35 +38,23 @@ pub async fn zscan(payload: String, cid: u32) -> Result<ZScanResp, CusError> {
     }
     let values: redis::Value = cmd.query_async(&mut conn).await?;
     if let Value::Bulk(s) = values {
-        let cursor_value = s.get(0).unwrap();
-        let mut cursor = String::from("0");
+        let cursor = String::from_redis_value(s.get(0).unwrap())?;
         let mut fields: Vec<ScoreField> = vec![];
-        if let Value::Data(vv) = cursor_value {
-            cursor = std::str::from_utf8(&vv).unwrap().into()
-        }
         let keys_vec = s.get(1);
         if let Some(s) = keys_vec {
-            if let Value::Bulk(vec) = s {
-                let length = vec.len();
-                let mut current: usize = 0;
-                while current < length {
-                    let mut field: ScoreField = ScoreField {
-                        score: String::from(""),
-                        value: String::from(""),
-                    };
-                    let key_value = vec.get(current).unwrap();
-                    if let Value::Data(key) = key_value {
-                        field.value = std::str::from_utf8(key).unwrap().into()
-                    }
-                    current = current + 1;
-                    let value_value = vec.get(current).unwrap();
-                    if let Value::Data(value) = value_value {
-                        field.score = std::str::from_utf8(value).unwrap().into()
-                    }
-                    current = current + 1;
-                    fields.push(field);
-                }
-            };
+            let vec = Vec::<String>::from_redis_value(s)?;
+            let length = vec.len();
+            let mut current: usize = 0;
+            while current < length {
+                let mut field: ScoreField = ScoreField {
+                    score: String::from(""),
+                    value: String::from(""),
+                };
+                field.value = vec.get(current).unwrap().clone();
+                field.score = vec.get(current + 1).unwrap().clone();
+                current = current + 2;
+                fields.push(field);
+            }
         };
         Ok(ZScanResp {
             cursor: cursor,
@@ -93,10 +80,7 @@ pub async fn zrem(payload: String, cid: u32) -> Result<i64, CusError> {
         .arg(args.value)
         .query_async(&mut conn)
         .await?;
-    if let Value::Int(i) = v {
-        return Ok(i);
-    }
-    Err(err::new_normal())
+    Ok(i64::from_redis_value(&v)?)
 }
 
 #[derive(Deserialize)]
@@ -116,8 +100,5 @@ pub async fn zadd(payload: String, cid: u32) -> Result<i64, CusError> {
         .arg(args.value)
         .query_async(&mut conn)
         .await?;
-    if let Value::Int(i) = v {
-        return Ok(i);
-    }
-    Err(err::new_normal())
+    Ok(i64::from_redis_value(&v)?)
 }

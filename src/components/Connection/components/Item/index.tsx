@@ -17,6 +17,7 @@ import ConnectionMenu from './ConnectionMenu'
 import InfoIcon from './Info'
 import ClientIcon from './Client'
 import { useTranslation } from 'react-i18next'
+import Monitor from './Monitor'
 
 export interface DBType {
   db: number
@@ -105,9 +106,11 @@ const Index: React.FC<{
         className={
           'flex justify-between rounded hover:bg-gray-100 hover:cursor-pointer text-lg'
         }
-        onClick={onItemClickTh.run}
       >
-        <div className={'flex overflow-hidden'}>
+        <div
+          className={'flex overflow-hidden flex-1'}
+          onClick={onItemClickTh.run}
+        >
           {icon}
           <div className="truncate">
             {connection.host}:{connection.port}
@@ -129,6 +132,7 @@ const Index: React.FC<{
 
                 <InfoIcon connection={connection} />
                 <ClientIcon connection={connection} />
+                <Monitor connection={connection} />
               </>
             )}
 

@@ -1,4 +1,4 @@
-use tauri::{State, Window};
+use tauri::Window;
 
 use crate::err::CusError;
 use crate::response::Response;
@@ -57,6 +57,8 @@ pub async fn dispatch<'r>(
         "config/databases" => Response::new(config::get_database(cid).await?),
         "pubsub/subscribe" => Response::new(pubsub::subscribe(window, pubsub, payload, cid).await?),
         "pubsub/publish" => Response::new(pubsub::publish(payload, cid).await?),
+        "pubsub/cancel" => Response::new(pubsub::cancel(payload, pubsub).await?),
+        "pubsub/monitor" => Response::new(pubsub::monitor(window, pubsub, cid).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

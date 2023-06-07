@@ -1,3 +1,4 @@
+use redis::FromRedisValue;
 use serde::Deserialize;
 
 use crate::{
@@ -22,16 +23,7 @@ pub async fn lrange(payload: String, cid: u32) -> Result<Vec<String>, CusError> 
         .arg(&args.stop)
         .query_async(&mut conn)
         .await?;
-    if let redis::Value::Bulk(arr) = values {
-        let mut res: Vec<String> = vec![];
-        for i in arr {
-            if let redis::Value::Data(vv) = i {
-                res.push(std::str::from_utf8(&vv).unwrap().into())
-            }
-        }
-        return Ok(res);
-    }
-    Err(err::new_normal())
+    Ok(Vec::<String>::from_redis_value(&values)?)
 }
 
 #[derive(Deserialize)]
@@ -50,10 +42,7 @@ pub async fn lset(payload: String, cid: u32) -> Result<String, CusError> {
         .arg(&args.value)
         .query_async(&mut conn)
         .await?;
-    if let redis::Value::Okay = value {
-        return Ok(String::from("OK"));
-    }
-    Err(err::new_normal())
+    Ok(String::from_redis_value(&value)?)
 }
 
 #[derive(Deserialize)]
@@ -73,10 +62,7 @@ pub async fn ltrim(payload: String, cid: u32) -> Result<String, CusError> {
         .arg(args.stop)
         .query_async(&mut conn)
         .await?;
-    if let redis::Value::Okay = value {
-        return Ok(String::from("OK"));
-    }
-    Err(err::new_normal())
+    Ok(String::from_redis_value(&value)?)
 }
 
 #[derive(Deserialize)]

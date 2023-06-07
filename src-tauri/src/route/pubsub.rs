@@ -1,9 +1,6 @@
 use crate::model::EventResp;
-use crate::state::{self, PubsubItem, PubsubManager};
-use crate::{
-    err::{self, CusError},
-    redis_conn,
-};
+use crate::state::{PubsubItem, PubsubManager};
+use crate::{err::CusError, redis_conn};
 use chrono::prelude::*;
 use futures::stream::StreamExt;
 use rand::distributions::Alphanumeric;
@@ -18,7 +15,7 @@ struct SubscribeArgs {
     db: u8,
     channels: Vec<String>,
 }
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 struct Message {
     channel: String,
     payload: String,
@@ -45,8 +42,7 @@ pub async fn subscribe<'r>(
         .collect::<String>();
     let event_name_resp = event_name.clone();
     let (tx, rx) = oneshot::channel::<()>();
-    // let rx_ref: RefCell<oneshot::Receiver<()>> = RefCell::new(rx);
-    pubsub_manager.add(event_name_resp.clone(), PubsubItem(tx, Utc::now()));
+    pubsub_manager.add(event_name_resp.clone(), PubsubItem(tx, Local::now()));
     tokio::spawn(async move {
         let event_str = event_name.as_str();
         let mut stream = pubsub.on_message();
@@ -71,9 +67,10 @@ pub async fn subscribe<'r>(
                         }
                     }
                 }
-            } => {}
-            _ = rx => {
+            } => {
 
+            }
+            _ = rx => {
             }
         }
     });
@@ -86,6 +83,7 @@ struct PublishArgs {
     channel: String,
     value: String,
 }
+
 pub async fn publish(payload: String, cid: u32) -> Result<i64, CusError> {
     let args: PublishArgs = serde_json::from_str(&payload)?;
     let mut conn = redis_conn::get_connection(cid, args.db).await?;
@@ -94,24 +92,66 @@ pub async fn publish(payload: String, cid: u32) -> Result<i64, CusError> {
         .arg(args.value)
         .query_async(&mut conn)
         .await?;
-    if let redis::Value::Int(count) = v {
-        return Ok(count);
-    }
-    Err(err::new_normal())
+    Ok(i64::from_redis_value(&v)?)
+}
+
+pub async fn monitor<'r>(
+    window: tauri::Window,
+    pubsub_manager: State<'r, PubsubManager>,
+    cid: u32,
+) -> Result<String, CusError> {
+    let conn = redis_conn::get_connection(cid, 0).await?;
+
+    let mut monitor = conn.into_monitor();
+
+    let mut rng = rand::thread_rng();
+    let event_name = Alphanumeric
+        .sample_iter(&mut rng)
+        .take(20)
+        .map(char::from)
+        .collect::<String>();
+    let event_name_resp = event_name.clone();
+    let (tx, rx) = oneshot::channel::<()>();
+    pubsub_manager.add(event_name_resp.clone(), PubsubItem(tx, Local::now()));
+    tokio::spawn(async move {
+        let event_str = event_name.as_str();
+        let _ = monitor.monitor().await;
+        let mut stream = monitor.into_on_message::<redis::Value>();
+        tokio::select! {
+            _ = async {
+
+                while let Some(msg) = stream.next().await {
+                    dbg!(&msg);
+                    let r: EventResp<String> = EventResp::new(
+                        String::from_redis_value(&msg).unwrap(),
+                        String::from(event_str),
+                    );
+                    let result = window.emit(event_str, serde_json::to_string(&r).unwrap());
+                    if let Err(e) = result {
+                        dbg!(e);
+                    }
+                }
+            } => {
+
+            }
+            _ = rx => {
+            }
+        }
+    });
+    Ok(event_name_resp)
 }
 
 #[derive(Deserialize)]
 struct CancelArgs {
     name: String,
-    db: u8,
 }
 pub async fn cancel<'r>(
     payload: String,
     pubsub_manager: State<'r, PubsubManager>,
 ) -> Result<String, CusError> {
     let args: CancelArgs = serde_json::from_str(&payload)?;
-    if let Some(x) = pubsub_manager.0.lock().unwrap().get_mut(&args.name) {
-        x.close();
+    if let Some(x) = pubsub_manager.0.lock().unwrap().remove(&args.name) {
+        let _ = x.0.send(());
     }
     Ok(String::from("Ok"))
 }

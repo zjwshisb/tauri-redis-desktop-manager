@@ -1,29 +1,10 @@
-use std::sync::Arc;
 use std::time::Duration;
-use std::{collections::HashMap, sync::Mutex};
 
 use crate::err::CusError;
 use crate::model::Connection as Conn;
 use redis::aio::Connection;
 use redis::Client;
-use tokio::{sync::mpsc, time::timeout};
-
-pub struct RedisManager {
-    pub conns: Mutex<HashMap<u32, Arc<Connection>>>,
-    pub rx: mpsc::Receiver<String>,
-    pub tx: mpsc::Sender<String>,
-}
-
-impl RedisManager {
-    pub fn new() -> RedisManager {
-        let (tx, rx) = mpsc::channel::<String>(32);
-        RedisManager {
-            conns: Mutex::new(HashMap::new()),
-            tx,
-            rx,
-        }
-    }
-}
+use tokio::time::timeout;
 
 pub async fn get_connection(connection_id: u32, db: u8) -> Result<Connection, CusError> {
     let c = Conn::first(connection_id)?;

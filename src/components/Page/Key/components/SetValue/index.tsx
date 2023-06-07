@@ -116,7 +116,6 @@ const Index: React.FC<{
               return a.value > b.value ? 1 : -1
             }
           },
-
           {
             title: t('Action'),
             width: '200px',
@@ -138,17 +137,16 @@ const Index: React.FC<{
           }
         ]}
       ></Table>
-      {more && (
-        <Button
-          block
-          className="my-4"
-          onClick={() => {
-            getFields()
-          }}
-        >
-          {t('load more')}
-        </Button>
-      )}
+      <Button
+        block
+        disabled={!more}
+        className="my-4"
+        onClick={() => {
+          getFields()
+        }}
+      >
+        {t('Load More')}
+      </Button>
     </div>
   )
 }

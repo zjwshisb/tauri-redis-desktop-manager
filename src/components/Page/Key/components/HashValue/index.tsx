@@ -1,12 +1,13 @@
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Space, Table, Tooltip, Input } from 'antd'
+import { Button, Space, Tooltip, Input } from 'antd'
 import { EyeOutlined, EditOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
 import FieldForm from './components/FieldForm'
 import DeleteField from './components/DeleteField'
 import { actionIconStyle } from '@/utils/styles'
 import { useTranslation } from 'react-i18next'
+import CusTable from '@/components/CusTable'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -74,24 +75,14 @@ const Index: React.FC<{
           }
         />
       </div>
-      <Table
-        pagination={false}
-        scroll={{
-          x: 'auto'
-        }}
+      <CusTable
         rowKey={'name'}
+        more={more}
+        onLoadMore={getFields}
         dataSource={fields}
-        bordered
         columns={[
           {
-            title: '#',
-            render(r, d, index) {
-              return index + 1
-            }
-          },
-          {
             dataIndex: 'name',
-
             title: (
               <div className="flex items-center justify-center">
                 <div>{t('Field Name')}</div>
@@ -172,17 +163,7 @@ const Index: React.FC<{
             }
           }
         ]}
-      ></Table>
-      <Button
-        disabled={!more}
-        block
-        className="my-4"
-        onClick={() => {
-          getFields()
-        }}
-      >
-        {t('Load More')}
-      </Button>
+      ></CusTable>
     </div>
   )
 }

@@ -152,7 +152,7 @@ const Index: React.FC = () => {
                 {db != null && (
                   <Add
                     onSuccess={(name: string) => {
-                      const key = `${name}|${db.connection.host}:${db.connection.port}`
+                      const key = getPageKey(name, db.connection, db.db)
                       store.page.addPage({
                         key,
                         label: key,

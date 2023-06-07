@@ -1,6 +1,6 @@
 use crate::err::{self, CusError};
 use crate::redis_conn;
-use redis::Value;
+use redis::{FromRedisValue, Value};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
@@ -28,23 +28,12 @@ pub async fn sscan(payload: String, cid: u32) -> Result<SScanResp, CusError> {
         cmd.arg(&["MATCH", &format!("*{}*", args.search)]);
     }
     let values = cmd.query_async(&mut conn).await?;
-    dbg!(&values);
     if let Value::Bulk(s) = values {
-        let cursor_value = s.get(0).unwrap();
-        let mut cursor = String::from("0");
+        let cursor = String::from_redis_value(s.get(0).unwrap())?;
         let mut fields: Vec<String> = vec![];
-        if let Value::Data(vv) = cursor_value {
-            cursor = std::str::from_utf8(&vv).unwrap().into()
-        }
         let keys_vec = s.get(1);
         if let Some(s) = keys_vec {
-            if let Value::Bulk(arr) = s {
-                for v in arr {
-                    if let Value::Data(vv) = v {
-                        fields.push(std::str::from_utf8(&vv).unwrap().into())
-                    }
-                }
-            };
+            fields = Vec::<String>::from_redis_value(&s)?;
         };
         return Ok(SScanResp {
             cursor: cursor,
@@ -90,7 +79,7 @@ struct SRemArgs {
 }
 
 pub async fn srem(payload: String, cid: u32) -> Result<i64, CusError> {
-    let args: SAddArgs = serde_json::from_str(payload.as_str())?;
+    let args: SRemArgs = serde_json::from_str(payload.as_str())?;
     let mut conn = redis_conn::get_connection(cid, args.db).await?;
     let value: Value = redis::cmd("srem")
         .arg(args.name)
