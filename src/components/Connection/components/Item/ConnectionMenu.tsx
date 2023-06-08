@@ -41,7 +41,6 @@ const Index: React.FC<{
                 className="flex"
                 onClick={(e) => {
                   e.stopPropagation()
-                  store.connection.close(connection.id)
                 }}
               >
                 <EditOutlined />
@@ -73,7 +72,7 @@ const Index: React.FC<{
       })
     }
     return menus
-  }, [connection, store.connection, t, isOpen])
+  }, [store, connection, t, isOpen])
 
   return (
     <Dropdown
@@ -100,7 +99,7 @@ const Index: React.FC<{
               break
             }
             case 'close': {
-              store.connection.close(connection.id)
+              store.closeConnection(connection.id)
               break
             }
           }

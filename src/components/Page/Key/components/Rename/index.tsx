@@ -1,67 +1,46 @@
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
+import CusModal from '@/components/CusModal'
 
 const Index: React.FC<{
   keys: APP.Key
   trigger: React.ReactElement
   onSuccess: (name: string) => void
 }> = (props) => {
-  const [open, setOpen] = React.useState(false)
-
   const [form] = useForm()
 
-  const [loading, setLoading] = React.useState(false)
-
-  const trigger = React.cloneElement(props.trigger, {
-    onClick() {
-      setOpen(true)
-    }
-  })
-
   return (
-    <>
-      {trigger}
-      <Modal
-        width={'800px'}
-        confirmLoading={loading}
-        onOk={async () => {
-          setLoading(true)
-          const newName: string = form.getFieldValue('name')
-          await request<number>('key/rename', props.keys.connection_id, {
-            name: props.keys.name,
-            new_name: newName,
-            db: props.keys.db
-          })
-            .then(() => {
-              message.success('success')
-              props.onSuccess(newName)
-              setOpen(false)
-            })
-            .finally(() => {
-              setLoading(false)
-            })
-        }}
-        open={open}
-        title={'RENAME'}
-        onCancel={() => {
-          setOpen(false)
-          form.resetFields()
+    <CusModal
+      width={'800px'}
+      trigger={props.trigger}
+      onOk={async () => {
+        const newName: string = form.getFieldValue('name')
+        await request<number>('key/rename', props.keys.connection_id, {
+          name: props.keys.name,
+          new_name: newName,
+          db: props.keys.db
+        }).then(() => {
+          props.onSuccess(newName)
+        })
+      }}
+      title={'RENAME'}
+      onCancel={() => {
+        form.resetFields()
+      }}
+    >
+      <Form
+        form={form}
+        initialValues={{
+          name: props.keys.name
         }}
       >
-        <Form
-          form={form}
-          initialValues={{
-            name: props.keys.name
-          }}
-        >
-          <Form.Item name={'name'} label={'Name'} rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
+        <Form.Item name={'name'} label={'Name'} rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+      </Form>
+    </CusModal>
   )
 }
 export default Index

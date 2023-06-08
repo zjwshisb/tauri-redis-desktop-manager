@@ -37,11 +37,7 @@ const Index: React.FC = () => {
   const id = React.useId()
 
   const db = React.useMemo(() => {
-    if (store.db.db.length > 0) {
-      return store.db.db[0]
-    } else {
-      return null
-    }
+    return store.db.db
   }, [store.db.db])
 
   const { t } = useTranslation()
@@ -62,7 +58,7 @@ const Index: React.FC = () => {
         request<ScanResp>('key/scan', current.connection.id, {
           cursor: cursor.current,
           search: search.current,
-          count: store.setting.key_count,
+          count: store.setting.setting.key_count,
           db: current.db
         })
           .then((res) => {
@@ -86,7 +82,7 @@ const Index: React.FC = () => {
           })
       }
     },
-    [store.setting.key_count]
+    [store.setting.setting.key_count]
   )
 
   const reload = React.useCallback(() => {
@@ -156,6 +152,7 @@ const Index: React.FC = () => {
                       store.page.addPage({
                         key,
                         label: key,
+                        connectionId: db.connection.id,
                         children: (
                           <Key
                             name={name}
@@ -172,7 +169,7 @@ const Index: React.FC = () => {
               </Space>
             </div>
           </div>
-          {keys.length === 0 && (
+          {(keys.length === 0 || db === null) && (
             <div
               className="flex items-center justify-center"
               style={{
@@ -201,6 +198,7 @@ const Index: React.FC = () => {
                         store.page.addPage({
                           key,
                           label: key,
+                          connectionId: db.connection.id,
                           children: (
                             <Key
                               name={v}

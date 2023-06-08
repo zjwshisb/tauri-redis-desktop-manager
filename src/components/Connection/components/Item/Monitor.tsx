@@ -21,7 +21,8 @@ const Subscribe: React.FC<{
           store.page.addPage({
             key,
             label: key,
-            children: <Monitor connection={props.connection}></Monitor>
+            children: <Monitor connection={props.connection}></Monitor>,
+            connectionId: props.connection.id
           })
         }}
       ></MonitorOutlined>

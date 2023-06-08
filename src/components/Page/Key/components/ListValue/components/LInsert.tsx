@@ -1,59 +1,38 @@
-import { Form, Input, Modal, message, Button, Radio } from 'antd'
+import { Form, Input, Button, Radio } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
+import CusModal from '@/components/CusModal'
 
 const Index: React.FC<{
   keys: APP.ListKey
   onSuccess: () => void
 }> = (props) => {
-  const [open, setOpen] = React.useState(false)
-
   const [form] = useForm()
-
-  const [loading, setLoading] = React.useState(false)
-
-  React.useEffect(() => {
-    if (!open) {
-      form.resetFields()
-    }
-  }, [form, open])
 
   return (
     <>
-      <Button
-        type="primary"
-        onClick={() => {
-          setOpen(true)
-        }}
-      >
-        LINSERT
-      </Button>
-      <Modal
-        confirmLoading={loading}
+      <CusModal
+        trigger={<Button type="primary">LINSERT</Button>}
         onOk={async () => {
-          form.validateFields().then((formData) => {
-            setLoading(true)
-            request<number>('key/list/linsert', props.keys.connection_id, {
-              name: props.keys.name,
-              db: props.keys.db,
-              types: 'BEFORE',
-              ...formData
+          await form.validateFields().then(async (formData) => {
+            await request<number>(
+              'key/list/linsert',
+              props.keys.connection_id,
+              {
+                name: props.keys.name,
+                db: props.keys.db,
+                types: 'BEFORE',
+                ...formData
+              }
+            ).then(() => {
+              props.onSuccess()
             })
-              .then(() => {
-                message.success('success')
-                props.onSuccess()
-                setOpen(false)
-              })
-              .finally(() => {
-                setLoading(false)
-              })
           })
         }}
-        open={open}
         title={'LINSERT'}
-        onCancel={() => {
-          setOpen(false)
+        onClear={() => {
+          form.resetFields()
         }}
       >
         <Form form={form} layout="vertical" initialValues={{}}>
@@ -83,7 +62,7 @@ const Index: React.FC<{
             <Input.TextArea rows={20}></Input.TextArea>
           </Form.Item>
         </Form>
-      </Modal>
+      </CusModal>
     </>
   )
 }

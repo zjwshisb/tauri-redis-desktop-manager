@@ -1,6 +1,6 @@
 import { Modal } from 'antd'
 import React from 'react'
-import useStore from '../../hooks/useStore'
+import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
 import ReactJson from 'react-json-view'
 import lodash from 'lodash'

@@ -1,12 +1,13 @@
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Space, Table } from 'antd'
+import { Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import LTrim from './components/LTrim'
 import LSet from './components/LSet'
 import LInsert from './components/LInsert'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
+import CusTable from '@/components/CusTable'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -27,7 +28,7 @@ const Index: React.FC<{
   const getFields = React.useCallback(
     async (reset = false) => {
       const start = index.current
-      const stop = index.current + store.setting.field_count - 1
+      const stop = index.current + store.setting.setting.field_count - 1
       setLoading(true)
       await request<string[]>('key/list/lrange', keys.connection_id, {
         name: keys.name,
@@ -49,7 +50,7 @@ const Index: React.FC<{
           setLoading(false)
         })
     },
-    [keys, store.setting.field_count]
+    [keys, store.setting.setting.field_count]
   )
 
   React.useEffect(() => {
@@ -67,7 +68,7 @@ const Index: React.FC<{
 
   return (
     <div>
-      <Space className="mb-2">
+      <Space className="pb-2">
         <LInsert
           keys={keys}
           onSuccess={() => {
@@ -81,20 +82,18 @@ const Index: React.FC<{
           }}
         />
       </Space>
-      <Table
+      <CusTable
+        showIndex={false}
+        more={more}
         loading={loading}
-        pagination={false}
-        scroll={{
-          x: 'auto'
-        }}
         rowKey={'index'}
+        onLoadMore={getFields}
         dataSource={items.map((v, index) => {
           return {
             value: v,
             index
           }
         })}
-        bordered
         columns={[
           {
             title: t('Index'),
@@ -131,17 +130,7 @@ const Index: React.FC<{
             }
           }
         ]}
-      ></Table>
-      <Button
-        block
-        disabled={!more}
-        className="my-4"
-        onClick={() => {
-          getFields()
-        }}
-      >
-        {t('Load More')}
-      </Button>
+      ></CusTable>
     </div>
   )
 }

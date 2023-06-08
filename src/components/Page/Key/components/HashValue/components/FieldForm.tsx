@@ -1,8 +1,9 @@
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
+import CusModal from '@/components/CusModal'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -10,11 +11,7 @@ const Index: React.FC<{
   trigger: React.ReactElement
   onSuccess: (newField: APP.HashField) => void
 }> = (props) => {
-  const [open, setOpen] = React.useState(false)
-
   const [form] = useForm(undefined)
-
-  const [loading, setLoading] = React.useState(false)
 
   const { t } = useTranslation()
 
@@ -26,65 +23,47 @@ const Index: React.FC<{
     return isEdit ? t('Edit Field') : 'Add Field'
   }, [isEdit, t])
 
-  const trigger = React.cloneElement(props.trigger, {
-    onClick() {
-      setOpen(true)
-    }
-  })
-
   return (
-    <>
-      {trigger}
-      <Modal
-        confirmLoading={loading}
-        onOk={async () => {
-          setLoading(true)
-          await request<number>('key/hash/hset', props.keys.connection_id, {
-            name: props.keys.name,
-            field: form.getFieldValue('name'),
-            value: form.getFieldValue('value'),
-            db: props.keys.db
-          })
-            .then(() => {
-              message.success('success')
-              props.onSuccess(form.getFieldsValue())
-              setOpen(false)
-            })
-            .finally(() => {
-              setLoading(false)
-            })
-        }}
-        open={open}
-        title={title}
-        onCancel={() => {
-          setOpen(false)
-          form.resetFields()
+    <CusModal
+      trigger={props.trigger}
+      onOk={async () => {
+        await request<number>('key/hash/hset', props.keys.connection_id, {
+          name: props.keys.name,
+          field: form.getFieldValue('name'),
+          value: form.getFieldValue('value'),
+          db: props.keys.db
+        }).then(() => {
+          props.onSuccess(form.getFieldsValue())
+        })
+      }}
+      title={title}
+      onClear={() => {
+        form.resetFields()
+      }}
+    >
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          ...props.field
         }}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={{
-            ...props.field
-          }}
+        <Form.Item
+          name={'name'}
+          label={t('Field Name')}
+          rules={[{ required: true }]}
         >
-          <Form.Item
-            name={'name'}
-            label={t('Field Name')}
-            rules={[{ required: true }]}
-          >
-            <Input readOnly={isEdit}></Input>
-          </Form.Item>
-          <Form.Item
-            name={'value'}
-            label={t('Field Value')}
-            rules={[{ required: true }]}
-          >
-            <Input.TextArea rows={20}></Input.TextArea>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
+          <Input readOnly={isEdit}></Input>
+        </Form.Item>
+        <Form.Item
+          name={'value'}
+          label={t('Field Value')}
+          rules={[{ required: true }]}
+        >
+          <Input.TextArea rows={20}></Input.TextArea>
+        </Form.Item>
+      </Form>
+    </CusModal>
   )
 }
 export default Index

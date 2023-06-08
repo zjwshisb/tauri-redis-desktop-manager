@@ -244,6 +244,7 @@ pub async fn add(payload: String, cid: u32) -> Result<String, CusError> {
     match args.types.as_str() {
         "string" => {
             let v: Value = redis::cmd("set")
+                .arg(&args.name)
                 .arg("Hello World")
                 .query_async(&mut conn)
                 .await?;

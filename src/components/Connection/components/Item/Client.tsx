@@ -24,6 +24,7 @@ const Index: React.FC<{
           const key = getPageKey('client', connection)
           store.page.addPage({
             label: key,
+            connectionId: connection.id,
             key,
             children: <Client connection={connection}></Client>
           })

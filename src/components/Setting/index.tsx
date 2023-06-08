@@ -1,4 +1,4 @@
-import { Button, Form, Modal, Select, message, InputNumber } from 'antd'
+import { Button, Form, Select, InputNumber } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { observer } from 'mobx-react-lite'
@@ -6,11 +6,10 @@ import { SettingOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
 import { useForm } from 'antd/es/form/Form'
 import lodash from 'lodash'
+import CusModal from '../CusModal'
 
 const Index: React.FC = () => {
   const { i18n, t } = useTranslation()
-
-  const [open, setOpen] = React.useState(false)
 
   const store = useStore()
 
@@ -18,26 +17,13 @@ const Index: React.FC = () => {
 
   return (
     <>
-      <Button
-        icon={<SettingOutlined />}
-        size="large"
-        onClick={() => {
-          setOpen(true)
-        }}
-      ></Button>
-      <Modal
+      <CusModal
+        trigger={<Button icon={<SettingOutlined />} size="large"></Button>}
         destroyOnClose
-        open={open}
         title={t('Setting')}
         onOk={async () => {
           const data = await form.validateFields()
-          // i18n.changeLanguage(data.locale)
           store.setting.update(data)
-          message.success('Success')
-          setOpen(false)
-        }}
-        onCancel={() => {
-          setOpen(false)
         }}
       >
         <div className="pt-4">
@@ -56,9 +42,7 @@ const Index: React.FC = () => {
               }
             }}
             initialValues={{
-              locale: store.setting.locale,
-              key_count: store.setting.key_count,
-              field_count: store.setting.field_count
+              ...store.setting.setting
             }}
           >
             <Form.Item name="locale" label={t('Language')}>
@@ -87,7 +71,7 @@ const Index: React.FC = () => {
             </Form.Item>
           </Form>
         </div>
-      </Modal>
+      </CusModal>
     </>
   )
 }

@@ -4,14 +4,17 @@ import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { type ColumnsType } from 'antd/es/table'
 
-export function formatColumns<T>(c: ColumnsType<T>) {
+export function formatColumns<T>(c: ColumnsType<T>, showIndex: boolean) {
   const n = [...c]
-  n.unshift({
-    title: '#',
-    render(_, __, index) {
-      return index + 1
-    }
-  })
+  if (showIndex) {
+    n.unshift({
+      title: '#',
+      render(_, __, index) {
+        return index + 1
+      }
+    })
+  }
+
   n.forEach((v) => {
     if (v.align === undefined) {
       v.align = 'center'
@@ -24,20 +27,26 @@ export default function CusTable<T extends object>(
   props: TableProps<T> & {
     onLoadMore?: () => void
     more?: boolean
+    showIndex?: boolean
   }
 ) {
   const { t } = useTranslation()
 
-  const { columns, ...others } = props
+  const { columns, showIndex = true, ...others } = props
 
   return (
     <div>
       <Table
         pagination={false}
+        bordered
         scroll={{
           x: 'auto'
         }}
-        columns={columns !== undefined ? formatColumns<T>(columns) : undefined}
+        columns={
+          columns !== undefined
+            ? formatColumns<T>(columns, showIndex)
+            : undefined
+        }
         {...others}
       ></Table>
       {others.more !== undefined && (

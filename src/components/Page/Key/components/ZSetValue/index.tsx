@@ -1,6 +1,6 @@
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Space, Table, Input } from 'antd'
+import { Button, Space, Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import ZRem from './components/ZRem'
 import useStore from '@/hooks/useStore'
@@ -8,6 +8,7 @@ import { observer } from 'mobx-react-lite'
 import Form from './components/Form'
 import { EditOutlined } from '@ant-design/icons'
 import { actionIconStyle } from '@/utils/styles'
+import CusTable from '@/components/CusTable'
 
 interface ZScanResp {
   cursor: string
@@ -27,18 +28,19 @@ const Index: React.FC<{
 
   const { t } = useTranslation()
 
-  const p = React.useRef(1)
-
   const search = React.useRef('')
 
   const getFields = React.useCallback(
     async (reset = false) => {
+      if (reset) {
+        cursor.current = '0'
+      }
       await request<ZScanResp>('key/zset/zscan', keys.connection_id, {
         name: keys.name,
         db: keys.db,
         cursor: cursor.current,
         search: search.current,
-        count: store.setting.field_count
+        count: store.setting.setting.field_count
       }).then((res) => {
         if (res.data.cursor === '0') {
           setMore(false)
@@ -55,39 +57,31 @@ const Index: React.FC<{
         }
       })
     },
-    [keys, store.setting.field_count]
+    [keys, store.setting.setting.field_count]
   )
 
   React.useEffect(() => {
-    cursor.current = '0'
-    setMore(true)
     getFields(true)
   }, [getFields])
 
   return (
     <div>
-      <Space className="mb-2">
-        <Form
-          onSuccess={onRefresh}
-          keys={keys}
-          trigger={<Button type="primary">ZAdd</Button>}
-        ></Form>
-      </Space>
-      <Table
-        pagination={false}
-        scroll={{
-          x: 'auto'
-        }}
+      <div className="pb-2">
+        <Space>
+          <Form
+            onSuccess={onRefresh}
+            keys={keys}
+            trigger={<Button type="primary">ZAdd</Button>}
+          ></Form>
+        </Space>
+      </div>
+
+      <CusTable
+        more={more}
+        onLoadMore={getFields}
         rowKey={'value'}
         dataSource={items}
-        bordered
         columns={[
-          {
-            title: '#',
-            render(_, record, p) {
-              return p + 1
-            }
-          },
           {
             title: (
               <div className="flex items-center justify-center">
@@ -152,19 +146,7 @@ const Index: React.FC<{
             }
           }
         ]}
-      ></Table>
-      <Button
-        disabled={!more}
-        block
-        className="my-4"
-        onClick={() => {
-          getFields().then(() => {
-            p.current++
-          })
-        }}
-      >
-        {t('Load More')}
-      </Button>
+      ></CusTable>
     </div>
   )
 }

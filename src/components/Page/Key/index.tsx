@@ -102,6 +102,7 @@ const Index: React.FC<{
                         store.page.updatePage(pageKey, {
                           label: newName,
                           key: newName,
+                          connectionId: connection.id,
                           children: (
                             <Index
                               name={newName}

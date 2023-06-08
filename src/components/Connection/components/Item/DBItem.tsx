@@ -42,10 +42,6 @@ const Index: React.FC<{
     )
   }, [keyCount, loading])
 
-  const key = React.useMemo(() => {
-    return `${props.db.db}|${props.connection.host}:${props.connection.port}`
-  }, [props.connection.host, props.connection.port, props.db])
-
   return (
     <div
       className={classnames([
@@ -56,11 +52,7 @@ const Index: React.FC<{
       <div
         className="flex flex-1"
         onClick={() => {
-          if (props.active) {
-            store.db.remove(key)
-          } else {
-            store.db.add(props.connection, props.db.db)
-          }
+          store.db.set(props.connection, props.db.db)
         }}
       >
         <DatabaseOutlined className="mr-1 text-sm" />

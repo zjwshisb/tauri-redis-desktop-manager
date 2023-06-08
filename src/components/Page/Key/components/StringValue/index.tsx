@@ -19,7 +19,7 @@ const Index: React.FC<{
 
   return (
     <div>
-      <div className="pb-2">
+      <div className="pb-2 flex">
         {!editable && (
           <Button
             type="primary"

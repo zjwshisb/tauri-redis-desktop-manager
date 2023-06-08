@@ -89,6 +89,9 @@ const Index: React.FC<{
                     ...v,
                     id: props.connection.id
                   })
+                  if (store.connection.isOpen(props.connection.id)) {
+                    store.closeConnection(props.connection.id)
+                  }
                 }
                 store.connection.fetchConnections()
                 message.success('操作成功')

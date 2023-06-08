@@ -148,14 +148,14 @@ const Index: React.FC<{
       >
         <Spin spinning={loading}>
           {databases.map((item, index) => {
-            const active = store.db.db.findIndex((v) => {
-              return v.connection.id === connection.id && v.db === item.db
-            })
+            const active =
+              store.db.db?.connection.id === connection.id &&
+              store.db.db?.db === item.db
             return (
               <DBItem
                 db={item}
                 connection={connection}
-                active={active > -1}
+                active={active}
                 key={index}
               ></DBItem>
             )

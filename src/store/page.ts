@@ -5,6 +5,7 @@ export interface Page {
   label: string
   key: string
   children: React.ReactNode
+  connectionId: number
 }
 
 class PageStore {
@@ -51,6 +52,10 @@ class PageStore {
         }
       }
     }
+  }
+
+  setPage(pages: Page[]) {
+    this.pages = pages
   }
 
   updatePage(key: string, page: Page) {

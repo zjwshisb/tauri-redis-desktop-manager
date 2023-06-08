@@ -19,6 +19,17 @@ class Store {
     this.fieldView = new FieldView()
     this.setting = new SettingStore()
   }
+
+  closeConnection(id: number) {
+    this.connection.close(id)
+    const pages = this.page.pages.filter(v => {
+      return v.connectionId !== id
+    })
+    this.page.setPage(pages)
+    if (this.db.db?.connection.id === id) {
+      this.db.db = null
+    }
+  }
 }
 
 const store = new Store()

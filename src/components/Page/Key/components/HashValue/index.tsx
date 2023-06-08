@@ -19,6 +19,8 @@ const Index: React.FC<{
   const [more, setMore] = React.useState(true)
   const search = React.useRef('')
 
+  const [loading, setLoadinng] = React.useState(false)
+
   const { t } = useTranslation()
 
   const getFields = React.useCallback(
@@ -26,6 +28,7 @@ const Index: React.FC<{
       if (reset) {
         cursor.current = '0'
       }
+      setLoadinng(true)
       request<{
         cursor: string
         fields: APP.HashField[]
@@ -33,23 +36,27 @@ const Index: React.FC<{
         name: keys.name,
         db: keys.db,
         cursor: cursor.current,
-        count: store.setting.field_count,
+        count: store.setting.setting.field_count,
         search: search.current
-      }).then((res) => {
-        cursor.current = res.data.cursor
-        if (res.data.cursor === '0') {
-          setMore(false)
-        } else {
-          setMore(true)
-        }
-        if (reset) {
-          setFields(res.data.fields)
-        } else {
-          setFields((p) => [...p].concat(res.data.fields))
-        }
       })
+        .then((res) => {
+          cursor.current = res.data.cursor
+          if (res.data.cursor === '0') {
+            setMore(false)
+          } else {
+            setMore(true)
+          }
+          if (reset) {
+            setFields(res.data.fields)
+          } else {
+            setFields((p) => [...p].concat(res.data.fields))
+          }
+        })
+        .finally(() => {
+          setLoadinng(false)
+        })
     },
-    [keys, store.setting.field_count]
+    [keys, store.setting.setting.field_count]
   )
 
   React.useEffect(() => {
@@ -60,7 +67,7 @@ const Index: React.FC<{
 
   return (
     <div>
-      <div>
+      <div className="pb-2 flex">
         <FieldForm
           keys={keys}
           onSuccess={(f) => {
@@ -68,14 +75,11 @@ const Index: React.FC<{
               return [...p].concat([f])
             })
           }}
-          trigger={
-            <Button type="primary" className="mb-4">
-              {t('Add Field')}
-            </Button>
-          }
+          trigger={<Button type="primary">{t('Add Field')}</Button>}
         />
       </div>
       <CusTable
+        loading={loading}
         rowKey={'name'}
         more={more}
         onLoadMore={getFields}

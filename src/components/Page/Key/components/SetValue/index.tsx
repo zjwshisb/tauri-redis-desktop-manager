@@ -1,11 +1,12 @@
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Input, Space, Table } from 'antd'
+import { Input, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import SAdd from './components/SAdd'
 import SRem from './components/SRem'
 import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
+import CusTable from '@/components/CusTable'
 
 interface SScanResp {
   cursor: string
@@ -26,43 +27,51 @@ const Index: React.FC<{
   const search = React.useRef('')
 
   const { t } = useTranslation()
+  const [loading, setLoading] = React.useState(false)
 
   const getFields = React.useCallback(
     async (reset = false) => {
+      if (reset) {
+        cursor.current = '0'
+      }
+      setLoading(true)
       await request<SScanResp>('key/set/sscan', keys.connection_id, {
         name: keys.name,
         db: keys.db,
         cursor: cursor.current,
         search: search.current,
-        count: store.setting.field_count
-      }).then((res) => {
-        if (res.data.cursor === '0') {
-          setMore(false)
-        } else {
-          setMore(true)
-        }
-        cursor.current = res.data.cursor
-        if (reset) {
-          setItems(res.data.fields)
-        } else {
-          setItems((p) => {
-            return [...p].concat(res.data.fields)
-          })
-        }
+        count: store.setting.setting.field_count
       })
+        .then((res) => {
+          if (res.data.cursor === '0') {
+            setMore(false)
+          } else {
+            setMore(true)
+          }
+          cursor.current = res.data.cursor
+          if (reset) {
+            setItems(res.data.fields)
+          } else {
+            setItems((p) => {
+              return [...p].concat(res.data.fields)
+            })
+          }
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     },
-    [keys, store.setting.field_count]
+    [keys, store.setting.setting.field_count]
   )
 
   React.useEffect(() => {
-    cursor.current = '0'
     setMore(true)
     getFields(true).then()
   }, [getFields])
 
   return (
     <div>
-      <Space className="mb-2">
+      <Space className="pb-2">
         <SAdd
           keys={keys}
           onSuccess={() => {
@@ -70,11 +79,10 @@ const Index: React.FC<{
           }}
         ></SAdd>
       </Space>
-      <Table
-        pagination={false}
-        scroll={{
-          x: 'auto'
-        }}
+      <CusTable
+        loading={loading}
+        more={more}
+        onLoadMore={getFields}
         rowKey={'value'}
         dataSource={items.map((v, index) => {
           return {
@@ -82,13 +90,7 @@ const Index: React.FC<{
             value: v
           }
         })}
-        bordered
         columns={[
-          {
-            title: '#',
-            dataIndex: 'index',
-            align: 'center'
-          },
           {
             title: (
               <div className="flex items-center justify-center">
@@ -136,17 +138,7 @@ const Index: React.FC<{
             }
           }
         ]}
-      ></Table>
-      <Button
-        block
-        disabled={!more}
-        className="my-4"
-        onClick={() => {
-          getFields()
-        }}
-      >
-        {t('Load More')}
-      </Button>
+      ></CusTable>
     </div>
   )
 }

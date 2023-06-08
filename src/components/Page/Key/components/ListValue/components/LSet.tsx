@@ -1,10 +1,11 @@
-import { Form, Input, Modal, message, InputNumber } from 'antd'
+import { Form, Input, InputNumber } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import { EditOutlined } from '@ant-design/icons'
 import { actionIconStyle } from '@/utils/styles'
 import { useTranslation } from 'react-i18next'
+import CusModal from '@/components/CusModal'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -12,57 +13,41 @@ const Index: React.FC<{
   value: string
   onSuccess: (value: string, index: number) => void
 }> = (props) => {
-  const [open, setOpen] = React.useState(false)
-
   const [form] = useForm(undefined)
-
-  const [loading, setLoading] = React.useState(false)
 
   const { t } = useTranslation()
 
   return (
     <>
-      <EditOutlined
-        style={actionIconStyle}
-        className="hover:cursor-pointer"
-        onClick={() => {
-          setOpen(true)
-        }}
-      />
-      <Modal
-        confirmLoading={loading}
+      <CusModal
+        trigger={
+          <EditOutlined
+            style={actionIconStyle}
+            className="hover:cursor-pointer"
+          />
+        }
         onOk={async () => {
-          setLoading(true)
           const formData = form.getFieldsValue()
           await request<number>('key/list/lset', props.keys.connection_id, {
             name: props.keys.name,
             db: props.keys.db,
             ...formData
+          }).then(() => {
+            props.onSuccess(formData.value, formData.index)
           })
-            .then(() => {
-              message.success('success')
-              props.onSuccess(formData.value, formData.index)
-              setOpen(false)
-            })
-            .finally(() => {
-              setLoading(false)
-            })
         }}
-        open={open}
         title={'LSET'}
-        onCancel={() => {
-          setOpen(false)
+        onClear={() => {
           form.resetFields()
         }}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={{
+        onOpen={() => {
+          form.setFieldsValue({
             index: props.index,
             value: props.value
-          }}
-        >
+          })
+        }}
+      >
+        <Form form={form} layout="vertical">
           <Form.Item name={'index'} label={t('Index')}>
             <InputNumber readOnly></InputNumber>
           </Form.Item>
@@ -70,7 +55,7 @@ const Index: React.FC<{
             <Input.TextArea rows={20}></Input.TextArea>
           </Form.Item>
         </Form>
-      </Modal>
+      </CusModal>
     </>
   )
 }

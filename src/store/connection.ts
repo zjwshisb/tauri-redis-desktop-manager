@@ -18,6 +18,10 @@ class ConnectionStore {
     this.openIds[id] = false
   }
 
+  isOpen(id: number) {
+    return this.openIds[id]
+  }
+
   async fetchConnections() {
     this.connections = (
       await request<APP.Connection[]>('connections/get', 0)

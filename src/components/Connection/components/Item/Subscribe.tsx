@@ -1,10 +1,11 @@
 import useStore from '@/hooks/useStore'
-import { Form, Modal, Select, Tooltip } from 'antd'
+import { Form, Select, Tooltip } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Pubsub from '@/components/Page/Pubsub'
 import { useForm } from 'antd/es/form/Form'
 import { getPageKey } from '@/utils'
+import CusModal from '@/components/CusModal'
 
 const Subscribe: React.FC<{
   connection: APP.Connection
@@ -13,33 +14,19 @@ const Subscribe: React.FC<{
   const { t } = useTranslation()
 
   const store = useStore()
-  const [open, setOpen] = React.useState(false)
-  const [loading, setLoading] = React.useState(false)
 
   const [form] = useForm()
 
-  React.useEffect(() => {
-    if (!open) {
-      form.resetFields()
-    }
-  }, [form, open])
-
   return (
     <Tooltip title={t('Pubsub')}>
-      <Modal
-        open={open}
+      <CusModal
+        onClear={() => {
+          form.resetFields()
+        }}
+        trigger={<div className="font-bold italic">P</div>}
         title={t('Pubsub')}
-        okButtonProps={{
-          loading
-        }}
-        onCancel={(e) => {
-          e.stopPropagation()
-          setOpen(false)
-        }}
-        onOk={(e) => {
-          e.stopPropagation()
-          form.validateFields().then((data) => {
-            setLoading(true)
+        onOk={async () => {
+          await form.validateFields().then((data) => {
             const channels = data.channels as string[]
             const key = getPageKey(
               `pubsub:${channels.join(',')}`,
@@ -49,6 +36,7 @@ const Subscribe: React.FC<{
             store.page.addPage({
               key,
               label: key,
+              connectionId: props.connection.id,
               children: (
                 <Pubsub
                   connection={props.connection}
@@ -57,8 +45,6 @@ const Subscribe: React.FC<{
                 ></Pubsub>
               )
             })
-            setLoading(false)
-            setOpen(false)
           })
         }}
       >
@@ -78,15 +64,7 @@ const Subscribe: React.FC<{
             </Form.Item>
           </Form>
         </div>
-      </Modal>
-      <div
-        className="font-bold italic"
-        onClick={() => {
-          setOpen(true)
-        }}
-      >
-        P
-      </div>
+      </CusModal>
     </Tooltip>
   )
 }
