@@ -2,8 +2,8 @@ import React from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
 import { Modal, message } from 'antd'
 import request from '@/utils/request'
-import { actionIconStyle } from '@/utils/styles'
 import { useTranslation } from 'react-i18next'
+import IconButton from '@/components/IconButton'
 
 const Index: React.FC<{
   keys: APP.Key
@@ -13,10 +13,7 @@ const Index: React.FC<{
   const { t } = useTranslation()
 
   return (
-    <DeleteOutlined
-      className="hover:cursor-pointer"
-      style={actionIconStyle}
-      key={'delete'}
+    <IconButton
       onClick={() => {
         Modal.confirm({
           title: t('Notice'),
@@ -34,7 +31,8 @@ const Index: React.FC<{
           }
         })
       }}
-    />
+      icon={<DeleteOutlined />}
+    ></IconButton>
   )
 }
 export default Index

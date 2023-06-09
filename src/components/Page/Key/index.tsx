@@ -10,9 +10,9 @@ import Copy from '@/components/Copy'
 import useRequest from '@/hooks/useRequest'
 import request from '@/utils/request'
 import useStore from '@/hooks/useStore'
-import Expire from './components/Expire'
 import Rename from './components/Rename'
 import { useTranslation } from 'react-i18next'
+import TTL from './components/TTL'
 const Index: React.FC<{
   name: string
   connection: APP.Connection
@@ -120,18 +120,7 @@ const Index: React.FC<{
             </Row>
             <Row gutter={20}>
               <Col xs={24} xl={6} className="mb-2">
-                <Input
-                  addonBefore={t('TTL')}
-                  value={item.ttl}
-                  addonAfter={
-                    <Expire
-                      keys={item}
-                      onSuccess={fetch}
-                      trigger={<EditOutlined />}
-                    />
-                  }
-                  readOnly
-                ></Input>
+                <TTL keys={item} onChange={fetch}></TTL>
               </Col>
               <Col xs={24} xl={6} className="mb-2">
                 <Input
@@ -167,7 +156,6 @@ const Index: React.FC<{
               </Col>
             </Row>
           </div>
-
           <div>{value}</div>
         </div>
       )}

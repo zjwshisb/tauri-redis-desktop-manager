@@ -18,9 +18,9 @@ import {
   ReloadOutlined
 } from '@ant-design/icons'
 import { type ColumnType } from 'antd/es/table'
-import { actionIconStyle } from '@/utils/styles'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
+import IconButton from '@/components/IconButton'
 
 interface Client {
   id: string
@@ -208,13 +208,12 @@ const Index: React.FC<{
                 render(_, record) {
                   return (
                     <Space>
-                      <DeleteOutlined
+                      <IconButton
                         onClick={() => {
                           handleKill(record.id)
                         }}
-                        style={actionIconStyle}
-                        className="hover:cursor-pointer"
-                      />
+                        icon={<DeleteOutlined />}
+                      ></IconButton>
                     </Space>
                   )
                 }

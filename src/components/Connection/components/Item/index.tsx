@@ -12,12 +12,14 @@ import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import { useThrottleFn } from 'ahooks'
 import { Space, Spin, Tooltip } from 'antd'
-import DBItem from './DBItem'
-import ConnectionMenu from './ConnectionMenu'
-import InfoIcon from './Info'
-import ClientIcon from './Client'
+import DBItem from './components/DBItem'
+import ConnectionMenu from './components/ConnectionMenu'
+import InfoIcon from './components/Info'
+import ClientIcon from './components/Client'
 import { useTranslation } from 'react-i18next'
-import Monitor from './Monitor'
+import Info from '@/components/Page/Info'
+import Monitor from './components/Monitor'
+import { getPageKey } from '@/utils'
 
 export interface DBType {
   db: number
@@ -26,9 +28,7 @@ export interface DBType {
 
 const Index: React.FC<{
   connection: APP.Connection
-  onDeleteClick: (conn: APP.Connection) => void
-  onConnectionChange?: (conn: APP.Connection) => void
-}> = ({ connection, onDeleteClick }) => {
+}> = ({ connection }) => {
   const store = useStore()
 
   const [collapse, setCollapse] = React.useState(false)
@@ -84,9 +84,16 @@ const Index: React.FC<{
       getDbs().then(() => {
         setCollapse(true)
         store.connection.open(connection.id)
+        const key = getPageKey('info', connection)
+        store.page.addPage({
+          label: key,
+          key,
+          children: <Info connection={connection}></Info>,
+          connectionId: connection.id
+        })
       })
     }
-  }, [connection.id, getDbs, isOpen, store.connection])
+  }, [connection, getDbs, isOpen, store.connection, store.page])
 
   const onItemClickTh = useThrottleFn(onItemClick, {
     wait: 500

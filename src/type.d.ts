@@ -4,6 +4,7 @@ declare namespace APP {
     host: string
     port: number
     auth: string
+    version: string
   }
 
   interface BaseKey<T, V> {

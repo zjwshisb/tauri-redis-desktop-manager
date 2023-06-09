@@ -2,7 +2,6 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { Tabs, Dropdown, Typography } from 'antd'
-import FieldView from '../FieldView'
 import { useTranslation } from 'react-i18next'
 
 const Index: React.FC = () => {
@@ -16,7 +15,6 @@ const Index: React.FC = () => {
         'flex-1 h-screen bg-white p-2 pb-20 box-border overflow-x-hidden'
       }
     >
-      <FieldView />
       {store.page.pages.length === 0 && (
         <div className="w-full h-full flex items-center justify-center">
           <Typography.Title>Tauri Redis Desktop Manager</Typography.Title>

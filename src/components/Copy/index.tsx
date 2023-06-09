@@ -3,9 +3,11 @@ import React from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { green } from '@ant-design/colors'
 
-const Index: React.FC<{
+const Copy: React.FC<{
   content: string
-}> = ({ content }) => {
+  className?: string
+  style?: React.CSSProperties
+}> = ({ content, className, style }) => {
   const [showSuccess, setShowSuccess] = React.useState(false)
 
   if (showSuccess) {
@@ -23,8 +25,8 @@ const Index: React.FC<{
         }
       }}
     >
-      <CopyOutlined />
+      <CopyOutlined className={className} style={style} />
     </CopyToClipboard>
   )
 }
-export default Index
+export default Copy

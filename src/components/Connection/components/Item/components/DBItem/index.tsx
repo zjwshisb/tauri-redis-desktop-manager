@@ -5,7 +5,7 @@ import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import Subscribe from './Subscribe'
 
-import { type DBType } from './index'
+import { type DBType } from '../../index'
 
 const Index: React.FC<{
   active: boolean

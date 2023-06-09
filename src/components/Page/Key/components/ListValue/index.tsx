@@ -8,6 +8,7 @@ import LInsert from './components/LInsert'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import CusTable from '@/components/CusTable'
+import FieldViewer from '@/components/FieldViewer'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -98,15 +99,19 @@ const Index: React.FC<{
           {
             title: t('Index'),
             dataIndex: 'index',
-            align: 'center'
+            align: 'center',
+            width: 100
           },
           {
             dataIndex: 'value',
-            title: t('Value')
+            title: t('Value'),
+            render(_) {
+              return <FieldViewer content={_} />
+            }
           },
           {
             title: t('Action'),
-            width: '300px',
+            width: 100,
             fixed: 'right',
             render(_, record, index) {
               return (

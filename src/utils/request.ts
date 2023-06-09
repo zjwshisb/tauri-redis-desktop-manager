@@ -10,18 +10,12 @@ export default async function request<T>(
   args: Record<string, any> = {}
 ): Promise<Response<T>> {
   try {
-    console.log({
-      path,
-      cid,
-      payload: JSON.stringify(args)
-    })
     const res = await invoke('dispatch', {
       path,
       cid,
       payload: JSON.stringify(args)
     })
     const data = JSON.parse(res as string)
-    console.log(data)
     return data as Response<T>
   } catch (err) {
     message.error(err as string)

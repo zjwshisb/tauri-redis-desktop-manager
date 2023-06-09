@@ -7,8 +7,9 @@ import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
 import Form from './components/Form'
 import { EditOutlined } from '@ant-design/icons'
-import { actionIconStyle } from '@/utils/styles'
 import CusTable from '@/components/CusTable'
+import IconButton from '@/components/IconButton'
+import FieldViewer from '@/components/FieldViewer'
 
 interface ZScanResp {
   cursor: string
@@ -104,11 +105,15 @@ const Index: React.FC<{
               </div>
             ),
             dataIndex: 'value',
-            align: 'center'
+            align: 'center',
+            render(_) {
+              return <FieldViewer content={_} />
+            }
           },
           {
             dataIndex: 'score',
             title: t('Score'),
+            width: 200,
             sorter: (a, b) => {
               if (a.score === b.score) {
                 return 0
@@ -118,7 +123,7 @@ const Index: React.FC<{
           },
           {
             title: t('Action'),
-            width: '300px',
+            width: 200,
             fixed: 'right',
             render(_, record, index) {
               return (
@@ -134,12 +139,7 @@ const Index: React.FC<{
                     onSuccess={onRefresh}
                     keys={keys}
                     field={record}
-                    trigger={
-                      <EditOutlined
-                        className="hover:cursor-pointer"
-                        style={actionIconStyle}
-                      />
-                    }
+                    trigger={<IconButton icon={<EditOutlined />} />}
                   ></Form>
                 </Space>
               )

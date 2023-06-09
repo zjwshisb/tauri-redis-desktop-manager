@@ -2,21 +2,18 @@ import ConnectionStore from './connection'
 import PageStore from './page'
 import DBStore from './db'
 import React from 'react'
-import FieldView from './fieldview'
 import SettingStore from './setting'
 
 class Store {
   connection: ConnectionStore
   page: PageStore
   db: DBStore
-  fieldView: FieldView
   setting: SettingStore
 
   constructor() {
     this.connection = new ConnectionStore()
     this.page = new PageStore()
     this.db = new DBStore()
-    this.fieldView = new FieldView()
     this.setting = new SettingStore()
   }
 
@@ -29,6 +26,11 @@ class Store {
     if (this.db.db?.connection.id === id) {
       this.db.db = null
     }
+  }
+
+  removeConnection(id: number) {
+    this.closeConnection(id)
+    this.connection.remove(id)
   }
 }
 

@@ -3,9 +3,9 @@ import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import { EditOutlined } from '@ant-design/icons'
-import { actionIconStyle } from '@/utils/styles'
 import { useTranslation } from 'react-i18next'
 import CusModal from '@/components/CusModal'
+import IconButton from '@/components/IconButton'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -20,12 +20,7 @@ const Index: React.FC<{
   return (
     <>
       <CusModal
-        trigger={
-          <EditOutlined
-            style={actionIconStyle}
-            className="hover:cursor-pointer"
-          />
-        }
+        trigger={<IconButton icon={<EditOutlined />} />}
         onOk={async () => {
           const formData = form.getFieldsValue()
           await request<number>('key/list/lset', props.keys.connection_id, {

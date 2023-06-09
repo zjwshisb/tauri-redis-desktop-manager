@@ -99,6 +99,7 @@ struct ScanArgs {
     search: String,
     db: u8,
     count: i64,
+    types: String,
 }
 #[derive(Serialize)]
 pub struct ScanResp<T> {
@@ -118,6 +119,9 @@ pub async fn scan(payload: String, cid: u32) -> Result<ScanResp<String>, CusErro
         search.insert_str(0, "*");
         search.push_str("*");
         cmd.arg(&["MATCH", &search]);
+    }
+    if args.types != "" {
+        cmd.arg(&["TYPE", &args.types]);
     }
     let value = cmd.query_async(&mut connection).await?;
     return match value {

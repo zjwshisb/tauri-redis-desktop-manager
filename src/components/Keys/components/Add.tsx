@@ -1,35 +1,12 @@
 import { type DB } from '@/store/db'
 import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
-import { Form, Input, Select, message } from 'antd'
+import { Form, Input, Select, Tooltip, message } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import CusModal from '@/components/CusModal'
-
-const options = [
-  {
-    label: 'String',
-    value: 'string'
-  },
-  {
-    label: 'List',
-    value: 'list'
-  },
-  {
-    label: 'Hash',
-    value: 'hash'
-  },
-  {
-    label: 'Set',
-    value: 'set'
-  },
-
-  {
-    label: 'Sorted Set',
-    value: 'zset'
-  }
-]
+import useKeyTypes from '@/hooks/useKeyTypes'
 
 const Plus: React.FC<{
   onSuccess: (name: string) => void
@@ -39,10 +16,14 @@ const Plus: React.FC<{
 
   const [form] = useForm()
 
+  const keyTypes = useKeyTypes()
+
   return (
     <CusModal
       trigger={
-        <PlusOutlined className="hover:cursor-pointer text-lg"></PlusOutlined>
+        <Tooltip title={t('New Key')}>
+          <PlusOutlined className="hover:cursor-pointer text-lg"></PlusOutlined>
+        </Tooltip>
       }
       title={t('New Key')}
       onOk={async () => {
@@ -83,7 +64,7 @@ const Plus: React.FC<{
           label={t('Key Type')}
           rules={[{ required: true }]}
         >
-          <Select options={options}></Select>
+          <Select options={keyTypes}></Select>
         </Form.Item>
       </Form>
     </CusModal>

@@ -2,7 +2,7 @@ import React from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
 import { Modal, message } from 'antd'
 import request from '@/utils/request'
-import { actionIconStyle } from '@/utils/styles'
+import IconButton from '@/components/IconButton'
 
 const Index: React.FC<{
   keys: APP.Key
@@ -10,10 +10,8 @@ const Index: React.FC<{
   onSuccess: (f: string) => void
 }> = ({ value, keys, onSuccess }) => {
   return (
-    <DeleteOutlined
-      className="hover:cursor-pointer"
-      style={actionIconStyle}
-      key={'delete'}
+    <IconButton
+      icon={<DeleteOutlined />}
       onClick={() => {
         Modal.confirm({
           title: 'notice',
@@ -29,7 +27,7 @@ const Index: React.FC<{
           }
         })
       }}
-    />
+    ></IconButton>
   )
 }
 export default Index

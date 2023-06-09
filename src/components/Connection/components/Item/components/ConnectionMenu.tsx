@@ -10,7 +10,7 @@ import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import { Dropdown, Modal, Tooltip, message } from 'antd'
 import { useTranslation } from 'react-i18next'
-import ConnectionForm from '../Form'
+import ConnectionForm from '../../Form'
 
 export interface DBType {
   db: number
@@ -92,8 +92,8 @@ const Index: React.FC<{
                   await request('connections/del', 0, {
                     id: connection.id
                   })
+                  store.removeConnection(connection.id)
                   message.success(t('Success'))
-                  store.connection.fetchConnections()
                 }
               })
               break

@@ -18,6 +18,25 @@ class ConnectionStore {
     this.openIds[id] = false
   }
 
+  update(id: number, data: Partial<APP.Connection>) {
+    const index = this.connections.findIndex(v => v.id === id)
+    if (index > -1) {
+      this.connections = [...this.connections]
+      this.connections[index] = {
+        ...this.connections[index],
+        ...data
+      }
+    }
+  }
+
+  remove(id: number) {
+    const index = this.connections.findIndex(v => v.id === id)
+    if (index > -1) {
+      this.connections.splice(index, 1)
+      this.connections = [...this.connections]
+    }
+  }
+
   isOpen(id: number) {
     return this.openIds[id]
   }

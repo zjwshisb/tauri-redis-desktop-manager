@@ -1,13 +1,14 @@
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Space, Tooltip, Input } from 'antd'
-import { EyeOutlined, EditOutlined } from '@ant-design/icons'
+import { Button, Space, Input } from 'antd'
+import { EditOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
 import FieldForm from './components/FieldForm'
 import DeleteField from './components/DeleteField'
-import { actionIconStyle } from '@/utils/styles'
 import { useTranslation } from 'react-i18next'
 import CusTable from '@/components/CusTable'
+import FieldViewer from '@/components/FieldViewer'
+import IconButton from '@/components/IconButton'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -19,7 +20,7 @@ const Index: React.FC<{
   const [more, setMore] = React.useState(true)
   const search = React.useRef('')
 
-  const [loading, setLoadinng] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
 
   const { t } = useTranslation()
 
@@ -28,7 +29,7 @@ const Index: React.FC<{
       if (reset) {
         cursor.current = '0'
       }
-      setLoadinng(true)
+      setLoading(true)
       request<{
         cursor: string
         fields: APP.HashField[]
@@ -53,7 +54,7 @@ const Index: React.FC<{
           }
         })
         .finally(() => {
-          setLoadinng(false)
+          setLoading(false)
         })
     },
     [keys, store.setting.setting.field_count]
@@ -87,6 +88,7 @@ const Index: React.FC<{
         columns={[
           {
             dataIndex: 'name',
+            width: 200,
             title: (
               <div className="flex items-center justify-center">
                 <div>{t('Field Name')}</div>
@@ -110,26 +112,20 @@ const Index: React.FC<{
           },
           {
             dataIndex: 'value',
-            width: 500,
             title: t('Field Value'),
             render(_, record) {
-              return <Tooltip title={_}>{_}</Tooltip>
+              return <FieldViewer content={_}></FieldViewer>
             }
           },
           {
             title: t('Action'),
-            width: '300px',
+            width: 200,
             fixed: 'right',
             render(_, record, index) {
               return (
                 <Space>
                   <FieldForm
-                    trigger={
-                      <EditOutlined
-                        className="hover:cursor-pointer"
-                        style={actionIconStyle}
-                      ></EditOutlined>
-                    }
+                    trigger={<IconButton icon={<EditOutlined />} />}
                     keys={keys}
                     field={record}
                     onSuccess={(f) => {
@@ -148,17 +144,6 @@ const Index: React.FC<{
                         const newFields = [...prev]
                         newFields.splice(index, 1)
                         return newFields
-                      })
-                    }}
-                  />
-                  <EyeOutlined
-                    style={actionIconStyle}
-                    className="hover:cursor-pointer"
-                    key={'view'}
-                    onClick={() => {
-                      store.fieldView.show({
-                        title: record.name,
-                        content: record.value
                       })
                     }}
                   />

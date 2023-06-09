@@ -2,6 +2,7 @@ import React from 'react'
 import useRequest from '@/hooks/useRequest'
 import { Card, Col, Divider, Row, Table, Descriptions } from 'antd'
 import { useTranslation } from 'react-i18next'
+import useStore from '@/hooks/useStore'
 
 interface Item {
   label: string
@@ -14,6 +15,8 @@ const Index: React.FC<{
   const { data } = useRequest<string>('server/info', props.connection.id)
 
   const { t } = useTranslation()
+
+  const store = useStore()
 
   const info = React.useMemo(() => {
     if (data == null) {
@@ -66,8 +69,10 @@ const Index: React.FC<{
   }, [info])
 
   React.useEffect(() => {
-    console.log(info)
-  }, [info])
+    store.connection.update(props.connection.id, {
+      version: inKv.redis_version
+    })
+  }, [inKv, props.connection.id, store])
 
   return (
     <div>

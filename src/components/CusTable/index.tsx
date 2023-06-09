@@ -9,6 +9,7 @@ export function formatColumns<T>(c: ColumnsType<T>, showIndex: boolean) {
   if (showIndex) {
     n.unshift({
       title: '#',
+      width: 100,
       render(_, __, index) {
         return index + 1
       }

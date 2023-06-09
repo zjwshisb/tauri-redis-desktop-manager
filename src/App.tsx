@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite'
 import PageContent from './components/PageContent'
 import { StyleProvider } from '@ant-design/cssinjs'
 
-import KeyList from './components/KeyList'
+import Keys from './components/Keys'
 import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import { type Locale } from 'antd/es/locale'
@@ -32,7 +32,7 @@ const App: React.FC = () => {
         <Layout className="h-full bg-[#FFF] border-t">
           <Layout.Content className="flex">
             <Connection />
-            <KeyList />
+            <Keys />
             <PageContent />
           </Layout.Content>
         </Layout>
