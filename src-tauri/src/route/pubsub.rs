@@ -121,15 +121,11 @@ pub async fn monitor<'r>(
             _ = async {
 
                 while let Some(msg) = stream.next().await {
-                    dbg!(&msg);
                     let r: EventResp<String> = EventResp::new(
                         String::from_redis_value(&msg).unwrap(),
                         String::from(event_str),
                     );
-                    let result = window.emit(event_str, serde_json::to_string(&r).unwrap());
-                    if let Err(e) = result {
-                        dbg!(e);
-                    }
+                    let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
                 }
             } => {
 

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { type TypeFormat } from '.'
 import React from 'react'
+import Error from '../Err'
 
 const item: TypeFormat = {
   key: 'datetime',
@@ -18,7 +19,10 @@ const item: TypeFormat = {
       // seconds
       d = dayjs.unix(time)
     }
-    return d.format('YYYY-MM-DDTHH:mm:ssZ[Z]')
+    if (d.isValid()) {
+      return d.format('YYYY-MM-DDTHH:mm:ssZ[Z]')
+    }
+    return <Error message="invalid Datetime" />
   }
 }
 

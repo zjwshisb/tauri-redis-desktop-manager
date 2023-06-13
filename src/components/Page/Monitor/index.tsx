@@ -36,15 +36,16 @@ const Index: React.FC<{
   React.useEffect(() => {
     if (name !== '') {
       appWindow
-        .listen<string>(name, (e) => {
+        .listen<string>(name, (r) => {
           try {
-            const message: APP.EventPayload<string> = JSON.parse(e.payload)
+            const message: APP.EventPayload<string> = JSON.parse(r.payload)
             setRows((prev) => {
-              prev.push({
-                id: message.id,
-                message: message.data
-              })
-              return [...prev]
+              return [...prev].concat([
+                {
+                  id: message.id,
+                  message: message.data
+                }
+              ])
             })
           } catch (e) {}
         })
@@ -60,7 +61,7 @@ const Index: React.FC<{
         unListen.current()
       }
     }
-  }, [unListen])
+  }, [])
 
   return (
     <div>

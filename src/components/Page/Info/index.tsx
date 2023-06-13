@@ -1,8 +1,10 @@
 import React from 'react'
 import useRequest from '@/hooks/useRequest'
-import { Card, Col, Divider, Row, Table, Descriptions } from 'antd'
+import { Card, Col, Row, Table, Descriptions, Button } from 'antd'
 import { useTranslation } from 'react-i18next'
 import useStore from '@/hooks/useStore'
+
+import Memory from './components/Memory'
 
 interface Item {
   label: string
@@ -12,7 +14,17 @@ interface Item {
 const Index: React.FC<{
   connection: APP.Connection
 }> = (props) => {
-  const { data } = useRequest<string>('server/info', props.connection.id)
+  const { data, fetch, loading } = useRequest<string>(
+    'server/info',
+    props.connection.id
+  )
+
+  React.useEffect(() => {
+    const i = setInterval(fetch, 2000)
+    return () => {
+      clearInterval(i)
+    }
+  }, [fetch])
 
   const { t } = useTranslation()
 
@@ -77,8 +89,15 @@ const Index: React.FC<{
   return (
     <div>
       <Row gutter={20}>
-        <Col span={12}>
-          <Card title={t('Server')}>
+        <Col span={24}>
+          <Card
+            title={t('Base Info')}
+            extra={
+              <Button onClick={fetch} loading={loading}>
+                {t('Refresh')}
+              </Button>
+            }
+          >
             <Descriptions column={1} bordered size="small">
               <Descriptions.Item label={'Redis ' + t('Version')}>
                 {inKv.redis_version}
@@ -96,49 +115,38 @@ const Index: React.FC<{
             </Descriptions>
           </Card>
         </Col>
+      </Row>
+      <Row className="mt-4">
         <Col span={12}>
-          <Card title={t('Memory')}>
-            <Descriptions column={1} bordered size="small">
-              <Descriptions.Item label={t('System Memory')}>
-                {inKv.total_system_memory_human}
-              </Descriptions.Item>
-              <Descriptions.Item label={t('Used Memory')}>
-                {inKv.used_memory_human}
-              </Descriptions.Item>
-              <Descriptions.Item label={t('Used Memory Rss')}>
-                {inKv.used_memory_rss_human}
-              </Descriptions.Item>
-              <Descriptions.Item label={t('Used Memory Peak')}>
-                {inKv.used_memory_peak_human}
-              </Descriptions.Item>
-              <Descriptions.Item label={t('Used Memory Lua')}>
-                {inKv.used_memory_lua_human}
-              </Descriptions.Item>
-            </Descriptions>
+          <Memory items={inKv} />
+        </Col>
+      </Row>
+      <Row className="mt-4">
+        <Col span={24}>
+          <Card title={t('All Info')}>
+            <Table
+              bordered
+              size="small"
+              pagination={false}
+              rowKey={'label'}
+              dataSource={items}
+              columns={[
+                {
+                  title: t('Key'),
+                  dataIndex: 'label',
+                  sorter(a, b) {
+                    return a.label > b.label ? 1 : -1
+                  }
+                },
+                {
+                  title: t('Value'),
+                  dataIndex: 'value'
+                }
+              ]}
+            ></Table>
           </Card>
         </Col>
       </Row>
-      <Divider orientation="left">{t('All Info')}</Divider>
-      <Table
-        bordered
-        size="small"
-        pagination={false}
-        rowKey={'label'}
-        dataSource={items}
-        columns={[
-          {
-            title: t('Key'),
-            dataIndex: 'label',
-            sorter(a, b) {
-              return a.label > b.label ? 1 : -1
-            }
-          },
-          {
-            title: t('Value'),
-            dataIndex: 'value'
-          }
-        ]}
-      ></Table>
     </div>
   )
 }

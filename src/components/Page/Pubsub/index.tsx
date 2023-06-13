@@ -52,15 +52,15 @@ const Index: React.FC<{
             const message: APP.EventPayload<APP.PubsubMessage> = JSON.parse(
               e.payload
             )
-            console.log(e)
             setRows((prev) => {
-              prev.push({
-                id: message.id,
-                tags: [message.data.channel],
-                message: message.data.payload,
-                time: message.time
-              })
-              return [...prev]
+              return [...prev].concat([
+                {
+                  id: message.id,
+                  tags: [message.data.channel],
+                  message: message.data.payload,
+                  time: message.time
+                }
+              ])
             })
           } catch (e) {}
         })

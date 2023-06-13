@@ -7,6 +7,7 @@ import SRem from './components/SRem'
 import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
 import CusTable from '@/components/CusTable'
+import FieldViewer from '@/components/FieldViewer'
 
 interface SScanResp {
   cursor: string
@@ -116,6 +117,9 @@ const Index: React.FC<{
             align: 'center',
             sorter: (a, b) => {
               return a.value > b.value ? 1 : -1
+            },
+            render(_) {
+              return <FieldViewer content={_}></FieldViewer>
             }
           },
           {

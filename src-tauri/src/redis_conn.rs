@@ -19,10 +19,13 @@ pub async fn get_connection(connection_id: u32, db: u8) -> Result<Connection, Cu
                         .query_async(&mut connection)
                         .await?;
                 }
-                redis::cmd("select")
-                    .arg(db)
-                    .query_async(&mut connection)
-                    .await?;
+                if db > 0 {
+                    redis::cmd("select")
+                        .arg(db)
+                        .query_async(&mut connection)
+                        .await?;
+                }
+
                 redis::cmd("CLIENT")
                     .arg("SETNAME")
                     .arg(format!("{}:{}@tauri-redis", c.host, c.port))
