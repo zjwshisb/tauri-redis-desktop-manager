@@ -1,10 +1,14 @@
 import React from 'react'
 import useRequest from '@/hooks/useRequest'
-import { Card, Col, Row, Table, Descriptions, Button } from 'antd'
+import { Card, Col, Row, Table, Descriptions, Button, Switch } from 'antd'
 import { useTranslation } from 'react-i18next'
 import useStore from '@/hooks/useStore'
 
 import Memory from './components/Memory'
+import Network from './components/Network'
+import Ops from './components/Ops'
+import Client from './components/Client'
+import DbInfo from './components/DbInfo'
 
 interface Item {
   label: string
@@ -14,17 +18,9 @@ interface Item {
 const Index: React.FC<{
   connection: APP.Connection
 }> = (props) => {
-  const { data, fetch, loading } = useRequest<string>(
-    'server/info',
-    props.connection.id
-  )
+  const [autoRefresh, setAutoRefresh] = React.useState(true)
 
-  React.useEffect(() => {
-    const i = setInterval(fetch, 2000)
-    return () => {
-      clearInterval(i)
-    }
-  }, [fetch])
+  const { data, fetch } = useRequest<string>('server/info', props.connection.id)
 
   const { t } = useTranslation()
 
@@ -86,39 +82,67 @@ const Index: React.FC<{
     })
   }, [inKv, props.connection.id, store])
 
+  React.useEffect(() => {
+    if (autoRefresh) {
+      const i = setInterval(fetch, 5 * 1000)
+      return () => {
+        clearInterval(i)
+      }
+    }
+    return () => {}
+  }, [autoRefresh, fetch])
+
   return (
     <div>
-      <Row gutter={20}>
-        <Col span={24}>
-          <Card
-            title={t('Base Info')}
-            extra={
-              <Button onClick={fetch} loading={loading}>
-                {t('Refresh')}
-              </Button>
-            }
-          >
-            <Descriptions column={1} bordered size="small">
-              <Descriptions.Item label={'Redis ' + t('Version')}>
-                {inKv.redis_version}
-              </Descriptions.Item>
-              <Descriptions.Item label={'Redis ' + t('Mode')}>
-                {inKv.redis_mode}
-              </Descriptions.Item>
-              <Descriptions.Item label={t('Config File')}>
-                {inKv.config_file}
-              </Descriptions.Item>
-              <Descriptions.Item label={t('OS')}>{inKv.os}</Descriptions.Item>
-              <Descriptions.Item label={'Tcp' + t('Port')}>
-                {inKv.tcp_port}
-              </Descriptions.Item>
-            </Descriptions>
-          </Card>
+      <Card
+        title={t('Base Info')}
+        extra={
+          <div>
+            <span className="mr-2">{t('Auto Refresh')}</span>
+            <Switch
+              checked={autoRefresh}
+              onChange={(e) => {
+                setAutoRefresh(e)
+              }}
+            ></Switch>
+          </div>
+        }
+      >
+        <Descriptions column={1} bordered size="small">
+          <Descriptions.Item label={'Redis ' + t('Version')}>
+            {inKv.redis_version}
+          </Descriptions.Item>
+          <Descriptions.Item label={'Redis ' + t('Mode')}>
+            {inKv.redis_mode}
+          </Descriptions.Item>
+          <Descriptions.Item label={t('Config File')}>
+            {inKv.config_file}
+          </Descriptions.Item>
+          <Descriptions.Item label={t('OS')}>{inKv.os}</Descriptions.Item>
+          <Descriptions.Item label={'Tcp' + t('Port')}>
+            {inKv.tcp_port}
+          </Descriptions.Item>
+        </Descriptions>
+      </Card>
+      <Row className="mt-4" gutter={20}>
+        <Col span={12}>
+          <Memory items={inKv} />
+        </Col>
+        <Col span={12}>
+          <Network items={inKv} />
+        </Col>
+      </Row>
+      <Row className="mt-4" gutter={20}>
+        <Col span={12}>
+          <Client items={inKv} />
+        </Col>
+        <Col span={12}>
+          <Ops items={inKv} />
         </Col>
       </Row>
       <Row className="mt-4">
-        <Col span={12}>
-          <Memory items={inKv} />
+        <Col span={24}>
+          <DbInfo items={inKv} />
         </Col>
       </Row>
       <Row className="mt-4">

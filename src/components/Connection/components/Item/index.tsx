@@ -70,11 +70,8 @@ const Index: React.FC<{
         })
       }
       setDatabases(dbs)
-      setLoading(false)
-    } catch (e) {
-      setLoading(false)
-      throw e
-    }
+    } catch (e) {}
+    setLoading(false)
   }, [connection.id])
 
   const onItemClick = React.useCallback(() => {
@@ -96,7 +93,7 @@ const Index: React.FC<{
   }, [connection, getDbs, isOpen, store.connection, store.page])
 
   const onItemClickTh = useThrottleFn(onItemClick, {
-    wait: 500
+    wait: 300
   })
 
   const height = React.useMemo(() => {

@@ -5,11 +5,12 @@ import { Line } from '@ant-design/plots'
 import dayjs from 'dayjs'
 
 interface Point {
-  memory: any
-  time: any
+  category: string
+  value: number
+  label: string
 }
 
-const Memory: React.FC<{
+const Network: React.FC<{
   items: Record<string, any>
 }> = ({ items }) => {
   const { t } = useTranslation()
@@ -17,12 +18,18 @@ const Memory: React.FC<{
   const [lines, setLines] = React.useState<Point[]>([])
 
   React.useEffect(() => {
-    if (items.used_memory !== undefined) {
+    if (items.instantaneous_input_kbps !== undefined) {
       setLines((prev) => {
         return [...prev].concat([
           {
-            time: dayjs().format('HH:mm:ss'),
-            memory: parseFloat((items.used_memory / (1024 * 1024)).toFixed(2))
+            label: dayjs().format('HH:mm:ss'),
+            value: parseFloat(items.instantaneous_input_kbps),
+            category: 'in'
+          },
+          {
+            label: dayjs().format('HH:mm:ss'),
+            value: parseFloat(items.instantaneous_output_kbps),
+            category: 'out'
           }
         ])
       })
@@ -30,27 +37,28 @@ const Memory: React.FC<{
   }, [items])
 
   return (
-    <Card title={t('Memory')} className="mt-4">
+    <Card title={t('Network')} className="mt-4">
       <Line
         slider={{
           start: 0,
           end: 1
         }}
         data={lines}
-        xField="time"
+        xField="label"
+        seriesField="category"
         yAxis={{
           label: {
             formatter(text, item, index) {
-              return text + 'M'
+              return text + 'kbps'
             }
           }
         }}
         xAxis={{}}
-        yField="memory"
+        yField="value"
         smooth={true}
         animation={false}
       />
     </Card>
   )
 }
-export default Memory
+export default Network

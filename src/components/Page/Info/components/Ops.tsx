@@ -5,11 +5,11 @@ import { Line } from '@ant-design/plots'
 import dayjs from 'dayjs'
 
 interface Point {
-  memory: any
-  time: any
+  count: number
+  time: string
 }
 
-const Memory: React.FC<{
+const Ops: React.FC<{
   items: Record<string, any>
 }> = ({ items }) => {
   const { t } = useTranslation()
@@ -17,12 +17,12 @@ const Memory: React.FC<{
   const [lines, setLines] = React.useState<Point[]>([])
 
   React.useEffect(() => {
-    if (items.used_memory !== undefined) {
+    if (items.instantaneous_ops_per_sec !== undefined) {
       setLines((prev) => {
         return [...prev].concat([
           {
             time: dayjs().format('HH:mm:ss'),
-            memory: parseFloat((items.used_memory / (1024 * 1024)).toFixed(2))
+            count: parseInt(items.instantaneous_ops_per_sec)
           }
         ])
       })
@@ -30,7 +30,7 @@ const Memory: React.FC<{
   }, [items])
 
   return (
-    <Card title={t('Memory')} className="mt-4">
+    <Card title={t('Ops')} className="mt-4">
       <Line
         slider={{
           start: 0,
@@ -38,19 +38,13 @@ const Memory: React.FC<{
         }}
         data={lines}
         xField="time"
-        yAxis={{
-          label: {
-            formatter(text, item, index) {
-              return text + 'M'
-            }
-          }
-        }}
+        yAxis={{}}
         xAxis={{}}
-        yField="memory"
+        yField="count"
         smooth={true}
         animation={false}
       />
     </Card>
   )
 }
-export default Memory
+export default Ops
