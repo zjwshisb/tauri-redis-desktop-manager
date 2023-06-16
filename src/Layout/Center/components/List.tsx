@@ -7,7 +7,6 @@ import { type DB } from '@/store/db'
 import classNames from 'classnames'
 import { getPageKey } from '@/utils'
 import Key from '@/components/Page/Key'
-import { useTranslation } from 'react-i18next'
 
 const Index: React.FC<{
   db: DB | null
@@ -17,8 +16,6 @@ const Index: React.FC<{
 }> = ({ db, keys, height, listRef }) => {
   const store = useStore()
 
-  const { t } = useTranslation()
-
   if (keys.length === 0 || db === null) {
     return (
       <div
@@ -27,7 +24,7 @@ const Index: React.FC<{
           height
         }}
       >
-        <Empty description={t('No Keys')} />
+        <Empty />
       </div>
     )
   }

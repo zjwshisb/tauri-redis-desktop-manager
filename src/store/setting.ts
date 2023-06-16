@@ -10,23 +10,21 @@ export interface AppSetting {
 }
 
 class SettingStore {
-  setting: AppSetting
+  setting: AppSetting = {
+    locale: i18n.language,
+    key_count: 100,
+    field_count: 100
+  }
+
   constructor() {
     const cache = localStorage.getItem(SETTING_CACHE_KEY)
     if (cache !== null) {
       try {
         const setting: AppSetting = JSON.parse(cache)
         this.setting = setting
-        makeAutoObservable(this)
         i18n.changeLanguage(this.setting.locale)
-        return
       } catch {
       }
-    }
-    this.setting = {
-      locale: i18n.language,
-      key_count: 100,
-      field_count: 100
     }
     makeAutoObservable(this)
   }

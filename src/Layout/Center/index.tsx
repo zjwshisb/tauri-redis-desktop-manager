@@ -2,23 +2,17 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import request from '@/utils/request'
 import { type ListRef } from 'rc-virtual-list'
-import { Button, Input, Space, Spin, Dropdown, Tooltip } from 'antd'
+import { Button, Input, Space, Spin, Tooltip } from 'antd'
 import { useDebounceFn } from 'ahooks'
-import {
-  SearchOutlined,
-  ReloadOutlined,
-  PlusOutlined,
-  SmallDashOutlined
-} from '@ant-design/icons'
-import Key from '../Page/Key'
+import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons'
+import Key from '@/components/Page/Key'
 import useStore from '@/hooks/useStore'
-import { type DB } from '@/store/db'
 import Add from './components/Add'
 import { useTranslation } from 'react-i18next'
 import ResizableDiv from '@/components/ResizableDiv'
-import { getPageKey, versionCompare } from '@/utils'
+import { getPageKey } from '@/utils'
 import List from './components/List'
-import useKeyTypes from '@/hooks/useKeyTypes'
+import TypeSelect from './components/TypeSelect'
 
 interface ScanResp {
   cursor: string
@@ -44,40 +38,30 @@ const Index: React.FC = () => {
 
   const id = React.useId()
 
-  const keyTypes = useKeyTypes()
-
   const db = React.useMemo(() => {
     return store.db.db
   }, [store.db.db])
 
   const { t } = useTranslation()
 
-  const isShowTypeSelect = React.useMemo(() => {
-    const r = db != null && versionCompare(db?.connection.version, '6.0.0') > -1
-    if (!r) {
-      types.current = ''
-    }
-    return r
-  }, [db])
-
   const onSearchChange = useDebounceFn((s: string) => {
     cursor.current = '0'
     search.current = s
-    getKeys(db, true)
+    getKeys(true)
   })
 
   const getKeys = React.useCallback(
-    (current: DB | null, reset: boolean = false) => {
-      if (current !== null) {
+    (reset: boolean = false) => {
+      if (db !== null) {
         setLoading(true)
         if (reset) {
           cursor.current = '0'
         }
-        request<ScanResp>('key/scan', current.connection.id, {
+        request<ScanResp>('key/scan', db.connection.id, {
           cursor: cursor.current,
           search: search.current,
           count: store.setting.setting.key_count,
-          db: current.db,
+          db: db.db,
           types: types.current
         })
           .then((res) => {
@@ -101,54 +85,17 @@ const Index: React.FC = () => {
           })
       }
     },
-    [store.setting.setting.key_count, types]
+    [db, store.setting.setting.key_count]
   )
 
   const reload = React.useCallback(() => {
-    getKeys(db, true)
-  }, [getKeys, db])
-
-  const typeSelect = React.useMemo(() => {
-    if (isShowTypeSelect) {
-      return (
-        <Tooltip title={t('Type Select')} placement="left">
-          <Dropdown
-            trigger={['click']}
-            menu={{
-              selectable: true,
-              onSelect(e) {
-                cursor.current = '0'
-                types.current = e.key
-                getKeys(db, true)
-              },
-              items: [
-                {
-                  label: t('All'),
-                  key: ''
-                }
-              ].concat(
-                keyTypes.map((v) => {
-                  return {
-                    label: v.label,
-                    key: v.value
-                  }
-                })
-              )
-            }}
-          >
-            <SmallDashOutlined className="hover:cursor-pointer" />
-          </Dropdown>
-        </Tooltip>
-      )
-    } else {
-      return <></>
-    }
-  }, [db, getKeys, isShowTypeSelect, keyTypes, t])
+    getKeys(true)
+  }, [getKeys])
 
   React.useEffect(() => {
     cursor.current = '0'
-    getKeys(db, true)
-  }, [getKeys, db])
+    getKeys(true)
+  }, [getKeys])
 
   const [listHeight, setListHeight] = React.useState(0)
 
@@ -198,14 +145,20 @@ const Index: React.FC = () => {
             <div className="flex-shrink-0 flex item-center px-2 justify-center">
               {db != null && (
                 <Space>
-                  {typeSelect}
+                  <TypeSelect
+                    version={db.connection.version}
+                    onChange={(e) => {
+                      cursor.current = '0'
+                      types.current = e
+                      getKeys(true)
+                    }}
+                  />
                   <Tooltip title={t('Refresh')}>
                     <ReloadOutlined
                       className="hover:cursor-pointer text-lg"
                       onClick={reload}
                     />
                   </Tooltip>
-
                   <Add
                     onSuccess={(name: string) => {
                       const key = getPageKey(name, db.connection, db.db)
@@ -237,7 +190,7 @@ const Index: React.FC = () => {
               icon={<PlusOutlined />}
               block
               onClick={() => {
-                getKeys(db)
+                getKeys()
               }}
             >
               {t('Load More')}

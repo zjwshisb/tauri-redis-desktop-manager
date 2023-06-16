@@ -94,7 +94,7 @@ const Index: React.FC<{
                   }
                 }
                 store.connection.fetchConnections()
-                message.success('操作成功')
+                message.success(t('Success'))
                 props.onSuccess()
                 setVisible(false)
               }}

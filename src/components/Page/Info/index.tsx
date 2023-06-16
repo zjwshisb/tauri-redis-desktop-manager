@@ -1,6 +1,6 @@
 import React from 'react'
 import useRequest from '@/hooks/useRequest'
-import { Card, Col, Row, Table, Descriptions, Button, Switch } from 'antd'
+import { Card, Col, Row, Table, Descriptions, Switch } from 'antd'
 import { useTranslation } from 'react-i18next'
 import useStore from '@/hooks/useStore'
 

@@ -3,13 +3,12 @@ import './i18n'
 import './App.css'
 import 'antd/dist/reset.css'
 import { Layout, ConfigProvider } from 'antd'
-import Connection from './components/Connection'
 import { useTranslation } from 'react-i18next'
 import { observer } from 'mobx-react-lite'
-import PageContent from './components/PageContent'
+import Right from './Layout/Right'
 import { StyleProvider } from '@ant-design/cssinjs'
-
-import Keys from './components/Keys'
+import Left from './Layout/Left'
+import Center from './Layout/Center'
 import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import { type Locale } from 'antd/es/locale'
@@ -31,9 +30,9 @@ const App: React.FC = () => {
       <StyleProvider hashPriority="high">
         <Layout className="h-full bg-[#FFF] border-t">
           <Layout.Content className="flex">
-            <Connection />
-            <Keys />
-            <PageContent />
+            <Left />
+            <Center />
+            <Right />
           </Layout.Content>
         </Layout>
       </StyleProvider>

@@ -120,7 +120,7 @@ const FieldViewer: React.FC<{
         <Copy
           content={content}
           style={{ color: blue.primary }}
-          className="ml-1"
+          className="ml-2"
         ></Copy>
       )}
     </div>

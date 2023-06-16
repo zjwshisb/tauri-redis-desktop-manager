@@ -1,7 +1,7 @@
-# Tauri + React + Typescript
+# Tauri Redis Desktop Manager
+> A Redis Desktop Manager powered by Rust、Tauri、Vite、Typescript、React、ant-design、tailwindcss
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+### Support
++ Keys Operate
++ Pub/Sub
++ monitor
