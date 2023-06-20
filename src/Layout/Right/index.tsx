@@ -88,7 +88,9 @@ const Index: React.FC = () => {
                     ]
                   }}
                 >
-                  <div className="max-w-xs truncate">{v.label}</div>
+                  <div className="max-w-xs truncate hover:context-menu">
+                    {v.label}
+                  </div>
                 </Dropdown>
               ),
               key: v.key,

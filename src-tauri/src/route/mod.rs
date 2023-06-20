@@ -58,7 +58,7 @@ pub async fn dispatch<'r>(
         "pubsub/subscribe" => Response::new(pubsub::subscribe(window, pubsub, payload, cid).await?),
         "pubsub/publish" => Response::new(pubsub::publish(payload, cid).await?),
         "pubsub/cancel" => Response::new(pubsub::cancel(payload, pubsub).await?),
-        "pubsub/monitor" => Response::new(pubsub::monitor(window, pubsub, cid).await?),
+        "pubsub/monitor" => Response::new(pubsub::monitor(window, pubsub, payload, cid).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

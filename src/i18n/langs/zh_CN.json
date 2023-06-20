@@ -77,5 +77,7 @@
   "Field Load Number": "字段加载数量",
   "The COUNT option for command SCAN": "SCAN 命令的 COUNT 选项",
   "The COUNT option for command HSCAN,SSCAN,ZSCAN": " HSCAN,SSCAN,ZSCAN 命令的 COUNT 选项",
-  "Are you sure delete <{{name}}>?":"确定删除<{{name}}>?"
+  "Are you sure delete <{{name}}>?":"确定删除<{{name}}>?",
+  "Are Sure Open A Monitor Page?":"确定打开一个monitor页面?",
+  "Save Log To File": "保存日志到文件"
 }

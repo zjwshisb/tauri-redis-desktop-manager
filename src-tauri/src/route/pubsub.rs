@@ -7,8 +7,11 @@ use rand::distributions::Alphanumeric;
 use rand::prelude::*;
 use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
+use std::fs::File;
+use std::io::prelude::*;
 use tauri::State;
-use tokio::sync::oneshot;
+
+use tokio::sync::{mpsc, oneshot};
 
 #[derive(Deserialize)]
 struct SubscribeArgs {
@@ -95,11 +98,24 @@ pub async fn publish(payload: String, cid: u32) -> Result<i64, CusError> {
     Ok(i64::from_redis_value(&v)?)
 }
 
+#[derive(Deserialize, PartialEq)]
+struct MonitorArgs {
+    file: bool,
+}
+
+#[derive(Serialize)]
+pub struct MonitorResp {
+    pub event_name: String,
+    pub file_name: String,
+}
+
 pub async fn monitor<'r>(
     window: tauri::Window,
     pubsub_manager: State<'r, PubsubManager>,
+    payload: String,
     cid: u32,
-) -> Result<String, CusError> {
+) -> Result<MonitorResp, CusError> {
+    let args: MonitorArgs = serde_json::from_str(&payload)?;
     let conn = redis_conn::get_connection(cid, 0).await?;
 
     let mut monitor = conn.into_monitor();
@@ -112,29 +128,77 @@ pub async fn monitor<'r>(
         .collect::<String>();
     let event_name_resp = event_name.clone();
     let (tx, rx) = oneshot::channel::<()>();
+    let mut log_file = String::from("");
+    if args.file {
+        let dir_o = dirs_next::home_dir();
+        match dir_o {
+            Some(dir) => {
+                log_file.push_str(dir.to_str().unwrap());
+                log_file.push_str("/monitor-");
+                log_file.push_str(&event_name);
+                log_file.push_str(".log");
+            }
+            None => return Err(CusError::App(String::from("home dir not found"))),
+        }
+    }
+    let file_name_resp = log_file.clone();
     pubsub_manager.add(event_name_resp.clone(), PubsubItem(tx, Local::now()));
     tokio::spawn(async move {
         let event_str = event_name.as_str();
         let _ = monitor.monitor().await;
         let mut stream = monitor.into_on_message::<redis::Value>();
+        // a channel to stop file loop
+        let (stop_file_tx, stop_file_rx) = oneshot::channel::<()>();
         tokio::select! {
             _ = async {
+                let (file_tx, mut file_rx) = mpsc::channel::<String>(32);
+                if args.file  {
+                    let mut f =  File::create(log_file).unwrap();
+                    tokio::spawn(async move {
+                        tokio::select! {
+                            _ = async {
+                                let mut count = 0;
+                                while let Some(mut msg) = file_rx.recv().await {
+                                    msg.push_str("\r\n");
+                                    dbg!(&msg);
+                                    f.write(msg.as_bytes()).unwrap();
+                                    count = count + 1;
+                                    if count > 4 {
+                                        f.flush().unwrap();
+                                        count = 0;
+                                    }
+                                }
+                            } => {
 
+                            }
+                            _ = stop_file_rx => {
+                            }
+                        }
+
+                    });
+                }
                 while let Some(msg) = stream.next().await {
+                    let msg_string =  String::from_redis_value(&msg).unwrap();
+                    if args.file {
+                        file_tx.send(msg_string.clone()).await.unwrap();
+                    }
                     let r: EventResp<String> = EventResp::new(
-                        String::from_redis_value(&msg).unwrap(),
+                        msg_string,
                         String::from(event_str),
                     );
                     let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
                 }
             } => {
-
             }
             _ = rx => {
+                stop_file_tx.send(()).unwrap();
             }
         }
     });
-    Ok(event_name_resp)
+    Ok(MonitorResp {
+        event_name: event_name_resp,
+        file_name: file_name_resp,
+    })
 }
 
 #[derive(Deserialize)]

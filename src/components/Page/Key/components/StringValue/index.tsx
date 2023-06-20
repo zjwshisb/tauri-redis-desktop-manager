@@ -19,7 +19,7 @@ const Index: React.FC<{
 
   return (
     <div>
-      <div className="pb-2 flex">
+      <div className="pb-2 flex items-center">
         {!editable && (
           <Button
             type="primary"
@@ -58,6 +58,7 @@ const Index: React.FC<{
             </Button>
           </Space>
         )}
+        <div className="ml-2">{keys.extra_type}</div>
       </div>
       <Input.TextArea
         onChange={(e) => {
