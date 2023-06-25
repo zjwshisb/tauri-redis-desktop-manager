@@ -51,6 +51,7 @@ pub async fn dispatch<'r>(
         "key/get" => Response::new(key::get(payload, cid).await?),
         "key/set" => Response::new(key::set(payload, cid).await?),
         "key/expire" => Response::new(key::expire(payload, cid).await?),
+        "key/setbit" => Response::new(key::setbit(payload, cid).await?),
         "db/dbsize" => Response::new(db::dbsize(payload, cid).await?),
         "client/list" => Response::new(client::list(payload, cid).await?),
         "client/kill" => Response::new(client::kill(payload, cid).await?),

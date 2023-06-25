@@ -11,7 +11,7 @@ const Index: React.FC<{
   trigger: React.ReactElement
   onSuccess: (newField: APP.HashField) => void
 }> = (props) => {
-  const [form] = useForm(undefined)
+  const [form] = useForm()
 
   const { t } = useTranslation()
 
@@ -20,7 +20,7 @@ const Index: React.FC<{
   }, [props.field])
 
   const title = React.useMemo(() => {
-    return isEdit ? t('Edit Field') : 'Add Field'
+    return isEdit ? t('Edit Field') : t('Add Field')
   }, [isEdit, t])
 
   return (

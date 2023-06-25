@@ -1,7 +1,7 @@
 import React from 'react'
-import { Button, Input, Space, message } from 'antd'
-import { useTranslation } from 'react-i18next'
-import request from '@/utils/request'
+import { Card } from 'antd'
+import FieldViewer from '@/components/FieldViewer'
+import Edit from './components/Edit'
 
 const Index: React.FC<{
   keys: APP.StringKey
@@ -13,61 +13,15 @@ const Index: React.FC<{
     setValue(keys.data)
   }, [keys.data])
 
-  const [editable, setEditable] = React.useState(false)
-
-  const { t } = useTranslation()
-
   return (
     <div>
       <div className="pb-2 flex items-center">
-        {!editable && (
-          <Button
-            type="primary"
-            onClick={() => {
-              setEditable(true)
-            }}
-          >
-            {t('Edit')}
-          </Button>
-        )}
-        {editable && (
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => {
-                request('key/set', keys.connection_id, {
-                  db: keys.db,
-                  name: keys.name,
-                  value
-                }).then(() => {
-                  message.success(t('Success'))
-                  onRefresh()
-                  setEditable(false)
-                })
-              }}
-            >
-              {t('Save')}
-            </Button>
-            <Button
-              onClick={() => {
-                setValue(keys.data)
-                setEditable(false)
-              }}
-            >
-              {t('Cancel')}
-            </Button>
-          </Space>
-        )}
+        <Edit keys={keys} onSuccess={onRefresh} />
         <div className="ml-2">{keys.extra_type}</div>
       </div>
-      <Input.TextArea
-        onChange={(e) => {
-          setValue(e.target.value)
-        }}
-        value={value}
-        rows={4}
-        readOnly={!editable}
-      ></Input.TextArea>
+      <Card bodyStyle={{ padding: 16 }}>
+        <FieldViewer content={value}></FieldViewer>
+      </Card>
     </div>
   )
 }

@@ -10,8 +10,9 @@ import { type MenuItemType } from 'antd/es/menu/hooks/useItems'
 
 const FieldViewer: React.FC<{
   content: string
-}> = ({ content }) => {
-  const [types, setTypes] = React.useState<string>('text')
+  defaultType?: string
+}> = ({ content, defaultType = 'text' }) => {
+  const [types, setTypes] = React.useState<string>(defaultType)
 
   const [isOrigin, setIsOrigin] = React.useState(true)
 

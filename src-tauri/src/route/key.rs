@@ -56,14 +56,15 @@ impl Key {
         Ok(())
     }
     async fn get_string_value(&mut self, conn: &mut Connection) -> Result<(), CusError> {
-        let value = redis::cmd("get").arg(&self.name).query_async(conn).await?;
-        if let Value::Data(s) = value {
-            let utf8_result = std::str::from_utf8(&s);
-            if let Ok(s) = utf8_result {
-                self.data = String::from(s);
-            } else {
+        let value: Value = redis::cmd("get").arg(&self.name).query_async(conn).await?;
+
+        let v: Result<String, redis::RedisError> = String::from_redis_value(&value);
+        match v {
+            Ok(s) => self.data = s,
+            Err(_) => {
+                let i: Vec<u8> = Vec::from_redis_value(&value).unwrap();
                 let mut data = String::from("");
-                for v in s {
+                for v in i {
                     let bs = format!("{:b}", v);
                     data.push_str(bs.as_str());
                 }
@@ -128,7 +129,6 @@ pub async fn scan(payload: String, cid: u32) -> Result<ScanResp<String>, CusErro
         Value::Bulk(s) => {
             let mut keys: Vec<String> = vec![];
             let cursor = String::from_redis_value(s.get(0).unwrap())?;
-
             let keys_vec = s.get(1);
             if let Some(s) = keys_vec {
                 keys = Vec::from_redis_value(&s)?;
@@ -291,4 +291,24 @@ pub async fn add(payload: String, cid: u32) -> Result<String, CusError> {
         _ => {}
     }
     Err(err::new_normal())
+}
+
+#[derive(Deserialize)]
+struct SetbitArgs {
+    offset: i64,
+    value: i64,
+    db: u8,
+    name: String,
+}
+
+pub async fn setbit(payload: String, cid: u32) -> Result<i64, CusError> {
+    let args: SetbitArgs = serde_json::from_str(&payload)?;
+    let mut conn = redis_conn::get_connection(cid, args.db).await?;
+    let value: Value = redis::cmd("setbit")
+        .arg(args.name)
+        .arg(args.offset)
+        .arg(args.value)
+        .query_async(&mut conn)
+        .await?;
+    Ok(i64::from_redis_value(&value).unwrap())
 }
