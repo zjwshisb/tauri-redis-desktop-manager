@@ -1,7 +1,7 @@
 import { type DB } from '@/store/db'
 import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
-import { Form, Input, Select, Tooltip, message } from 'antd'
+import { Form, Input, Select, Tooltip } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -33,7 +33,6 @@ const Plus: React.FC<{
             db: props.db?.db
           }).then(() => {
             props.onSuccess(res.name)
-            message.success(t('Success'))
           })
         })
       }}

@@ -1,4 +1,13 @@
-import { Button, Form, Input, Modal, InputNumber, Space, message } from 'antd'
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  InputNumber,
+  Space,
+  message,
+  Checkbox
+} from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import React from 'react'
 import request from '@/utils/request'
@@ -30,6 +39,7 @@ const Index: React.FC<{
       form.setFieldsValue({
         ...props.connection
       })
+      console.log(props.connection)
     }
   }, [form, props.connection, visible])
 
@@ -82,6 +92,7 @@ const Index: React.FC<{
               type="primary"
               onClick={async () => {
                 const v = await form.validateFields()
+                console.log(v)
                 if (props.connection == null) {
                   await request('connections/add', 0, v)
                 } else {
@@ -116,7 +127,8 @@ const Index: React.FC<{
           initialValues={{
             port: 6379,
             host: '127.0.0.1',
-            password: ''
+            password: '',
+            is_cluster: false
           }}
         >
           <Form.Item name="host" label={t('Host')} rules={[{ required: true }]}>
@@ -138,6 +150,13 @@ const Index: React.FC<{
                 name: t('Password')
               }).toString()}
             ></Input.Password>
+          </Form.Item>
+          <Form.Item
+            name="is_cluster"
+            label={t('Cluster')}
+            valuePropName="checked"
+          >
+            <Checkbox />
           </Form.Item>
         </Form>
       </Modal>

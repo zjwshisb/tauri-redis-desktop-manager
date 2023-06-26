@@ -1,3 +1,4 @@
+use crate::model::Connection as Conn;
 use crate::model::EventResp;
 use crate::state::{PubsubItem, PubsubManager};
 use crate::{err::CusError, redis_conn};
@@ -5,6 +6,7 @@ use chrono::prelude::*;
 use futures::stream::StreamExt;
 use rand::distributions::Alphanumeric;
 use rand::prelude::*;
+use redis::aio::Connection;
 use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
@@ -31,7 +33,8 @@ pub async fn subscribe<'r>(
     cid: u32,
 ) -> Result<String, CusError> {
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
-    let conn = redis_conn::get_connection(cid, args.db).await?;
+    let model = Conn::first(cid)?;
+    let conn: Connection = redis_conn::get_normal_connection(model, args.db).await?;
 
     let mut pubsub = conn.into_pubsub();
     for x in args.channels {
@@ -116,7 +119,8 @@ pub async fn monitor<'r>(
     cid: u32,
 ) -> Result<MonitorResp, CusError> {
     let args: MonitorArgs = serde_json::from_str(&payload)?;
-    let conn = redis_conn::get_connection(cid, 0).await?;
+    let model = Conn::first(cid)?;
+    let conn: Connection = redis_conn::get_normal_connection(model, 0).await?;
 
     let mut monitor = conn.into_monitor();
 

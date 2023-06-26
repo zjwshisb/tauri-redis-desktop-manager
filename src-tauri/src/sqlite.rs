@@ -3,7 +3,7 @@ use dirs_next;
 use rusqlite::{self, Connection};
 use std::fs;
 
-const DATA_NAME: &str = "data.db";
+const DATA_NAME: &str = "data1.db";
 const DATA_DIR: &str = "redis";
 
 pub fn get_sqlite_client() -> Result<Connection, CusError> {
@@ -27,7 +27,8 @@ pub fn init_sqlite() {
             id    INTEGER PRIMARY KEY,
             host  TEXT NOT NULL,
             port  INTEGER NOT NULL,
-            password  TEXT
+            password  TEXT,
+            is_cluster INTEGER NOT NULL DEFAULT 0
         )",
             (), // empty list of parameters.
         )

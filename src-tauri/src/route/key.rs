@@ -2,7 +2,7 @@ use crate::{
     err::{self, CusError},
     redis_conn::{self},
 };
-use redis::{aio::Connection, FromRedisValue};
+use redis::{aio::ConnectionLike, FromRedisValue};
 use redis::{cmd, Value};
 use serde::{Deserialize, Serialize};
 
@@ -19,7 +19,12 @@ pub struct Key {
     extra_type: String,
 }
 impl Key {
-    async fn new(name: String, db: u8, cid: u32, conn: &mut Connection) -> Result<Key, CusError> {
+    async fn new<T: ConnectionLike>(
+        name: String,
+        db: u8,
+        cid: u32,
+        conn: &mut T,
+    ) -> Result<Key, CusError> {
         let mut key: Key = Key {
             name: name,
             types: "".into(),
@@ -40,7 +45,7 @@ impl Key {
         }
         Ok(key)
     }
-    async fn get_memory(&mut self, conn: &mut Connection) -> Result<(), CusError> {
+    async fn get_memory<T: ConnectionLike>(&mut self, conn: &mut T) -> Result<(), CusError> {
         let memory_value: Value = cmd("memory")
             .arg("usage")
             .arg(&self.name)
@@ -50,12 +55,12 @@ impl Key {
         self.memory = i64::from_redis_value(&memory_value)?;
         Ok(())
     }
-    async fn get_ttl(&mut self, conn: &mut Connection) -> Result<(), CusError> {
+    async fn get_ttl<T: ConnectionLike>(&mut self, conn: &mut T) -> Result<(), CusError> {
         let ttl_result: Value = cmd("ttl").arg(&self.name).query_async(conn).await?;
         self.ttl = i64::from_redis_value(&ttl_result)?;
         Ok(())
     }
-    async fn get_string_value(&mut self, conn: &mut Connection) -> Result<(), CusError> {
+    async fn get_string_value<T: ConnectionLike>(&mut self, conn: &mut T) -> Result<(), CusError> {
         let value: Value = redis::cmd("get").arg(&self.name).query_async(conn).await?;
 
         let v: Result<String, redis::RedisError> = String::from_redis_value(&value);
@@ -74,7 +79,7 @@ impl Key {
         }
         Ok(())
     }
-    async fn get_length(&mut self, conn: &mut Connection) -> Result<(), CusError> {
+    async fn get_length<T: ConnectionLike>(&mut self, conn: &mut T) -> Result<(), CusError> {
         let cmd = match &self.types[..] {
             "string" => "STRLEN",
             "hash" => "HLEN",
@@ -150,10 +155,6 @@ struct GetArgs {
 pub async fn get(payload: String, cid: u32) -> Result<Key, CusError> {
     let args: GetArgs = serde_json::from_str(&payload)?;
     let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let _: redis::Value = redis::cmd("select")
-        .arg(args.db)
-        .query_async(&mut conn)
-        .await?;
     let mut key: Key = Key::new(args.name, args.db, cid, &mut conn).await?;
     if key.is_none() {
         return Err(CusError::App(format!("{} is not exist", &key.name)));

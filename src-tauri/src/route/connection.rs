@@ -6,6 +6,7 @@ struct AddArgs {
     host: String,
     port: i32,
     password: String,
+    is_cluster: bool,
 }
 
 pub fn add(payload: String) -> Result<Connection, CusError> {
@@ -15,6 +16,7 @@ pub fn add(payload: String) -> Result<Connection, CusError> {
         host: args.host,
         port: args.port,
         password: args.password,
+        is_cluster: args.is_cluster,
     };
     connection.save()
 }
@@ -40,13 +42,17 @@ struct UpdateArgs {
     pub host: String,
     pub port: i32,
     pub password: String,
+    pub is_cluster: bool,
 }
 
 pub fn update(payload: String) -> Result<Connection, CusError> {
     let args: UpdateArgs = serde_json::from_str(&payload)?;
     let mut connection = Connection::first(args.id)?;
+    dbg!(&args);
+
     connection.host = args.host;
     connection.password = args.password;
     connection.port = args.port;
+    connection.is_cluster = args.is_cluster;
     connection.save()
 }

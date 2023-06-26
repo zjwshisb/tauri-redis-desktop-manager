@@ -16,7 +16,6 @@ pub async fn get_database(cid: u32) -> Result<String, CusError> {
         .arg("version")
         .query_async(&mut conn)
         .await?;
-    dbg!(&value_version);
     if let Value::Bulk(v) = value_version {
         if let Some(version) = v.get(1) {
             let vv: String = String::from_redis_value(version)?;

@@ -10,11 +10,13 @@ export default async function request<T>(
   args: Record<string, any> = {}
 ): Promise<Response<T>> {
   try {
-    const res = await invoke('dispatch', {
+    const params = {
       path,
       cid,
       payload: JSON.stringify(args)
-    })
+    }
+    const res = await invoke('dispatch', params)
+    console.log(params)
     const data = JSON.parse(res as string)
     return data as Response<T>
   } catch (err) {

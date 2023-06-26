@@ -60,16 +60,21 @@ const Index: React.FC<{
 
   const getDbs = React.useCallback(async () => {
     setLoading(true)
-    const res = await request<string>('config/databases', connection.id)
-    const dbs: DBType[] = []
-    for (let i = 0; i < parseInt(res.data); i++) {
-      dbs.push({
-        db: i,
-        count: 0
-      })
+    try {
+      const res = await request<string>('config/databases', connection.id)
+      const dbs: DBType[] = []
+      for (let i = 0; i < parseInt(res.data); i++) {
+        dbs.push({
+          db: i,
+          count: 0
+        })
+      }
+      setDatabases(dbs)
+      setLoading(false)
+    } catch (e) {
+      setLoading(false)
+      throw e
     }
-    setDatabases(dbs)
-    setLoading(false)
   }, [connection.id])
 
   const onItemClick = React.useCallback(() => {

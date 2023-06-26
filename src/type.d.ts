@@ -5,6 +5,7 @@ declare namespace APP {
     port: number
     auth: string
     version: string
+    is_cluster: boolean
   }
 
   interface BaseKey<T, V> {
