@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import type React from 'react'
 
 export interface Page {
-  label: string
+  label: React.ReactNode
   key: string
   children: React.ReactNode
   connectionId: number

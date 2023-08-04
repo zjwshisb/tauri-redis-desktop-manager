@@ -1,5 +1,6 @@
 use crate::model::Connection as Conn;
 use crate::model::EventResp;
+use crate::state::ConnectionManager;
 use crate::state::{PubsubItem, PubsubManager};
 use crate::{err::CusError, redis_conn};
 use chrono::prelude::*;
@@ -34,7 +35,9 @@ pub async fn subscribe<'r>(
 ) -> Result<String, CusError> {
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
     let model = Conn::first(cid)?;
-    let conn: Connection = redis_conn::get_normal_connection(model, args.db).await?;
+
+    let conn: Connection =
+        redis_conn::RedisConnection::get_normal_connection(&model, args.db).await?;
 
     let mut pubsub = conn.into_pubsub();
     for x in args.channels {
@@ -90,13 +93,18 @@ struct PublishArgs {
     value: String,
 }
 
-pub async fn publish(payload: String, cid: u32) -> Result<i64, CusError> {
+pub async fn publish<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let args: PublishArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let v: redis::Value = redis::cmd("publish")
-        .arg(args.channel)
-        .arg(args.value)
-        .query_async(&mut conn)
+    let v: redis::Value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("publish").arg(args.channel).arg(args.value),
+        )
         .await?;
     Ok(i64::from_redis_value(&v)?)
 }
@@ -120,7 +128,7 @@ pub async fn monitor<'r>(
 ) -> Result<MonitorResp, CusError> {
     let args: MonitorArgs = serde_json::from_str(&payload)?;
     let model = Conn::first(cid)?;
-    let conn: Connection = redis_conn::get_normal_connection(model, 0).await?;
+    let conn: Connection = redis_conn::RedisConnection::get_normal_connection(&model, 0).await?;
 
     let mut monitor = conn.into_monitor();
 
@@ -164,7 +172,6 @@ pub async fn monitor<'r>(
                                 let mut count = 0;
                                 while let Some(mut msg) = file_rx.recv().await {
                                     msg.push_str("\r\n");
-                                    dbg!(&msg);
                                     f.write(msg.as_bytes()).unwrap();
                                     count = count + 1;
                                     if count > 4 {
@@ -176,6 +183,7 @@ pub async fn monitor<'r>(
 
                             }
                             _ = stop_file_rx => {
+                                dbg!("stop_file_rx");
                             }
                         }
 

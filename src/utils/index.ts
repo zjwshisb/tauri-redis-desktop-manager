@@ -1,5 +1,5 @@
 export function getPageKey(name: string, conn: APP.Connection, db?: number) {
-    let key = `${name}|${conn.host}:${conn.port}`
+    let key = `#${conn.id}|${name}`
     if (db !== undefined) {
         key += `@${db}`
     }

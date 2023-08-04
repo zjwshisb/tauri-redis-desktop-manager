@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next'
 import ResizableDiv from '@/components/ResizableDiv'
 import { getPageKey } from '@/utils'
 import List from './components/List'
-import TypeSelect from './components/TypeSelect'
 
 interface ScanResp {
   cursor: string
@@ -145,14 +144,14 @@ const Index: React.FC = () => {
             <div className="flex-shrink-0 flex item-center px-2 justify-center">
               {db != null && (
                 <Space>
-                  <TypeSelect
+                  {/* <TypeSelect
                     version={db.connection.version}
                     onChange={(e) => {
                       cursor.current = '0'
                       types.current = e
                       getKeys(true)
                     }}
-                  />
+                  /> */}
                   <Tooltip title={t('Refresh')}>
                     <ReloadOutlined
                       className="hover:cursor-pointer text-lg"

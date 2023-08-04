@@ -1,105 +1,89 @@
 import React from 'react'
 import {
-  DeleteOutlined,
-  MenuFoldOutlined,
-  EditOutlined,
-  PoweroffOutlined
+  InfoCircleOutlined,
+  ControlOutlined,
+  MenuOutlined
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import request from '@/utils/request'
-import { Dropdown, Modal, Tooltip, message } from 'antd'
+import { Dropdown } from 'antd'
 import { useTranslation } from 'react-i18next'
-import ConnectionForm from '@/components/ConnectionForm'
+import Monitor from './Monitor'
+import { getPageKey } from '@/utils'
+import Client from '@/components/Page/Client'
+import Info from '@/components/Page/Info'
+import Subscribe from './Subscribe'
 
-export interface DBType {
-  db: number
-  count: number
-}
-
-const Index: React.FC<{
+const Menu: React.FC<{
   connection: APP.Connection
-}> = ({ connection }) => {
+  db?: number[]
+}> = ({ connection, db }) => {
   const store = useStore()
 
   const { t } = useTranslation()
 
-  const isOpen = React.useMemo(() => {
-    return store.connection.openIds[connection.id]
-  }, [connection.id, store.connection.openIds])
-
   const connectionMenus = React.useMemo(() => {
-    const menus = [
+    let menus = [
       {
-        key: 'edit',
+        key: 'info',
         label: (
-          <ConnectionForm
-            onSuccess={store.connection.fetchConnections}
-            connection={connection}
-            trigger={
-              <div
-                className="flex"
-                onClick={(e) => {
-                  e.stopPropagation()
-                }}
-              >
-                <EditOutlined />
-                <div className="ml-2">{t('Edit Connection')}</div>
-              </div>
-            }
-          ></ConnectionForm>
+          <div className="flex">
+            <InfoCircleOutlined className="hover:text-blue-600" />
+            <div className="ml-2">{t('Info')}</div>
+          </div>
         )
       },
       {
-        key: 'delete',
+        key: 'client',
         label: (
           <div className="flex">
-            <DeleteOutlined />
-            <div className="ml-2">{t('Delete Connection')}</div>
+            <ControlOutlined className="hover:text-blue-600" />
+            <div className="ml-2">{t('Client')}</div>
           </div>
         )
       }
     ]
-    if (isOpen) {
-      menus.unshift({
-        key: 'close',
-        label: (
-          <div className="flex">
-            <PoweroffOutlined />
-            <div className="ml-2">{t('Close Connection')}</div>
-          </div>
-        )
-      })
+    if (!connection.is_cluster) {
+      menus = menus.concat([
+        {
+          key: 'monitor',
+          label: <Monitor connection={connection} />
+        },
+        {
+          key: 'Subscribe',
+          label: <Subscribe connection={connection} db={db}></Subscribe>
+        }
+      ])
     }
     return menus
-  }, [store, connection, t, isOpen])
+  }, [connection, t, db])
 
   return (
     <Dropdown
-      trigger={['click']}
+      trigger={['hover']}
       className="hover:text-blue-600"
       menu={{
         onClick(e) {
           e.domEvent.stopPropagation()
           switch (e.key) {
-            case 'delete': {
-              Modal.confirm({
-                title: t('Notice'),
-                content: t('Are you sure delete <{{name}}>?', {
-                  name: t('Connection')
-                }),
-                async onOk() {
-                  await request('connections/del', 0, {
-                    id: connection.id
-                  })
-                  store.removeConnection(connection.id)
-                  message.success(t('Success'))
-                }
+            case 'client': {
+              const key = getPageKey('client', connection)
+              store.page.addPage({
+                label: key,
+                connectionId: connection.id,
+                key,
+                children: <Client connection={connection}></Client>
               })
               break
             }
-            case 'close': {
-              store.closeConnection(connection.id)
+            case 'info': {
+              const key = getPageKey('info', connection)
+              store.page.addPage({
+                label: key,
+                key,
+                children: <Info connection={connection}></Info>,
+                connectionId: connection.id
+              })
               break
             }
           }
@@ -107,14 +91,12 @@ const Index: React.FC<{
         items: connectionMenus
       }}
     >
-      <Tooltip title={t('Connection')}>
-        <MenuFoldOutlined
-          onClick={(e) => {
-            e.stopPropagation()
-          }}
-        />
-      </Tooltip>
+      <MenuOutlined
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
+      />
     </Dropdown>
   )
 }
-export default observer(Index)
+export default observer(Menu)

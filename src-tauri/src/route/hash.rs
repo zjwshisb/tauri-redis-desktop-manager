@@ -1,6 +1,7 @@
 use crate::err;
+use crate::err::CusError;
 use crate::model::Field;
-use crate::{err::CusError, redis_conn};
+use crate::state::ConnectionManager;
 use redis::{FromRedisValue, Value};
 use serde::{Deserialize, Serialize};
 
@@ -18,9 +19,12 @@ pub struct HScanResp {
     fields: Vec<Field>,
 }
 
-pub async fn hscan(payload: String, cid: u32) -> Result<HScanResp, CusError> {
+pub async fn hscan<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<HScanResp, CusError> {
     let args: HScanArgs = serde_json::from_str(&payload)?;
-    let mut connection = redis_conn::get_connection(cid, args.db).await?;
     let mut cmd: redis::Cmd = redis::cmd("hscan");
     cmd.arg(args.name)
         .arg(args.cursor)
@@ -28,7 +32,7 @@ pub async fn hscan(payload: String, cid: u32) -> Result<HScanResp, CusError> {
     if args.search != "" {
         cmd.arg(&["MATCH", format!("*{}*", args.search.as_str()).as_str()]);
     }
-    let value = cmd.query_async(&mut connection).await?;
+    let value = manager.execute(cid, args.db, &mut cmd).await?;
     if let Value::Bulk(s) = value {
         let cursor = String::from_redis_value(s.get(0).unwrap())?;
         let mut fields: Vec<Field> = vec![];
@@ -58,13 +62,20 @@ struct HSetArgs {
     value: String,
     db: u8,
 }
-pub async fn hset(payload: String, cid: u32) -> Result<i64, CusError> {
+pub async fn hset<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let args: HSetArgs = serde_json::from_str(&payload)?;
-    let mut connection = redis_conn::get_connection(cid, args.db).await?;
-    let value: Value = redis::cmd("hset")
-        .arg(&args.name)
-        .arg(&[args.field, args.value])
-        .query_async(&mut connection)
+    let value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("hset")
+                .arg(&args.name)
+                .arg(&[args.field, args.value]),
+        )
         .await?;
     Ok(i64::from_redis_value(&value)?)
 }
@@ -75,13 +86,18 @@ struct HDelArgs {
     db: u8,
 }
 
-pub async fn hdel(payload: String, cid: u32) -> Result<i64, CusError> {
+pub async fn hdel<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let args: HDelArgs = serde_json::from_str(&payload)?;
-    let mut connection = redis_conn::get_connection(cid, args.db).await?;
-    let value: Value = redis::cmd("hdel")
-        .arg(&args.name)
-        .arg(&args.fields)
-        .query_async(&mut connection)
+    let value: Value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("hdel").arg(&args.name).arg(&args.fields),
+        )
         .await?;
     Ok(i64::from_redis_value(&value)?)
 }

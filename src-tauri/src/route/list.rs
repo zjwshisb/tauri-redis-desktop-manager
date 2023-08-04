@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::{
     err::{self, CusError},
-    redis_conn,
+    ConnectionManager,
 };
 
 #[derive(Deserialize)]
@@ -14,14 +14,21 @@ struct LRangeArgs {
     db: u8,
 }
 
-pub async fn lrange(payload: String, cid: u32) -> Result<Vec<String>, CusError> {
+pub async fn lrange<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<Vec<String>, CusError> {
     let args: LRangeArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let values: redis::Value = redis::cmd("lrange")
-        .arg(&args.name)
-        .arg(&args.start)
-        .arg(&args.stop)
-        .query_async(&mut conn)
+    let values: redis::Value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("lrange")
+                .arg(&args.name)
+                .arg(&args.start)
+                .arg(&args.stop),
+        )
         .await?;
     Ok(Vec::<String>::from_redis_value(&values)?)
 }
@@ -33,14 +40,21 @@ struct LSetArgs {
     value: String,
     db: u8,
 }
-pub async fn lset(payload: String, cid: u32) -> Result<String, CusError> {
+pub async fn lset<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
     let args: LSetArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let value: redis::Value = redis::cmd("lset")
-        .arg(&args.name)
-        .arg(args.index)
-        .arg(&args.value)
-        .query_async(&mut conn)
+    let value: redis::Value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("lset")
+                .arg(&args.name)
+                .arg(args.index)
+                .arg(&args.value),
+        )
         .await?;
     Ok(String::from_redis_value(&value)?)
 }
@@ -53,14 +67,21 @@ struct LTrimArgs {
     stop: i64,
 }
 
-pub async fn ltrim(payload: String, cid: u32) -> Result<String, CusError> {
+pub async fn ltrim<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
     let args: LTrimArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let value: redis::Value = redis::cmd("ltrim")
-        .arg(&args.name)
-        .arg(args.start)
-        .arg(args.stop)
-        .query_async(&mut conn)
+    let value: redis::Value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("ltrim")
+                .arg(&args.name)
+                .arg(args.start)
+                .arg(args.stop),
+        )
         .await?;
     Ok(String::from_redis_value(&value)?)
 }
@@ -73,15 +94,22 @@ struct InsertArgs {
     value: String,
     pivot: String,
 }
-pub async fn linsert(payload: String, cid: u32) -> Result<i64, CusError> {
+pub async fn linsert<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let args: InsertArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let value: redis::Value = redis::cmd("linsert")
-        .arg(&args.name)
-        .arg(&args.types)
-        .arg(&args.pivot)
-        .arg(&args.value)
-        .query_async(&mut conn)
+    let value: redis::Value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("linsert")
+                .arg(&args.name)
+                .arg(&args.types)
+                .arg(&args.pivot)
+                .arg(&args.value),
+        )
         .await?;
     if let redis::Value::Int(r) = value {
         match r {

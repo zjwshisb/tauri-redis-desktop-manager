@@ -1,8 +1,8 @@
 use crate::{
     err::{self, CusError},
-    redis_conn::{self},
+    state::ConnectionManager,
 };
-use redis::{aio::ConnectionLike, FromRedisValue};
+use redis::FromRedisValue;
 use redis::{cmd, Value};
 use serde::{Deserialize, Serialize};
 
@@ -19,11 +19,11 @@ pub struct Key {
     extra_type: String,
 }
 impl Key {
-    async fn new<T: ConnectionLike>(
+    async fn new<'r>(
         name: String,
         db: u8,
         cid: u32,
-        conn: &mut T,
+        manager: &tauri::State<'r, ConnectionManager>,
     ) -> Result<Key, CusError> {
         let mut key: Key = Key {
             name: name,
@@ -36,33 +36,53 @@ impl Key {
             length: 0,
             extra_type: String::from(""),
         };
-        let types_value: Value = cmd("type").arg(&key.name).query_async(conn).await?;
+        let types_value: Value = manager.execute(cid, db, cmd("type").arg(&key.name)).await?;
         key.types = String::from_redis_value(&types_value)?;
         if !key.is_none() {
-            key.get_ttl(conn).await?;
-            key.get_memory(conn).await?;
-            key.get_length(conn).await?;
+            key.get_ttl(&manager).await?;
+            key.get_memory(&manager).await?;
+            key.get_length(&manager).await?;
         }
         Ok(key)
     }
-    async fn get_memory<T: ConnectionLike>(&mut self, conn: &mut T) -> Result<(), CusError> {
-        let memory_value: Value = cmd("memory")
-            .arg("usage")
-            .arg(&self.name)
-            .arg(&["SAMPLES", "0"])
-            .query_async(conn)
+    async fn get_memory<'r>(
+        &mut self,
+        manager: &tauri::State<'r, ConnectionManager>,
+    ) -> Result<(), CusError> {
+        let memory_value: Value = manager
+            .execute(
+                self.connection_id,
+                self.db,
+                cmd("memory")
+                    .arg("usage")
+                    .arg(&self.name)
+                    .arg(&["SAMPLES", "0"]),
+            )
             .await?;
         self.memory = i64::from_redis_value(&memory_value)?;
         Ok(())
     }
-    async fn get_ttl<T: ConnectionLike>(&mut self, conn: &mut T) -> Result<(), CusError> {
-        let ttl_result: Value = cmd("ttl").arg(&self.name).query_async(conn).await?;
+    async fn get_ttl<'r>(
+        &mut self,
+        manager: &tauri::State<'r, ConnectionManager>,
+    ) -> Result<(), CusError> {
+        let ttl_result: Value = manager
+            .execute(self.connection_id, self.db, cmd("ttl").arg(&self.name))
+            .await?;
         self.ttl = i64::from_redis_value(&ttl_result)?;
         Ok(())
     }
-    async fn get_string_value<T: ConnectionLike>(&mut self, conn: &mut T) -> Result<(), CusError> {
-        let value: Value = redis::cmd("get").arg(&self.name).query_async(conn).await?;
-
+    async fn get_string_value<'r>(
+        &mut self,
+        manager: &tauri::State<'r, ConnectionManager>,
+    ) -> Result<(), CusError> {
+        let value: Value = manager
+            .execute(
+                self.connection_id,
+                self.db,
+                redis::cmd("get").arg(&self.name),
+            )
+            .await?;
         let v: Result<String, redis::RedisError> = String::from_redis_value(&value);
         match v {
             Ok(s) => self.data = s,
@@ -79,7 +99,10 @@ impl Key {
         }
         Ok(())
     }
-    async fn get_length<T: ConnectionLike>(&mut self, conn: &mut T) -> Result<(), CusError> {
+    async fn get_length<'r>(
+        &mut self,
+        manager: &tauri::State<'r, ConnectionManager>,
+    ) -> Result<(), CusError> {
         let cmd = match &self.types[..] {
             "string" => "STRLEN",
             "hash" => "HLEN",
@@ -89,7 +112,9 @@ impl Key {
             _ => "",
         };
         if cmd != "" {
-            let length_value: Value = redis::cmd(cmd).arg(&self.name).query_async(conn).await?;
+            let length_value: Value = manager
+                .execute(self.connection_id, self.db, redis::cmd(cmd).arg(&self.name))
+                .await?;
             self.length = i64::from_redis_value(&length_value)?;
         }
         Ok(())
@@ -113,9 +138,13 @@ pub struct ScanResp<T> {
     keys: Vec<T>,
 }
 
-pub async fn scan(payload: String, cid: u32) -> Result<ScanResp<String>, CusError> {
+pub async fn scan<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<ScanResp<String>, CusError> {
     let args: ScanArgs = serde_json::from_str(&payload)?;
-    let mut connection = redis_conn::get_connection(cid, args.db).await?;
+
     let mut cmd = redis::cmd("scan");
     cmd.arg(&args.cursor)
         .arg(&["count", &args.count.to_string()]);
@@ -129,7 +158,7 @@ pub async fn scan(payload: String, cid: u32) -> Result<ScanResp<String>, CusErro
     if args.types != "" {
         cmd.arg(&["TYPE", &args.types]);
     }
-    let value = cmd.query_async(&mut connection).await?;
+    let value = manager.execute(cid, args.db, &mut cmd).await?;
     return match value {
         Value::Bulk(s) => {
             let mut keys: Vec<String> = vec![];
@@ -152,17 +181,20 @@ struct GetArgs {
     name: String,
     db: u8,
 }
-pub async fn get(payload: String, cid: u32) -> Result<Key, CusError> {
+pub async fn get<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<Key, CusError> {
     let args: GetArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let mut key: Key = Key::new(args.name, args.db, cid, &mut conn).await?;
+    let mut key: Key = Key::new(args.name, args.db, cid, &manager).await?;
     if key.is_none() {
         return Err(CusError::App(format!("{} is not exist", &key.name)));
     }
     match &key.types[..] {
         "hash" => {}
         "string" => {
-            key.get_string_value(&mut conn).await?;
+            key.get_string_value(&manager).await?;
         }
         _ => (),
     }
@@ -174,12 +206,14 @@ struct DelArgs {
     names: Vec<String>,
     db: u8,
 }
-pub async fn del(payload: String, cid: u32) -> Result<i64, CusError> {
+pub async fn del<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let args: DelArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let value: Value = redis::cmd("del")
-        .arg(&args.names)
-        .query_async(&mut conn)
+    let value: Value = manager
+        .execute(cid, args.db, redis::cmd("del").arg(&args.names))
         .await?;
     Ok(i64::from_redis_value(&value)?)
 }
@@ -189,13 +223,18 @@ struct ExpireArgs {
     ttl: i64,
     db: u8,
 }
-pub async fn expire(payload: String, cid: u32) -> Result<i64, CusError> {
+pub async fn expire<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let args: ExpireArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let value: Value = redis::cmd("expire")
-        .arg(&args.name)
-        .arg(args.ttl)
-        .query_async(&mut conn)
+    let value: Value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("expire").arg(&args.name).arg(args.ttl),
+        )
         .await?;
     Ok(i64::from_redis_value(&value)?)
 }
@@ -207,13 +246,18 @@ struct RenameArgs {
     db: u8,
 }
 
-pub async fn rename(payload: String, cid: u32) -> Result<String, CusError> {
+pub async fn rename<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
     let args: RenameArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let value: Value = redis::cmd("rename")
-        .arg(&args.name)
-        .arg(&args.new_name)
-        .query_async(&mut conn)
+    let value: Value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("rename").arg(&args.name).arg(&args.new_name),
+        )
         .await?;
     Ok(String::from_redis_value(&value)?)
 }
@@ -225,13 +269,18 @@ struct SetArgs {
     db: u8,
 }
 
-pub async fn set(payload: String, cid: u32) -> Result<String, CusError> {
+pub async fn set<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
     let args: SetArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let v: Value = redis::cmd("set")
-        .arg(&args.name)
-        .arg(&args.value)
-        .query_async(&mut conn)
+    let v = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("set").arg(&args.name).arg(&args.value),
+        )
         .await?;
     Ok(String::from_redis_value(&v)?)
 }
@@ -243,49 +292,59 @@ struct AddArgs {
     db: u8,
 }
 
-pub async fn add(payload: String, cid: u32) -> Result<String, CusError> {
+pub async fn add<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
     let args: AddArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
     match args.types.as_str() {
         "string" => {
-            let v: Value = redis::cmd("set")
-                .arg(&args.name)
-                .arg("Hello World")
-                .query_async(&mut conn)
+            let v: Value = manager
+                .execute(
+                    cid,
+                    args.db,
+                    redis::cmd("set").arg(&args.name).arg("Hello World"),
+                )
                 .await?;
             return Ok(String::from_redis_value(&v)?);
         }
         "hash" => {
-            let v: Value = redis::cmd("hset")
-                .arg(&args.name)
-                .arg("rust")
-                .arg("Hello World")
-                .query_async(&mut conn)
+            let v: Value = manager
+                .execute(
+                    cid,
+                    args.db,
+                    redis::cmd("hset")
+                        .arg(&args.name)
+                        .arg("rust")
+                        .arg("Hello World"),
+                )
                 .await?;
             return Ok(i64::from_redis_value(&v)?.to_string());
         }
         "set" => {
-            let v: Value = redis::cmd("sadd")
-                .arg(&args.name)
-                .arg("rust")
-                .query_async(&mut conn)
+            let v: Value = manager
+                .execute(cid, args.db, redis::cmd("sadd").arg(&args.name).arg("rust"))
                 .await?;
             return Ok(i64::from_redis_value(&v)?.to_string());
         }
         "list" => {
-            let v: Value = redis::cmd("lpush")
-                .arg(&args.name)
-                .arg("Hello World")
-                .query_async(&mut conn)
+            let v: Value = manager
+                .execute(
+                    cid,
+                    args.db,
+                    redis::cmd("lpush").arg(&args.name).arg("Hello World"),
+                )
                 .await?;
             return Ok(i64::from_redis_value(&v)?.to_string());
         }
         "zset" => {
-            let v: Value = redis::cmd("zadd")
-                .arg(&args.name)
-                .arg("9999")
-                .arg("rust")
-                .query_async(&mut conn)
+            let v: Value = manager
+                .execute(
+                    cid,
+                    args.db,
+                    redis::cmd("zadd").arg(&args.name).arg("9999").arg("rust"),
+                )
                 .await?;
             return Ok(i64::from_redis_value(&v)?.to_string());
         }
@@ -302,14 +361,21 @@ struct SetbitArgs {
     name: String,
 }
 
-pub async fn setbit(payload: String, cid: u32) -> Result<i64, CusError> {
+pub async fn setbit<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let args: SetbitArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let value: Value = redis::cmd("setbit")
-        .arg(args.name)
-        .arg(args.offset)
-        .arg(args.value)
-        .query_async(&mut conn)
+    let value: Value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("setbit")
+                .arg(args.name)
+                .arg(args.offset)
+                .arg(args.value),
+        )
         .await?;
     Ok(i64::from_redis_value(&value).unwrap())
 }

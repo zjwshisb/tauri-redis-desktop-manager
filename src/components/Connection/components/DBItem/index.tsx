@@ -1,16 +1,13 @@
 import React from 'react'
 import { DatabaseOutlined, ReloadOutlined } from '@ant-design/icons'
-import classnames from 'classnames'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
-import Subscribe from './Subscribe'
-
-import { type DBType } from '../../index'
+import ItemLayout from '../ItemLayout'
 
 const Index: React.FC<{
   active: boolean
   connection: APP.Connection
-  db: DBType
+  db: number
 }> = (props) => {
   const [keyCount, setKeyCount] = React.useState(0)
 
@@ -21,7 +18,7 @@ const Index: React.FC<{
   React.useEffect(() => {
     setLoading(true)
     request<number>('db/dbsize', props.connection?.id, {
-      db: props.db.db
+      db: props.db
     })
       .then((res) => {
         setKeyCount(res.data)
@@ -35,34 +32,22 @@ const Index: React.FC<{
     if (loading) {
       return <ReloadOutlined spin />
     }
-    return (
-      <>
-        <span className="">({keyCount})</span>
-      </>
-    )
+    return <span className="">({keyCount})</span>
   }, [keyCount, loading])
 
   return (
-    <div
-      className={classnames([
-        'h-[22px] flex items-center px-2 rounded hover:cursor-pointer justify-between',
-        props.active ? 'bg-blue-50' : 'hover:bg-gray-100'
-      ])}
-    >
+    <ItemLayout active={props.active}>
       <div
         className="flex flex-1"
         onClick={() => {
-          store.db.set(props.connection, props.db.db)
+          store.db.set(props.connection, props.db)
         }}
       >
         <DatabaseOutlined className="mr-1 text-sm" />
-        <div className="w-6">{props.db.db}</div>
+        <div className="w-6">{props.db}</div>
         <div>{child}</div>
       </div>
-      <div className="flex pl-2">
-        <Subscribe connection={props.connection} db={props.db.db} />
-      </div>
-    </div>
+    </ItemLayout>
   )
 }
 export default Index

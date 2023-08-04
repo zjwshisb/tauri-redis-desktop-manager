@@ -1,5 +1,5 @@
 use crate::err::{self, CusError};
-use crate::redis_conn;
+use crate::state::ConnectionManager;
 use redis::{FromRedisValue, Value};
 use serde::{Deserialize, Serialize};
 
@@ -17,9 +17,12 @@ pub struct SScanResp {
     fields: Vec<String>,
 }
 
-pub async fn sscan(payload: String, cid: u32) -> Result<SScanResp, CusError> {
+pub async fn sscan<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<SScanResp, CusError> {
     let args: SScanArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
     let mut cmd = redis::cmd("sscan");
     cmd.arg(&args.name)
         .arg(&args.cursor)
@@ -27,7 +30,7 @@ pub async fn sscan(payload: String, cid: u32) -> Result<SScanResp, CusError> {
     if args.search != "" {
         cmd.arg(&["MATCH", &format!("*{}*", args.search)]);
     }
-    let values = cmd.query_async(&mut conn).await?;
+    let values = manager.execute(cid, args.db, &mut cmd).await?;
     if let Value::Bulk(s) = values {
         let cursor = String::from_redis_value(s.get(0).unwrap())?;
         let mut fields: Vec<String> = vec![];
@@ -50,13 +53,18 @@ struct SAddArgs {
     value: String,
 }
 
-pub async fn sadd(payload: String, cid: u32) -> Result<i64, CusError> {
+pub async fn sadd<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let args: SAddArgs = serde_json::from_str(&payload)?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let value: Value = redis::cmd("sadd")
-        .arg(args.name)
-        .arg(args.value)
-        .query_async(&mut conn)
+    let value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("sadd").arg(args.name).arg(args.value),
+        )
         .await?;
     if let Value::Int(v) = value {
         match v {
@@ -78,13 +86,18 @@ struct SRemArgs {
     value: String,
 }
 
-pub async fn srem(payload: String, cid: u32) -> Result<i64, CusError> {
+pub async fn srem<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let args: SRemArgs = serde_json::from_str(payload.as_str())?;
-    let mut conn = redis_conn::get_connection(cid, args.db).await?;
-    let value: Value = redis::cmd("srem")
-        .arg(args.name)
-        .arg(args.value)
-        .query_async(&mut conn)
+    let value = manager
+        .execute(
+            cid,
+            args.db,
+            redis::cmd("srem").arg(args.name).arg(args.value),
+        )
         .await?;
     if let Value::Int(v) = value {
         match v {

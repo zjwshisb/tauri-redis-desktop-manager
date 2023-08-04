@@ -3,7 +3,7 @@ import PageStore from './page'
 import DBStore from './db'
 import React from 'react'
 import SettingStore from './setting'
-
+import request from '@/utils/request'
 class Store {
   connection: ConnectionStore
   page: PageStore
@@ -19,6 +19,7 @@ class Store {
 
   closeConnection(id: number) {
     this.connection.close(id)
+    request('connections/close', id).then(() => {})
     const pages = this.page.pages.filter(v => {
       return v.connectionId !== id
     })

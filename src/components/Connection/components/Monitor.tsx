@@ -1,5 +1,5 @@
 import useStore from '@/hooks/useStore'
-import { Form, Switch, Tooltip } from 'antd'
+import { Form, Switch } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPageKey } from '@/utils'
@@ -8,7 +8,7 @@ import Monitor from '@/components/Page/Monitor'
 import CusModal from '@/components/CusModal'
 import { useForm } from 'antd/es/form/Form'
 
-const Subscribe: React.FC<{
+const MonitorIcon: React.FC<{
   connection: APP.Connection
 }> = (props) => {
   const { t } = useTranslation()
@@ -20,6 +20,9 @@ const Subscribe: React.FC<{
   return (
     <CusModal
       title={t('Monitor')}
+      getContainer={() => {
+        return document.getElementsByTagName('body')[0]
+      }}
       showOkNotice={false}
       onOk={async () => {
         const key = getPageKey('monitor', props.connection)
@@ -36,9 +39,14 @@ const Subscribe: React.FC<{
         })
       }}
       trigger={
-        <Tooltip title={t('Monitor')}>
-          <MonitorOutlined onClick={() => {}}></MonitorOutlined>
-        </Tooltip>
+        <div className="flex items-center">
+          <MonitorOutlined
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+          />
+          <div className="ml-2">{t('Monitor')}</div>
+        </div>
       }
     >
       {t('Are Sure Open A Monitor Page?')}
@@ -51,4 +59,4 @@ const Subscribe: React.FC<{
   )
 }
 
-export default Subscribe
+export default MonitorIcon

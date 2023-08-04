@@ -13,26 +13,21 @@ import request from '@/utils/request'
 import { useThrottleFn } from 'ahooks'
 import { Space, Spin, Tooltip } from 'antd'
 import DBItem from './components/DBItem'
-import ConnectionMenu from './components/Menu'
-import InfoIcon from './components/Info'
-import ClientIcon from './components/Client'
+import NodeItem from './components/NodeItem'
+import CurlMenu from './components/CurlMenu'
+import Menu from './components/Menu'
 import { useTranslation } from 'react-i18next'
 import Info from '@/components/Page/Info'
-import Monitor from './components/Monitor'
 import { getPageKey } from '@/utils'
 
-export interface DBType {
-  db: number
-  count: number
-}
-
-const Index: React.FC<{
+const Connection: React.FC<{
   connection: APP.Connection
 }> = ({ connection }) => {
   const store = useStore()
 
   const [collapse, setCollapse] = React.useState(false)
-  const [databases, setDatabases] = React.useState<DBType[]>([])
+  const [databases, setDatabases] = React.useState<number[]>([])
+  const [nodes, setNodes] = React.useState<string[]>([])
 
   const [loading, setLoading] = React.useState(false)
 
@@ -62,12 +57,10 @@ const Index: React.FC<{
     setLoading(true)
     try {
       const res = await request<string>('config/databases', connection.id)
-      const dbs: DBType[] = []
-      for (let i = 0; i < parseInt(res.data); i++) {
-        dbs.push({
-          db: i,
-          count: 0
-        })
+      const count = parseInt(res.data)
+      const dbs: number[] = []
+      for (let i = 0; i < count; i++) {
+        dbs.push(i)
       }
       setDatabases(dbs)
       setLoading(false)
@@ -77,23 +70,51 @@ const Index: React.FC<{
     }
   }, [connection.id])
 
-  const onItemClick = React.useCallback(() => {
+  const getNodes = React.useCallback(async () => {
+    setLoading(true)
+    try {
+      const res = await request<string[]>('cluster/nodes', connection.id)
+      setNodes(res.data)
+      setLoading(false)
+    } catch (e) {
+      setLoading(false)
+      throw e
+    }
+  }, [connection.id])
+
+  const openConnection = React.useCallback(async () => {
+    await request('connections/open', connection.id)
+  }, [connection.id])
+
+  const onItemClick = React.useCallback(async () => {
     if (isOpen) {
       setCollapse((p) => !p)
     } else {
-      getDbs().then(() => {
-        store.connection.open(connection.id)
-        const key = getPageKey('info', connection)
-        store.page.addPage({
-          label: key,
-          key,
-          children: <Info connection={connection}></Info>,
-          connectionId: connection.id
-        })
-        setCollapse(true)
+      await openConnection()
+      if (connection.is_cluster) {
+        await getNodes()
+      } else {
+        await getDbs()
+      }
+      store.connection.open(connection.id)
+      const key = getPageKey('info', connection)
+      store.page.addPage({
+        label: key,
+        key,
+        children: <Info connection={connection}></Info>,
+        connectionId: connection.id
       })
+      setCollapse(true)
     }
-  }, [connection, getDbs, isOpen, store.connection, store.page])
+  }, [
+    connection,
+    getDbs,
+    getNodes,
+    isOpen,
+    openConnection,
+    store.connection,
+    store.page
+  ])
 
   const onItemClickTh = useThrottleFn(onItemClick, {
     wait: 300
@@ -101,11 +122,17 @@ const Index: React.FC<{
 
   const height = React.useMemo(() => {
     if (isOpen && collapse) {
-      return (22 * databases.length).toString() + 'px'
+      let count = 0
+      if (connection.is_cluster) {
+        count = nodes.length
+      } else {
+        count = databases.length
+      }
+      return (22 * count).toString() + 'px'
     } else {
       return 0
     }
-  }, [collapse, databases, isOpen])
+  }, [collapse, connection.is_cluster, databases.length, isOpen, nodes.length])
 
   return (
     <div className={'my-2 px-2 box-border'}>
@@ -120,6 +147,7 @@ const Index: React.FC<{
         >
           {icon}
           <div className="truncate">
+            <span className="pr-2">#{connection.id}</span>
             {connection.host}:{connection.port}
           </div>
         </div>
@@ -136,14 +164,10 @@ const Index: React.FC<{
                     }}
                   ></ReloadOutlined>
                 </Tooltip>
-
-                <InfoIcon connection={connection} />
-                <ClientIcon connection={connection} />
-                <Monitor connection={connection} />
+                <Menu connection={connection} db={databases} />
               </>
             )}
-
-            <ConnectionMenu connection={connection} />
+            <CurlMenu connection={connection} />
           </Space>
         </div>
       </div>
@@ -154,22 +178,32 @@ const Index: React.FC<{
         }}
       >
         <Spin spinning={loading}>
-          {databases.map((item) => {
-            const active =
-              store.db.db?.connection.id === connection.id &&
-              store.db.db?.db === item.db
-            return (
-              <DBItem
-                db={item}
-                connection={connection}
-                active={active}
-                key={item.db}
-              ></DBItem>
-            )
-          })}
+          {connection.is_cluster
+            ? nodes.map((v) => {
+                return (
+                  <NodeItem
+                    key={v}
+                    server={v}
+                    connection={connection}
+                  ></NodeItem>
+                )
+              })
+            : databases.map((item) => {
+                const active =
+                  store.db.db?.connection.id === connection.id &&
+                  store.db.db?.db === item
+                return (
+                  <DBItem
+                    db={item}
+                    connection={connection}
+                    active={active}
+                    key={item}
+                  ></DBItem>
+                )
+              })}
         </Spin>
       </div>
     </div>
   )
 }
-export default observer(Index)
+export default observer(Connection)

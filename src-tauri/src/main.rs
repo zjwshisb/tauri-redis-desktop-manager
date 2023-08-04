@@ -8,7 +8,7 @@ mod route;
 mod sqlite;
 mod state;
 mod utils;
-use state::PubsubManager;
+use state::{ConnectionManager, PubsubManager};
 use tauri::Menu;
 
 fn main() {
@@ -20,6 +20,7 @@ fn main() {
     tauri::Builder::default()
         .menu(menu)
         .manage(PubsubManager::new())
+        .manage(ConnectionManager::new())
         .enable_macos_default_menu(true)
         .invoke_handler(tauri::generate_handler![route::dispatch])
         .run(tauri::generate_context!())
