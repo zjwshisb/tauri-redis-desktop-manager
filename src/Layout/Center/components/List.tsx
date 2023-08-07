@@ -3,20 +3,20 @@ import { observer } from 'mobx-react-lite'
 import VirtualList, { type ListRef } from 'rc-virtual-list'
 import { Typography, List, Empty } from 'antd'
 import useStore from '@/hooks/useStore'
-import { type DB } from '@/store/db'
+import { type KeyInfo } from '@/store/key'
 import classNames from 'classnames'
 import { getPageKey } from '@/utils'
 import Key from '@/components/Page/Key'
 
 const Index: React.FC<{
-  db: DB | null
+  info: KeyInfo
   keys: string[]
   height: number
   listRef: React.RefObject<ListRef>
-}> = ({ db, keys, height, listRef }) => {
+}> = ({ info, keys, height, listRef }) => {
   const store = useStore()
 
-  if (keys.length === 0 || db === null) {
+  if (keys.length === 0 || info === null) {
     return (
       <div
         className="flex items-center justify-center"
@@ -39,7 +39,7 @@ const Index: React.FC<{
         height={height}
       >
         {(v) => {
-          const key = getPageKey(v, db.connection, db.db)
+          const key = getPageKey(v, info.connection, info.db)
           return (
             <List.Item
               key={key}
@@ -47,12 +47,12 @@ const Index: React.FC<{
                 store.page.addPage({
                   key,
                   label: key,
-                  connectionId: db.connection.id,
+                  connectionId: info.connection.id,
                   children: (
                     <Key
                       name={v}
-                      db={db.db}
-                      connection={db.connection}
+                      db={info.db as number}
+                      connection={info.connection}
                       pageKey={key}
                     ></Key>
                   )

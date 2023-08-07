@@ -18,6 +18,8 @@ pub fn add(payload: String) -> Result<Connection, CusError> {
         port: args.port,
         password: args.password,
         is_cluster: args.is_cluster,
+        nodes: vec![],
+        dbs: vec![],
     };
     connection.save()
 }

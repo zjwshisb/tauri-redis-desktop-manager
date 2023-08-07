@@ -36,11 +36,11 @@ const Index: React.FC<{
   }, [keyCount, loading])
 
   return (
-    <ItemLayout active={props.active}>
+    <ItemLayout active={props.active} clickAble={true}>
       <div
         className="flex flex-1"
         onClick={() => {
-          store.db.set(props.connection, props.db)
+          store.keyInfo.set(props.connection, props.db)
         }}
       >
         <DatabaseOutlined className="mr-1 text-sm" />

@@ -6,6 +6,8 @@ declare namespace APP {
     auth: string
     version: string
     is_cluster: boolean
+    nodes: string[]
+    dbs: number[]
   }
 
   interface BaseKey<T, V> {

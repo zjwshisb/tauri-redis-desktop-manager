@@ -10,6 +10,8 @@ pub struct Connection {
     pub port: i32,
     pub password: String,
     pub is_cluster: bool,
+    pub nodes: Vec<String>,
+    pub dbs: Vec<u8>,
 }
 
 impl Connection {
@@ -31,6 +33,8 @@ impl Connection {
                         port: r.get(2).unwrap(),
                         password: r.get(3).unwrap(),
                         is_cluster: is_cluster,
+                        nodes: vec![],
+                        dbs: vec![],
                     })
                 }) {
                     Ok(c) => {
@@ -109,6 +113,8 @@ impl Connection {
                         port: row.get(2).unwrap(),
                         password: row.get(3).unwrap(),
                         is_cluster: is_cluster,
+                        nodes: vec![],
+                        dbs: vec![],
                     })
                 });
                 match connections_result {

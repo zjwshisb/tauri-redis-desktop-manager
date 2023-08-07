@@ -4,7 +4,8 @@ import {
   DownOutlined,
   DisconnectOutlined,
   ReloadOutlined,
-  LoadingOutlined
+  LoadingOutlined,
+  KeyOutlined
 } from '@ant-design/icons'
 import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
@@ -26,8 +27,6 @@ const Connection: React.FC<{
   const store = useStore()
 
   const [collapse, setCollapse] = React.useState(false)
-  const [databases, setDatabases] = React.useState<number[]>([])
-  const [nodes, setNodes] = React.useState<string[]>([])
 
   const [loading, setLoading] = React.useState(false)
 
@@ -62,25 +61,37 @@ const Connection: React.FC<{
       for (let i = 0; i < count; i++) {
         dbs.push(i)
       }
-      setDatabases(dbs)
+      store.connection.update(connection.id, {
+        dbs
+      })
       setLoading(false)
     } catch (e) {
       setLoading(false)
       throw e
     }
-  }, [connection.id])
+  }, [connection.id, store.connection])
 
   const getNodes = React.useCallback(async () => {
     setLoading(true)
     try {
       const res = await request<string[]>('cluster/nodes', connection.id)
-      setNodes(res.data)
+      store.connection.update(connection.id, {
+        nodes: res.data
+      })
       setLoading(false)
     } catch (e) {
       setLoading(false)
       throw e
     }
-  }, [connection.id])
+  }, [connection.id, store.connection])
+
+  const getConnectionInfo = React.useCallback(async () => {
+    if (connection.is_cluster) {
+      await getNodes()
+    } else {
+      await getDbs()
+    }
+  }, [connection.is_cluster, getDbs, getNodes])
 
   const openConnection = React.useCallback(async () => {
     await request('connections/open', connection.id)
@@ -91,11 +102,7 @@ const Connection: React.FC<{
       setCollapse((p) => !p)
     } else {
       await openConnection()
-      if (connection.is_cluster) {
-        await getNodes()
-      } else {
-        await getDbs()
-      }
+      getConnectionInfo()
       store.connection.open(connection.id)
       const key = getPageKey('info', connection)
       store.page.addPage({
@@ -108,8 +115,7 @@ const Connection: React.FC<{
     }
   }, [
     connection,
-    getDbs,
-    getNodes,
+    getConnectionInfo,
     isOpen,
     openConnection,
     store.connection,
@@ -124,15 +130,21 @@ const Connection: React.FC<{
     if (isOpen && collapse) {
       let count = 0
       if (connection.is_cluster) {
-        count = nodes.length
+        count = connection.nodes.length
       } else {
-        count = databases.length
+        count = connection.dbs.length
       }
       return (22 * count).toString() + 'px'
     } else {
       return 0
     }
-  }, [collapse, connection.is_cluster, databases.length, isOpen, nodes.length])
+  }, [
+    isOpen,
+    collapse,
+    connection.is_cluster,
+    connection.nodes.length,
+    connection.dbs.length
+  ])
 
   return (
     <div className={'my-2 px-2 box-border'}>
@@ -155,16 +167,26 @@ const Connection: React.FC<{
           <Space>
             {isOpen && (
               <>
+                {connection.is_cluster && (
+                  <Tooltip title={'keys'}>
+                    <KeyOutlined
+                      onClick={() => {
+                        store.keyInfo.set(connection)
+                      }}
+                    />
+                  </Tooltip>
+                )}
+
                 <Tooltip title={t('Refresh')}>
                   <ReloadOutlined
                     className="hover:text-blue-600"
                     onClick={(e) => {
+                      getConnectionInfo()
                       e.stopPropagation()
-                      getDbs()
                     }}
                   ></ReloadOutlined>
                 </Tooltip>
-                <Menu connection={connection} db={databases} />
+                <Menu connection={connection} />
               </>
             )}
             <CurlMenu connection={connection} />
@@ -179,19 +201,23 @@ const Connection: React.FC<{
       >
         <Spin spinning={loading}>
           {connection.is_cluster
-            ? nodes.map((v) => {
+            ? connection.nodes.map((v) => {
+                const active =
+                  store.keyInfo.info?.connection.id === connection.id &&
+                  store.keyInfo.info?.node === v
                 return (
                   <NodeItem
                     key={v}
                     server={v}
+                    active={active}
                     connection={connection}
                   ></NodeItem>
                 )
               })
-            : databases.map((item) => {
+            : connection.dbs.map((item) => {
                 const active =
-                  store.db.db?.connection.id === connection.id &&
-                  store.db.db?.db === item
+                  store.keyInfo.info?.connection.id === connection.id &&
+                  store.keyInfo.info?.db === item
                 return (
                   <DBItem
                     db={item}

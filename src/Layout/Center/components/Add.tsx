@@ -1,4 +1,4 @@
-import { type DB } from '@/store/db'
+import { type KeyInfo } from '@/store/key'
 import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
 import { Form, Input, Select, Tooltip } from 'antd'
@@ -10,7 +10,7 @@ import useKeyTypes from '@/hooks/useKeyTypes'
 
 const Plus: React.FC<{
   onSuccess: (name: string) => void
-  db: DB
+  info: KeyInfo
 }> = (props) => {
   const { t } = useTranslation()
 
@@ -28,9 +28,9 @@ const Plus: React.FC<{
       title={t('New Key')}
       onOk={async () => {
         await form.validateFields().then(async (res) => {
-          await request('key/add', props.db.connection.id, {
+          await request('key/add', props.info.connection.id, {
             ...res,
-            db: props.db?.db
+            db: props.info?.db
           }).then(() => {
             props.onSuccess(res.name)
           })

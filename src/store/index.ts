@@ -1,19 +1,19 @@
 import ConnectionStore from './connection'
 import PageStore from './page'
-import DBStore from './db'
+import KeyInfo from './key'
 import React from 'react'
 import SettingStore from './setting'
 import request from '@/utils/request'
 class Store {
   connection: ConnectionStore
   page: PageStore
-  db: DBStore
+  keyInfo: KeyInfo
   setting: SettingStore
 
   constructor() {
     this.connection = new ConnectionStore()
     this.page = new PageStore()
-    this.db = new DBStore()
+    this.keyInfo = new KeyInfo()
     this.setting = new SettingStore()
   }
 
@@ -24,8 +24,8 @@ class Store {
       return v.connectionId !== id
     })
     this.page.setPage(pages)
-    if (this.db.db?.connection.id === id) {
-      this.db.db = null
+    if (this.keyInfo.info?.connection.id === id) {
+      this.keyInfo.info = null
     }
   }
 
