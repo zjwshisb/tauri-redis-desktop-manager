@@ -33,6 +33,18 @@ pub fn init_sqlite() {
             (), // empty list of parameters.
         )
         .unwrap();
+    client
+        .execute(
+            "CREATE TABLE IF NOT EXISTS logs (
+        id    INTEGER PRIMARY KEY,
+        cmd  TEXT NOT NULL,
+        response  TEXT NOT NULL,
+        host  TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    )",
+            (), // empty list of parameters.
+        )
+        .unwrap();
 }
 
 fn get_data_path() -> String {

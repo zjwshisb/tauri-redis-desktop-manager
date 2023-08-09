@@ -27,6 +27,9 @@
         "message": false,
         "open": false,
         "save": false
+      },
+      "window": {
+        "all": true
       }
     },
     "bundle": {
@@ -49,6 +52,7 @@
     },
     "windows": [
       {
+        "label": "main",
         "fullscreen": false,
         "resizable": true,
         "title": "Tauri Desktop Redis Manager",

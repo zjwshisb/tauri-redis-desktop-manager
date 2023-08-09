@@ -7,7 +7,10 @@ import { Tabs } from 'antd'
 const Index: React.FC<{
   connection: APP.Connection
 }> = ({ connection }) => {
-  const { data } = useRequest<string[]>('server/info', connection.id)
+  const { data } = useRequest<Array<Record<string, string>>>(
+    'server/info',
+    connection.id
+  )
 
   if (data?.length === 1) {
     return <Item data={data[0]}></Item>

@@ -18,6 +18,18 @@ fn main() {
     let menu: Menu = Menu::os_default(app_name);
 
     tauri::Builder::default()
+        .setup(|app| {
+            // let docs_window = tauri::WindowBuilder::new(
+            //     app,
+            //     "main", /* the unique window label */
+            //     tauri::WindowUrl::App("index.html".into()),
+            // )
+            // .build()?;
+            // let local_window =
+            //     tauri::WindowBuilder::new(app, "log", tauri::WindowUrl::App("index.html".into()))
+            //         .build()?;
+            Ok(())
+        })
         .menu(menu)
         .manage(PubsubManager::new())
         .manage(ConnectionManager::new())

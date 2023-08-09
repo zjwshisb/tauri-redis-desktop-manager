@@ -3,12 +3,9 @@ import { observer } from 'mobx-react-lite'
 import { type ListRef } from 'rc-virtual-list'
 import { Spin } from 'antd'
 import { useDebounceFn } from 'ahooks'
-import Key from '@/components/Page/Key'
 import useStore from '@/hooks/useStore'
-import Add from './components/Add'
 import ResizableDiv from '@/components/ResizableDiv'
-import { getPageKey } from '@/utils'
-import Single from './components/Single'
+import Request from './components/Request'
 
 const Index: React.FC = () => {
   const store = useStore()
@@ -55,41 +52,20 @@ const Index: React.FC = () => {
     <ResizableDiv
       className={'h-screen border-r'}
       minWidth={200}
-      defaultWidth={250}
-      maxWidth={500}
+      defaultWidth={300}
+      maxWidth={800}
     >
       <Spin spinning={loading}>
         <div
           className="flex flex-col h-screen overflow-hidden   bg-white"
           id={id}
         >
-          <Single
+          <Request
             keyInfo={info}
             onLoadingChange={setLoading}
             loading={loading}
             listHeight={listHeight}
             listRef={listRef}
-            add={
-              <Add
-                onSuccess={(name: string) => {
-                  const key = getPageKey(name, info.connection, info.db)
-                  store.page.addPage({
-                    key,
-                    label: key,
-                    connectionId: info.connection.id,
-                    children: (
-                      <Key
-                        name={name}
-                        db={info.db as number}
-                        connection={info.connection}
-                        pageKey={key}
-                      ></Key>
-                    )
-                  })
-                }}
-                info={info}
-              />
-            }
           />
         </div>
       </Spin>

@@ -1,12 +1,11 @@
-use std::fmt::Debug;
+use std::{collections::HashMap, fmt::Debug};
 
-use crate::{err::CusError, state::ConnectionManager};
-use redis::{Client, FromRedisValue, Value};
+use crate::{err::CusError, redis_conn::RedisConnection, state::ConnectionManager};
+use redis::{FromRedisValue, Value};
 use serde::Deserialize;
-use tokio::time::{timeout, Duration};
 
 #[derive(Deserialize, Debug)]
-struct P {
+struct PingArgs {
     host: String,
     port: i64,
     password: String,
@@ -15,53 +14,21 @@ struct P {
 pub async fn info<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
-) -> Result<Vec<String>, CusError> {
-    let v: Value = manager.execute(cid, 0, &mut redis::cmd("info")).await?;
-    match v {
-        Value::Nil => {}
-        Value::Data(cc) => {
-            if let Ok(r) = String::from_utf8(cc) {
-                return Ok(vec![r]);
-            }
-        }
-        Value::Bulk(vv) => {
-            let mut r: Vec<String> = vec![];
-            for vvv in vv {
-                r.push(String::from_redis_value(&vvv)?);
-            }
-            return Ok(r);
-        }
-        Value::Int(_) => todo!(),
-        Value::Status(_) => todo!(),
-        Value::Okay => todo!(),
-    }
-    return Err(CusError::App(String::from("Connected Timeout")));
+) -> Result<Vec<HashMap<String, String>>, CusError> {
+    manager.get_info(cid).await
 }
 
 pub async fn ping(payload: String) -> Result<String, CusError> {
-    let params: P = serde_json::from_str(payload.as_str())?;
-    let url = format!("redis://{}:{}", params.host, params.port);
-    let client = Client::open(url)?;
+    let params: PingArgs = serde_json::from_str(payload.as_str())?;
+    let host = format!("redis://{}:{}", params.host, params.port);
+    let mut conn = RedisConnection::build_anonymous(&host, &params.password).await?;
+    let v: Value = conn.execute(&mut redis::cmd("ping"), 0).await?;
+    Ok(String::from_redis_value(&v)?)
+}
 
-    let rx = timeout(Duration::from_secs(5), client.get_async_connection()).await;
-    match rx {
-        Ok(c) => match c {
-            Ok(mut connection) => {
-                if params.password != "" {
-                    redis::cmd("auth")
-                        .arg(params.password)
-                        .query_async(&mut connection)
-                        .await?;
-                }
-                let v: Value = redis::cmd("ping").query_async(&mut connection).await?;
-                Ok(String::from_redis_value(&v)?)
-            }
-            Err(r) => {
-                return Err(CusError::App(r.to_string()));
-            }
-        },
-        Err(_) => {
-            return Err(CusError::App(String::from("Connected Timeout")));
-        }
-    }
+pub async fn version<'r>(
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
+    manager.get_version(cid).await
 }

@@ -15,7 +15,7 @@ export default async function request<T>(
       cid,
       payload: JSON.stringify(args)
     }
-
+    console.log(path, params)
     const res = await invoke('dispatch', params)
 
     const data = JSON.parse(res as string)

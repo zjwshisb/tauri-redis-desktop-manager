@@ -1,5 +1,5 @@
 use crate::{err::CusError, sqlite};
-use chrono::prelude::*;
+
 use rusqlite::{self, params};
 use serde::Serialize;
 
@@ -15,6 +15,10 @@ pub struct Connection {
 }
 
 impl Connection {
+    pub fn get_host(&self) -> String {
+        return format!("redis://{}:{}", &self.host, &self.port);
+    }
+
     pub fn first(id: u32) -> Result<Connection, CusError> {
         let conn = sqlite::get_sqlite_client()?;
         let stmt_result = conn
@@ -137,34 +141,29 @@ impl Connection {
     }
 }
 
-#[derive(Serialize, Debug)]
-pub struct Field {
-    pub name: String,
-    pub value: String,
+#[derive(Debug)]
+pub struct Log {
+    pub id: i32,
+    pub cmd: String,
+    pub response: String,
+    pub host: String,
+    pub created_at: String,
 }
 
-#[derive(Serialize, Debug)]
-pub struct EventResp<T> {
-    pub data: T,
-    pub success: bool,
-    pub event: String,
-    pub time: String,
-    pub id: u32,
-}
-
-impl<T> EventResp<T>
-where
-    T: serde::Serialize,
-{
-    pub fn new(data: T, event: String) -> EventResp<T> {
-        let id = rand::random::<u32>();
-        let now: DateTime<Local> = Local::now();
-        return EventResp {
-            data,
-            success: true,
-            event,
-            time: now.format("%H:%M:%S").to_string(),
-            id,
-        };
+impl Log {
+    pub fn save(self) -> Result<Self, CusError> {
+        let conn = sqlite::get_sqlite_client()?;
+        let r = conn.execute(
+            "insert into logs (host, cmd, response, created_at) values(?1, ?2, ?3, ?4)",
+            (&self.host, &self.cmd, &self.response, &self.created_at),
+        );
+        match r {
+            Err(e) => {
+                return Err(CusError::App(e.to_string()));
+            }
+            _ => {
+                return Ok(self);
+            }
+        }
     }
 }

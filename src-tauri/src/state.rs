@@ -41,6 +41,20 @@ impl ConnectionManager {
         return Err(CusError::App(String::from("Connection Not Found")));
     }
 
+    pub async fn get_info(&self, cid: u32) -> Result<Vec<HashMap<String, String>>, CusError> {
+        if let Some(conn) = self.m.lock().await.get_mut(&cid) {
+            return conn.get_info().await;
+        }
+        return Err(CusError::App(String::from("Connection Not Found")));
+    }
+
+    pub async fn get_version(&self, cid: u32) -> Result<String, CusError> {
+        if let Some(conn) = self.m.lock().await.get_mut(&cid) {
+            return conn.get_version().await;
+        }
+        return Err(CusError::App(String::from("Connection Not Found")));
+    }
+
     pub async fn execute(
         &self,
         cid: u32,
@@ -48,13 +62,7 @@ impl ConnectionManager {
         cmd: &mut redis::Cmd,
     ) -> Result<redis::Value, CusError> {
         if let Some(conn) = self.m.lock().await.get_mut(&cid) {
-            conn.change_db(db).await?;
-            let v = cmd.get_packed_command();
-            let cmd_str = String::from_utf8(v).unwrap();
-            dbg!(cmd_str);
-            let t: redis::Value = cmd.query_async(conn).await?;
-            dbg!(&t);
-            return Ok(t);
+            return conn.execute(cmd, db).await;
         }
         return Err(CusError::App(String::from("Connection Not Found")));
     }

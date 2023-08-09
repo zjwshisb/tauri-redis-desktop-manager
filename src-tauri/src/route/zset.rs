@@ -1,3 +1,4 @@
+use crate::response::ScoreField;
 use crate::{
     err::{self, CusError},
     ConnectionManager,
@@ -12,12 +13,6 @@ struct ZScanArgs {
     search: String,
     db: u8,
     count: i64,
-}
-
-#[derive(Serialize)]
-struct ScoreField {
-    value: String,
-    score: String,
 }
 
 #[derive(Serialize)]

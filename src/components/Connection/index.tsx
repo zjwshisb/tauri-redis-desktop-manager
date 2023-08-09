@@ -97,12 +97,20 @@ const Connection: React.FC<{
     await request('connections/open', connection.id)
   }, [connection.id])
 
+  const getVersion = React.useCallback(async () => {
+    const res = await request<string>('server/version', connection.id)
+    store.connection.update(connection.id, {
+      version: res.data
+    })
+  }, [connection.id, store.connection])
+
   const onItemClick = React.useCallback(async () => {
     if (isOpen) {
       setCollapse((p) => !p)
     } else {
       await openConnection()
       getConnectionInfo()
+      getVersion()
       store.connection.open(connection.id)
       const key = getPageKey('info', connection)
       store.page.addPage({
@@ -116,6 +124,7 @@ const Connection: React.FC<{
   }, [
     connection,
     getConnectionInfo,
+    getVersion,
     isOpen,
     openConnection,
     store.connection,
@@ -159,7 +168,7 @@ const Connection: React.FC<{
         >
           {icon}
           <div className="truncate">
-            <span className="pr-2">#{connection.id}</span>
+            <span className="pr-2 text-gray-600">#{connection.id}</span>
             {connection.host}:{connection.port}
           </div>
         </div>
@@ -208,7 +217,7 @@ const Connection: React.FC<{
                 return (
                   <NodeItem
                     key={v}
-                    server={v}
+                    node={v}
                     active={active}
                     connection={connection}
                   ></NodeItem>

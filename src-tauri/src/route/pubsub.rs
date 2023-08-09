@@ -1,5 +1,5 @@
 use crate::model::Connection as Conn;
-use crate::model::EventResp;
+use crate::response::EventResp;
 use crate::state::ConnectionManager;
 use crate::state::{PubsubItem, PubsubManager};
 use crate::{err::CusError, redis_conn};
@@ -18,7 +18,6 @@ use tokio::sync::{mpsc, oneshot};
 
 #[derive(Deserialize)]
 struct SubscribeArgs {
-    db: u8,
     channels: Vec<String>,
 }
 #[derive(Serialize, Debug)]
@@ -35,10 +34,8 @@ pub async fn subscribe<'r>(
 ) -> Result<String, CusError> {
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
     let model = Conn::first(cid)?;
-
     let conn: Connection =
-        redis_conn::RedisConnection::get_normal_connection(&model, args.db).await?;
-
+        redis_conn::RedisConnection::get_normal(&model.get_host(), &model.password).await?;
     let mut pubsub = conn.into_pubsub();
     for x in args.channels {
         pubsub.subscribe(&x).await?;
@@ -128,7 +125,8 @@ pub async fn monitor<'r>(
 ) -> Result<MonitorResp, CusError> {
     let args: MonitorArgs = serde_json::from_str(&payload)?;
     let model = Conn::first(cid)?;
-    let conn: Connection = redis_conn::RedisConnection::get_normal_connection(&model, 0).await?;
+    let conn: Connection =
+        redis_conn::RedisConnection::get_normal(&model.get_host(), &model.password).await?;
 
     let mut monitor = conn.into_monitor();
 

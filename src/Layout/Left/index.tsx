@@ -8,6 +8,7 @@ import Setting from '@/components/Setting'
 import useStore from '@/hooks/useStore'
 import ConnectionForm from '@/components/ConnectionForm'
 import { PlusOutlined } from '@ant-design/icons'
+import Log from '@/components/Log'
 
 const Index: React.FC = () => {
   const store = useStore()
@@ -41,6 +42,9 @@ const Index: React.FC = () => {
           </div>
           <div className="ml-2 flex-shrink-0">
             <Setting />
+          </div>
+          <div className="ml-2 flex-shrink-0">
+            <Log />
           </div>
         </div>
 

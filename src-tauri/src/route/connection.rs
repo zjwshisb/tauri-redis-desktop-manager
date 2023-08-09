@@ -60,7 +60,7 @@ pub fn update(payload: String) -> Result<Connection, CusError> {
 }
 
 pub async fn open<'r>(cid: u32, manager: State<'r, ConnectionManager>) -> Result<(), CusError> {
-    let conn = redis_conn::RedisConnection::build(cid, 0).await?;
+    let conn = redis_conn::RedisConnection::build(cid).await?;
     manager.add(cid, conn).await;
     Ok(())
 }

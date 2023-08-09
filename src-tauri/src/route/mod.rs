@@ -35,6 +35,7 @@ pub async fn dispatch<'r>(
         "connections/close" => Response::new(connection::close(cid, manager).await?),
         "server/ping" => Response::new(server::ping(payload).await?),
         "server/info" => Response::new(server::info(cid, manager).await?),
+        "server/version" => Response::new(server::version(cid, manager).await?),
         "key/scan" => Response::new(key::scan(payload, cid, manager).await?),
         "key/hash/hscan" => Response::new(hash::hscan(payload, cid, manager).await?),
         "key/hash/hset" => Response::new(hash::hset(payload, cid, manager).await?),
@@ -65,6 +66,8 @@ pub async fn dispatch<'r>(
         "pubsub/cancel" => Response::new(pubsub::cancel(payload, pubsub).await?),
         "pubsub/monitor" => Response::new(pubsub::monitor(window, pubsub, payload, cid).await?),
         "cluster/nodes" => Response::new(cluster::get_nodes(cid, manager).await?),
+        "cluster/scan" => Response::new(cluster::scan(cid, payload).await?),
+        "cluster/nodesize" => Response::new(cluster::node_size(cid, payload).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

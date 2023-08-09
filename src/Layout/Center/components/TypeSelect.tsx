@@ -1,55 +1,42 @@
 import React from 'react'
 
-import { Dropdown, Tooltip } from 'antd'
-import { SmallDashOutlined } from '@ant-design/icons'
+import { Select } from 'antd'
 
 import { useTranslation } from 'react-i18next'
-import { versionCompare } from '@/utils'
 import useKeyTypes from '@/hooks/useKeyTypes'
+import VersionAccess from '@/components/VersionAccess'
 const TypeSelect: React.FC<{
-  version: string
+  connection: APP.Connection
   onChange: (key: string) => void
 }> = (props) => {
   const { t } = useTranslation()
 
-  const isShowTypeSelect = React.useMemo(() => {
-    return versionCompare(props.version, '6.0.0') > -1
-  }, [props.version])
-
   const keyTypes = useKeyTypes()
 
-  if (isShowTypeSelect) {
-    return (
-      <Tooltip title={t('Type Select')} placement="left">
-        <Dropdown
-          trigger={['click']}
-          menu={{
-            selectable: true,
-            onSelect(e) {
-              props.onChange(e.key)
-            },
-            items: [
-              {
-                label: t('All'),
-                key: ''
-              }
-            ].concat(
-              keyTypes.map((v) => {
-                return {
-                  label: v.label,
-                  key: v.value
-                }
-              })
-            )
-          }}
-        >
-          <SmallDashOutlined className="hover:cursor-pointer" />
-        </Dropdown>
-      </Tooltip>
-    )
-  } else {
-    return <></>
-  }
+  const [value, setValue] = React.useState('')
+
+  const options = React.useMemo(() => {
+    return [
+      {
+        label: t('All'),
+        value: ''
+      }
+    ].concat(keyTypes)
+  }, [keyTypes, t])
+
+  return (
+    <VersionAccess version="6.0.0" connection={props.connection}>
+      <Select
+        className="w-28"
+        options={options}
+        value={value}
+        onSelect={(e) => {
+          setValue(e)
+          props.onChange(e)
+        }}
+      ></Select>
+    </VersionAccess>
+  )
 }
 
 export default TypeSelect

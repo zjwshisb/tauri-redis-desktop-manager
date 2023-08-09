@@ -9,6 +9,10 @@ module.exports = {
   ],
   overrides: [
   ],
+  ignorePatterns: [
+    'babel.config.js',
+    'vite.config.ts'
+  ],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',

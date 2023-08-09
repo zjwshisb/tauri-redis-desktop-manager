@@ -24,6 +24,14 @@ const DbInfo: React.FC<{
         })
         arr.push(i)
       }
+      arr.sort((a, b) => {
+        if (a.name === b.name) {
+          return 0
+        } else if (a.name > b.name) {
+          return 1
+        }
+        return -1
+      })
       setInfo(arr)
     })
   }, [items])
