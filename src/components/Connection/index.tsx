@@ -1,7 +1,6 @@
 import React from 'react'
 import {
-  RightOutlined,
-  DownOutlined,
+  CaretRightFilled,
   DisconnectOutlined,
   ReloadOutlined,
   LoadingOutlined,
@@ -43,9 +42,11 @@ const Connection: React.FC<{
     }
     if (isOpen) {
       if (collapse) {
-        return <DownOutlined className="text-sm mr-1" />
+        return (
+          <CaretRightFilled className="text-sm mr-1 rotate-90 transition-all" />
+        )
       } else {
-        return <RightOutlined className="text-sm mr-1" />
+        return <CaretRightFilled className="text-sm mr-1 transition-all" />
       }
     } else {
       return <DisconnectOutlined className="text-sm mr-1" />

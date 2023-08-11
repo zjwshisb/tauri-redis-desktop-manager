@@ -1,128 +1,11 @@
 use crate::{
     err::{self, CusError},
+    key::Key,
     state::ConnectionManager,
 };
 use redis::FromRedisValue;
-use redis::{cmd, Value};
+use redis::Value;
 use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Debug)]
-pub struct Key {
-    name: String,
-    types: String,
-    ttl: i64,
-    data: String,
-    connection_id: u32,
-    db: u8,
-    memory: i64,
-    length: i64,
-    extra_type: String,
-}
-impl Key {
-    async fn new<'r>(
-        name: String,
-        db: u8,
-        cid: u32,
-        manager: &tauri::State<'r, ConnectionManager>,
-    ) -> Result<Key, CusError> {
-        let mut key: Key = Key {
-            name: name,
-            types: "".into(),
-            ttl: -2,
-            data: String::from(""),
-            connection_id: cid,
-            db,
-            memory: 0,
-            length: 0,
-            extra_type: String::from(""),
-        };
-        let types_value: Value = manager.execute(cid, db, cmd("type").arg(&key.name)).await?;
-        key.types = String::from_redis_value(&types_value)?;
-        if !key.is_none() {
-            key.get_ttl(&manager).await?;
-            key.get_memory(&manager).await?;
-            key.get_length(&manager).await?;
-        }
-        Ok(key)
-    }
-    async fn get_memory<'r>(
-        &mut self,
-        manager: &tauri::State<'r, ConnectionManager>,
-    ) -> Result<(), CusError> {
-        let memory_value: Value = manager
-            .execute(
-                self.connection_id,
-                self.db,
-                cmd("memory")
-                    .arg("usage")
-                    .arg(&self.name)
-                    .arg(&["SAMPLES", "0"]),
-            )
-            .await?;
-        self.memory = i64::from_redis_value(&memory_value)?;
-        Ok(())
-    }
-    async fn get_ttl<'r>(
-        &mut self,
-        manager: &tauri::State<'r, ConnectionManager>,
-    ) -> Result<(), CusError> {
-        let ttl_result: Value = manager
-            .execute(self.connection_id, self.db, cmd("ttl").arg(&self.name))
-            .await?;
-        self.ttl = i64::from_redis_value(&ttl_result)?;
-        Ok(())
-    }
-    async fn get_string_value<'r>(
-        &mut self,
-        manager: &tauri::State<'r, ConnectionManager>,
-    ) -> Result<(), CusError> {
-        let value: Value = manager
-            .execute(
-                self.connection_id,
-                self.db,
-                redis::cmd("get").arg(&self.name),
-            )
-            .await?;
-        let v: Result<String, redis::RedisError> = String::from_redis_value(&value);
-        match v {
-            Ok(s) => self.data = s,
-            Err(_) => {
-                let i: Vec<u8> = Vec::from_redis_value(&value).unwrap();
-                let mut data = String::from("");
-                for v in i {
-                    let bs = format!("{:b}", v);
-                    data.push_str(bs.as_str());
-                }
-                self.extra_type = String::from("Binary");
-                self.data = String::from(data);
-            }
-        }
-        Ok(())
-    }
-    async fn get_length<'r>(
-        &mut self,
-        manager: &tauri::State<'r, ConnectionManager>,
-    ) -> Result<(), CusError> {
-        let cmd = match &self.types[..] {
-            "string" => "STRLEN",
-            "hash" => "HLEN",
-            "list" => "LLEN",
-            "set" => "SCARD",
-            "zset" => "ZCARD",
-            _ => "",
-        };
-        if cmd != "" {
-            let length_value: Value = manager
-                .execute(self.connection_id, self.db, redis::cmd(cmd).arg(&self.name))
-                .await?;
-            self.length = i64::from_redis_value(&length_value)?;
-        }
-        Ok(())
-    }
-    fn is_none(&self) -> bool {
-        self.types == "none"
-    }
-}
 
 #[derive(Deserialize)]
 struct ScanArgs {
@@ -187,12 +70,11 @@ pub async fn get<'r>(
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<Key, CusError> {
     let args: GetArgs = serde_json::from_str(&payload)?;
-    let mut key: Key = Key::new(args.name, args.db, cid, &manager).await?;
+    let mut key: Key = Key::build(args.name, args.db, cid, &manager).await?;
     if key.is_none() {
-        return Err(CusError::App(format!("{} is not exist", &key.name)));
+        return Err(CusError::App(format!("{} is not exist", key.get_name())));
     }
-    match &key.types[..] {
-        "hash" => {}
+    match key.get_type().as_str() {
         "string" => {
             key.get_string_value(&manager).await?;
         }

@@ -3,7 +3,6 @@ use crate::response::EventResp;
 use crate::state::ConnectionManager;
 use crate::state::{PubsubItem, PubsubManager};
 use crate::{err::CusError, redis_conn};
-use chrono::prelude::*;
 use futures::stream::StreamExt;
 use rand::distributions::Alphanumeric;
 use rand::prelude::*;
@@ -34,8 +33,8 @@ pub async fn subscribe<'r>(
 ) -> Result<String, CusError> {
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
     let model = Conn::first(cid)?;
-    let conn: Connection =
-        redis_conn::RedisConnection::get_normal(&model.get_host(), &model.password).await?;
+    let host = model.get_host();
+    let conn: Connection = redis_conn::RedisConnection::get_normal(&host, &model.password).await?;
     let mut pubsub = conn.into_pubsub();
     for x in args.channels {
         pubsub.subscribe(&x).await?;
@@ -47,8 +46,12 @@ pub async fn subscribe<'r>(
         .map(char::from)
         .collect::<String>();
     let event_name_resp = event_name.clone();
+    // a channel to stop loop when frontend close the page
     let (tx, rx) = oneshot::channel::<()>();
-    pubsub_manager.add(event_name_resp.clone(), PubsubItem(tx, Local::now()));
+    pubsub_manager.add(
+        event_name_resp.clone(),
+        PubsubItem::new(tx, host, "pubsub".to_string()),
+    );
     tokio::spawn(async move {
         let event_str = event_name.as_str();
         let mut stream = pubsub.on_message();
@@ -66,10 +69,8 @@ pub async fn subscribe<'r>(
                                 },
                                 String::from(event_str),
                             );
-                            let result = window.emit(event_str, serde_json::to_string(&r).unwrap());
-                            if let Err(e) = result {
-                                dbg!(e);
-                            }
+                            let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
+
                         }
                     }
                 }
@@ -125,10 +126,9 @@ pub async fn monitor<'r>(
 ) -> Result<MonitorResp, CusError> {
     let args: MonitorArgs = serde_json::from_str(&payload)?;
     let model = Conn::first(cid)?;
-    let conn: Connection =
-        redis_conn::RedisConnection::get_normal(&model.get_host(), &model.password).await?;
-
-    let mut monitor = conn.into_monitor();
+    let host = model.get_host();
+    let conn: Connection = redis_conn::RedisConnection::get_normal(&host, &model.password).await?;
+    let mut monitor: redis::aio::Monitor = conn.into_monitor();
 
     let mut rng = rand::thread_rng();
     let event_name = Alphanumeric
@@ -137,7 +137,6 @@ pub async fn monitor<'r>(
         .map(char::from)
         .collect::<String>();
     let event_name_resp = event_name.clone();
-    let (tx, rx) = oneshot::channel::<()>();
     let mut log_file = String::from("");
     if args.file {
         let dir_o = dirs_next::home_dir();
@@ -152,7 +151,12 @@ pub async fn monitor<'r>(
         }
     }
     let file_name_resp = log_file.clone();
-    pubsub_manager.add(event_name_resp.clone(), PubsubItem(tx, Local::now()));
+    // a channel to stop loop when frontend close the page
+    let (tx, rx) = oneshot::channel::<()>();
+    pubsub_manager.add(
+        event_name_resp.clone(),
+        PubsubItem::new(tx, host, "monitor".to_string()),
+    );
     tokio::spawn(async move {
         let event_str = event_name.as_str();
         let _ = monitor.monitor().await;
@@ -220,8 +224,6 @@ pub async fn cancel<'r>(
     pubsub_manager: State<'r, PubsubManager>,
 ) -> Result<String, CusError> {
     let args: CancelArgs = serde_json::from_str(&payload)?;
-    if let Some(x) = pubsub_manager.0.lock().unwrap().remove(&args.name) {
-        let _ = x.0.send(());
-    }
+    pubsub_manager.close(&args.name);
     Ok(String::from("Ok"))
 }

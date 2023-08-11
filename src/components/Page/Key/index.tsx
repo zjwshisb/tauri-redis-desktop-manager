@@ -34,6 +34,7 @@ const Index: React.FC<{
   const { t } = useTranslation()
 
   const value = React.useMemo(() => {
+    console.log(item)
     if (item !== undefined) {
       switch (item.types) {
         case 'string': {

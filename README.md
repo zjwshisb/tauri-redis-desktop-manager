@@ -4,9 +4,12 @@
 
 ## Support
 
++ Cluster
 + Keys Operate
 + Pub/Sub
-+ Monitor（Save Log To Local File）
++ Monitor
++ Use scan,sscan,hscan,zscan for key,field iterate
+
 
 ## Devlopment
 

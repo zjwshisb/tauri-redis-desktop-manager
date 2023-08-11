@@ -7,10 +7,8 @@ import Error from '../Err'
 const item: TypeFormat = {
   key: 'json',
   label: 'json',
-  component: (content) => {
-    return <div>{content}</div>
-  },
-  format(content: string) {
+
+  render(content: string) {
     let error = ''
     try {
       const obj = JSON.parse(content)

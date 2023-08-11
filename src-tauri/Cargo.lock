@@ -2973,6 +2973,7 @@ dependencies = [
  "chrono",
  "dirs-next",
  "futures",
+ "hex",
  "once_cell",
  "rand 0.8.5",
  "redis",

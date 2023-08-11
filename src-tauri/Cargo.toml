@@ -26,6 +26,7 @@ once_cell= "*"
 futures = "*"
 rand="*"
 chrono="*"
+hex="*"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

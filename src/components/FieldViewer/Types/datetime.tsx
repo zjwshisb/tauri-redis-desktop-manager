@@ -6,10 +6,7 @@ import Error from '../Err'
 const item: TypeFormat = {
   key: 'datetime',
   label: 'datetime',
-  component: (content) => {
-    return <div>{content}</div>
-  },
-  format(content: string) {
+  render: (content) => {
     const time = parseFloat(content)
     let d
     if (time > 100000000000) {

@@ -3,6 +3,7 @@ import React from 'react'
 import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { type ColumnsType } from 'antd/es/table'
+import { PlusOutlined } from '@ant-design/icons'
 
 export function formatColumns<T>(c: ColumnsType<T>, showIndex: boolean) {
   const n = [...c]
@@ -53,6 +54,7 @@ export default function CusTable<T extends object>(
       {others.more !== undefined && (
         <Button
           disabled={!others.more}
+          icon={<PlusOutlined />}
           block
           className="my-4"
           onClick={() => {

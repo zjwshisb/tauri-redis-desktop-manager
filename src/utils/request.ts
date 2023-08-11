@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/tauri'
-import { message } from 'antd'
+import { notification } from 'antd'
 
 export interface Response<T> {
   data: T
@@ -23,7 +23,10 @@ export default async function request<T>(
 
     return data as Response<T>
   } catch (err) {
-    message.error(err as string)
+    notification.error({
+      message: err as string,
+      duration: 3
+    })
     console.log(err)
     throw err
   }

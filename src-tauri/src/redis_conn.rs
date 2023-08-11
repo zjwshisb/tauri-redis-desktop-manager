@@ -20,6 +20,7 @@ pub struct RedisConnection {
 }
 
 impl RedisConnection {
+    // get the conn with connection id
     pub async fn build(cid: u32) -> Result<Self, CusError> {
         let conn = Conn::first(cid)?;
         let b: Box<dyn ConnectionLike + Send>;
@@ -37,14 +38,13 @@ impl RedisConnection {
             nodes: vec![],
             db: 0,
         };
-        conn.set_name(format!("{}@tauri-redis", host.clone()))
-            .await?;
+        conn.set_name("tauri-redis".to_string()).await?;
         if conn.is_cluster {
             conn.get_nodes().await?;
         }
         return Ok(conn);
     }
-
+    // get the conn with host
     pub async fn build_anonymous(host: &String, password: &String) -> Result<Self, CusError> {
         let b: Box<dyn ConnectionLike + Send>;
         b = Box::new(Self::get_normal(host, password).await?);
@@ -56,13 +56,12 @@ impl RedisConnection {
             nodes: vec![],
             db: 0,
         };
-        conn.set_name(format!("{}@tauri-redis", host.clone()))
-            .await?;
+        conn.set_name("tauri-redis".to_string()).await?;
         return Ok(conn);
     }
 
+    // execute the redis command
     pub async fn execute_base(&mut self, cmd: &mut redis::Cmd) -> Result<redis::Value, CusError> {
-        let value: redis::Value = cmd.query_async(self).await?;
         let mut cmd_vec: Vec<String> = vec![];
         for arg in cmd.args_iter() {
             match arg {
@@ -73,6 +72,7 @@ impl RedisConnection {
                 Arg::Cursor => {}
             }
         }
+        let value: redis::Value = cmd.query_async(self).await?;
         let mut rep: Vec<String> = vec![];
         match &value {
             Value::Bulk(v) => {
@@ -100,11 +100,25 @@ impl RedisConnection {
             Value::Int(v) => rep.push(v.to_string()),
             Value::Nil => rep.push(String::from("nil")),
             Value::Data(v) => {
-                rep.push(String::from_utf8(v.to_vec()).unwrap());
+                // maybe value is bitmap
+                let s = String::from_utf8(v.to_vec());
+                match s {
+                    Ok(s) => rep.push(s),
+                    Err(_) => {
+                        let i: Vec<u8> = Vec::from_redis_value(&value).unwrap();
+                        let binary = i
+                            .iter()
+                            .map(|u| format!("{:b}", u))
+                            .collect::<Vec<String>>()
+                            .join("");
+
+                        rep.push(binary)
+                    }
+                }
             }
             Value::Status(v) => rep.push(v.to_string()),
             Value::Okay => {
-                rep.push(String::from("ok"));
+                rep.push(String::from("OK"));
             }
         }
         let log = Log {
@@ -118,6 +132,7 @@ impl RedisConnection {
         Ok(value)
     }
 
+    // execute the redis command
     pub async fn execute(
         &mut self,
         cmd: &mut redis::Cmd,
@@ -132,10 +147,12 @@ impl RedisConnection {
             .await?;
         Ok(())
     }
-
+    // get the server info
+    // if the cluster server, response is vec
+    // so for unify, normal server is change to vec, the value is set to vec
     pub async fn get_info(&mut self) -> Result<Vec<HashMap<String, String>>, CusError> {
         let v: Value = self.execute(&mut redis::cmd("info"), 0).await?;
-        let format = |str_value: String| {
+        let format_fn = |str_value: String| {
             let arr: Vec<&str> = str_value.split("\r\n").collect();
             let mut kv: HashMap<String, String> = HashMap::new();
             for v in arr {
@@ -153,13 +170,13 @@ impl RedisConnection {
         match v {
             Value::Data(cc) => {
                 if let Ok(r) = String::from_utf8(cc) {
-                    return Ok(vec![format(r)]);
+                    return Ok(vec![format_fn(r)]);
                 }
             }
             Value::Bulk(vv) => {
                 let mut r: Vec<HashMap<String, String>> = vec![];
                 for vvv in vv {
-                    r.push(format(String::from_redis_value(&vvv)?));
+                    r.push(format_fn(String::from_redis_value(&vvv)?));
                 }
                 return Ok(r);
             }
@@ -168,6 +185,7 @@ impl RedisConnection {
         return Err(CusError::App(String::from("Connected Timeout")));
     }
 
+    // get redis server version
     pub async fn get_version(&mut self) -> Result<String, CusError> {
         let info = self.get_info().await?;
         if let Some(fields) = info.get(0) {
@@ -178,6 +196,7 @@ impl RedisConnection {
         Ok(String::from(""))
     }
 
+    // change current database
     pub async fn change_db(&mut self, db: u8) -> Result<(), CusError> {
         if !self.is_cluster {
             if self.db != db {
@@ -188,6 +207,7 @@ impl RedisConnection {
         Ok(())
     }
 
+    // get the cluster node
     pub async fn get_nodes(&mut self) -> Result<Vec<String>, CusError> {
         if !self.is_cluster {
             return Err(CusError::App(String::from("Not a Cluster Server")));
@@ -217,8 +237,9 @@ impl RedisConnection {
         Ok(self.nodes.clone())
     }
 
-    pub async fn get_normal(host: &String, password: &String) -> Result<Connection, CusError> {
-        let client = Client::open(host.clone())?;
+    // get normal redis connection
+    pub async fn get_normal(host: &str, password: &str) -> Result<Connection, CusError> {
+        let client = Client::open(host)?;
         let rx = timeout(Duration::from_secs(2), client.get_async_connection()).await;
         match rx {
             Ok(conn_result) => match conn_result {
@@ -240,13 +261,9 @@ impl RedisConnection {
             }
         }
     }
-
-    pub async fn get_cluster(
-        host: &String,
-        password: &String,
-    ) -> Result<ClusterConnection, CusError> {
-        let client = ClusterClient::new(vec![host.clone()]).unwrap();
-
+    // get cluster redis connection
+    pub async fn get_cluster(host: &str, password: &str) -> Result<ClusterConnection, CusError> {
+        let client = ClusterClient::new(vec![host]).unwrap();
         let rx = timeout(Duration::from_secs(2), client.get_async_connection()).await;
         match rx {
             Ok(conn_result) => match conn_result {

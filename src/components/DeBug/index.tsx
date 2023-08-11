@@ -1,13 +1,13 @@
 import { Button } from 'antd'
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { HistoryOutlined } from '@ant-design/icons'
+import { BugOutlined } from '@ant-design/icons'
 
 import { WebviewWindow } from '@tauri-apps/api/window'
 const Index: React.FC = () => {
   return (
     <Button
-      icon={<HistoryOutlined />}
+      icon={<BugOutlined />}
       size="large"
       onClick={() => {
         const webview = new WebviewWindow('logs', {

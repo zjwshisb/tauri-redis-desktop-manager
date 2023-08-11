@@ -4,7 +4,7 @@ import { type TypeFormat } from '.'
 const item: TypeFormat = {
     key: 'text',
     label: 'text',
-    format(content: string) {
+    render(content: string) {
        return content
     }
 }

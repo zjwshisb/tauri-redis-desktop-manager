@@ -6,6 +6,7 @@ import { useDebounceFn } from 'ahooks'
 import { Dropdown } from 'antd'
 
 import formatter from './Types'
+import { MenuOutlined } from '@ant-design/icons'
 import { type MenuItemType } from 'antd/es/menu/hooks/useItems'
 
 const FieldViewer: React.FC<{
@@ -16,7 +17,7 @@ const FieldViewer: React.FC<{
 
   const [isOrigin, setIsOrigin] = React.useState(true)
 
-  const [child, setChild] = React.useState<React.ReactNode | null | string>()
+  const [child, setChild] = React.useState<React.ReactNode>()
 
   const init = React.useRef(false)
 
@@ -31,37 +32,34 @@ const FieldViewer: React.FC<{
     return m
   }, [])
 
+  const change = React.useCallback((t: string, c: string) => {
+    const item = formatter[t]
+    if (item !== undefined) {
+      setIsOrigin(t === 'text')
+      setChild(item.render(c))
+    }
+  }, [])
+
   React.useEffect(() => {
     if (!init.current) {
+      let type = 'text'
       try {
         const u = JSON.parse(content)
         if (lodash.isPlainObject(u)) {
-          setTypes('json')
-        } else {
-          setTypes('text')
+          type = 'json'
         }
-      } catch (_) {
-        setTypes('text')
-      }
+      } catch (_) {}
+      setTypes(type)
+      change(type, content)
       init.current = true
     }
-  }, [content])
+  }, [change, content])
 
   React.useEffect(() => {
     if (init.current) {
-      const item = formatter[types]
-      if (item !== undefined) {
-        const f = item.format(content)
-        setIsOrigin(f === content)
-        if (item.component != null) {
-          const node = item.component(item.format(content))
-          setChild(node)
-        } else {
-          setChild(f)
-        }
-      }
+      change(types, content)
     }
-  }, [content, types])
+  }, [content, change, types])
 
   const [isFocus, setIsFocus] = React.useState(false)
 
@@ -98,12 +96,14 @@ const FieldViewer: React.FC<{
             }}
           >
             {types}
+            <MenuOutlined size={6} className="ml-1 text-xs" />
           </div>
         </Dropdown>
       )
     }
     return <></>
   }, [isFocus, isOrigin, menus, types])
+
   return (
     <div
       className="my-[-16px] py-[16px] break-all"
@@ -115,7 +115,7 @@ const FieldViewer: React.FC<{
         setIsFocus(true)
       }}
     >
-      {child}
+      {init.current && child}
       {typeNode}
       {isFocus && types === 'text' && (
         <Copy

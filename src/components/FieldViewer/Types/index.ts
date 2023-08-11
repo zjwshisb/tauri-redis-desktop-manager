@@ -6,8 +6,7 @@ import json from './json'
 export interface TypeFormat {
     key: string
     label: string
-    format: (content: string) => any
-    component?: (content: string) => React.ReactNode
+    render: (content: string) => React.ReactNode
 }
 
 const items: Record<string, TypeFormat> = {}

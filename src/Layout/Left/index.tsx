@@ -8,7 +8,8 @@ import Setting from '@/components/Setting'
 import useStore from '@/hooks/useStore'
 import ConnectionForm from '@/components/ConnectionForm'
 import { PlusOutlined } from '@ant-design/icons'
-import Log from '@/components/Log'
+import DeBug from '@/components/DeBug'
+import { MacScrollbar } from 'mac-scrollbar'
 
 const Index: React.FC = () => {
   const store = useStore()
@@ -26,8 +27,11 @@ const Index: React.FC = () => {
       defaultWidth={300}
       maxWidth={500}
     >
-      <div className="h-full overflow-y-auto bg-white pb-10" id="connection">
-        <div className="flex items-center p-2">
+      <div
+        className="flex h-full overflow-y-auto bg-white flex-col overflow-hidden"
+        id="connection"
+      >
+        <div className="flex items-center p-2 flex-shrink-0">
           <div className="flex-1">
             <ConnectionForm
               trigger={
@@ -44,15 +48,16 @@ const Index: React.FC = () => {
             <Setting />
           </div>
           <div className="ml-2 flex-shrink-0">
-            <Log />
+            <DeBug />
           </div>
         </div>
-
-        <div className={''}>
-          {store.connection.connections.map((v) => {
-            return <Connection connection={v} key={v.id}></Connection>
-          })}
-        </div>
+        <MacScrollbar>
+          <div className={'pr-2'}>
+            {store.connection.connections.map((v) => {
+              return <Connection connection={v} key={v.id}></Connection>
+            })}
+          </div>
+        </MacScrollbar>
       </div>
     </ResizableDiv>
   )

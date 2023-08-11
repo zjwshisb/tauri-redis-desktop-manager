@@ -19,7 +19,6 @@ declare namespace APP {
     db: number
     connection_id: number
     length: number
-    extra_type: string
   }
 
   interface HashField {

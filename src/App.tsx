@@ -12,6 +12,7 @@ import Center from './Layout/Center'
 import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import { type Locale } from 'antd/es/locale'
+import 'mac-scrollbar/dist/mac-scrollbar.css'
 
 const langs: Record<string, Locale> = {
   zh_CN: zhCN,

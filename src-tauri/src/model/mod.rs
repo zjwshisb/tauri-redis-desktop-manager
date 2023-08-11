@@ -143,7 +143,7 @@ impl Connection {
 
 #[derive(Debug)]
 pub struct Log {
-    pub id: i32,
+    pub id: i64,
     pub cmd: String,
     pub response: String,
     pub host: String,
@@ -151,6 +151,31 @@ pub struct Log {
 }
 
 impl Log {
+    pub fn first() -> Result<Self, CusError> {
+        let conn = sqlite::get_sqlite_client()?;
+        let stmt_result =
+            conn.prepare("select id, cmd, response, host, created_at from logs where 1=1 limit 1");
+        match stmt_result {
+            Ok(mut stmt) => {
+                return match stmt.query_row([], |row| {
+                    Ok(Self {
+                        id: row.get(0).unwrap(),
+                        cmd: row.get(1).unwrap(),
+                        response: row.get(2).unwrap(),
+                        host: row.get(3).unwrap(),
+                        created_at: row.get(4).unwrap(),
+                    })
+                }) {
+                    Ok(log) => return Ok(log),
+                    Err(_) => Err(CusError::App("Connection Not Found".to_string())),
+                }
+            }
+            Err(e) => {
+                return Err(CusError::App(e.to_string()));
+            }
+        }
+    }
+
     pub fn save(self) -> Result<Self, CusError> {
         let conn = sqlite::get_sqlite_client()?;
         let r = conn.execute(

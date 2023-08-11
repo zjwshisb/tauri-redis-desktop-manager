@@ -10,6 +10,7 @@ export default function useRequest<T>(
   const [data, setData] = React.useState<T>()
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState('')
+  const [init, setInit] = React.useState(false)
   const argsRef = useLatest(args)
 
   const fetch = React.useCallback(() => {
@@ -22,13 +23,16 @@ export default function useRequest<T>(
         setError(err as string)
       })
       .finally(() => {
+        setInit(true)
         setLoading(false)
       })
   }, [cmd, cid, argsRef])
 
   React.useEffect(() => {
-    fetch()
-  }, [fetch])
+    if (!init) {
+      fetch()
+    }
+  }, [fetch, init])
 
   return {
     error,

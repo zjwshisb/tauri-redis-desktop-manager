@@ -1,9 +1,5 @@
 import React from 'react'
-import {
-  InfoCircleOutlined,
-  ControlOutlined,
-  MenuOutlined
-} from '@ant-design/icons'
+import { HomeOutlined, ControlOutlined, MenuOutlined } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { Dropdown } from 'antd'
@@ -28,7 +24,7 @@ const Menu: React.FC<{
         key: 'info',
         label: (
           <div className="flex">
-            <InfoCircleOutlined className="hover:text-blue-600" />
+            <HomeOutlined className="hover:text-blue-600" />
             <div className="ml-2">{t('Info')}</div>
           </div>
         )
