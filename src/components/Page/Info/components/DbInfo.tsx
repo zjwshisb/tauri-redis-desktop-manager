@@ -42,6 +42,7 @@ const DbInfo: React.FC<{
         dataSource={info}
         bordered
         pagination={false}
+        rowKey={'name'}
         columns={[
           {
             dataIndex: 'name',

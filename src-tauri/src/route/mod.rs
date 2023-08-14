@@ -69,6 +69,8 @@ pub async fn dispatch<'r>(
         "cluster/nodes" => Response::new(cluster::get_nodes(cid, manager).await?),
         "cluster/scan" => Response::new(cluster::scan(cid, payload).await?),
         "cluster/nodesize" => Response::new(cluster::node_size(cid, payload).await?),
+        "debug/log" => Response::new(debug::log(manager, window).await?),
+        "debug/cancel" => Response::new(debug::cancel(manager).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

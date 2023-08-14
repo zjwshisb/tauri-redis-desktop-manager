@@ -1,13 +1,20 @@
-use chrono::Local;
+use crate::{err::CusError, redis_conn::CusCmd, state::ConnectionManager};
 
-use crate::err::CusError;
-
-pub fn log(window: tauri::Window) -> Result<(), CusError> {
-    let now = Local::now();
+pub async fn log<'r>(
+    manager: tauri::State<'r, ConnectionManager>,
+    window: tauri::Window,
+) -> Result<(), CusError> {
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<CusCmd>(32);
+    manager.set_tx(tx).await;
     tokio::spawn(async move {
-        let id: i64 = 0;
-        loop {}
-        dbg!(now);
+        while let Some(cmd) = rx.recv().await {
+            let _ = window.emit("debug", serde_json::to_string(&cmd).unwrap());
+        }
     });
+    Ok(())
+}
+
+pub async fn cancel<'r>(manager: tauri::State<'r, ConnectionManager>) -> Result<(), CusError> {
+    manager.remove_tx().await;
     Ok(())
 }

@@ -54,7 +54,7 @@ pub async fn scan(cid: u32, payload: String) -> Result<ScanResp, CusError> {
                 if args.types != "" {
                     cmd.arg(&["TYPE", &args.types]);
                 }
-                let value: Value = conn.execute(&mut cmd, 0).await?;
+                let (value, _) = conn.execute(&mut cmd).await?;
                 match value {
                     Value::Bulk(s) => {
                         let cursor = String::from_redis_value(s.get(0).unwrap())?;
@@ -87,6 +87,6 @@ pub async fn node_size(cid: u32, payload: String) -> Result<i64, CusError> {
     let args: NodeSizeArgs = serde_json::from_str(&payload.as_str())?;
     let mut conn =
         redis_conn::RedisConnection::build_anonymous(&args.node, &model.password).await?;
-    let v: Value = conn.execute(&mut redis::cmd("dbsize"), 0).await?;
+    let (v, _) = conn.execute(&mut redis::cmd("dbsize")).await?;
     Ok(i64::from_redis_value(&v)?)
 }

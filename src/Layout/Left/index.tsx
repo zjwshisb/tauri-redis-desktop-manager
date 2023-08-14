@@ -28,7 +28,7 @@ const Index: React.FC = () => {
       maxWidth={500}
     >
       <div
-        className="flex h-full overflow-y-auto bg-white flex-col overflow-hidden"
+        className="flex h-full  bg-white flex-col overflow-hidden"
         id="connection"
       >
         <div className="flex items-center p-2 flex-shrink-0">

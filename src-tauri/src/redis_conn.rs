@@ -2,13 +2,25 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use crate::err::CusError;
-use crate::model::{Connection as Conn, Log};
+use crate::model::Connection as Conn;
 use chrono::prelude::*;
+use rand::distributions::Alphanumeric;
+use rand::prelude::*;
 use redis::aio::{Connection, ConnectionLike};
 use redis::cluster::ClusterClient;
 use redis::cluster_async::ClusterConnection;
 use redis::{Arg, Client, FromRedisValue, Value};
+use serde::Serialize;
 use tokio::time::timeout;
+
+#[derive(Serialize)]
+pub struct CusCmd {
+    pub id: String,
+    pub cmd: String,
+    pub response: String,
+    pub host: String,
+    pub created_at: String,
+}
 
 pub struct RedisConnection {
     pub conn: Box<dyn ConnectionLike + Send>,
@@ -61,7 +73,10 @@ impl RedisConnection {
     }
 
     // execute the redis command
-    pub async fn execute_base(&mut self, cmd: &mut redis::Cmd) -> Result<redis::Value, CusError> {
+    pub async fn execute(
+        &mut self,
+        cmd: &mut redis::Cmd,
+    ) -> Result<(redis::Value, CusCmd), CusError> {
         let mut cmd_vec: Vec<String> = vec![];
         for arg in cmd.args_iter() {
             match arg {
@@ -121,29 +136,24 @@ impl RedisConnection {
                 rep.push(String::from("OK"));
             }
         }
-        let log = Log {
-            id: 0,
+        let mut rng = rand::thread_rng();
+        let id = Alphanumeric
+            .sample_iter(&mut rng)
+            .take(20)
+            .map(char::from)
+            .collect::<String>();
+        let cus_cmd = CusCmd {
+            id,
             cmd: cmd_vec.join(" "),
             response: rep.join(" "),
             created_at: Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
             host: self.host.clone(),
         };
-        let _ = log.save().unwrap();
-        Ok(value)
-    }
-
-    // execute the redis command
-    pub async fn execute(
-        &mut self,
-        cmd: &mut redis::Cmd,
-        db: u8,
-    ) -> Result<redis::Value, CusError> {
-        self.change_db(db).await?;
-        self.execute_base(cmd).await
+        Ok((value, cus_cmd))
     }
 
     pub async fn set_name(&mut self, name: String) -> Result<(), CusError> {
-        self.execute(&mut redis::cmd("CLIENT").arg("SETNAME").arg(name), 0)
+        self.execute(&mut redis::cmd("CLIENT").arg("SETNAME").arg(name))
             .await?;
         Ok(())
     }
@@ -151,7 +161,7 @@ impl RedisConnection {
     // if the cluster server, response is vec
     // so for unify, normal server is change to vec, the value is set to vec
     pub async fn get_info(&mut self) -> Result<Vec<HashMap<String, String>>, CusError> {
-        let v: Value = self.execute(&mut redis::cmd("info"), 0).await?;
+        let (v, _) = self.execute(&mut redis::cmd("info")).await?;
         let format_fn = |str_value: String| {
             let arr: Vec<&str> = str_value.split("\r\n").collect();
             let mut kv: HashMap<String, String> = HashMap::new();
@@ -198,11 +208,9 @@ impl RedisConnection {
 
     // change current database
     pub async fn change_db(&mut self, db: u8) -> Result<(), CusError> {
-        if !self.is_cluster {
-            if self.db != db {
-                self.execute_base(redis::cmd("select").arg(db)).await?;
-                self.db = db;
-            }
+        if !self.is_cluster && self.db != db {
+            self.execute(redis::cmd("select").arg(db)).await?;
+            self.db = db;
         }
         Ok(())
     }
@@ -213,7 +221,7 @@ impl RedisConnection {
             return Err(CusError::App(String::from("Not a Cluster Server")));
         }
         if self.nodes.len() == 0 {
-            let values: redis::Value = self.execute(redis::cmd("CLUSTER").arg("nodes"), 0).await?;
+            let (values, _) = self.execute(redis::cmd("CLUSTER").arg("nodes")).await?;
             let csv = String::from_redis_value(&values)?;
             let items: Vec<&str> = csv.split("\n").collect();
             let mut nodes: Vec<String> = vec![];

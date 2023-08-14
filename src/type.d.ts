@@ -55,4 +55,12 @@ declare namespace APP {
     payload: string
     channel: string
   }
+
+  interface RedisCmd {
+     id: string
+     cmd: string
+     response: string
+     host: string
+     created_at: string
+  }
 }

@@ -2,13 +2,17 @@ import React from 'react'
 import '../src/i18n'
 import '../src/App.css'
 import 'antd/dist/reset.css'
-import { Layout, ConfigProvider } from 'antd'
+import { Layout, ConfigProvider, Tabs } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { observer } from 'mobx-react-lite'
 import { StyleProvider } from '@ant-design/cssinjs'
 import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import { type Locale } from 'antd/es/locale'
+import 'mac-scrollbar/dist/mac-scrollbar.css'
+
+import Log from './components/Log'
+import Client from './components/Client'
 
 const langs: Record<string, Locale> = {
   zh_CN: zhCN,
@@ -25,8 +29,25 @@ const App: React.FC = () => {
   return (
     <ConfigProvider locale={locale}>
       <StyleProvider hashPriority="high">
-        <Layout className="h-full bg-[#FFF] border-t">
-          <Layout.Content className="h-full w-full"></Layout.Content>
+        <Layout className="h-full border-t">
+          <Layout.Content className="h-full w-full flex bg-white">
+            <Tabs
+              className="w-full"
+              tabPosition="left"
+              items={[
+                {
+                  label: 'log',
+                  key: 'log',
+                  children: <Log />
+                },
+                {
+                  label: 'client',
+                  key: 'client',
+                  children: <Client />
+                }
+              ]}
+            ></Tabs>
+          </Layout.Content>
         </Layout>
       </StyleProvider>
     </ConfigProvider>

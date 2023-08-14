@@ -19,7 +19,7 @@ const FieldViewer: React.FC<{
 
   const [child, setChild] = React.useState<React.ReactNode>()
 
-  const init = React.useRef(false)
+  const [init, setInit] = React.useState(false)
 
   const menus = React.useMemo(() => {
     const m: MenuItemType[] = []
@@ -41,7 +41,7 @@ const FieldViewer: React.FC<{
   }, [])
 
   React.useEffect(() => {
-    if (!init.current) {
+    if (!init) {
       let type = 'text'
       try {
         const u = JSON.parse(content)
@@ -51,15 +51,15 @@ const FieldViewer: React.FC<{
       } catch (_) {}
       setTypes(type)
       change(type, content)
-      init.current = true
+      setInit(true)
     }
-  }, [change, content])
+  }, [change, content, init])
 
   React.useEffect(() => {
-    if (init.current) {
+    if (init) {
       change(types, content)
     }
-  }, [content, change, types])
+  }, [content, change, types, init])
 
   const [isFocus, setIsFocus] = React.useState(false)
 
@@ -115,7 +115,7 @@ const FieldViewer: React.FC<{
         setIsFocus(true)
       }}
     >
-      {init.current && child}
+      {init && child}
       {typeNode}
       {isFocus && types === 'text' && (
         <Copy
