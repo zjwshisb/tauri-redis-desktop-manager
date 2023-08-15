@@ -11,7 +11,6 @@ import { isNumber } from 'lodash'
 
 const Subscribe: React.FC<{
   connection: APP.Connection
-  db?: number[]
 }> = (props) => {
   const { t } = useTranslation()
 
@@ -49,7 +48,10 @@ const Subscribe: React.FC<{
           store.page.addPage({
             key,
             label: key,
-            connectionId: props.connection.id,
+            type: 'pubsub',
+            connection: props.connection,
+            channels,
+            db,
             children: (
               <Pubsub
                 connection={props.connection}
@@ -63,7 +65,7 @@ const Subscribe: React.FC<{
     >
       <div className="pt-2">
         <Form layout="vertical" form={form}>
-          {props.db != null && props.db.length > 0 && (
+          {!props.connection.is_cluster && (
             <Form.Item
               label="db"
               name="db"
@@ -71,7 +73,7 @@ const Subscribe: React.FC<{
               initialValue={0}
             >
               <Select
-                options={props.db?.map((v) => {
+                options={props.connection.dbs.map((v) => {
                   return {
                     label: v,
                     value: v
@@ -80,6 +82,7 @@ const Subscribe: React.FC<{
               ></Select>
             </Form.Item>
           )}
+
           <Form.Item
             label={t('Channel')}
             name={'channels'}

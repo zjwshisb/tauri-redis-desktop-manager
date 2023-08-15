@@ -5,28 +5,36 @@ export interface TerminalRow {
   message: string
   tags?: string[]
   id: string | number
+  messageNode?: React.ReactNode
 }
 
 const Row: React.FC<{
   item: TerminalRow
 }> = ({ item }) => {
+  const message = React.useMemo(() => {
+    if (item.messageNode !== undefined) {
+      return item.messageNode
+    }
+    return item.message
+  }, [item.message, item.messageNode])
+
   return (
-    <div className="flex color-white font-mono px-2">
+    <div className="flex font-mono px-2 break-words">
       {item.time !== undefined && (
-        <div className="text-gray-400 flex-shrink-0">{item.time}</div>
+        <div className="flex-shrink-0 text-gray-800">{item.time}</div>
       )}
       {item.tags != null && item.tags.length > 0 && (
-        <div className="ml-2">
+        <div className="ml-2 text-yellow-600 flex-shrink-0 ">
           {item.tags.map((v) => {
             return (
-              <div className="text-yellow-600 flex-shrink-0" key={v}>
+              <span className="" key={v}>
                 [{v}]
-              </div>
+              </span>
             )
           })}
         </div>
       )}
-      <div className="text-white ml-2">{item.message}</div>
+      <div className="ml-2 font-medium">{message}</div>
     </div>
   )
 }

@@ -18,11 +18,16 @@ pub async fn info<'r>(
     manager.get_info(cid).await
 }
 
-pub async fn ping(payload: String) -> Result<String, CusError> {
+pub async fn ping<'r>(
+    payload: String,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
     let params: PingArgs = serde_json::from_str(payload.as_str())?;
     let host = format!("redis://{}:{}", params.host, params.port);
     let mut conn = RedisConnection::build_anonymous(&host, &params.password).await?;
-    let (v, _) = conn.execute(&mut redis::cmd("ping")).await?;
+    let v = manager
+        .execute_with(&mut redis::cmd("ping"), &mut conn)
+        .await?;
     Ok(String::from_redis_value(&v)?)
 }
 

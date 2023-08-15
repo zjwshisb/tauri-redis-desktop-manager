@@ -35,7 +35,9 @@ const MonitorIcon: React.FC<{
               file={form.getFieldValue('file')}
             ></Monitor>
           ),
-          connectionId: props.connection.id
+          connection: props.connection,
+          type: 'monitor',
+          file: form.getFieldValue('file')
         })
       }}
       trigger={

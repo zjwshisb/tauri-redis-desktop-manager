@@ -3,6 +3,8 @@ import request from '@/utils/request'
 import { event } from '@tauri-apps/api'
 import Terminal, { type TerminalRow } from '@/components/Terminal'
 import { useMount, useUnmount } from 'ahooks'
+import { Tooltip } from 'antd'
+import { InfoCircleOutlined } from '@ant-design/icons'
 
 const Index: React.FC = () => {
   const [rows, setRows] = React.useState<TerminalRow[]>([])
@@ -20,8 +22,21 @@ const Index: React.FC = () => {
             const cmd: APP.RedisCmd = JSON.parse(e.payload)
             const row: TerminalRow = {
               time: cmd.created_at,
+              tags: [cmd.host, `${cmd.duration}us`],
               message: cmd.cmd,
-              id: cmd.id
+              id: cmd.id,
+              messageNode: (
+                <div className="flex">
+                  <div>{cmd.cmd}</div>
+                  <Tooltip
+                    title={cmd.response}
+                    className="ml-1"
+                    placement="right"
+                  >
+                    <InfoCircleOutlined className="text-amber-600" />
+                  </Tooltip>
+                </div>
+              )
             }
             setRows((prev) => {
               return [...prev, row]
@@ -42,9 +57,9 @@ const Index: React.FC = () => {
   })
 
   return (
-    <div>
+    <div className="mr-6 pt-2">
       <Terminal
-        className="h-[500px] mr-2 mt-2"
+        className="h-[500px]"
         rows={rows}
         onClear={() => {
           setRows([])

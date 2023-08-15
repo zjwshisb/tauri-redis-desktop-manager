@@ -23,7 +23,7 @@ const NodeItem: React.FC<{
       .finally(() => {
         setLoading(false)
       })
-  }, [props.connection.id, props.node])
+  }, [props.connection, props.node])
 
   const child = React.useMemo(() => {
     if (loading) {

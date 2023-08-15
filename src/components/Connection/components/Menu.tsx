@@ -47,12 +47,12 @@ const Menu: React.FC<{
         },
         {
           key: 'Subscribe',
-          label: <Subscribe connection={connection} db={db}></Subscribe>
+          label: <Subscribe connection={connection}></Subscribe>
         }
       ])
     }
     return menus
-  }, [connection, t, db])
+  }, [connection, t])
 
   return (
     <Dropdown
@@ -66,7 +66,8 @@ const Menu: React.FC<{
               const key = getPageKey('client', connection)
               store.page.addPage({
                 label: key,
-                connectionId: connection.id,
+                connection,
+                type: 'client',
                 key,
                 children: <Client connection={connection}></Client>
               })
@@ -76,9 +77,10 @@ const Menu: React.FC<{
               const key = getPageKey('info', connection)
               store.page.addPage({
                 label: key,
+                type: 'info',
                 key,
                 children: <Info connection={connection}></Info>,
-                connectionId: connection.id
+                connection
               })
               break
             }

@@ -20,6 +20,7 @@ pub struct CusCmd {
     pub response: String,
     pub host: String,
     pub created_at: String,
+    pub duration: i64,
 }
 
 pub struct RedisConnection {
@@ -50,7 +51,6 @@ impl RedisConnection {
             nodes: vec![],
             db: 0,
         };
-        conn.set_name("tauri-redis".to_string()).await?;
         if conn.is_cluster {
             conn.get_nodes().await?;
         }
@@ -60,7 +60,7 @@ impl RedisConnection {
     pub async fn build_anonymous(host: &String, password: &String) -> Result<Self, CusError> {
         let b: Box<dyn ConnectionLike + Send>;
         b = Box::new(Self::get_normal(host, password).await?);
-        let mut conn = Self {
+        let conn = Self {
             id: 0,
             conn: b,
             is_cluster: false,
@@ -68,7 +68,6 @@ impl RedisConnection {
             nodes: vec![],
             db: 0,
         };
-        conn.set_name("tauri-redis".to_string()).await?;
         return Ok(conn);
     }
 
@@ -87,7 +86,9 @@ impl RedisConnection {
                 Arg::Cursor => {}
             }
         }
+        let start = Local::now();
         let value: redis::Value = cmd.query_async(self).await?;
+        let end = Local::now();
         let mut rep: Vec<String> = vec![];
         match &value {
             Value::Bulk(v) => {
@@ -148,15 +149,11 @@ impl RedisConnection {
             response: rep.join(" "),
             created_at: Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
             host: self.host.clone(),
+            duration: end.timestamp_micros() - start.timestamp_micros(),
         };
         Ok((value, cus_cmd))
     }
 
-    pub async fn set_name(&mut self, name: String) -> Result<(), CusError> {
-        self.execute(&mut redis::cmd("CLIENT").arg("SETNAME").arg(name))
-            .await?;
-        Ok(())
-    }
     // get the server info
     // if the cluster server, response is vec
     // so for unify, normal server is change to vec, the value is set to vec
@@ -204,15 +201,6 @@ impl RedisConnection {
             }
         }
         Ok(String::from(""))
-    }
-
-    // change current database
-    pub async fn change_db(&mut self, db: u8) -> Result<(), CusError> {
-        if !self.is_cluster && self.db != db {
-            self.execute(redis::cmd("select").arg(db)).await?;
-            self.db = db;
-        }
-        Ok(())
     }
 
     // get the cluster node

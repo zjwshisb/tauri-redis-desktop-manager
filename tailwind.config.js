@@ -8,9 +8,9 @@ export default {
     './src/**/**/**/**/*.{js,ts,jsx,tsx}',
     './src/**/**/**/**/**/*.{js,ts,jsx,tsx}',
     './src/**/**/**/**/**/**/*.{js,ts,jsx,tsx}',
-    './log/*.{js,ts,jsx,tsx}',
-    './log/**/*.{js,ts,jsx,tsx}',
-    './log/**/**/*.{js,ts,jsx,tsx}'
+    './src/**/**/**/**/**/**/**/*.{js,ts,jsx,tsx}',
+    './src/**/**/**/**/**/**/**/**/*.{js,ts,jsx,tsx}'
+
   ],
   theme: {
     container: false,

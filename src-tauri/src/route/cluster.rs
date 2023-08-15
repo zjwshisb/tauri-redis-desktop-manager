@@ -30,7 +30,11 @@ pub struct ScanResp {
     pub keys: Vec<String>,
 }
 
-pub async fn scan(cid: u32, payload: String) -> Result<ScanResp, CusError> {
+pub async fn scan<'r>(
+    cid: u32,
+    payload: String,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<ScanResp, CusError> {
     let args: ScanArgs = serde_json::from_str(payload.as_str())?;
     let connection = Connection::first(cid)?;
     let mut resp: ScanResp = ScanResp {
@@ -54,7 +58,7 @@ pub async fn scan(cid: u32, payload: String) -> Result<ScanResp, CusError> {
                 if args.types != "" {
                     cmd.arg(&["TYPE", &args.types]);
                 }
-                let (value, _) = conn.execute(&mut cmd).await?;
+                let value = manager.execute_with(&mut cmd, &mut conn).await?;
                 match value {
                     Value::Bulk(s) => {
                         let cursor = String::from_redis_value(s.get(0).unwrap())?;
@@ -82,11 +86,17 @@ pub async fn scan(cid: u32, payload: String) -> Result<ScanResp, CusError> {
 struct NodeSizeArgs {
     node: String,
 }
-pub async fn node_size(cid: u32, payload: String) -> Result<i64, CusError> {
+pub async fn node_size<'r>(
+    cid: u32,
+    payload: String,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
     let model = Connection::first(cid)?;
     let args: NodeSizeArgs = serde_json::from_str(&payload.as_str())?;
     let mut conn =
         redis_conn::RedisConnection::build_anonymous(&args.node, &model.password).await?;
-    let (v, _) = conn.execute(&mut redis::cmd("dbsize")).await?;
-    Ok(i64::from_redis_value(&v)?)
+    let value = manager
+        .execute_with(&mut redis::cmd("dbsize"), &mut conn)
+        .await?;
+    Ok(i64::from_redis_value(&value)?)
 }

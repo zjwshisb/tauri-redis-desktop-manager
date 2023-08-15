@@ -1,6 +1,6 @@
 import React from 'react'
-import '../src/i18n'
-import '../src/App.css'
+import '@/i18n'
+import '@/App.css'
 import 'antd/dist/reset.css'
 import { Layout, ConfigProvider, Tabs } from 'antd'
 import { useTranslation } from 'react-i18next'
@@ -13,6 +13,7 @@ import 'mac-scrollbar/dist/mac-scrollbar.css'
 
 import Log from './components/Log'
 import Client from './components/Client'
+import useStore from '@/hooks/useStore'
 
 const langs: Record<string, Locale> = {
   zh_CN: zhCN,
@@ -25,6 +26,16 @@ const App: React.FC = () => {
   const locale = React.useMemo(() => {
     return langs[i18n.language]
   }, [i18n.language])
+
+  const store = useStore()
+
+  React.useEffect(() => {
+    store.connection.fetchConnections()
+  }, [store.connection])
+
+  React.useEffect(() => {
+    console.log(store.connection.connections)
+  }, [store.connection.connections])
 
   return (
     <ConfigProvider locale={locale}>

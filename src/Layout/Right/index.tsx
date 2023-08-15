@@ -49,6 +49,10 @@ const Index: React.FC = () => {
                       menu={{
                         onClick(e) {
                           switch (e.key) {
+                            case 'window': {
+                              store.page.openNewWindowPage(v)
+                              break
+                            }
                             case 'close': {
                               store.page.removePage(v.key)
                               break
@@ -72,6 +76,10 @@ const Index: React.FC = () => {
                           }
                         },
                         items: [
+                          {
+                            label: t('Open In New Window'),
+                            key: 'window'
+                          },
                           {
                             label: t('Close'),
                             key: 'close'

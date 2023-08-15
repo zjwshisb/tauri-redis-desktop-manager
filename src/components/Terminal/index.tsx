@@ -1,7 +1,7 @@
 import React from 'react'
 import { type TerminalRow } from './Row'
 import Row from './Row'
-import { Button } from 'antd'
+import { Button, Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import classNames from 'classnames'
 import { MacScrollbar } from 'mac-scrollbar'
@@ -13,6 +13,8 @@ const Index: React.FC<{
 }> = ({ rows, onClear, className }) => {
   const container = React.useRef<HTMLDivElement>(null)
 
+  const [filter, setFilter] = React.useState('')
+
   React.useLayoutEffect(() => {
     if (container.current != null) {
       container.current.scrollTop = container.current.scrollHeight
@@ -21,23 +23,59 @@ const Index: React.FC<{
 
   const { t } = useTranslation()
 
+  const items = React.useMemo(() => {
+    let r = rows
+    if (filter !== '') {
+      r = rows.filter((v) => {
+        console.log(v)
+        if (v.message.includes(filter)) {
+          return true
+        }
+        if (v.tags !== undefined) {
+          for (const tag of v.tags) {
+            if (tag.includes(filter)) {
+              console.log('test')
+              return true
+            }
+          }
+        }
+        return false
+      })
+    }
+    if (r.length > 100) {
+      r.splice(0, r.length - 100)
+    }
+    return r
+  }, [filter, rows])
+
   return (
-    <div className={classNames(['flex flex-col p-1', className])}>
+    <div className={classNames(['flex flex-col', className])}>
       <div
         className={classNames([
-          'flex bg-[#002B36] flex-1 rounded  overflow-hidden flex-col'
+          'flex  flex-1 rounded py-1  bg-slate-100 overflow-hidden flex-col'
         ])}
       >
         <MacScrollbar ref={container}>
           <div>
-            {rows.map((v) => {
+            {items.map((v) => {
               return <Row item={v} key={v.id}></Row>
             })}
           </div>
         </MacScrollbar>
       </div>
-      <div className="py-2 h-[100px]">
-        <Button onClick={onClear}>{t('Clear')}</Button>
+      <div className="flex py-2">
+        <div className="w-[200px]">
+          <Input
+            placeholder="filter"
+            value={filter}
+            onChange={(e) => {
+              setFilter(e.target.value)
+            }}
+          ></Input>
+        </div>
+        <Button onClick={onClear} className="ml-2">
+          {t('Clear')}
+        </Button>
       </div>
     </div>
   )

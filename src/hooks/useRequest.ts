@@ -38,6 +38,7 @@ export default function useRequest<T>(
     error,
     data,
     fetch,
-    loading
+    loading,
+    init
   }
 }

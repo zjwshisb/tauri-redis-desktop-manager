@@ -79,5 +79,6 @@
   "The COUNT option for command HSCAN,SSCAN,ZSCAN": " HSCAN,SSCAN,ZSCAN 命令的 COUNT 选项",
   "Are you sure delete <{{name}}>?":"确定删除<{{name}}>?",
   "Are Sure Open A Monitor Page?":"确定打开一个monitor页面?",
-  "Save Log To File": "保存日志到文件"
+  "Save Log To File": "保存日志到文件",
+  "Open In New Window": "新窗口打开"
 }

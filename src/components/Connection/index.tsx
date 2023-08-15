@@ -116,9 +116,10 @@ const Connection: React.FC<{
       const key = getPageKey('info', connection)
       store.page.addPage({
         label: key,
+        type: 'info',
         key,
         children: <Info connection={connection}></Info>,
-        connectionId: connection.id
+        connection
       })
       setCollapse(true)
     }
@@ -224,16 +225,16 @@ const Connection: React.FC<{
                   ></NodeItem>
                 )
               })
-            : connection.dbs.map((item) => {
+            : connection.dbs.map((db) => {
                 const active =
                   store.keyInfo.info?.connection.id === connection.id &&
-                  store.keyInfo.info?.db === item
+                  store.keyInfo.info?.db === db
                 return (
                   <DBItem
-                    db={item}
+                    db={db}
                     connection={connection}
                     active={active}
-                    key={item}
+                    key={db}
                   ></DBItem>
                 )
               })}

@@ -43,7 +43,10 @@ const Index: React.FC<{
                   store.page.addPage({
                     key,
                     label: key,
-                    connectionId: info.connection.id,
+                    connection: info.connection,
+                    name: v,
+                    db: info.db,
+                    type: 'key',
                     children: (
                       <Key
                         name={v}

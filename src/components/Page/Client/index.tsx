@@ -22,7 +22,7 @@ import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import IconButton from '@/components/IconButton'
 
-interface Client {
+interface ClientRow {
   id: string
   addr: string
   laddr: string
@@ -51,7 +51,7 @@ interface Client {
   resp: string
 }
 
-function clientColumn(title: string, tooltip: string): ColumnType<Client> {
+function clientColumn(title: string, tooltip: string): ColumnType<ClientRow> {
   return {
     dataIndex: title,
     align: 'center',
@@ -64,7 +64,7 @@ function clientColumn(title: string, tooltip: string): ColumnType<Client> {
   }
 }
 
-const Index: React.FC<{
+const Client: React.FC<{
   connection: APP.Connection
 }> = ({ connection }) => {
   const {
@@ -88,7 +88,7 @@ const Index: React.FC<{
               client[field2Value[0]] = field2Value[1]
             }
           })
-          return client as unknown as Client
+          return client as unknown as ClientRow
         })
     }
     return []
@@ -225,4 +225,4 @@ const Index: React.FC<{
     </Spin>
   )
 }
-export default Index
+export default Client

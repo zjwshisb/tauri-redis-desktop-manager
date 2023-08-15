@@ -26,7 +26,7 @@ const Index: React.FC<{
       .finally(() => {
         setLoading(false)
       })
-  }, [props.connection.id, props.db])
+  }, [props.connection, props.db])
 
   const child = React.useMemo(() => {
     if (loading) {

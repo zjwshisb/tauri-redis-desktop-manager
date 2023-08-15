@@ -1,4 +1,5 @@
 use chrono::prelude::*;
+use redis::Cmd;
 use std::collections::HashMap;
 use tokio::sync::oneshot;
 
@@ -53,8 +54,17 @@ impl ConnectionManager {
             tx: Mutex::new(vec![]),
         }
     }
-    pub async fn add(&self, cid: u32, item: RedisConnection) {
-        self.map.lock().await.insert(cid, item);
+    pub async fn add(&self, cid: u32, conn: RedisConnection) {
+        self.map.lock().await.insert(cid, conn);
+        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
+            let _ = self.set_name(conn, "tauri-redis".to_string()).await;
+        }
+    }
+
+    pub async fn set_name(&self, conn: &mut RedisConnection, name: String) -> Result<(), CusError> {
+        self.execute_with(redis::cmd("CLIENT").arg("SETNAME").arg(&name), conn)
+            .await?;
+        Ok(())
     }
 
     pub async fn get_server_node(&self, cid: u32) -> Result<Vec<String>, CusError> {
@@ -78,6 +88,18 @@ impl ConnectionManager {
         return Err(CusError::App(String::from("Connection Not Found")));
     }
 
+    pub async fn execute_with(
+        &self,
+        cmd: &mut Cmd,
+        conn: &mut RedisConnection,
+    ) -> Result<redis::Value, CusError> {
+        let (c, cus_cmd) = conn.execute(cmd).await?;
+        if let Some(tx) = self.tx.lock().await.get_mut(0) {
+            let _ = tx.send(cus_cmd).await;
+        }
+        return Ok(c);
+    }
+
     pub async fn execute(
         &self,
         cid: u32,
@@ -85,12 +107,14 @@ impl ConnectionManager {
         cmd: &mut redis::Cmd,
     ) -> Result<redis::Value, CusError> {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
-            conn.change_db(db).await?;
-            let (c, cus_cmd) = conn.execute(cmd).await?;
-            if let Some(tx) = self.tx.lock().await.get_mut(0) {
-                let _ = tx.send(cus_cmd).await;
+            if !conn.is_cluster && conn.db != db {
+                let _ = self
+                    .execute_with(redis::cmd("select").arg(db), conn)
+                    .await?;
+                conn.db = db
             }
-            return Ok(c);
+            let v = self.execute_with(cmd, conn).await?;
+            return Ok(v);
         }
         return Err(CusError::App(String::from("Connection Not Found")));
     }

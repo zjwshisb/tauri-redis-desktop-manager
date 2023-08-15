@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import Terminal from '@/components/Terminal'
 import { type TerminalRow } from '@/components/Terminal/Row'
 
-const Index: React.FC<{
+const Pubsub: React.FC<{
   channels: string[]
   connection: APP.Connection
   db: number
@@ -114,4 +114,4 @@ const Index: React.FC<{
   )
 }
 
-export default Index
+export default Pubsub

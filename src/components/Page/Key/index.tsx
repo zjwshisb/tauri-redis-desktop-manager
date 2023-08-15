@@ -13,6 +13,7 @@ import useStore from '@/hooks/useStore'
 import Rename from './components/Rename'
 import { useTranslation } from 'react-i18next'
 import TTL from './components/TTL'
+import { getPageKey } from '@/utils'
 const Index: React.FC<{
   name: string
   connection: APP.Connection
@@ -34,7 +35,6 @@ const Index: React.FC<{
   const { t } = useTranslation()
 
   const value = React.useMemo(() => {
-    console.log(item)
     if (item !== undefined) {
       switch (item.types) {
         case 'string': {
@@ -100,16 +100,20 @@ const Index: React.FC<{
                       trigger={<EditOutlined />}
                       keys={item}
                       onSuccess={(newName) => {
+                        const newPageKey = getPageKey(newName, connection, db)
                         store.page.updatePage(pageKey, {
-                          label: newName,
-                          key: newName,
-                          connectionId: connection.id,
+                          type: 'key',
+                          label: newPageKey,
+                          key: newPageKey,
+                          connection,
+                          name: newName,
+                          db,
                           children: (
                             <Index
                               name={newName}
                               connection={connection}
                               db={db}
-                              pageKey={newName}
+                              pageKey={newPageKey}
                             ></Index>
                           )
                         })

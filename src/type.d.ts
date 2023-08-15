@@ -62,5 +62,6 @@ declare namespace APP {
      response: string
      host: string
      created_at: string
+     duration: number
   }
 }

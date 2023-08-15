@@ -4,7 +4,7 @@ import useRequest from '@/hooks/useRequest'
 import Item from './components/Item'
 import { Tabs } from 'antd'
 
-const Index: React.FC<{
+const Info: React.FC<{
   connection: APP.Connection
 }> = ({ connection }) => {
   const { data } = useRequest<Array<Record<string, string>>>(
@@ -30,4 +30,4 @@ const Index: React.FC<{
     )
   }
 }
-export default Index
+export default Info

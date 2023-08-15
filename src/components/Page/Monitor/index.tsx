@@ -10,7 +10,7 @@ interface MonitorResp {
   file_name: string
 }
 
-const Index: React.FC<{
+const Monitor: React.FC<{
   connection: APP.Connection
   file?: boolean
 }> = (props) => {
@@ -91,7 +91,7 @@ const Index: React.FC<{
   return (
     <div>
       <Terminal
-        className="h-[700px]"
+        className="h-[500px]"
         rows={rows}
         onClear={() => {
           setRows([])
@@ -102,4 +102,4 @@ const Index: React.FC<{
   )
 }
 
-export default Index
+export default Monitor

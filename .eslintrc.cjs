@@ -11,7 +11,8 @@ module.exports = {
   ],
   ignorePatterns: [
     'babel.config.js',
-    'vite.config.ts'
+    'vite.config.ts',
+    'index.html'
   ],
   parserOptions: {
     ecmaVersion: 'latest',
