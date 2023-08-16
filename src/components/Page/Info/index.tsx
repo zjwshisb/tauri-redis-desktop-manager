@@ -11,7 +11,6 @@ const Info: React.FC<{
     'server/info',
     connection.id
   )
-
   if (data?.length === 1) {
     return <Item data={data[0]}></Item>
   } else {

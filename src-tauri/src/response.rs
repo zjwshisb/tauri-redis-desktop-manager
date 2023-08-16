@@ -53,3 +53,11 @@ pub struct ScoreField {
     pub value: String,
     pub score: String,
 }
+
+#[derive(Serialize)]
+pub struct Conn {
+    pub id: String,
+    pub host: String,
+    pub created_at: String,
+    pub types: String,
+}

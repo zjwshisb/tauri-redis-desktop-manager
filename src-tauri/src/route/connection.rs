@@ -1,4 +1,8 @@
-use crate::{err::CusError, model::Connection, redis_conn, state::ConnectionManager};
+use crate::{
+    conn::{ConnectionManager, CusConnection},
+    err::CusError,
+    model::Connection,
+};
 use serde::Deserialize;
 use tauri::State;
 
@@ -60,7 +64,7 @@ pub fn update(payload: String) -> Result<Connection, CusError> {
 }
 
 pub async fn open<'r>(cid: u32, manager: State<'r, ConnectionManager>) -> Result<(), CusError> {
-    let conn = redis_conn::RedisConnection::build(cid).await?;
+    let conn = CusConnection::build(cid).await?;
     manager.add(cid, conn).await;
     Ok(())
 }

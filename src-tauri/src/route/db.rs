@@ -1,5 +1,5 @@
+use crate::conn::ConnectionManager;
 use crate::err::CusError;
-use crate::state::ConnectionManager;
 use redis::{self, FromRedisValue};
 use serde::Deserialize;
 use serde_json;

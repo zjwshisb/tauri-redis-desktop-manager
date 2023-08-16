@@ -1,14 +1,16 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+mod conn;
 mod err;
 mod key;
 mod model;
-mod redis_conn;
+mod pubsub;
 mod response;
 mod route;
 mod sqlite;
-mod state;
-use state::{ConnectionManager, PubsubManager};
+mod utils;
+use conn::ConnectionManager;
+use pubsub::PubsubManager;
 use tauri::Menu;
 
 fn main() {

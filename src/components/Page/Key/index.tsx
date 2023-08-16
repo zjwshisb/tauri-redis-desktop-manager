@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Col, Input, Modal, Result, Row, Spin, message } from 'antd'
+import { Button, Input, Modal, Result, Space, Spin, message } from 'antd'
 import StringValue from './components/StringValue'
 import HashValue from './components/HashValue'
 import ListValue from './components/ListValue'
@@ -86,80 +86,80 @@ const Index: React.FC<{
       {item !== undefined && (
         <div>
           <div className="pb-2">
-            <Row>
-              <Col span={24} className="mb-2">
-                <Input
-                  addonBefore={t(
-                    item.types.slice(0, 1).toUpperCase() +
-                      item.types.slice(1).toLowerCase()
-                  )}
-                  value={item.name}
-                  readOnly
-                  addonAfter={
-                    <Rename
-                      trigger={<EditOutlined />}
-                      keys={item}
-                      onSuccess={(newName) => {
-                        const newPageKey = getPageKey(newName, connection, db)
-                        store.page.updatePage(pageKey, {
-                          type: 'key',
-                          label: newPageKey,
-                          key: newPageKey,
-                          connection,
-                          name: newName,
-                          db,
-                          children: (
-                            <Index
-                              name={newName}
-                              connection={connection}
-                              db={db}
-                              pageKey={newPageKey}
-                            ></Index>
-                          )
-                        })
-                      }}
-                    />
-                  }
-                ></Input>
-              </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col xs={24} xl={6} className="mb-2">
+            <div className="w-full mb-2">
+              <Input
+                addonBefore={t(
+                  item.types.slice(0, 1).toUpperCase() +
+                    item.types.slice(1).toLowerCase()
+                )}
+                value={item.name}
+                readOnly
+                addonAfter={
+                  <Rename
+                    trigger={<EditOutlined />}
+                    keys={item}
+                    onSuccess={(newName) => {
+                      const newPageKey = getPageKey(newName, connection, db)
+                      store.page.updatePage(pageKey, {
+                        type: 'key',
+                        label: newPageKey,
+                        key: newPageKey,
+                        connection,
+                        name: newName,
+                        db,
+                        children: (
+                          <Index
+                            name={newName}
+                            connection={connection}
+                            db={db}
+                            pageKey={newPageKey}
+                          ></Index>
+                        )
+                      })
+                    }}
+                  />
+                }
+              ></Input>
+            </div>
+            <div className="w-full flex flex-wrap">
+              <div className="mb-2 mr-2 w-[200px]">
                 <TTL keys={item} onChange={fetch}></TTL>
-              </Col>
-              <Col xs={24} xl={6} className="mb-2">
+              </div>
+              <div className="mb-2 mr-2 w-[200px]">
                 <Input
                   addonBefore={t('Memory')}
                   value={item.memory}
                   readOnly
                   suffix={'bytes'}
                 ></Input>
-              </Col>
-              <Col xs={24} xl={6} className="mb-2">
+              </div>
+              <div className="mb-2 mr-2 w-[200px]">
                 <Input
                   addonBefore={t('Length')}
                   value={item.length}
                   readOnly
                 ></Input>
-              </Col>
-              <Col xs={24} xl={6} className="mb-2">
-                <Button
-                  className="mr-1 mb-2"
-                  icon={<ReloadOutlined onClick={fetch} />}
-                ></Button>
-                <Button
-                  className="mr-1 mb-2"
-                  icon={<Copy content={item.name} />}
-                ></Button>
-                <Button
-                  className="mr-1 mb-2"
-                  onClick={handleDelete}
-                  danger
-                  type="primary"
-                  icon={<DeleteOutlined />}
-                ></Button>
-              </Col>
-            </Row>
+              </div>
+              <div className="mb-2 mr-2 w-[200px]">
+                <Space>
+                  <Button
+                    className="mb-2"
+                    icon={<ReloadOutlined onClick={fetch} />}
+                  ></Button>
+                  <Button
+                    className="mb-2"
+                    icon={<Copy content={item.name} />}
+                  ></Button>
+                  <Button
+                    className="mb-2"
+                    onClick={handleDelete}
+                    danger
+                    type="primary"
+                    icon={<DeleteOutlined />}
+                  ></Button>
+                </Space>
+              </div>
+            </div>
           </div>
           <div>{value}</div>
         </div>

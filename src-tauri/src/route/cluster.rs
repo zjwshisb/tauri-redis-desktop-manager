@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
 use crate::{
+    conn::{ConnectionManager, CusConnection, Node},
     err::{new_normal, CusError},
     model::Connection,
-    redis_conn::{self, RedisConnection},
-    state::ConnectionManager,
 };
 use redis::{FromRedisValue, Value};
 use serde::{Deserialize, Serialize};
@@ -13,7 +12,20 @@ pub async fn get_nodes<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<Vec<String>, CusError> {
-    return manager.get_server_node(cid).await;
+    let nodes = manager.get_nodes(cid).await?;
+    let mut node_str: Vec<String> = vec![];
+    for n in nodes {
+        if n.flags.contains("master") {
+            let mut host = n.host.as_str();
+            if let Some(index) = host.find("@") {
+                host = &host[0..index];
+            }
+            let mut format_host = "redis://".to_string();
+            format_host.push_str(host);
+            node_str.push(format_host)
+        }
+    }
+    return Ok(node_str);
 }
 
 #[derive(Deserialize, Debug)]
@@ -44,8 +56,7 @@ pub async fn scan<'r>(
     for x in &args.cursor {
         if let Some(node) = x.get("node") {
             if let Some(cursor) = x.get("cursor") {
-                let mut conn =
-                    RedisConnection::build_anonymous(&node, &connection.password).await?;
+                let mut conn = CusConnection::build_anonymous(&node, &connection.password).await?;
                 let mut cmd = redis::cmd("scan");
                 cmd.arg(cursor)
                     .arg(&["count", args.count.to_string().as_str()]);
@@ -93,10 +104,16 @@ pub async fn node_size<'r>(
 ) -> Result<i64, CusError> {
     let model = Connection::first(cid)?;
     let args: NodeSizeArgs = serde_json::from_str(&payload.as_str())?;
-    let mut conn =
-        redis_conn::RedisConnection::build_anonymous(&args.node, &model.password).await?;
+    let mut conn = CusConnection::build_anonymous(&args.node, &model.password).await?;
     let value = manager
         .execute_with(&mut redis::cmd("dbsize"), &mut conn)
         .await?;
     Ok(i64::from_redis_value(&value)?)
+}
+
+pub async fn node<'r>(
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<Vec<Node>, CusError> {
+    Ok(manager.get_nodes(cid).await?)
 }

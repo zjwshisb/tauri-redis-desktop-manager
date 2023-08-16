@@ -1,4 +1,9 @@
-use crate::{err::CusError, redis_conn::CusCmd, state::ConnectionManager};
+use crate::{
+    conn::{ConnectionManager, CusCmd},
+    err::CusError,
+    pubsub::PubsubManager,
+    response,
+};
 
 pub async fn log<'r>(
     manager: tauri::State<'r, ConnectionManager>,
@@ -17,4 +22,16 @@ pub async fn log<'r>(
 pub async fn cancel<'r>(manager: tauri::State<'r, ConnectionManager>) -> Result<(), CusError> {
     manager.remove_tx().await;
     Ok(())
+}
+
+pub async fn clients<'r>(
+    manager: tauri::State<'r, ConnectionManager>,
+    pubsub: tauri::State<'r, PubsubManager>,
+) -> Result<Vec<response::Conn>, CusError> {
+    let mut r = vec![];
+    let mut m = manager.get_conns().await;
+    let mut p = pubsub.get_conns();
+    r.append(&mut m);
+    r.append(&mut p);
+    Ok(r)
 }

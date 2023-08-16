@@ -9,6 +9,7 @@ import { getPageKey } from '@/utils'
 import Client from '@/components/Page/Client'
 import Info from '@/components/Page/Info'
 import Subscribe from './Subscribe'
+import Node from '@/components/Page/Node'
 
 const Menu: React.FC<{
   connection: APP.Connection
@@ -51,6 +52,19 @@ const Menu: React.FC<{
         }
       ])
     }
+    if (connection.is_cluster) {
+      menus = menus.concat([
+        {
+          key: 'node',
+          label: (
+            <div className="flex">
+              <ControlOutlined className="hover:text-blue-600" />
+              <div className="ml-2">{t('Node')}</div>
+            </div>
+          )
+        }
+      ])
+    }
     return menus
   }, [connection, t])
 
@@ -80,6 +94,17 @@ const Menu: React.FC<{
                 type: 'info',
                 key,
                 children: <Info connection={connection}></Info>,
+                connection
+              })
+              break
+            }
+            case 'node': {
+              const key = getPageKey('node', connection)
+              store.page.addPage({
+                label: key,
+                type: 'node',
+                key,
+                children: <Node connection={connection}></Node>,
                 connection
               })
               break

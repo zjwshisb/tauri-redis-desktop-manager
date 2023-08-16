@@ -1,5 +1,5 @@
+use crate::conn::ConnectionManager;
 use crate::err::{self, CusError};
-use crate::state::ConnectionManager;
 use redis::{FromRedisValue, Value};
 use serde::{Deserialize, Serialize};
 

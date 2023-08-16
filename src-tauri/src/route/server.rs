@@ -1,6 +1,9 @@
 use std::{collections::HashMap, fmt::Debug};
 
-use crate::{err::CusError, redis_conn::RedisConnection, state::ConnectionManager};
+use crate::{
+    conn::{ConnectionManager, CusConnection},
+    err::CusError,
+};
 use redis::FromRedisValue;
 use serde::Deserialize;
 
@@ -24,7 +27,7 @@ pub async fn ping<'r>(
 ) -> Result<String, CusError> {
     let params: PingArgs = serde_json::from_str(payload.as_str())?;
     let host = format!("redis://{}:{}", params.host, params.port);
-    let mut conn = RedisConnection::build_anonymous(&host, &params.password).await?;
+    let mut conn = CusConnection::build_anonymous(&host, &params.password).await?;
     let v = manager
         .execute_with(&mut redis::cmd("ping"), &mut conn)
         .await?;

@@ -2,8 +2,9 @@ import { makeAutoObservable } from 'mobx'
 import type React from 'react'
 import { WebviewWindow } from '@tauri-apps/api/window'
 import { message } from 'antd'
+import spark from 'spark-md5'
 
-export type Page = MonitorPage | InfoPage | KeyPage | ClientPage | PubsubPage
+export type Page = MonitorPage | InfoPage | KeyPage | ClientPage | PubsubPage | NodePage
 
 interface BasePage {
   label: React.ReactNode
@@ -20,6 +21,10 @@ type PubsubPage = BasePage & {
 type ClientPage = BasePage & {
   type: 'client'
 }
+type NodePage = BasePage & {
+  type: 'node'
+}
+
 type MonitorPage = BasePage & {
   type: 'monitor'
   file: boolean
@@ -104,13 +109,16 @@ class PageStore {
         url += `&db=${p.db}&channels=${p.channels.join(',')}`
         break
       }
+      case 'node': {
+        break
+      }
       default: {
         url = ''
         break
       }
     }
     if (url !== '') {
-      const webview = new WebviewWindow('test', {
+      const webview = new WebviewWindow(spark.hash(p.key), {
         url,
         title: p.key,
         focus: true

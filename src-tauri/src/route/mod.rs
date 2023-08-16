@@ -1,8 +1,9 @@
 use tauri::Window;
 
+use crate::conn::ConnectionManager;
 use crate::err::CusError;
+use crate::pubsub::PubsubManager;
 use crate::response::Response;
-use crate::state::{ConnectionManager, PubsubManager};
 
 pub mod client;
 pub mod cluster;
@@ -68,9 +69,11 @@ pub async fn dispatch<'r>(
         "pubsub/monitor" => Response::new(pubsub::monitor(window, pubsub, payload, cid).await?),
         "cluster/nodes" => Response::new(cluster::get_nodes(cid, manager).await?),
         "cluster/scan" => Response::new(cluster::scan(cid, payload, manager).await?),
+        "cluster/node-list" => Response::new(cluster::node(cid, manager).await?),
         "cluster/nodesize" => Response::new(cluster::node_size(cid, payload, manager).await?),
         "debug/log" => Response::new(debug::log(manager, window).await?),
         "debug/cancel" => Response::new(debug::cancel(manager).await?),
+        "debug/clients" => Response::new(debug::clients(manager, pubsub).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

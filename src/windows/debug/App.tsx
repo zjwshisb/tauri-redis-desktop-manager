@@ -47,12 +47,12 @@ const App: React.FC = () => {
               tabPosition="left"
               items={[
                 {
-                  label: 'log',
+                  label: 'Log',
                   key: 'log',
                   children: <Log />
                 },
                 {
-                  label: 'client',
+                  label: 'Client',
                   key: 'client',
                   children: <Client />
                 }

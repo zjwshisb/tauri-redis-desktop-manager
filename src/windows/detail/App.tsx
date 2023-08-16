@@ -19,6 +19,7 @@ import Info from '@/components/Page/Info'
 import Client from '@/components/Page/Client'
 import Monitor from '@/components/Page/Monitor'
 import Pubsub from '@/components/Page/Pubsub'
+import Node from '@/components/Page/Node'
 
 const langs: Record<string, Locale> = {
   zh_CN: zhCN,
@@ -102,6 +103,11 @@ const App: React.FC = () => {
               ></Pubsub>
             )
           }
+          break
+        }
+        case 'node': {
+          node = <Node connection={connection}></Node>
+          break
         }
       }
     }

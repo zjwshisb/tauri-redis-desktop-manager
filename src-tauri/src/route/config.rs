@@ -1,6 +1,6 @@
 use crate::{
+    conn::ConnectionManager,
     err::{self, CusError},
-    state::ConnectionManager,
 };
 use redis::{FromRedisValue, Value};
 

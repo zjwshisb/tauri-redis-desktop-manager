@@ -21,7 +21,7 @@ class Store {
     this.connection.close(id)
     request('connections/close', id).then(() => {})
     const pages = this.page.pages.filter(v => {
-      return v.connectionId !== id
+      return v.connection.id !== id
     })
     this.page.setPage(pages)
     if (this.keyInfo.info?.connection.id === id) {

@@ -10,6 +10,18 @@ declare namespace APP {
     dbs: number[]
   }
 
+  interface Node {
+    config_epoch: string
+    flags: string
+    host: string
+    id: string
+    link_state: string
+    master: string
+    ping_sent: number
+    pong_recv: number
+    slot: string
+  }
+
   interface BaseKey<T, V> {
     name: string
     types: T
