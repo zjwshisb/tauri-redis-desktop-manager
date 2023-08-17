@@ -8,6 +8,7 @@ declare namespace APP {
     is_cluster: boolean
     nodes: string[]
     dbs: number[]
+    readonly: boolean
   }
 
   interface Node {

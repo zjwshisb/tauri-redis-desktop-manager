@@ -1,9 +1,10 @@
-import React from 'react'
-import { Input, Tooltip } from 'antd'
+import React, { useContext } from 'react'
+import { Input, type InputProps } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import Expire from '../Expire'
-import dayjs from 'dayjs'
+import context from '../../context'
+import Editable from '@/components/Editable'
 
 const TTL: React.FC<{
   keys: APP.Key
@@ -11,29 +12,35 @@ const TTL: React.FC<{
 }> = ({ keys, onChange }) => {
   const { t } = useTranslation()
 
+  const connection = useContext(context)
+
+  const props: InputProps = React.useMemo(() => {
+    return {
+      value: keys.ttl,
+      readOnly: true,
+      addonBefore: t('TTL')
+    }
+  }, [keys.ttl, t])
+
   const content = React.useMemo(() => {
     return (
-      <Input
-        addonBefore={t('TTL')}
-        value={keys.ttl}
-        addonAfter={
-          <Expire keys={keys} onSuccess={onChange} trigger={<EditOutlined />} />
-        }
-        readOnly
-      ></Input>
+      <Editable feedback={<Input {...props}></Input>}>
+        <Input
+          {...props}
+          addonAfter={
+            <Editable connection={connection}>
+              <Expire
+                keys={keys}
+                onSuccess={onChange}
+                trigger={<EditOutlined />}
+              />
+            </Editable>
+          }
+        ></Input>
+      </Editable>
     )
-  }, [keys, onChange, t])
+  }, [connection, keys, onChange, props])
 
-  if (keys.ttl <= -1) {
-    return content
-  }
-  return (
-    <Tooltip
-      placement="bottom"
-      title={dayjs().add(keys.ttl, 's').format('YYYY-MM-DDTHH:mm:ssZ[Z]')}
-    >
-      {content}
-    </Tooltip>
-  )
+  return content
 }
 export default TTL

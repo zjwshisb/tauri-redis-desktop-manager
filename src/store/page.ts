@@ -1,8 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import type React from 'react'
-import { WebviewWindow } from '@tauri-apps/api/window'
-import { message } from 'antd'
 import spark from 'spark-md5'
+import { openWindow } from '@/utils'
 
 export type Page = MonitorPage | InfoPage | KeyPage | ClientPage | PubsubPage | NodePage
 
@@ -118,16 +117,11 @@ class PageStore {
       }
     }
     if (url !== '') {
-      const webview = new WebviewWindow(spark.hash(p.key), {
+      this.removePage(p.key)
+      openWindow(spark.hash(p.key), {
         url,
         title: p.key,
         focus: true
-      })
-      webview.once('tauri://created', (e) => {
-          this.removePage(p.key)
-      })
-      webview.once('tauri://error', (e) => {
-        message.error(e.payload as string)
       })
     }
   }

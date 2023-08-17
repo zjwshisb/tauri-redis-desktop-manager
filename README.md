@@ -1,18 +1,19 @@
 # Tauri Redis Desktop Manager
 
-> A Redis Desktop Manager powered by Rust、Tauri、Vite、Typescript、React、ant-design、tailwindcss
+> A Redis Desktop Manager powered by Rust、Tauri、Vite、Typescript、React、ant-design、tailwindcss with beautiful interface
 
 ## Support
 
-+ Cluster
 + Keys Operate
-+ Pub/Sub
++ Cluster Mode Support
++ Publish/Subscribe
 + Monitor
 + Use scan,sscan,hscan,zscan for key,field iterate
-
++ Readonly Mode
++ Multiwindow
++ Debug
 
 ## Devlopment
 
 + Backend [Tauri](https://tauri.app/v1/guides/development/development-cycle/)
 + Frontend [Vite](https://vitejs.dev/)
- 

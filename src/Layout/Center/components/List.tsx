@@ -36,7 +36,7 @@ const Index: React.FC<{
         {(v) => {
           const key = getPageKey(v, info.connection, info.db)
           return (
-            <Tooltip title={v} mouseEnterDelay={0.3}>
+            <Tooltip title={v} mouseEnterDelay={1}>
               <List.Item
                 key={key}
                 onClick={(e) => {

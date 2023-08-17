@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import request from '@/utils/request'
 import { Button, Space, Input } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
 import IconButton from '@/components/IconButton'
+import context from '../../context'
+import Editable from '@/components/Editable'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -23,6 +25,8 @@ const Index: React.FC<{
   const [loading, setLoading] = React.useState(false)
 
   const { t } = useTranslation()
+
+  const connection = useContext(context)
 
   const getFields = React.useCallback(
     (reset = false) => {
@@ -69,15 +73,17 @@ const Index: React.FC<{
   return (
     <div>
       <div className="pb-2 flex">
-        <FieldForm
-          keys={keys}
-          onSuccess={(f) => {
-            setFields((p) => {
-              return [...p].concat([f])
-            })
-          }}
-          trigger={<Button type="primary">{t('Add Field')}</Button>}
-        />
+        <Editable connection={connection}>
+          <FieldForm
+            keys={keys}
+            onSuccess={(f) => {
+              setFields((p) => {
+                return [...p].concat([f])
+              })
+            }}
+            trigger={<Button type="primary">{t('Add Field')}</Button>}
+          />
+        </Editable>
       </div>
       <CusTable
         loading={loading}
@@ -124,29 +130,33 @@ const Index: React.FC<{
             render(_, record, index) {
               return (
                 <Space>
-                  <FieldForm
-                    trigger={<IconButton icon={<EditOutlined />} />}
-                    keys={keys}
-                    field={record}
-                    onSuccess={(f) => {
-                      setFields((prev) => {
-                        const newFields = [...prev]
-                        newFields[index] = f
-                        return newFields
-                      })
-                    }}
-                  />
-                  <DeleteField
-                    keys={keys}
-                    field={record}
-                    onSuccess={() => {
-                      setFields((prev) => {
-                        const newFields = [...prev]
-                        newFields.splice(index, 1)
-                        return newFields
-                      })
-                    }}
-                  />
+                  <Editable connection={connection}>
+                    <FieldForm
+                      trigger={<IconButton icon={<EditOutlined />} />}
+                      keys={keys}
+                      field={record}
+                      onSuccess={(f) => {
+                        setFields((prev) => {
+                          const newFields = [...prev]
+                          newFields[index] = f
+                          return newFields
+                        })
+                      }}
+                    />
+                  </Editable>
+                  <Editable connection={connection}>
+                    <DeleteField
+                      keys={keys}
+                      field={record}
+                      onSuccess={() => {
+                        setFields((prev) => {
+                          const newFields = [...prev]
+                          newFields.splice(index, 1)
+                          return newFields
+                        })
+                      }}
+                    />
+                  </Editable>
                 </Space>
               )
             }

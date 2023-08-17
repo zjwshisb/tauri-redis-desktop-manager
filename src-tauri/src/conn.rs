@@ -19,7 +19,7 @@ use tokio::sync::{mpsc::Sender, Mutex};
 /**
  * see https://redis.io/commands/cluster-nodes/
  */
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct Node {
     pub id: String,
     pub host: String,
@@ -31,21 +31,7 @@ pub struct Node {
     pub link_state: String,
     pub slot: String,
 }
-impl Clone for Node {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id.clone(),
-            host: self.host.clone(),
-            flags: self.flags.clone(),
-            master: self.master.clone(),
-            ping_sent: self.ping_sent.clone(),
-            pong_recv: self.pong_recv.clone(),
-            config_epoch: self.config_epoch.clone(),
-            link_state: self.link_state.clone(),
-            slot: self.slot.clone(),
-        }
-    }
-}
+
 impl Node {
     pub fn build(s: String) -> Self {
         let mut v: Vec<&str> = s.split(" ").collect();
@@ -306,6 +292,22 @@ impl ConnectionManager {
         self.execute_with(redis::cmd("CLIENT").arg("SETNAME").arg(&name), conn)
             .await?;
         Ok(())
+    }
+
+    pub async fn get_config(&self, cid: u32, name: &str) -> Result<Value, CusError> {
+        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
+            return self.get_config_with(name, conn).await;
+        }
+        return Err(CusError::App(String::from("Connection Not Found")));
+    }
+
+    pub async fn get_config_with(
+        &self,
+        name: &str,
+        conn: &mut CusConnection,
+    ) -> Result<Value, CusError> {
+        self.execute_with(redis::cmd("config").arg("get").arg(name), conn)
+            .await
     }
 
     // get redis server version

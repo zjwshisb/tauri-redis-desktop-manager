@@ -1,3 +1,5 @@
+import { WebviewWindow, type WindowLabel, type WindowOptions } from '@tauri-apps/api/window'
+
 export function getPageKey(name: string, conn: APP.Connection, db?: number) {
     let key = `${conn.id}|${name}`
     if (db !== undefined) {
@@ -25,4 +27,12 @@ export function versionCompare(v1: string, v2: string) {
         }
     }
     return result
+}
+
+export function openWindow(label: WindowLabel, options: WindowOptions) {
+    const webview = new WebviewWindow(label, options)
+    webview.once('tauri://created', function () {})
+    webview.once('tauri://error', function (e) {
+        webview.setFocus()
+    })
 }

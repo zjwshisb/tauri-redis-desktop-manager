@@ -152,8 +152,17 @@ const Index: React.FC<{
             ></Input.Password>
           </Form.Item>
           <Form.Item
+            tooltip={t('Other node will auto discover')}
             name="is_cluster"
-            label={t('Cluster')}
+            label={t('Cluster Mode')}
+            valuePropName="checked"
+          >
+            <Checkbox />
+          </Form.Item>
+          <Form.Item
+            tooltip={t('Any action may change the value will be prohibited')}
+            name="readonly"
+            label={t('Readonly Mode')}
             valuePropName="checked"
           >
             <Checkbox />

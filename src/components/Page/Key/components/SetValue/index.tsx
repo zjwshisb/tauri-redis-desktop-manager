@@ -8,6 +8,8 @@ import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
+import context from '../../context'
+import Editable from '@/components/Editable'
 
 interface SScanResp {
   cursor: string
@@ -29,6 +31,8 @@ const Index: React.FC<{
 
   const { t } = useTranslation()
   const [loading, setLoading] = React.useState(false)
+
+  const connection = React.useContext(context)
 
   const getFields = React.useCallback(
     async (reset = false) => {
@@ -73,12 +77,14 @@ const Index: React.FC<{
   return (
     <div>
       <Space className="pb-2">
-        <SAdd
-          keys={keys}
-          onSuccess={() => {
-            onRefresh()
-          }}
-        ></SAdd>
+        <Editable connection={connection}>
+          <SAdd
+            keys={keys}
+            onSuccess={() => {
+              onRefresh()
+            }}
+          ></SAdd>
+        </Editable>
       </Space>
       <CusTable
         loading={loading}
@@ -130,13 +136,15 @@ const Index: React.FC<{
             render(_, record, index) {
               return (
                 <Space>
-                  <SRem
-                    keys={keys}
-                    value={record.value}
-                    onSuccess={() => {
-                      onRefresh()
-                    }}
-                  ></SRem>
+                  <Editable connection={connection}>
+                    <SRem
+                      keys={keys}
+                      value={record.value}
+                      onSuccess={() => {
+                        onRefresh()
+                      }}
+                    ></SRem>
+                  </Editable>
                 </Space>
               )
             }

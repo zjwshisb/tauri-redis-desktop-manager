@@ -29,6 +29,7 @@
   "Info": "信息",
   "Value": "值",
   "Memory": "内存",
+  "Readonly Mode": "只读模式",
   "Length": "长度",
   "Host": "地址",
   "Version": "版本",
@@ -59,6 +60,7 @@
   "Load More": "加载更多",
   "search": "搜索",
   "Network": "网络",
+  "Node": "节点",
   "Action": "操作",
   "Close": "关闭",
   "Close Other Tags": "关闭其他",
@@ -80,5 +82,8 @@
   "Are you sure delete <{{name}}>?":"确定删除<{{name}}>?",
   "Are Sure Open A Monitor Page?":"确定打开一个monitor页面?",
   "Save Log To File": "保存日志到文件",
-  "Open In New Window": "新窗口打开"
+  "Open In New Window": "新窗口打开",
+  "Cluster Mode": "集群模式",
+  "Other node will auto discover": "其他节点会自动识别",
+  "Any action may change the value will be prohibited": "任何能改变值的操作将会被禁止"
 }

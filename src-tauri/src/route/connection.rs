@@ -12,6 +12,7 @@ struct AddArgs {
     port: i32,
     password: String,
     is_cluster: bool,
+    readonly: bool,
 }
 
 pub fn add(payload: String) -> Result<Connection, CusError> {
@@ -22,6 +23,7 @@ pub fn add(payload: String) -> Result<Connection, CusError> {
         port: args.port,
         password: args.password,
         is_cluster: args.is_cluster,
+        readonly: args.readonly,
         nodes: vec![],
         dbs: vec![],
     };
@@ -45,11 +47,12 @@ pub fn del(payload: String) -> Result<(), CusError> {
 
 #[derive(Deserialize, Debug)]
 struct UpdateArgs {
-    pub id: u32,
-    pub host: String,
-    pub port: i32,
-    pub password: String,
-    pub is_cluster: bool,
+    id: u32,
+    host: String,
+    port: i32,
+    password: String,
+    is_cluster: bool,
+    readonly: bool,
 }
 
 pub fn update(payload: String) -> Result<Connection, CusError> {
@@ -60,6 +63,7 @@ pub fn update(payload: String) -> Result<Connection, CusError> {
     connection.password = args.password;
     connection.port = args.port;
     connection.is_cluster = args.is_cluster;
+    connection.readonly = args.readonly;
     connection.save()
 }
 

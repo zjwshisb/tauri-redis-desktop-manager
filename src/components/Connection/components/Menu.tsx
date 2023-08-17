@@ -1,5 +1,10 @@
 import React from 'react'
-import { HomeOutlined, ControlOutlined, MenuOutlined } from '@ant-design/icons'
+import {
+  HomeOutlined,
+  ControlOutlined,
+  MenuOutlined,
+  NodeIndexOutlined
+} from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { Dropdown } from 'antd'
@@ -58,7 +63,7 @@ const Menu: React.FC<{
           key: 'node',
           label: (
             <div className="flex">
-              <ControlOutlined className="hover:text-blue-600" />
+              <NodeIndexOutlined className="hover:text-blue-600" />
               <div className="ml-2">{t('Node')}</div>
             </div>
           )

@@ -2,7 +2,7 @@ import React from 'react'
 import '@/i18n'
 import '@/App.css'
 import 'antd/dist/reset.css'
-import { Layout, ConfigProvider } from 'antd'
+import { Layout, ConfigProvider, FloatButton } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { observer } from 'mobx-react-lite'
 import { StyleProvider } from '@ant-design/cssinjs'
@@ -127,7 +127,13 @@ const App: React.FC = () => {
       <StyleProvider hashPriority="high">
         <Layout className="border-t">
           <Layout.Content className="h-screen w-screen flex  bg-white overflow-hidden">
-            <MacScrollbar className="p-4  w-full box-border">
+            <MacScrollbar className="p-4  w-full box-border" id="container">
+              <FloatButton.BackTop
+                target={() => {
+                  const target = document.getElementById('container')
+                  return target as HTMLElement
+                }}
+              />
               <div className="box-border">{children}</div>
             </MacScrollbar>
           </Layout.Content>

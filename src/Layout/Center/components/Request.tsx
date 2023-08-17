@@ -16,6 +16,7 @@ import TypeSelect from './TypeSelect'
 
 import { getPageKey } from '@/utils'
 import Add from './Add'
+import Editable from '@/components/Editable'
 
 interface SingleScanResp {
   cursor: string
@@ -159,28 +160,30 @@ const Index: React.FC<{
                 }}
               />
             </Tooltip>
-            <Add
-              onSuccess={(name: string) => {
-                const key = getPageKey(name, keyInfo.connection, keyInfo.db)
-                store.page.addPage({
-                  key,
-                  label: key,
-                  type: 'key',
-                  connection: keyInfo.connection,
-                  name,
-                  db: keyInfo.db,
-                  children: (
-                    <Key
-                      name={name}
-                      db={keyInfo.db}
-                      connection={keyInfo.connection}
-                      pageKey={key}
-                    ></Key>
-                  )
-                })
-              }}
-              info={keyInfo}
-            />
+            <Editable connection={keyInfo.connection}>
+              <Add
+                onSuccess={(name: string) => {
+                  const key = getPageKey(name, keyInfo.connection, keyInfo.db)
+                  store.page.addPage({
+                    key,
+                    label: key,
+                    type: 'key',
+                    connection: keyInfo.connection,
+                    name,
+                    db: keyInfo.db,
+                    children: (
+                      <Key
+                        name={name}
+                        db={keyInfo.db}
+                        connection={keyInfo.connection}
+                        pageKey={key}
+                      ></Key>
+                    )
+                  })
+                }}
+                info={keyInfo}
+              />
+            </Editable>
           </Space>
         </div>
       </div>

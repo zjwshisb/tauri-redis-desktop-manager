@@ -9,6 +9,8 @@ import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
+import context from '../../context'
+import Editable from '@/components/Editable'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -25,6 +27,8 @@ const Index: React.FC<{
   const { t } = useTranslation()
 
   const index = React.useRef(0)
+
+  const connection = React.useContext(context)
 
   const getFields = React.useCallback(
     async (reset = false) => {
@@ -70,18 +74,22 @@ const Index: React.FC<{
   return (
     <div>
       <Space className="pb-2">
-        <LInsert
-          keys={keys}
-          onSuccess={() => {
-            onRefresh()
-          }}
-        />
-        <LTrim
-          keys={keys}
-          onSuccess={() => {
-            onRefresh()
-          }}
-        />
+        <Editable connection={connection}>
+          <LInsert
+            keys={keys}
+            onSuccess={() => {
+              onRefresh()
+            }}
+          />
+        </Editable>
+        <Editable connection={connection}>
+          <LTrim
+            keys={keys}
+            onSuccess={() => {
+              onRefresh()
+            }}
+          />
+        </Editable>
       </Space>
       <CusTable
         showIndex={false}
@@ -116,20 +124,22 @@ const Index: React.FC<{
             render(_, record, index) {
               return (
                 <Space>
-                  <LSet
-                    keys={keys}
-                    index={index}
-                    value={record.value}
-                    onSuccess={(value, index) => {
-                      setItems((prev) => {
-                        const newState = [...prev]
-                        if (newState.length >= index + 1) {
-                          newState[index] = value
-                        }
-                        return newState
-                      })
-                    }}
-                  />
+                  <Editable connection={connection}>
+                    <LSet
+                      keys={keys}
+                      index={index}
+                      value={record.value}
+                      onSuccess={(value, index) => {
+                        setItems((prev) => {
+                          const newState = [...prev]
+                          if (newState.length >= index + 1) {
+                            newState[index] = value
+                          }
+                          return newState
+                        })
+                      }}
+                    />
+                  </Editable>
                 </Space>
               )
             }

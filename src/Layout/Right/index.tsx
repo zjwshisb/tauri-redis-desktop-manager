@@ -12,6 +12,35 @@ const Index: React.FC = () => {
 
   const ref = React.useRef<HTMLElement>(null)
 
+  const rightMenus = React.useMemo(() => {
+    return [
+      {
+        label: t('Open In New Window'),
+        key: 'window'
+      },
+      {
+        label: t('Close'),
+        key: 'close'
+      },
+      {
+        label: t('Close All Tags'),
+        key: 'all'
+      },
+      {
+        label: t('Close Other Tags'),
+        key: 'other'
+      },
+      {
+        label: t('Close Left Tags'),
+        key: 'left'
+      },
+      {
+        label: t('Close Right Tags'),
+        key: 'right'
+      }
+    ]
+  }, [t])
+
   return (
     <div className={'flex flex-1 h-screen bg-white box-border overflow-hidden'}>
       <MacScrollbar className="w-full p-4 " ref={ref} id={'container'}>
@@ -75,32 +104,7 @@ const Index: React.FC = () => {
                             }
                           }
                         },
-                        items: [
-                          {
-                            label: t('Open In New Window'),
-                            key: 'window'
-                          },
-                          {
-                            label: t('Close'),
-                            key: 'close'
-                          },
-                          {
-                            label: t('Close All Tags'),
-                            key: 'all'
-                          },
-                          {
-                            label: t('Close Other Tags'),
-                            key: 'other'
-                          },
-                          {
-                            label: t('Close Left Tags'),
-                            key: 'left'
-                          },
-                          {
-                            label: t('Close Right Tags'),
-                            key: 'right'
-                          }
-                        ]
+                        items: rightMenus
                       }}
                     >
                       <div className="max-w-xs truncate hover:context-menu">

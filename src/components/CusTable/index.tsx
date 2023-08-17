@@ -39,6 +39,7 @@ export default function CusTable<T extends object>(
   return (
     <div>
       <Table
+        size="small"
         pagination={false}
         bordered
         scroll={{

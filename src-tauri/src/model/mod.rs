@@ -12,6 +12,7 @@ pub struct Connection {
     pub is_cluster: bool,
     pub nodes: Vec<String>,
     pub dbs: Vec<u8>,
+    pub readonly: bool,
 }
 
 impl Connection {
@@ -21,8 +22,9 @@ impl Connection {
 
     pub fn first(id: u32) -> Result<Connection, CusError> {
         let conn = sqlite::get_sqlite_client()?;
-        let stmt_result = conn
-            .prepare("select id, host, port, password, is_cluster from connections where id= ?1");
+        let stmt_result = conn.prepare(
+            "select id, host, port, password, is_cluster, readonly from connections where id= ?1",
+        );
         match stmt_result {
             Ok(mut stmt) => {
                 return match stmt.query_row([id], |r| {
@@ -31,14 +33,20 @@ impl Connection {
                     if i > 0 {
                         is_cluster = true
                     }
+                    let mut readonly = false;
+                    let i: i64 = r.get(5).unwrap();
+                    if i > 0 {
+                        readonly = true
+                    }
                     Ok(Connection {
                         id: r.get(0).unwrap(),
                         host: r.get(1).unwrap(),
                         port: r.get(2).unwrap(),
                         password: r.get(3).unwrap(),
-                        is_cluster: is_cluster,
+                        is_cluster,
                         nodes: vec![],
                         dbs: vec![],
+                        readonly: readonly,
                     })
                 }) {
                     Ok(c) => {
@@ -59,9 +67,13 @@ impl Connection {
             if self.is_cluster {
                 is_cluster = 1;
             }
+            let mut readonly = 0;
+            if self.readonly {
+                readonly = 1;
+            }
             let r = conn.execute(
-                "UPDATE connections set host= ?1,port= ?2, password= ?3, is_cluster= ?4 where id = ?5",
-                params!(self.host, self.port, self.password,  is_cluster, self.id),
+                "UPDATE connections set host= ?1,port= ?2, password= ?3, is_cluster= ?4, readonly =?5 where id = ?6",
+                params!(self.host, self.port, self.password,  is_cluster, readonly, self.id),
             );
             match r {
                 Err(e) => {
@@ -102,7 +114,7 @@ impl Connection {
     pub fn all() -> Result<Vec<Connection>, CusError> {
         let conn = crate::sqlite::get_sqlite_client()?;
         let stmt_result =
-            conn.prepare("select id, host, port, password, is_cluster from connections");
+            conn.prepare("select id, host, port, password, is_cluster, readonly from connections");
         match stmt_result {
             Ok(mut stmt) => {
                 let connections_result = stmt.query_map([], |row| {
@@ -111,12 +123,18 @@ impl Connection {
                     if i > 0 {
                         is_cluster = true
                     }
+                    let mut readonly = false;
+                    let i: i64 = row.get(5).unwrap();
+                    if i > 0 {
+                        readonly = true
+                    }
                     Ok(Connection {
                         id: row.get(0).unwrap(),
                         host: row.get(1).unwrap(),
                         port: row.get(2).unwrap(),
                         password: row.get(3).unwrap(),
-                        is_cluster: is_cluster,
+                        is_cluster,
+                        readonly,
                         nodes: vec![],
                         dbs: vec![],
                     })

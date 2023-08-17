@@ -28,7 +28,8 @@ pub fn init_sqlite() {
             host  TEXT NOT NULL,
             port  INTEGER NOT NULL,
             password  TEXT,
-            is_cluster INTEGER NOT NULL DEFAULT 0
+            is_cluster INTEGER NOT NULL DEFAULT 0,
+            readonly INTEGER NOT NULL DEFAULT 0
         )",
             (), // empty list of parameters.
         )

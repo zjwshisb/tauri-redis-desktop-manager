@@ -10,6 +10,8 @@ import { EditOutlined } from '@ant-design/icons'
 import CusTable from '@/components/CusTable'
 import IconButton from '@/components/IconButton'
 import FieldViewer from '@/components/FieldViewer'
+import context from '../../context'
+import Editable from '@/components/Editable'
 
 interface ZScanResp {
   cursor: string
@@ -23,6 +25,8 @@ const Index: React.FC<{
   const store = useStore()
 
   const [items, setItems] = React.useState<APP.ZSetField[]>([])
+
+  const connection = React.useContext(context)
 
   const cursor = React.useRef('0')
   const [more, setMore] = React.useState(true)
@@ -69,14 +73,15 @@ const Index: React.FC<{
     <div>
       <div className="pb-2">
         <Space>
-          <Form
-            onSuccess={onRefresh}
-            keys={keys}
-            trigger={<Button type="primary">ZAdd</Button>}
-          ></Form>
+          <Editable connection={connection}>
+            <Form
+              onSuccess={onRefresh}
+              keys={keys}
+              trigger={<Button type="primary">ZAdd</Button>}
+            ></Form>
+          </Editable>
         </Space>
       </div>
-
       <CusTable
         more={more}
         onLoadMore={getFields}
@@ -128,19 +133,23 @@ const Index: React.FC<{
             render(_, record, index) {
               return (
                 <Space>
-                  <ZRem
-                    keys={keys}
-                    value={record.value}
-                    onSuccess={() => {
-                      onRefresh()
-                    }}
-                  ></ZRem>
-                  <Form
-                    onSuccess={onRefresh}
-                    keys={keys}
-                    field={record}
-                    trigger={<IconButton icon={<EditOutlined />} />}
-                  ></Form>
+                  <Editable connection={connection}>
+                    <ZRem
+                      keys={keys}
+                      value={record.value}
+                      onSuccess={() => {
+                        onRefresh()
+                      }}
+                    ></ZRem>
+                  </Editable>
+                  <Editable connection={connection}>
+                    <Form
+                      onSuccess={onRefresh}
+                      keys={keys}
+                      field={record}
+                      trigger={<IconButton icon={<EditOutlined />} />}
+                    ></Form>
+                  </Editable>
                 </Space>
               )
             }
