@@ -15,6 +15,7 @@ import Client from '@/components/Page/Client'
 import Info from '@/components/Page/Info'
 import Subscribe from './Subscribe'
 import Node from '@/components/Page/Node'
+import SlowLog from '@/components/Page/SlowLog'
 
 const Menu: React.FC<{
   connection: APP.Connection
@@ -41,6 +42,15 @@ const Menu: React.FC<{
           <div className="flex">
             <ControlOutlined className="hover:text-blue-600" />
             <div className="ml-2">{t('Client')}</div>
+          </div>
+        )
+      },
+      {
+        key: 'slow-log',
+        label: (
+          <div className="flex">
+            <ControlOutlined className="hover:text-blue-600" />
+            <div className="ml-2">{t('Slow Log')}</div>
           </div>
         )
       }
@@ -110,6 +120,17 @@ const Menu: React.FC<{
                 type: 'node',
                 key,
                 children: <Node connection={connection}></Node>,
+                connection
+              })
+              break
+            }
+            case 'slow-log': {
+              const key = getPageKey('slow-log', connection)
+              store.page.addPage({
+                label: key,
+                type: 'slow-log',
+                key,
+                children: <SlowLog connection={connection}></SlowLog>,
                 connection
               })
               break

@@ -1,22 +1,31 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { type ListRef } from 'rc-virtual-list'
-import { Spin } from 'antd'
+import { Spin, Input, Space, Tooltip } from 'antd'
 import { useDebounceFn } from 'ahooks'
 import useStore from '@/hooks/useStore'
 import ResizableDiv from '@/components/ResizableDiv'
-import Request from './components/Request'
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
+import List from './components/List'
+import LoadMore from './components/LoadMore'
+import Key from '@/components/Page/Key'
+import TypeSelect from './components/TypeSelect'
 
-const Index: React.FC = () => {
+import { getPageKey } from '@/utils'
+import Add from './components/Add'
+import Editable from '@/components/Editable'
+import { useKeyScan, type UseKeyScanFilter } from '@/hooks/useKeyScan'
+import { type KeyInfo } from '@/store/key'
+
+const Index: React.FC<{
+  info: KeyInfo
+}> = ({ info }) => {
   const store = useStore()
 
   const listRef = React.useRef<ListRef>(null)
 
   const id = React.useId()
-
-  const info = React.useMemo(() => {
-    return store.keyInfo.info
-  }, [store.keyInfo.info])
 
   const [loading, setLoading] = React.useState(false)
 
@@ -44,6 +53,34 @@ const Index: React.FC = () => {
     }
   }, [getListHeightDb])
 
+  const { t } = useTranslation()
+
+  const [params, setParams] = React.useState<UseKeyScanFilter>({
+    types: '',
+    search: ''
+  })
+
+  const onSearchChange = useDebounceFn((s: string) => {
+    setParams((prev) => {
+      return {
+        ...prev,
+        search: s
+      }
+    })
+  })
+
+  const { keys, getKeys, more } = useKeyScan(info.connection, info.db, params, {
+    beforeGet() {
+      setLoading(true)
+    },
+    afterGet(reset: boolean) {
+      if (reset) {
+        listRef.current?.scrollTo(0)
+      }
+      setLoading(false)
+    }
+  })
+
   if (info == null) {
     return <></>
   }
@@ -60,12 +97,70 @@ const Index: React.FC = () => {
           className="flex flex-col h-screen overflow-hidden   bg-white"
           id={id}
         >
-          <Request
-            keyInfo={info}
-            onLoadingChange={setLoading}
+          <div className="py-2 px-2  bg-white flex item-center border-b">
+            <Input
+              prefix={<SearchOutlined />}
+              placeholder={t('search').toString()}
+              allowClear
+              onChange={(e) => {
+                onSearchChange.run(e.target.value)
+              }}
+            />
+            <div className="flex-shrink-0 flex item-center px-2 justify-center">
+              <Space>
+                <TypeSelect
+                  connection={info.connection}
+                  onChange={(e) => {
+                    setParams((prev) => {
+                      return {
+                        ...prev,
+                        types: e
+                      }
+                    })
+                  }}
+                />
+                <Tooltip title={t('Refresh')}>
+                  <ReloadOutlined
+                    className="hover:cursor-pointer text-lg"
+                    onClick={() => {
+                      getKeys(true)
+                    }}
+                  />
+                </Tooltip>
+                <Editable connection={info.connection}>
+                  <Add
+                    onSuccess={(name: string) => {
+                      const key = getPageKey(name, info.connection, info.db)
+                      store.page.addPage({
+                        key,
+                        label: key,
+                        type: 'key',
+                        connection: info.connection,
+                        name,
+                        db: info.db,
+                        children: (
+                          <Key
+                            name={name}
+                            db={info.db}
+                            connection={info.connection}
+                            pageKey={key}
+                          ></Key>
+                        )
+                      })
+                    }}
+                    info={info}
+                  />
+                </Editable>
+              </Space>
+            </div>
+          </div>
+          <List info={info} keys={keys} height={listHeight} listRef={listRef} />
+          <LoadMore
+            disabled={!more}
             loading={loading}
-            listHeight={listHeight}
-            listRef={listRef}
+            onClick={() => {
+              getKeys()
+            }}
           />
         </div>
       </Spin>

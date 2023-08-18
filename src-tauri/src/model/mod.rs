@@ -2,6 +2,7 @@ use crate::{err::CusError, sqlite};
 
 use rusqlite::{self, params};
 use serde::Serialize;
+pub mod redis;
 
 #[derive(Debug, Serialize)]
 pub struct Connection {

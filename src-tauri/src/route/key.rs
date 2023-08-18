@@ -2,6 +2,7 @@ use crate::{
     conn::ConnectionManager,
     err::{self, CusError},
     key::Key,
+    model::redis::ScanResult,
 };
 use redis::FromRedisValue;
 use redis::Value;
@@ -15,17 +16,12 @@ struct ScanArgs {
     count: i64,
     types: String,
 }
-#[derive(Serialize)]
-pub struct ScanResp<T> {
-    cursor: String,
-    keys: Vec<T>,
-}
 
 pub async fn scan<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
-) -> Result<ScanResp<String>, CusError> {
+) -> Result<ScanResult, CusError> {
     let args: ScanArgs = serde_json::from_str(&payload)?;
 
     let mut cmd = redis::cmd("scan");
@@ -42,21 +38,7 @@ pub async fn scan<'r>(
         cmd.arg(&["TYPE", &args.types]);
     }
     let value = manager.execute(cid, args.db, &mut cmd).await?;
-    return match value {
-        Value::Bulk(s) => {
-            let mut keys: Vec<String> = vec![];
-            let cursor = String::from_redis_value(s.get(0).unwrap())?;
-            let keys_vec = s.get(1);
-            if let Some(s) = keys_vec {
-                keys = Vec::from_redis_value(&s)?;
-            };
-            return Ok(ScanResp {
-                cursor: cursor,
-                keys: keys,
-            });
-        }
-        _ => Err(err::new_normal()),
-    };
+    Ok(ScanResult::build(&value))
 }
 
 #[derive(Deserialize)]
@@ -196,7 +178,7 @@ pub async fn add<'r>(
                 .execute(
                     cid,
                     args.db,
-                    redis::cmd("hset")
+                    redis::cmd("HSET")
                         .arg(&args.name)
                         .arg("rust")
                         .arg("Hello World"),
@@ -236,28 +218,25 @@ pub async fn add<'r>(
 }
 
 #[derive(Deserialize)]
-struct SetbitArgs {
-    offset: i64,
-    value: i64,
-    db: u8,
+struct MemoryUsageArgs {
     name: String,
+    db: u8,
 }
-
-pub async fn setbit<'r>(
+pub async fn memory_usage<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: SetbitArgs = serde_json::from_str(&payload)?;
-    let value: Value = manager
+    let args: MemoryUsageArgs = serde_json::from_str(&payload)?;
+    let value = manager
         .execute(
             cid,
             args.db,
-            redis::cmd("setbit")
-                .arg(args.name)
-                .arg(args.offset)
-                .arg(args.value),
+            redis::cmd("memory")
+                .arg("usage")
+                .arg(&args.name)
+                .arg(&["SAMPLES", "0"]),
         )
         .await?;
-    Ok(i64::from_redis_value(&value).unwrap())
+    Ok(i64::from_redis_value(&value)?)
 }

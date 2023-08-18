@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
 use crate::{
-    conn::{ConnectionManager, CusConnection, Node},
-    err::{new_normal, CusError},
-    model::Connection,
+    conn::{ConnectionManager, CusConnection},
+    err::CusError,
+    model::redis::Node,
+    model::{redis::ScanResult, Connection},
 };
-use redis::{FromRedisValue, Value};
+use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
 
 pub async fn get_nodes<'r>(
@@ -70,23 +71,12 @@ pub async fn scan<'r>(
                     cmd.arg(&["TYPE", &args.types]);
                 }
                 let value = manager.execute_with(&mut cmd, &mut conn).await?;
-                match value {
-                    Value::Bulk(s) => {
-                        let cursor = String::from_redis_value(s.get(0).unwrap())?;
-                        let keys_vec = s.get(1);
-                        if let Some(s) = keys_vec {
-                            let mut keys = Vec::from_redis_value(&s)?;
-                            resp.keys.append(&mut keys);
-                            let mut node_cursor: HashMap<String, String> = HashMap::new();
-                            node_cursor.insert(String::from("cursor"), cursor);
-                            node_cursor.insert(String::from("node"), node.clone());
-                            resp.cursor.push(node_cursor);
-                        };
-                    }
-                    _ => {
-                        return Err(new_normal());
-                    }
-                };
+                let mut result = ScanResult::build(&value);
+                let mut node_cursor: HashMap<String, String> = HashMap::new();
+                node_cursor.insert(String::from("cursor"), result.cursor);
+                node_cursor.insert(String::from("node"), node.clone());
+                resp.keys.append(&mut result.keys);
+                resp.cursor.push(node_cursor);
             }
         }
     }

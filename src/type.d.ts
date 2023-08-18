@@ -23,6 +23,15 @@ declare namespace APP {
     slot: string
   }
 
+  interface SlowLog {
+    id: number
+    processed_at: number
+    time: number
+    cmd: string
+    client_ip: string
+    client_name: string
+  }
+
   interface BaseKey<T, V> {
     name: string
     types: T

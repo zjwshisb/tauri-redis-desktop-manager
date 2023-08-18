@@ -3,7 +3,7 @@ import type React from 'react'
 import spark from 'spark-md5'
 import { openWindow } from '@/utils'
 
-export type Page = MonitorPage | InfoPage | KeyPage | ClientPage | PubsubPage | NodePage
+export type Page = MonitorPage | InfoPage | KeyPage | ClientPage | PubsubPage | NodePage | SlowLogPage
 
 interface BasePage {
   label: React.ReactNode
@@ -35,6 +35,10 @@ type KeyPage = BasePage & {
   type: 'key'
   name: string
   db: number
+}
+
+type SlowLogPage = BasePage & {
+  type: 'slow-log'
 }
 
 class PageStore {
@@ -109,6 +113,9 @@ class PageStore {
         break
       }
       case 'node': {
+        break
+      }
+      case 'slow-log': {
         break
       }
       default: {

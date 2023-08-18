@@ -5,7 +5,7 @@ use crate::err::CusError;
 use crate::model::Connection as Conn;
 use crate::{response, utils};
 use chrono::prelude::*;
-
+use futures::future::ok;
 use redis::aio::{Connection, ConnectionLike};
 use redis::cluster::ClusterClient;
 use redis::cluster_async::ClusterConnection;
@@ -14,47 +14,8 @@ use redis::{Arg, Client, FromRedisValue, Value};
 use serde::Serialize;
 use tokio::time::timeout;
 
+use crate::model::redis::Node;
 use tokio::sync::{mpsc::Sender, Mutex};
-
-/**
- * see https://redis.io/commands/cluster-nodes/
- */
-#[derive(Serialize, Clone)]
-pub struct Node {
-    pub id: String,
-    pub host: String,
-    pub flags: String,
-    pub master: String,
-    pub ping_sent: i64,
-    pub pong_recv: i64,
-    pub config_epoch: String,
-    pub link_state: String,
-    pub slot: String,
-}
-
-impl Node {
-    pub fn build(s: String) -> Self {
-        let mut v: Vec<&str> = s.split(" ").collect();
-        let get_fn = |v: &mut Vec<&str>, index: usize| -> String {
-            if v.len() > index {
-                return String::from(v.remove(index));
-            }
-            "".to_string()
-        };
-        let node = Self {
-            id: get_fn(&mut v, 0),
-            host: get_fn(&mut v, 0),
-            flags: get_fn(&mut v, 0),
-            master: get_fn(&mut v, 0),
-            ping_sent: get_fn(&mut v, 0).parse::<i64>().unwrap_or_default(),
-            pong_recv: get_fn(&mut v, 0).parse::<i64>().unwrap_or_default(),
-            config_epoch: get_fn(&mut v, 0),
-            link_state: get_fn(&mut v, 0),
-            slot: get_fn(&mut v, 0),
-        };
-        node
-    }
-}
 
 #[derive(Serialize)]
 pub struct CusCmd {
@@ -244,9 +205,6 @@ impl CusConnection {
     }
 }
 
-/**
- * connection manager state
- */
 impl ConnectionLike for CusConnection {
     fn req_packed_command<'a>(
         &'a mut self,
@@ -269,6 +227,9 @@ impl ConnectionLike for CusConnection {
     }
 }
 
+/**
+ * connection manager state
+ */
 pub struct ConnectionManager {
     pub map: Mutex<HashMap<u32, CusConnection>>,
     debug_tx: Mutex<Vec<Sender<CusCmd>>>,
@@ -294,20 +255,45 @@ impl ConnectionManager {
         Ok(())
     }
 
-    pub async fn get_config(&self, cid: u32, name: &str) -> Result<Value, CusError> {
+    pub async fn get_config(
+        &self,
+        cid: u32,
+        pattern: &str,
+    ) -> Result<HashMap<String, String>, CusError> {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
-            return self.get_config_with(name, conn).await;
+            return self.get_config_with(pattern, conn).await;
         }
         return Err(CusError::App(String::from("Connection Not Found")));
     }
 
     pub async fn get_config_with(
         &self,
-        name: &str,
+        pattern: &str,
         conn: &mut CusConnection,
-    ) -> Result<Value, CusError> {
-        self.execute_with(redis::cmd("config").arg("get").arg(name), conn)
-            .await
+    ) -> Result<HashMap<String, String>, CusError> {
+        let value: Value = self
+            .execute_with(redis::cmd("config").arg("get").arg(pattern), conn)
+            .await?;
+        let vec: Vec<String> = Vec::from_redis_value(&value)?;
+        let mut map = HashMap::new();
+
+        let mut i: usize = 0;
+        while i < vec.len() {
+            if let Some(key) = vec.get(i) {
+                if let Some(value) = vec.get(i + 1) {
+                    map.insert(key.clone(), value.clone());
+                }
+            }
+            i += 2;
+        }
+        Ok(map)
+    }
+
+    pub async fn get_version(&self, cid: u32) -> Result<String, CusError> {
+        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
+            return self.get_version_with(conn).await;
+        }
+        return Err(CusError::App(String::from("Connection Not Found")));
     }
 
     // get redis server version
@@ -319,13 +305,6 @@ impl ConnectionManager {
             }
         }
         Ok(String::from(""))
-    }
-
-    pub async fn get_version(&self, cid: u32) -> Result<String, CusError> {
-        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
-            return self.get_version_with(conn).await;
-        }
-        return Err(CusError::App(String::from("Connection Not Found")));
     }
 
     pub async fn get_info(&self, cid: u32) -> Result<Vec<HashMap<String, String>>, CusError> {

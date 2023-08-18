@@ -1,14 +1,7 @@
 import React from 'react'
-import '@/i18n'
-import '@/App.css'
-import 'antd/dist/reset.css'
-import { Layout, ConfigProvider, FloatButton } from 'antd'
-import { useTranslation } from 'react-i18next'
+
 import { observer } from 'mobx-react-lite'
-import { StyleProvider } from '@ant-design/cssinjs'
-import enUS from 'antd/locale/en_US'
-import zhCN from 'antd/locale/zh_CN'
-import { type Locale } from 'antd/es/locale'
+
 import 'mac-scrollbar/dist/mac-scrollbar.css'
 import Key from '@/components/Page/Key'
 
@@ -20,28 +13,27 @@ import Client from '@/components/Page/Client'
 import Monitor from '@/components/Page/Monitor'
 import Pubsub from '@/components/Page/Pubsub'
 import Node from '@/components/Page/Node'
-
-const langs: Record<string, Locale> = {
-  zh_CN: zhCN,
-  en_US: enUS
-}
+import { type Page } from '@/store/page'
+import SlowLog from '@/components/Page/SlowLog'
+import AppLayout from '@/components/AppLayout'
+import { FloatButton } from 'antd'
 
 const App: React.FC = () => {
-  const { i18n } = useTranslation()
-
-  const locale = React.useMemo(() => {
-    return langs[i18n.language]
-  }, [i18n.language])
-
   const store = useStore()
 
   React.useEffect(() => {
     store.connection.fetchConnections()
   }, [store.connection])
 
-  const params = useSearchParam<
-    'name' | 'cid' | 'db' | 'key' | 'type' | 'file' | 'channels'
-  >()
+  const params = useSearchParam<{
+    name: string
+    cid: string
+    db: string
+    key: string
+    type: Page['type']
+    file: string
+    channels: string
+  }>()
 
   const connection = React.useMemo(() => {
     if (params.cid !== undefined) {
@@ -109,6 +101,9 @@ const App: React.FC = () => {
           node = <Node connection={connection}></Node>
           break
         }
+        case 'slow-log': {
+          node = <SlowLog connection={connection}></SlowLog>
+        }
       }
     }
     return node
@@ -123,23 +118,17 @@ const App: React.FC = () => {
   ])
 
   return (
-    <ConfigProvider locale={locale}>
-      <StyleProvider hashPriority="high">
-        <Layout className="border-t">
-          <Layout.Content className="h-screen w-screen flex  bg-white overflow-hidden">
-            <MacScrollbar className="p-4  w-full box-border" id="container">
-              <FloatButton.BackTop
-                target={() => {
-                  const target = document.getElementById('container')
-                  return target as HTMLElement
-                }}
-              />
-              <div className="box-border">{children}</div>
-            </MacScrollbar>
-          </Layout.Content>
-        </Layout>
-      </StyleProvider>
-    </ConfigProvider>
+    <AppLayout>
+      <MacScrollbar className="p-4  w-full box-border" id="container">
+        <FloatButton.BackTop
+          target={() => {
+            const target = document.getElementById('container')
+            return target as HTMLElement
+          }}
+        />
+        <div className="box-border">{children}</div>
+      </MacScrollbar>
+    </AppLayout>
   )
 }
 
