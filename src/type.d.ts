@@ -43,10 +43,12 @@ declare namespace APP {
     length: number
   }
 
-  interface HashField {
+  interface Field {
     name: string
     value: string
   }
+
+  type HashField = Field
 
   interface ZSetField {
     value: string
@@ -79,11 +81,11 @@ declare namespace APP {
   }
 
   interface RedisCmd {
-     id: string
-     cmd: string
-     response: string
-     host: string
-     created_at: string
-     duration: number
+    id: string
+    cmd: string
+    response: string
+    host: string
+    created_at: string
+    duration: number
   }
 }

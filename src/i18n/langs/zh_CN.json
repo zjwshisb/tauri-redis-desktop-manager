@@ -27,8 +27,11 @@
   "Language": "语言",
   "Client" :"客户端",
   "Info": "信息",
+  "Name" : "名称",
   "Value": "值",
   "Memory": "内存",
+  "Config": "配置",
+  "Edit Config": "修改配置",
   "Readonly Mode": "只读模式",
   "Length": "长度",
   "Host": "地址",
@@ -68,6 +71,7 @@
   "Close Left Tags": "关闭左边所有",
   "Close Right Tags": "关闭右边所有",
   "Are you sure delete this connection?": "确定删除该连接？",
+  "Are you sure do this action?": "确定执行此操作?",
   "Delete Connection": "删除连接",
   "Edit Connection": "编辑连接",
   "Close Connection": "关闭连接",
@@ -84,6 +88,8 @@
   "Save Log To File": "保存日志到文件",
   "Open In New Window": "新窗口打开",
   "Cluster Mode": "集群模式",
+  "Slow Log": "慢日志",
   "Other node will auto discover": "其他节点会自动识别",
-  "Any action may change the value will be prohibited": "任何能改变值的操作将会被禁止"
+  "Any action may change the value will be prohibited": "任何能改变值的操作将会被禁止",
+  "Detailed In": "详情可见"
 }

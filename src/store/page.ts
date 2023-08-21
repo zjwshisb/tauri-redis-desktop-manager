@@ -3,7 +3,15 @@ import type React from 'react'
 import spark from 'spark-md5'
 import { openWindow } from '@/utils'
 
-export type Page = MonitorPage | InfoPage | KeyPage | ClientPage | PubsubPage | NodePage | SlowLogPage
+export type Page =
+  | MonitorPage
+  | InfoPage
+  | KeyPage
+  | ClientPage
+  | PubsubPage
+  | NodePage
+  | SlowLogPage
+  | ConfigPage
 
 interface BasePage {
   label: React.ReactNode
@@ -36,9 +44,11 @@ type KeyPage = BasePage & {
   name: string
   db: number
 }
-
 type SlowLogPage = BasePage & {
   type: 'slow-log'
+}
+type ConfigPage = BasePage & {
+  type: 'config'
 }
 
 class PageStore {
@@ -84,6 +94,7 @@ class PageStore {
           this.active = this.pages[this.pages.length - 1].key
         }
       }
+      console.log(this.active)
     }
   }
 
@@ -91,25 +102,25 @@ class PageStore {
     this.pages = pages
   }
 
-  openNewWindowPage(p: Page) {
+  async openNewWindowPage(p: Page) {
     let url = `/src/windows/detail/index.html?type=${p.type}&cid=${p.connection.id}`
     switch (p.type) {
       case 'key': {
         url += `&db=${p.db}&key=${encodeURI(p.key)}&name=${encodeURI(p.name)}`
         break
       }
-      case 'info': {
-        break
-      }
       case 'monitor': {
         url += `&file=${p.file ? 1 : 0}`
         break
       }
-      case 'client': {
-        break
-      }
       case 'pubsub': {
         url += `&db=${p.db}&channels=${p.channels.join(',')}`
+        break
+      }
+      case 'info': {
+        break
+      }
+      case 'client': {
         break
       }
       case 'node': {
@@ -118,18 +129,22 @@ class PageStore {
       case 'slow-log': {
         break
       }
+      case 'config': {
+        break
+      }
       default: {
         url = ''
         break
       }
     }
     if (url !== '') {
-      this.removePage(p.key)
-      openWindow(spark.hash(p.key), {
+      await openWindow(spark.hash(p.key), {
         url,
         title: p.key,
         focus: true
       })
+    } else {
+      return await Promise.reject(new Error('invalid page'))
     }
   }
 

@@ -3,7 +3,9 @@ import {
   HomeOutlined,
   ControlOutlined,
   MenuOutlined,
-  NodeIndexOutlined
+  NodeIndexOutlined,
+  UnorderedListOutlined,
+  SettingOutlined
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
@@ -16,6 +18,7 @@ import Info from '@/components/Page/Info'
 import Subscribe from './Subscribe'
 import Node from '@/components/Page/Node'
 import SlowLog from '@/components/Page/SlowLog'
+import Config from '@/components/Page/Config'
 
 const Menu: React.FC<{
   connection: APP.Connection
@@ -49,8 +52,17 @@ const Menu: React.FC<{
         key: 'slow-log',
         label: (
           <div className="flex">
-            <ControlOutlined className="hover:text-blue-600" />
+            <UnorderedListOutlined className="hover:text-blue-600" />
             <div className="ml-2">{t('Slow Log')}</div>
+          </div>
+        )
+      },
+      {
+        key: 'config',
+        label: (
+          <div className="flex">
+            <SettingOutlined className="hover:text-blue-600" />
+            <div className="ml-2">{t('Config')}</div>
           </div>
         )
       }
@@ -131,6 +143,17 @@ const Menu: React.FC<{
                 type: 'slow-log',
                 key,
                 children: <SlowLog connection={connection}></SlowLog>,
+                connection
+              })
+              break
+            }
+            case 'config': {
+              const key = getPageKey('config', connection)
+              store.page.addPage({
+                label: key,
+                type: 'config',
+                key,
+                children: <Config connection={connection}></Config>,
                 connection
               })
               break

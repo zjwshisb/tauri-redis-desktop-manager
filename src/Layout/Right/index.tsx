@@ -41,6 +41,10 @@ const Index: React.FC = () => {
     ]
   }, [t])
 
+  React.useEffect(() => {
+    console.log(store.page.active)
+  }, [store.page.active])
+
   return (
     <div className={'flex flex-1 h-screen bg-white box-border overflow-hidden'}>
       <MacScrollbar className="w-full p-4 " ref={ref} id={'container'}>
@@ -79,7 +83,9 @@ const Index: React.FC = () => {
                         onClick(e) {
                           switch (e.key) {
                             case 'window': {
-                              store.page.openNewWindowPage(v)
+                              store.page.openNewWindowPage(v).then(() => {
+                                store.page.removePage(v.key)
+                              })
                               break
                             }
                             case 'close': {

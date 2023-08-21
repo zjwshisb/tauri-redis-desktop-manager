@@ -17,6 +17,7 @@ import { type Page } from '@/store/page'
 import SlowLog from '@/components/Page/SlowLog'
 import AppLayout from '@/components/AppLayout'
 import { FloatButton } from 'antd'
+import Config from '@/components/Page/Config'
 
 const App: React.FC = () => {
   const store = useStore()
@@ -103,6 +104,11 @@ const App: React.FC = () => {
         }
         case 'slow-log': {
           node = <SlowLog connection={connection}></SlowLog>
+          break
+        }
+        case 'config': {
+          node = <Config connection={connection}></Config>
+          break
         }
       }
     }
