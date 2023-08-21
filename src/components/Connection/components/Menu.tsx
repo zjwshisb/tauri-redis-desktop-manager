@@ -19,6 +19,7 @@ import Subscribe from './Subscribe'
 import Node from '@/components/Page/Node'
 import SlowLog from '@/components/Page/SlowLog'
 import Config from '@/components/Page/Config'
+import MemoryAnalysis from '@/components/Page/MemoryAnalysis'
 
 const Menu: React.FC<{
   connection: APP.Connection
@@ -63,6 +64,15 @@ const Menu: React.FC<{
           <div className="flex">
             <SettingOutlined className="hover:text-blue-600" />
             <div className="ml-2">{t('Config')}</div>
+          </div>
+        )
+      },
+      {
+        key: 'memory',
+        label: (
+          <div className="flex">
+            <SettingOutlined className="hover:text-blue-600" />
+            <div className="ml-2">{t('Memory Analysis')}</div>
           </div>
         )
       }
@@ -154,6 +164,19 @@ const Menu: React.FC<{
                 type: 'config',
                 key,
                 children: <Config connection={connection}></Config>,
+                connection
+              })
+              break
+            }
+            case 'memory': {
+              const key = getPageKey('memory', connection)
+              store.page.addPage({
+                label: key,
+                type: 'memory-analysis',
+                key,
+                children: (
+                  <MemoryAnalysis connection={connection}></MemoryAnalysis>
+                ),
                 connection
               })
               break

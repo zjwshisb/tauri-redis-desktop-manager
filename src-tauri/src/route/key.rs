@@ -238,5 +238,8 @@ pub async fn memory_usage<'r>(
                 .arg(&["SAMPLES", "0"]),
         )
         .await?;
-    Ok(i64::from_redis_value(&value)?)
+    match value {
+        Value::Int(v) => return Ok(v),
+        _ => Ok(0),
+    }
 }

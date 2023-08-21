@@ -12,6 +12,7 @@ export type Page =
   | NodePage
   | SlowLogPage
   | ConfigPage
+  | MemoryAnalysisPage
 
 interface BasePage {
   label: React.ReactNode
@@ -49,6 +50,9 @@ type SlowLogPage = BasePage & {
 }
 type ConfigPage = BasePage & {
   type: 'config'
+}
+type MemoryAnalysisPage = BasePage & {
+  type: 'memory-analysis'
 }
 
 class PageStore {
@@ -115,6 +119,9 @@ class PageStore {
       }
       case 'pubsub': {
         url += `&db=${p.db}&channels=${p.channels.join(',')}`
+        break
+      }
+      case 'memory-analysis': {
         break
       }
       case 'info': {

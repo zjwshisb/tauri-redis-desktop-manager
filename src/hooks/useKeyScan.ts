@@ -54,7 +54,7 @@ export function useKeyScan(
   const last = useLatest(options)
 
   const getKeys = React.useCallback(
-    (reset: boolean = false) => {
+    async (reset: boolean = false) => {
       if (last.current?.beforeGet != null) {
         last.current?.beforeGet(reset)
       }
@@ -65,42 +65,45 @@ export function useKeyScan(
       if (connection.is_cluster) {
         path = 'cluster/scan'
       }
-      request<SingleScanResp | ClusterScanResp>(path, connection.id, {
-        cursor: cursor.current,
-        count: store.setting.setting.key_count,
-        db,
-        ...params
-      })
-        .then((res) => {
-          if (isArray(res.data.cursor)) {
-            const respCursor = res.data.cursor.filter((v) => {
-              return v.cursor !== '0'
-            })
-            if (respCursor.length === 0) {
-              setMore(false)
-            } else {
-              setMore(true)
-            }
-          } else if (isString(res.data.cursor)) {
-            if (res.data.cursor === '0') {
-              setMore(false)
-            } else {
-              setMore(true)
-            }
-          }
-          cursor.current = res.data.cursor
-          if (last.current?.afterGet != null) {
-            last.current.afterGet(reset)
-          }
-          if (reset) {
-            setKeys(res.data.keys)
+      return await request<SingleScanResp | ClusterScanResp>(
+        path,
+        connection.id,
+        {
+          cursor: cursor.current,
+          count: store.setting.setting.key_count,
+          db,
+          ...params
+        }
+      ).then((res) => {
+        if (isArray(res.data.cursor)) {
+          const respCursor = res.data.cursor.filter((v) => {
+            return v.cursor !== '0'
+          })
+          if (respCursor.length === 0) {
+            setMore(false)
           } else {
-            setKeys((pre) => {
-              return [...pre].concat(res.data.keys)
-            })
+            setMore(true)
           }
-        })
-        .finally(() => {})
+        } else if (isString(res.data.cursor)) {
+          if (res.data.cursor === '0') {
+            setMore(false)
+          } else {
+            setMore(true)
+          }
+        }
+        cursor.current = res.data.cursor
+        if (last.current?.afterGet != null) {
+          last.current.afterGet(reset)
+        }
+        if (reset) {
+          setKeys(res.data.keys)
+        } else {
+          setKeys((pre) => {
+            return [...pre].concat(res.data.keys)
+          })
+        }
+        return res.data.keys
+      })
     },
     [
       params,

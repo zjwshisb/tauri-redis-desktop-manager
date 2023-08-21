@@ -17,6 +17,8 @@ export default async function request<T>(
     }
     const res = await invoke('dispatch', params)
     const data = JSON.parse(res as string)
+    console.log(path, JSON.stringify(args), data)
+
     return data as Response<T>
   } catch (err) {
     notification.error({

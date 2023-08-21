@@ -22,15 +22,3 @@ const App: React.FC = () => {
 }
 
 export default observer(App)
-
-function test(current: number, count: number, interval = 10) {
-  const total = 10 * 8 + count
-  setTimeout(() => {
-    current += 1
-    // 改变对应的样式
-    console.log(current)
-    if (current < total) {
-      test(current, count, interval)
-    }
-  }, 100 + interval * current)
-}

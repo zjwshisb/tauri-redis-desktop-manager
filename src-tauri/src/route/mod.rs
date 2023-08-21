@@ -58,7 +58,7 @@ pub async fn dispatch<'r>(
         "key/del" => Response::new(key::del(payload, cid, manager).await?),
         "key/get" => Response::new(key::get(payload, cid, manager).await?),
         "key/set" => Response::new(key::set(payload, cid, manager).await?),
-        "key/memory_usage" => Response::new(key::memory_usage(payload, cid, manager).await?),
+        "key/memory-usage" => Response::new(key::memory_usage(payload, cid, manager).await?),
         "key/expire" => Response::new(key::expire(payload, cid, manager).await?),
         "db/dbsize" => Response::new(db::dbsize(payload, cid, manager).await?),
         "client/list" => Response::new(client::list(payload, cid, manager).await?),

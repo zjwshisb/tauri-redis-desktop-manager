@@ -88,6 +88,7 @@ const Index: React.FC = () => {
                               })
                               break
                             }
+
                             case 'close': {
                               store.page.removePage(v.key)
                               break
