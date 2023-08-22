@@ -60,7 +60,7 @@ const Index: React.FC<{
                 }}
                 className={classNames([
                   'hover:cursor-pointer border-none h-[37px]',
-                  'hover:bg-gray-100 '
+                  'hover:bg-gray-100'
                 ])}
               >
                 <Typography.Text ellipsis={true}>{v}</Typography.Text>

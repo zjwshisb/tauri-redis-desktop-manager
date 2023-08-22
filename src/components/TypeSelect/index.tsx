@@ -8,12 +8,13 @@ import VersionAccess from '@/components/VersionAccess'
 const TypeSelect: React.FC<{
   connection: APP.Connection
   onChange: (key: string) => void
+  className?: string
+  selectClassName?: string
+  value?: string
 }> = (props) => {
   const { t } = useTranslation()
 
   const keyTypes = useKeyTypes()
-
-  const [value, setValue] = React.useState('')
 
   const options = React.useMemo(() => {
     return [
@@ -26,15 +27,16 @@ const TypeSelect: React.FC<{
 
   return (
     <VersionAccess version="6.0.0" connection={props.connection}>
-      <Select
-        className="w-28"
-        options={options}
-        value={value}
-        onSelect={(e) => {
-          setValue(e)
-          props.onChange(e)
-        }}
-      ></Select>
+      <div className={props.className}>
+        <Select
+          className={props.selectClassName}
+          options={options}
+          value={props.value}
+          onSelect={(e) => {
+            props.onChange(e)
+          }}
+        ></Select>
+      </div>
     </VersionAccess>
   )
 }

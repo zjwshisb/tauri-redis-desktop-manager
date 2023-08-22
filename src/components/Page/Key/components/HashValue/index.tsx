@@ -1,8 +1,6 @@
-import React, { useContext } from 'react'
-import request from '@/utils/request'
+import React, { useContext, useState } from 'react'
 import { Button, Space, Input } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
-import useStore from '@/hooks/useStore'
 import FieldForm from './components/FieldForm'
 import DeleteField from './components/DeleteField'
 import { useTranslation } from 'react-i18next'
@@ -11,64 +9,19 @@ import FieldViewer from '@/components/FieldViewer'
 import IconButton from '@/components/IconButton'
 import context from '../../context'
 import Editable from '@/components/Editable'
+import { useFieldScan } from '@/hooks/useFieldScan'
 
 const Index: React.FC<{
   keys: APP.HashKey
 }> = ({ keys }) => {
-  const store = useStore()
-
-  const [fields, setFields] = React.useState<APP.HashField[]>([])
-  const cursor = React.useRef('0')
-  const [more, setMore] = React.useState(true)
-  const search = React.useRef('')
-
-  const [loading, setLoading] = React.useState(false)
-
+  const connection = useContext(context)
+  const [params, setParams] = useState({
+    search: ''
+  })
   const { t } = useTranslation()
 
-  const connection = useContext(context)
-
-  const getFields = React.useCallback(
-    (reset = false) => {
-      if (reset) {
-        cursor.current = '0'
-      }
-      setLoading(true)
-      request<{
-        cursor: string
-        fields: APP.HashField[]
-      }>('key/hash/hscan', keys.connection_id, {
-        name: keys.name,
-        db: keys.db,
-        cursor: cursor.current,
-        count: store.setting.setting.field_count,
-        search: search.current
-      })
-        .then((res) => {
-          cursor.current = res.data.cursor
-          if (res.data.cursor === '0') {
-            setMore(false)
-          } else {
-            setMore(true)
-          }
-          if (reset) {
-            setFields(res.data.fields)
-          } else {
-            setFields((p) => [...p].concat(res.data.fields))
-          }
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-    },
-    [keys, store.setting.setting.field_count]
-  )
-
-  React.useEffect(() => {
-    cursor.current = '0'
-    setMore(true)
-    getFields(true)
-  }, [getFields])
+  const { fields, setFields, getFields, loading, more } =
+    useFieldScan<APP.HashField>('key/hash/hscan', keys, params)
 
   return (
     <div>
@@ -108,8 +61,9 @@ const Index: React.FC<{
                     allowClear
                     size="small"
                     onSearch={(e) => {
-                      search.current = e
-                      getFields(true)
+                      setParams({
+                        search: e
+                      })
                     }}
                   />
                 </div>

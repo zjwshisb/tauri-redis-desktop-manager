@@ -9,7 +9,10 @@ const VersionAccess: React.FC<
   }>
 > = ({ version, connection, feedback = <></>, children }) => {
   const isShow = React.useMemo(() => {
-    return versionCompare(connection.version, version) > -1
+    if (connection.version !== undefined) {
+      return versionCompare(connection.version, version) > -1
+    }
+    return false
   }, [connection.version, version])
 
   if (!isShow) {

@@ -1,78 +1,32 @@
 import React from 'react'
-import request from '@/utils/request'
 import { Input, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import SAdd from './components/SAdd'
 import SRem from './components/SRem'
-import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
 import Editable from '@/components/Editable'
-
-interface SScanResp {
-  cursor: string
-  fields: string[]
-}
+import { useFieldScan } from '@/hooks/useFieldScan'
 
 const Index: React.FC<{
   keys: APP.SetKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
-  const store = useStore()
-
-  const [items, setItems] = React.useState<string[]>([])
-
-  const cursor = React.useRef('0')
-  const [more, setMore] = React.useState(true)
-
-  const search = React.useRef('')
-
   const { t } = useTranslation()
-  const [loading, setLoading] = React.useState(false)
 
   const connection = React.useContext(context)
 
-  const getFields = React.useCallback(
-    async (reset = false) => {
-      if (reset) {
-        cursor.current = '0'
-      }
-      setLoading(true)
-      await request<SScanResp>('key/set/sscan', keys.connection_id, {
-        name: keys.name,
-        db: keys.db,
-        cursor: cursor.current,
-        search: search.current,
-        count: store.setting.setting.field_count
-      })
-        .then((res) => {
-          if (res.data.cursor === '0') {
-            setMore(false)
-          } else {
-            setMore(true)
-          }
-          cursor.current = res.data.cursor
-          if (reset) {
-            setItems(res.data.fields)
-          } else {
-            setItems((p) => {
-              return [...p].concat(res.data.fields)
-            })
-          }
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-    },
-    [keys, store.setting.setting.field_count]
-  )
+  const [params, setParams] = React.useState({
+    search: ''
+  })
 
-  React.useEffect(() => {
-    setMore(true)
-    getFields(true).then()
-  }, [getFields])
+  const { fields, loading, more, getFields } = useFieldScan<string>(
+    'key/set/sscan',
+    keys,
+    params
+  )
 
   return (
     <div>
@@ -91,7 +45,7 @@ const Index: React.FC<{
         more={more}
         onLoadMore={getFields}
         rowKey={'value'}
-        dataSource={items.map((v, index) => {
+        dataSource={fields.map((v, index) => {
           return {
             index: index + 1,
             value: v
@@ -112,8 +66,9 @@ const Index: React.FC<{
                     allowClear
                     size="small"
                     onSearch={(e) => {
-                      search.current = e
-                      getFields(true)
+                      setParams({
+                        search: e
+                      })
                     }}
                   />
                 </div>

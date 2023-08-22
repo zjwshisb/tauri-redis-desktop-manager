@@ -5,7 +5,8 @@ import {
   MenuOutlined,
   NodeIndexOutlined,
   UnorderedListOutlined,
-  SettingOutlined
+  SettingOutlined,
+  CalculatorOutlined
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
@@ -71,7 +72,7 @@ const Menu: React.FC<{
         key: 'memory',
         label: (
           <div className="flex">
-            <SettingOutlined className="hover:text-blue-600" />
+            <CalculatorOutlined className="hover:text-blue-600" />
             <div className="ml-2">{t('Memory Analysis')}</div>
           </div>
         )

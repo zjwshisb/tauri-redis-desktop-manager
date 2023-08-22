@@ -91,5 +91,12 @@
   "Slow Log": "慢日志",
   "Other node will auto discover": "其他节点会自动识别",
   "Any action may change the value will be prohibited": "任何能改变值的操作将会被禁止",
-  "Detailed In": "详情可见"
+  "Detailed In": "详情可见",
+  "Filter": "过滤",
+  "Analysis" :"分析",
+  "Memory Analysis": "内存分析",
+  "Suspend" : "暂停",
+  "Continue": "继续",
+  "Total Amount": "总数量",
+  "Total Memory" :"总内存"
 }

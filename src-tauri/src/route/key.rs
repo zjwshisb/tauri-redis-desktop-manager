@@ -243,3 +243,65 @@ pub async fn memory_usage<'r>(
         _ => Ok(0),
     }
 }
+
+#[derive(Serialize)]
+pub struct KeyWithMemory {
+    name: String,
+    memory: i64,
+}
+
+#[derive(Serialize)]
+pub struct AnalysisResult {
+    cursor: String,
+    keys: Vec<KeyWithMemory>,
+}
+
+pub async fn analysis<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<AnalysisResult, CusError> {
+    let args: ScanArgs = serde_json::from_str(&payload)?;
+
+    let mut cmd = redis::cmd("scan");
+    cmd.arg(&args.cursor)
+        .arg(&["count", &args.count.to_string()]);
+
+    if args.search != "" {
+        let mut search = args.search.clone();
+        search.insert_str(0, "*");
+        search.push_str("*");
+        cmd.arg(&["MATCH", &search]);
+    }
+    if args.types != "" {
+        cmd.arg(&["TYPE", &args.types]);
+    }
+    let value = manager.execute(cid, args.db, &mut cmd).await?;
+    let result = ScanResult::build(&value);
+    let mut reps = AnalysisResult {
+        cursor: result.cursor.clone(),
+        keys: vec![],
+    };
+    for x in &result.keys {
+        let mut i = KeyWithMemory {
+            name: x.clone(),
+            memory: 0,
+        };
+        let m = manager
+            .execute(
+                cid,
+                args.db,
+                redis::cmd("memory")
+                    .arg("usage")
+                    .arg(&i.name)
+                    .arg(&["SAMPLES", "0"]),
+            )
+            .await?;
+        match m {
+            Value::Int(memory) => i.memory = memory,
+            _ => i.memory = 0,
+        }
+        reps.keys.push(i)
+    }
+    Ok(reps)
+}

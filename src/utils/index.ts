@@ -1,5 +1,8 @@
+import { store } from '@/store'
+import { type Page } from '@/store/page'
 import {
   WebviewWindow,
+  getCurrent,
   type WindowLabel,
   type WindowOptions
 } from '@tauri-apps/api/window'
@@ -41,7 +44,27 @@ export async function openWindow(label: WindowLabel, options: WindowOptions) {
     })
     webview.once('tauri://error', function (e) {
       webview.setFocus()
+      console.log(e)
       reject(webview)
     })
   })
+}
+
+export function memoryFormat(memory: number) {
+  if (memory <= 1024) {
+    return `${memory}B`
+  }
+  if (memory <= 1024 * 1024) {
+    return (memory / 1024).toFixed(1) + 'KB'
+  }
+  return (memory / 1024 / 1024).toFixed(1) + 'MB'
+}
+
+export async function openPage(page: Page) {
+  const current = getCurrent()
+  if (current.label === 'main') {
+    store.page.addPage(page)
+  } else {
+    store.page.openNewWindowPage(page)
+  }
 }

@@ -145,7 +145,8 @@ class PageStore {
       }
     }
     if (url !== '') {
-      await openWindow(spark.hash(p.key), {
+      const label = `${p.connection.id}-${spark.hash(p.key)}`
+      await openWindow(label, {
         url,
         title: p.key,
         focus: true

@@ -3,15 +3,13 @@ import {
   CaretRightFilled,
   DisconnectOutlined,
   ReloadOutlined,
-  LoadingOutlined,
   KeyOutlined
 } from '@ant-design/icons'
 import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import request from '@/utils/request'
 import { useThrottleFn } from 'ahooks'
-import { Space, Spin, Tooltip } from 'antd'
+import { Space, Tooltip } from 'antd'
 import DBItem from './components/DBItem'
 import NodeItem from './components/NodeItem'
 import CurlMenu from './components/CurlMenu'
@@ -27,19 +25,12 @@ const Connection: React.FC<{
 
   const [collapse, setCollapse] = React.useState(false)
 
-  const [loading, setLoading] = React.useState(false)
-
   const isOpen = React.useMemo(() => {
     return store.connection.openIds[connection.id]
   }, [connection.id, store.connection.openIds])
   const { t } = useTranslation()
 
   const icon = React.useMemo(() => {
-    if (loading) {
-      return (
-        <LoadingOutlined spin={true} className="text-sm mr-1"></LoadingOutlined>
-      )
-    }
     if (isOpen) {
       if (collapse) {
         return (
@@ -51,67 +42,12 @@ const Connection: React.FC<{
     } else {
       return <DisconnectOutlined className="text-sm mr-1" />
     }
-  }, [collapse, isOpen, loading])
-
-  const getDbs = React.useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await request<string>('config/databases', connection.id)
-      const count = parseInt(res.data)
-      const dbs: number[] = []
-      for (let i = 0; i < count; i++) {
-        dbs.push(i)
-      }
-      store.connection.update(connection.id, {
-        dbs
-      })
-      setLoading(false)
-    } catch (e) {
-      setLoading(false)
-      throw e
-    }
-  }, [connection.id, store.connection])
-
-  const getNodes = React.useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await request<string[]>('cluster/nodes', connection.id)
-      store.connection.update(connection.id, {
-        nodes: res.data
-      })
-      setLoading(false)
-    } catch (e) {
-      setLoading(false)
-      throw e
-    }
-  }, [connection.id, store.connection])
-
-  const getConnectionInfo = React.useCallback(async () => {
-    if (connection.is_cluster) {
-      await getNodes()
-    } else {
-      await getDbs()
-    }
-  }, [connection.is_cluster, getDbs, getNodes])
-
-  const openConnection = React.useCallback(async () => {
-    await request('connections/open', connection.id)
-  }, [connection.id])
-
-  const getVersion = React.useCallback(async () => {
-    const res = await request<string>('server/version', connection.id)
-    store.connection.update(connection.id, {
-      version: res.data
-    })
-  }, [connection.id, store.connection])
+  }, [collapse, isOpen])
 
   const onItemClick = React.useCallback(async () => {
     if (isOpen) {
       setCollapse((p) => !p)
     } else {
-      await openConnection()
-      getConnectionInfo()
-      getVersion()
       store.connection.open(connection.id)
       const key = getPageKey('info', connection)
       store.page.addPage({
@@ -123,15 +59,7 @@ const Connection: React.FC<{
       })
       setCollapse(true)
     }
-  }, [
-    connection,
-    getConnectionInfo,
-    getVersion,
-    isOpen,
-    openConnection,
-    store.connection,
-    store.page
-  ])
+  }, [connection, isOpen, store.connection, store.page])
 
   const onItemClickTh = useThrottleFn(onItemClick, {
     wait: 300
@@ -192,7 +120,6 @@ const Connection: React.FC<{
                   <ReloadOutlined
                     className="hover:text-blue-600"
                     onClick={(e) => {
-                      getConnectionInfo()
                       e.stopPropagation()
                     }}
                   ></ReloadOutlined>
@@ -210,35 +137,33 @@ const Connection: React.FC<{
           height
         }}
       >
-        <Spin spinning={loading}>
-          {connection.is_cluster
-            ? connection.nodes.map((v) => {
-                const active =
-                  store.keyInfo.info?.connection.id === connection.id &&
-                  store.keyInfo.info?.node === v
-                return (
-                  <NodeItem
-                    key={v}
-                    node={v}
-                    active={active}
-                    connection={connection}
-                  ></NodeItem>
-                )
-              })
-            : connection.dbs.map((db) => {
-                const active =
-                  store.keyInfo.info?.connection.id === connection.id &&
-                  store.keyInfo.info?.db === db
-                return (
-                  <DBItem
-                    db={db}
-                    connection={connection}
-                    active={active}
-                    key={db}
-                  ></DBItem>
-                )
-              })}
-        </Spin>
+        {connection.is_cluster
+          ? connection.nodes.map((v) => {
+              const active =
+                store.keyInfo.info?.connection.id === connection.id &&
+                store.keyInfo.info?.node === v
+              return (
+                <NodeItem
+                  key={v}
+                  node={v}
+                  active={active}
+                  connection={connection}
+                ></NodeItem>
+              )
+            })
+          : connection.dbs.map((db) => {
+              const active =
+                store.keyInfo.info?.connection.id === connection.id &&
+                store.keyInfo.info?.db === db
+              return (
+                <DBItem
+                  db={db}
+                  connection={connection}
+                  active={active}
+                  key={db}
+                ></DBItem>
+              )
+            })}
       </div>
     </div>
   )

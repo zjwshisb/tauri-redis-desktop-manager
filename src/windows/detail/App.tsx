@@ -45,11 +45,11 @@ const App: React.FC = () => {
     }
   }, [params.cid, store.connection.connections])
 
-  console.log(params)
-
   React.useEffect(() => {
-    console.log(store.connection.connections)
-  }, [store.connection.connections])
+    if (connection?.id !== undefined) {
+      store.connection.open(connection.id)
+    }
+  }, [connection?.id, store.connection])
 
   const children = React.useMemo(() => {
     let node = <></>

@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import List from './components/List'
 import LoadMore from './components/LoadMore'
 import Key from '@/components/Page/Key'
-import TypeSelect from './components/TypeSelect'
+import TypeSelect from '@/components/TypeSelect'
 
 import { getPageKey } from '@/utils'
 import Add from './components/Add'
@@ -109,6 +109,9 @@ const Index: React.FC<{
             <div className="flex-shrink-0 flex item-center px-2 justify-center">
               <Space>
                 <TypeSelect
+                  className="w-28"
+                  selectClassName="w-full"
+                  value={params.types}
                   connection={info.connection}
                   onChange={(e) => {
                     setParams((prev) => {
