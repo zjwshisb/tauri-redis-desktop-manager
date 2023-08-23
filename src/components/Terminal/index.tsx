@@ -34,7 +34,6 @@ const Index: React.FC<{
         if (v.tags !== undefined) {
           for (const tag of v.tags) {
             if (tag.includes(filter)) {
-              console.log('test')
               return true
             }
           }

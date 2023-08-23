@@ -3,12 +3,13 @@ import React from 'react'
 
 const CusModal: React.FC<
   {
-    trigger: React.ReactElement
+    trigger?: React.ReactElement
     showOkNotice?: boolean
     onOk: () => Promise<any>
+    onOpenChange?: (v: boolean) => void
     onOpen?: () => void
     onClear?: () => void
-  } & Omit<ModalProps, 'onOk' | 'open'>
+  } & Omit<ModalProps, 'onOk'>
 > = (props) => {
   const { onOk, onCancel, onOpen, showOkNotice = true, ...otherProps } = props
 
@@ -16,11 +17,16 @@ const CusModal: React.FC<
 
   const [confirmLoading, setConfirmLoading] = React.useState(false)
 
-  const trigger = React.cloneElement(props.trigger, {
-    onClick() {
-      setOpen(true)
+  const trigger = React.useMemo(() => {
+    if (otherProps.trigger !== undefined) {
+      return React.cloneElement(props.trigger as React.ReactElement, {
+        onClick() {
+          setOpen(true)
+        }
+      })
     }
-  })
+    return <></>
+  }, [otherProps.trigger, props.trigger])
 
   React.useEffect(() => {
     if (open && onOpen !== undefined) {
@@ -36,6 +42,23 @@ const CusModal: React.FC<
     }
   }, [open, otherProps])
 
+  const isOpen = React.useMemo(() => {
+    if (otherProps.open !== undefined) {
+      return otherProps.open
+    }
+    return open
+  }, [open, otherProps.open])
+
+  const onOpenChange = React.useCallback(
+    (v: boolean) => {
+      setOpen(v)
+      if (otherProps.onOpenChange != null) {
+        otherProps.onOpenChange(v)
+      }
+    },
+    [otherProps]
+  )
+
   return (
     <>
       {trigger}
@@ -49,19 +72,19 @@ const CusModal: React.FC<
               if (showOkNotice) {
                 message.success('Success')
               }
-              setOpen(false)
+              onOpenChange(false)
             })
             .catch(() => {})
             .finally(() => {
               setConfirmLoading(false)
             })
         }}
-        open={open}
+        open={isOpen}
         onCancel={(e) => {
           if (onCancel != null) {
             onCancel(e)
           }
-          setOpen(false)
+          onOpenChange(false)
         }}
         {...otherProps}
       >

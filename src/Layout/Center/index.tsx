@@ -15,7 +15,7 @@ import TypeSelect from '@/components/TypeSelect'
 import { getPageKey } from '@/utils'
 import Add from './components/Add'
 import Editable from '@/components/Editable'
-import { useKeyScan, type UseKeyScanFilter } from '@/hooks/useKeyScan'
+import useKeyScan, { type UseKeyScanFilter } from '@/hooks/useKeyScan'
 import { type KeyInfo } from '@/store/key'
 
 const Index: React.FC<{

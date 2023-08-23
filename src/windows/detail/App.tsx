@@ -54,7 +54,7 @@ const App: React.FC = () => {
   const children = React.useMemo(() => {
     let node = <></>
 
-    if (connection != null) {
+    if (connection != null && store.connection.isOpen(connection.id)) {
       switch (params.type) {
         case 'key': {
           if (
@@ -82,21 +82,11 @@ const App: React.FC = () => {
           break
         }
         case 'monitor': {
-          const file = params.file === undefined ? false : params.file !== '0'
-          node = <Monitor connection={connection} file={file}></Monitor>
+          node = <Monitor connection={connection}></Monitor>
           break
         }
         case 'pubsub': {
-          if (params.channels !== undefined && params.db !== undefined) {
-            const channels = params.channels.split(',')
-            node = (
-              <Pubsub
-                db={parseInt(params.db)}
-                channels={channels}
-                connection={connection}
-              ></Pubsub>
-            )
-          }
+          node = <Pubsub connection={connection}></Pubsub>
           break
         }
         case 'node': {
@@ -119,12 +109,11 @@ const App: React.FC = () => {
     return node
   }, [
     connection,
-    params.channels,
     params.db,
-    params.file,
     params.key,
     params.name,
-    params.type
+    params.type,
+    store.connection
   ])
 
   return (

@@ -1,20 +1,9 @@
 import React from 'react'
 import request from '@/utils/request'
 import useStore from './useStore'
-import { isArray, isString } from 'lodash'
+import { isArray } from 'lodash'
 import { useLatest } from 'ahooks'
 
-interface SingleScanResp {
-  cursor: string
-  keys: string[]
-}
-interface ClusterScanResp {
-  cursor: Array<{
-    cursor: string
-    node: string
-  }>
-  keys: string[]
-}
 export interface UseKeyScanOptions {
   beforeGet?: (rest: boolean) => void
   afterGet?: (rest: boolean) => void
@@ -25,12 +14,7 @@ export interface UseKeyScanFilter {
   search: string
 }
 
-export function useKeyScan(
-  connection: APP.Connection,
-  db: number,
-  params: UseKeyScanFilter,
-  options?: UseKeyScanOptions
-) {
+export function useScanCursor<T = string>(connection: APP.Connection) {
   const getInitCursor = React.useCallback(() => {
     if (connection.is_cluster) {
       return connection.nodes.map((v) => {
@@ -45,6 +29,54 @@ export function useKeyScan(
   }, [connection.is_cluster, connection.nodes])
 
   const cursor = React.useRef(getInitCursor())
+
+  const resetCursor = React.useCallback(() => {
+    cursor.current = getInitCursor()
+  }, [getInitCursor])
+
+  const isInit = React.useCallback(() => {
+    if (isArray(cursor.current)) {
+      return cursor.current.filter((v) => v.cursor === '0').length === 0
+    } else {
+      return cursor.current === '0'
+    }
+  }, [])
+
+  const setCursor = React.useCallback((res: APP.ScanLikeResp<T>) => {
+    if (isArray(res.cursor)) {
+      cursor.current = res.cursor.filter((v) => {
+        return v.cursor !== '0'
+      })
+    } else {
+      cursor.current = res.cursor
+    }
+  }, [])
+
+  const isMore = React.useCallback((res: APP.ScanLikeResp<T>) => {
+    if (isArray(res.cursor)) {
+      const respCursor = res.cursor.filter((v) => {
+        return v.cursor !== '0'
+      })
+      return respCursor.length !== 0
+    }
+    return res.cursor !== '0'
+  }, [])
+  return {
+    cursor,
+    resetCursor,
+    isMore,
+    isInit,
+    setCursor
+  }
+}
+
+export default function useKeyScan(
+  connection: APP.Connection,
+  db: number,
+  params: UseKeyScanFilter,
+  options?: UseKeyScanOptions
+) {
+  const { cursor, resetCursor, isMore, setCursor } = useScanCursor(connection)
   const store = useStore()
 
   const [keys, setKeys] = React.useState<string[]>([])
@@ -59,39 +91,20 @@ export function useKeyScan(
         last.current?.beforeGet(reset)
       }
       if (reset) {
-        cursor.current = getInitCursor()
+        resetCursor()
       }
       let path = 'key/scan'
       if (connection.is_cluster) {
         path = 'cluster/scan'
       }
-      return await request<SingleScanResp | ClusterScanResp>(
-        path,
-        connection.id,
-        {
-          cursor: cursor.current,
-          count: store.setting.setting.key_count,
-          db,
-          ...params
-        }
-      ).then((res) => {
-        if (isArray(res.data.cursor)) {
-          const respCursor = res.data.cursor.filter((v) => {
-            return v.cursor !== '0'
-          })
-          if (respCursor.length === 0) {
-            setMore(false)
-          } else {
-            setMore(true)
-          }
-        } else if (isString(res.data.cursor)) {
-          if (res.data.cursor === '0') {
-            setMore(false)
-          } else {
-            setMore(true)
-          }
-        }
-        cursor.current = res.data.cursor
+      return await request<APP.ScanLikeResp>(path, connection.id, {
+        cursor: cursor.current,
+        count: store.setting.setting.key_count,
+        db,
+        ...params
+      }).then((res) => {
+        setMore(isMore(res.data))
+        setCursor(res.data)
         if (last.current?.afterGet != null) {
           last.current.afterGet(reset)
         }
@@ -106,13 +119,16 @@ export function useKeyScan(
       })
     },
     [
-      params,
       last,
       connection.is_cluster,
       connection.id,
+      cursor,
       store.setting.setting.key_count,
       db,
-      getInitCursor
+      params,
+      resetCursor,
+      isMore,
+      setCursor
     ]
   )
 

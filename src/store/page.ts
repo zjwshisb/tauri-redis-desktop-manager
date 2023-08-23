@@ -23,8 +23,6 @@ interface BasePage {
 
 type PubsubPage = BasePage & {
   type: 'pubsub'
-  channels: string[]
-  db: number
 }
 type ClientPage = BasePage & {
   type: 'client'
@@ -35,7 +33,6 @@ type NodePage = BasePage & {
 
 type MonitorPage = BasePage & {
   type: 'monitor'
-  file: boolean
 }
 type InfoPage = BasePage & {
   type: 'info'
@@ -114,11 +111,9 @@ class PageStore {
         break
       }
       case 'monitor': {
-        url += `&file=${p.file ? 1 : 0}`
         break
       }
       case 'pubsub': {
-        url += `&db=${p.db}&channels=${p.channels.join(',')}`
         break
       }
       case 'memory-analysis': {

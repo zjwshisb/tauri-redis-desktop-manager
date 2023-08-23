@@ -5,7 +5,6 @@ use crate::err::CusError;
 use crate::model::Connection as Conn;
 use crate::{response, utils};
 use chrono::prelude::*;
-use futures::future::ok;
 use redis::aio::{Connection, ConnectionLike};
 use redis::cluster::ClusterClient;
 use redis::cluster_async::ClusterConnection;
@@ -61,7 +60,6 @@ impl CusConnection {
             db: 0,
             created_at: Local::now(),
         };
-        dbg!(&conn.id);
         return Ok(conn);
     }
     // get the conn with host

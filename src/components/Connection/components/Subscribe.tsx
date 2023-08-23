@@ -50,15 +50,7 @@ const Subscribe: React.FC<{
             label: key,
             type: 'pubsub',
             connection: props.connection,
-            channels,
-            db,
-            children: (
-              <Pubsub
-                connection={props.connection}
-                db={db}
-                channels={channels}
-              ></Pubsub>
-            )
+            children: <Pubsub connection={props.connection}></Pubsub>
           })
         })
       }}

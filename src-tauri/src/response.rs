@@ -61,3 +61,9 @@ pub struct Conn {
     pub created_at: String,
     pub types: String,
 }
+
+#[derive(Serialize)]
+pub struct KeyWithMemory {
+    pub name: String,
+    pub memory: i64,
+}

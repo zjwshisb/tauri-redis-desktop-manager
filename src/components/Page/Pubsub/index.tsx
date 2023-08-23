@@ -5,49 +5,34 @@ import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import Terminal from '@/components/Terminal'
 import { type TerminalRow } from '@/components/Terminal/Row'
+import Form, { type SubscribeForm } from './components/Form'
 
 const Pubsub: React.FC<{
-  channels: string[]
   connection: APP.Connection
-  db: number
 }> = (props) => {
-  const unListen = React.useRef<() => void>()
-  const [name, setName] = React.useState('')
+  const [eventName, setEventName] = React.useState<string>('')
+  const [form, setForm] = React.useState<SubscribeForm>()
 
   const [rows, setRows] = React.useState<TerminalRow[]>([])
 
   const { t } = useTranslation()
 
-  const initialized = React.useRef(false)
-
   React.useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true
-      request<string>('pubsub/subscribe', props.connection.id, {
-        db: props.db,
-        channels: props.channels
-      }).then((res) => {
-        setName(res.data)
-      })
+    if (form != null) {
+      request<string>('pubsub/subscribe', props.connection.id, form).then(
+        (res) => {
+          setEventName(res.data)
+        }
+      )
     }
-  }, [props.channels, props.connection.id, props.db])
+  }, [form, props.connection.id])
 
   React.useEffect(() => {
-    return () => {
-      if (name !== '') {
-        console.log('cancel:', name)
-        request('pubsub/cancel', 0, {
-          name
-        })
-      }
-    }
-  }, [name])
-
-  React.useEffect(() => {
-    if (name !== '') {
-      console.log('listen:', name)
+    let unListen: (() => void) | undefined
+    if (eventName !== '') {
+      setRows([])
       appWindow
-        .listen<string>(name, (e) => {
+        .listen<string>(eventName, (e) => {
           try {
             const message: APP.EventPayload<APP.PubsubMessage> = JSON.parse(
               e.payload
@@ -65,21 +50,42 @@ const Pubsub: React.FC<{
           } catch (e) {}
         })
         .then((f) => {
-          unListen.current = f
+          unListen = f
         })
     }
-  }, [name])
-
-  React.useEffect(() => {
     return () => {
-      if (unListen.current !== undefined) {
-        unListen.current()
+      if (unListen != null) {
+        unListen()
       }
     }
-  }, [unListen])
+  }, [eventName])
+
+  const publish = React.useMemo(() => {
+    if (form != null) {
+      return form.channels.map((v) => {
+        return (
+          <div key={v} className="py-1 w-[400px]">
+            <Input.Search
+              placeholder="payload"
+              enterButton={<Button>{t('Publish')}</Button>}
+              addonBefore={v}
+              onSearch={(e) => {
+                request('pubsub/publish', props.connection.id, {
+                  channel: v,
+                  value: e,
+                  db: form.db
+                })
+              }}
+            ></Input.Search>
+          </div>
+        )
+      })
+    }
+  }, [form, props.connection.id, t])
 
   return (
     <div className="">
+      <Form connection={props.connection} onChange={setForm}></Form>
       <Terminal
         className="h-[500px]"
         rows={rows}
@@ -91,24 +97,7 @@ const Pubsub: React.FC<{
         <Divider orientation="left" plain>
           {t('Channel')}
         </Divider>
-        {props.channels.map((v) => {
-          return (
-            <div key={v} className="py-1 w-[400px]">
-              <Input.Search
-                placeholder="payload"
-                enterButton={<Button>{t('Publish')}</Button>}
-                addonBefore={v}
-                onSearch={(e) => {
-                  request('pubsub/publish', props.connection.id, {
-                    channel: v,
-                    value: e,
-                    db: props.db
-                  })
-                }}
-              ></Input.Search>
-            </div>
-          )
-        })}
+        {publish}
       </div>
     </div>
   )

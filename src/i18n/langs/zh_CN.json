@@ -98,5 +98,6 @@
   "Suspend" : "暂停",
   "Continue": "继续",
   "Total Amount": "总数量",
-  "Total Memory" :"总内存"
+  "Total Memory" :"总内存",
+  "Minimum Size": "最小大小"
 }

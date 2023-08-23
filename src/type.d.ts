@@ -88,4 +88,18 @@ declare namespace APP {
     created_at: string
     duration: number
   }
+
+  interface SingleScanLikeResp<T = string> {
+    cursor: string
+    keys: T[]
+  }
+  interface ClusterScanLikeResp<T = string> {
+    cursor: Array<{
+      cursor: string
+      node: string
+    }>
+    keys: T[]
+  }
+
+  type ScanLikeResp<T = string> = SingleScanLikeResp<T> | ClusterScanLikeResp<T>
 }

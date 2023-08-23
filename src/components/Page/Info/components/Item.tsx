@@ -3,10 +3,6 @@ import { Card, Col, Row, Table, Descriptions, Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { SearchOutlined } from '@ant-design/icons'
 
-// import Memory from './Memory'
-// import Network from './Network'
-// import Ops from './Ops'
-// import Client from './Client'
 import DbInfo from './DbInfo'
 
 interface Item {

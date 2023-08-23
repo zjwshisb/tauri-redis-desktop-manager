@@ -6,103 +6,108 @@ import {
   NodeIndexOutlined,
   UnorderedListOutlined,
   SettingOutlined,
-  CalculatorOutlined
+  CalculatorOutlined,
+  BookOutlined,
+  MonitorOutlined
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { Dropdown } from 'antd'
 import { useTranslation } from 'react-i18next'
-import Monitor from './Monitor'
 import { getPageKey } from '@/utils'
 import Client from '@/components/Page/Client'
 import Info from '@/components/Page/Info'
-import Subscribe from './Subscribe'
 import Node from '@/components/Page/Node'
 import SlowLog from '@/components/Page/SlowLog'
 import Config from '@/components/Page/Config'
 import MemoryAnalysis from '@/components/Page/MemoryAnalysis'
+import Pubsub from '@/components/Page/Pubsub'
+import Monitor from '@/components/Page/Monitor'
+
+interface MenuItem {
+  key: string
+  icon: React.ReactNode
+  title: string
+  mode?: 'single' | 'cluster'
+}
+const menuItems: MenuItem[] = [
+  {
+    key: 'info',
+    icon: <HomeOutlined className="hover:text-blue-600" />,
+    title: 'Info'
+  },
+  {
+    key: 'config',
+    icon: <SettingOutlined className="hover:text-blue-600" />,
+    title: 'Config'
+  },
+  {
+    key: 'node',
+    icon: <NodeIndexOutlined className="hover:text-blue-600" />,
+    title: 'Node',
+    mode: 'cluster'
+  },
+  {
+    key: 'client',
+    icon: <ControlOutlined className="hover:text-blue-600" />,
+    title: 'Client'
+  },
+  {
+    key: 'slow-log',
+    icon: <UnorderedListOutlined className="hover:text-blue-600" />,
+    title: 'Slow Log'
+  },
+  {
+    key: 'memory',
+    icon: <CalculatorOutlined className="hover:text-blue-600" />,
+    title: 'Memory Analysis'
+  },
+  {
+    key: 'pubsub',
+    icon: <BookOutlined className="hover:text-blue-600" />,
+    title: 'Subscribe',
+    mode: 'single'
+  },
+  {
+    key: 'monitor',
+    icon: <MonitorOutlined className="hover:text-blue-600" />,
+    title: 'Monitor',
+    mode: 'single'
+  }
+]
 
 const Menu: React.FC<{
   connection: APP.Connection
-  db?: number[]
-}> = ({ connection, db }) => {
+}> = ({ connection }) => {
   const store = useStore()
 
   const { t } = useTranslation()
 
   const connectionMenus = React.useMemo(() => {
-    let menus = [
-      {
-        key: 'info',
-        label: (
-          <div className="flex">
-            <HomeOutlined className="hover:text-blue-600" />
-            <div className="ml-2">{t('Info')}</div>
-          </div>
-        )
-      },
-      {
-        key: 'client',
-        label: (
-          <div className="flex">
-            <ControlOutlined className="hover:text-blue-600" />
-            <div className="ml-2">{t('Client')}</div>
-          </div>
-        )
-      },
-      {
-        key: 'slow-log',
-        label: (
-          <div className="flex">
-            <UnorderedListOutlined className="hover:text-blue-600" />
-            <div className="ml-2">{t('Slow Log')}</div>
-          </div>
-        )
-      },
-      {
-        key: 'config',
-        label: (
-          <div className="flex">
-            <SettingOutlined className="hover:text-blue-600" />
-            <div className="ml-2">{t('Config')}</div>
-          </div>
-        )
-      },
-      {
-        key: 'memory',
-        label: (
-          <div className="flex">
-            <CalculatorOutlined className="hover:text-blue-600" />
-            <div className="ml-2">{t('Memory Analysis')}</div>
-          </div>
-        )
-      }
-    ]
-    if (!connection.is_cluster) {
-      menus = menus.concat([
-        {
-          key: 'monitor',
-          label: <Monitor connection={connection} />
-        },
-        {
-          key: 'Subscribe',
-          label: <Subscribe connection={connection}></Subscribe>
+    const menus = menuItems
+      .filter((v) => {
+        if (v.mode === undefined) {
+          return true
         }
-      ])
-    }
-    if (connection.is_cluster) {
-      menus = menus.concat([
-        {
-          key: 'node',
+        if (v.mode === 'cluster' && connection.is_cluster) {
+          return true
+        }
+        if (v.mode === 'single' && !connection.is_cluster) {
+          return true
+        }
+        return false
+      })
+      .map((v) => {
+        return {
+          key: v.key,
           label: (
-            <div className="flex">
-              <NodeIndexOutlined className="hover:text-blue-600" />
-              <div className="ml-2">{t('Node')}</div>
+            <div className="flex items-center">
+              {v.icon}
+              <div className="ml-2">{t(v.title)}</div>
             </div>
           )
         }
-      ])
-    }
+      })
     return menus
   }, [connection, t])
 
@@ -112,7 +117,6 @@ const Menu: React.FC<{
       className="hover:text-blue-600"
       menu={{
         onClick(e) {
-          e.domEvent.stopPropagation()
           switch (e.key) {
             case 'client': {
               const key = getPageKey('client', connection)
@@ -178,6 +182,28 @@ const Menu: React.FC<{
                 children: (
                   <MemoryAnalysis connection={connection}></MemoryAnalysis>
                 ),
+                connection
+              })
+              break
+            }
+            case 'pubsub': {
+              const key = getPageKey('pubsub', connection)
+              store.page.addPage({
+                label: key,
+                type: 'pubsub',
+                key,
+                children: <Pubsub connection={connection}></Pubsub>,
+                connection
+              })
+              break
+            }
+            case 'monitor': {
+              const key = getPageKey('monitor', connection)
+              store.page.addPage({
+                label: key,
+                type: 'monitor',
+                key,
+                children: <Monitor connection={connection} />,
                 connection
               })
               break

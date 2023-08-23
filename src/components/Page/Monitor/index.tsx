@@ -3,53 +3,31 @@ import { appWindow } from '@tauri-apps/api/window'
 import request from '@/utils/request'
 import Terminal from '@/components/Terminal'
 import { type TerminalRow } from '@/components/Terminal/Row'
+import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
-
-interface MonitorResp {
-  event_name: string
-  file_name: string
-}
 
 const Monitor: React.FC<{
   connection: APP.Connection
-  file?: boolean
 }> = (props) => {
-  const unListen = React.useRef<() => void>()
-  const [name, setName] = React.useState<MonitorResp>()
+  const [eventName, setEventName] = React.useState<string>('')
 
   const [rows, setRows] = React.useState<TerminalRow[]>([])
 
-  const initialized = React.useRef(false)
-
-  const { file = false } = props
+  const [stop, setStop] = React.useState(false)
 
   const { t } = useTranslation()
 
   React.useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true
-      request<MonitorResp>('pubsub/monitor', props.connection.id, {
-        file
-      }).then((res) => {
-        setName(res.data)
-      })
-    }
-  }, [file, props.connection.id])
+    request<string>('pubsub/monitor', props.connection.id).then((res) => {
+      setEventName(res.data)
+    })
+  }, [props.connection.id])
 
   React.useEffect(() => {
-    return () => {
-      if (name !== undefined && name.event_name !== '') {
-        request('pubsub/cancel', 0, {
-          name: name?.event_name
-        })
-      }
-    }
-  }, [name])
-
-  React.useEffect(() => {
-    if (name !== undefined && name.event_name !== '') {
+    let unListen: undefined | (() => void)
+    if (eventName !== null && !stop) {
       appWindow
-        .listen<string>(name.event_name, (r) => {
+        .listen<string>(eventName, (r) => {
           try {
             const message: APP.EventPayload<string> = JSON.parse(r.payload)
             setRows((prev) => {
@@ -63,41 +41,46 @@ const Monitor: React.FC<{
           } catch (e) {}
         })
         .then((f) => {
-          unListen.current = f
+          unListen = f
         })
     }
-  }, [name])
-
-  React.useEffect(() => {
     return () => {
-      if (unListen.current !== undefined) {
-        unListen.current()
+      if (unListen !== undefined) {
+        unListen()
       }
     }
-  }, [])
-
-  const fileName = React.useMemo(() => {
-    if (name !== undefined) {
-      if (name.file_name !== '') {
-        return (
-          <div>
-            {t('Log File')} : {name.file_name}
-          </div>
-        )
-      }
-    }
-  }, [name, t])
+  }, [eventName, stop])
 
   return (
     <div>
+      <div className="mb-2">
+        {!stop && (
+          <Button
+            danger
+            onClick={() => {
+              setStop(true)
+            }}
+          >
+            {t('Suspend')}
+          </Button>
+        )}
+        {stop && (
+          <Button
+            onClick={() => {
+              setStop(false)
+            }}
+          >
+            {t('Continue')}
+          </Button>
+        )}
+      </div>
       <Terminal
-        className="h-[500px]"
+        className="h-[500px] w-full"
         rows={rows}
         onClear={() => {
           setRows([])
         }}
       ></Terminal>
-      {fileName}
     </div>
   )
 }

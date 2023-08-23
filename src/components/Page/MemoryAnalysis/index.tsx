@@ -2,11 +2,13 @@ import React from 'react'
 import Item from './Components/Item'
 import request from '@/utils/request'
 import VirtualList from 'rc-virtual-list'
-import { Button, Space, message, Statistic } from 'antd'
+import { Button, Space, message, Statistic, InputNumber, Empty } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { memoryFormat } from '@/utils'
 import Filter, { type FilterForm } from './Components/Filter'
-import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons'
+import { CaretDownFilled, CaretUpFilled } from '@ant-design/icons'
+import { useScanCursor } from '@/hooks/useKeyScan'
+import classNames from 'classnames'
 
 export interface KeyItem {
   name: string
@@ -25,9 +27,14 @@ const MemoryAnalysis: React.FC<{
   const formRef = React.useRef(form)
   formRef.current = form
 
+  const { cursor, isMore, resetCursor, setCursor, isInit } =
+    useScanCursor<KeyItem>(connection)
+
   const cacheRef = React.useRef<FilterForm>(form)
 
   const [keys, setKeys] = React.useState<KeyItem[]>([])
+
+  const [size, setSize] = React.useState<number | null>(null)
 
   const [loading, setLoading] = React.useState(false)
 
@@ -41,14 +48,13 @@ const MemoryAnalysis: React.FC<{
 
   const init = React.useRef(false)
 
-  const cursor = React.useRef('0')
-
   const getData = React.useCallback(
     async (params: FilterForm) => {
-      await request<{
-        cursor: string
-        keys: KeyItem[]
-      }>('key/analysis', connection.id, {
+      let path = 'key/analysis'
+      if (connection.is_cluster) {
+        path = 'cluster/analysis'
+      }
+      await request<APP.ScanLikeResp<KeyItem>>(path, connection.id, {
         count: 100,
         cursor: cursor.current,
         ...params
@@ -56,21 +62,21 @@ const MemoryAnalysis: React.FC<{
         setKeys((prev) => {
           return [...prev].concat(r.data.keys)
         })
-        cursor.current = r.data.cursor
-        if (!stopSign.current) {
-          if (r.data.cursor !== '0') {
+        setCursor(r.data)
+        if (stopSign.current) {
+          cacheRef.current = params
+          setLoading(false)
+        } else {
+          if (isMore(r.data)) {
             getData(params)
           } else {
             setFinished(true)
             setLoading(false)
           }
-        } else {
-          cacheRef.current = params
-          setLoading(false)
         }
       })
     },
-    [connection.id]
+    [connection.id, connection.is_cluster, cursor, isMore, setCursor]
   )
 
   const analysis = React.useCallback(
@@ -79,11 +85,12 @@ const MemoryAnalysis: React.FC<{
       setFinished(false)
       setLoading(true)
       if (reset) {
+        resetCursor()
         setKeys([])
       }
       getData(params)
     },
-    [getData]
+    [getData, resetCursor]
   )
 
   const stopAnalysis = React.useCallback(() => {
@@ -91,12 +98,12 @@ const MemoryAnalysis: React.FC<{
   }, [])
 
   const continueAnalysis = React.useCallback(() => {
-    if (cursor.current === '0') {
+    if (isInit()) {
       message.error('All Key Had Down')
     } else {
       analysis(cacheRef.current, false)
     }
-  }, [analysis])
+  }, [analysis, isInit])
 
   React.useEffect(() => {
     if (!init.current) {
@@ -108,17 +115,34 @@ const MemoryAnalysis: React.FC<{
 
   const sortKeys = React.useMemo(() => {
     const number = sort === 'desc' ? -1 : 1
-    return keys.sort((a, b) => {
+    let r = keys
+    if (size !== null && size > 0) {
+      r = keys.filter((v) => {
+        return v.memory >= size
+      })
+    }
+    return r.sort((a, b) => {
       return a.memory > b.memory ? number : -number
     })
-  }, [keys, sort])
+  }, [keys, size, sort])
 
   const icon = React.useMemo(() => {
-    if (sort === 'desc') {
-      return <CaretDownOutlined></CaretDownOutlined>
-    } else {
-      return <CaretUpOutlined />
-    }
+    return (
+      <div className="flex flex-col justify-center h-[10px] text-[12px]">
+        <CaretUpFilled
+          size={10}
+          className={classNames([sort === 'asc' && 'text-blue-600'])}
+          color={sort === 'asc' ? '#1677ff' : undefined}
+        />
+        <CaretDownFilled
+          size={10}
+          className={classNames([
+            'mt-[-0.2rem]',
+            sort === 'desc' && 'text-blue-600'
+          ])}
+        />
+      </div>
+    )
   }, [sort])
 
   return (
@@ -168,37 +192,51 @@ const MemoryAnalysis: React.FC<{
           </div>
         </div>
         <div className="self-end flex-shrink-0 ml-10">
-          <div
-            className="w-10 h-10 flex items-center justify-center hover:cursor-pointer"
-            onClick={() => {
-              setSort((p) => {
-                return p === 'asc' ? 'desc' : 'asc'
-              })
-            }}
-          >
-            {icon}
+          <div className="flex items-center">
+            <InputNumber
+              onChange={(e) => {
+                setSize(e as number)
+              }}
+              className="mr-2"
+              size="small"
+              addonAfter="Bytes"
+              placeholder={t('Minimum Size').toString()}
+            />
+            <div
+              className="w-10 h-10 flex items-center justify-center hover:cursor-pointer"
+              onClick={() => {
+                setSort((p) => {
+                  return p === 'asc' ? 'desc' : 'asc'
+                })
+              }}
+            >
+              {icon}
+            </div>
           </div>
         </div>
       </div>
       <div className="border">
-        <VirtualList
-          height={600}
-          itemHeight={25}
-          data={sortKeys}
-          itemKey={(v) => v.name}
-        >
-          {(v, index) => {
-            return (
-              <Item
-                connection={connection}
-                db={form.db}
-                key={v.name}
-                item={v}
-                index={index + 1}
-              ></Item>
-            )
-          }}
-        </VirtualList>
+        {keys.length === 0 && <Empty></Empty>}
+        {keys.length !== 0 && (
+          <VirtualList
+            height={600}
+            itemHeight={25}
+            data={sortKeys}
+            itemKey={(v) => v.name}
+          >
+            {(v, index) => {
+              return (
+                <Item
+                  connection={connection}
+                  db={form.db}
+                  key={v.name}
+                  item={v}
+                  index={index + 1}
+                ></Item>
+              )
+            }}
+          </VirtualList>
+        )}
       </div>
     </div>
   )

@@ -48,16 +48,18 @@ const Connection: React.FC<{
     if (isOpen) {
       setCollapse((p) => !p)
     } else {
-      store.connection.open(connection.id)
-      const key = getPageKey('info', connection)
-      store.page.addPage({
-        label: key,
-        type: 'info',
-        key,
-        children: <Info connection={connection}></Info>,
-        connection
-      })
-      setCollapse(true)
+      try {
+        await store.connection.open(connection.id)
+        const key = getPageKey('info', connection)
+        store.page.addPage({
+          label: key,
+          type: 'info',
+          key,
+          children: <Info connection={connection}></Info>,
+          connection
+        })
+        setCollapse(true)
+      } catch {}
     }
   }, [connection, isOpen, store.connection, store.page])
 
@@ -120,6 +122,7 @@ const Connection: React.FC<{
                   <ReloadOutlined
                     className="hover:text-blue-600"
                     onClick={(e) => {
+                      store.connection.open(connection.id)
                       e.stopPropagation()
                     }}
                   ></ReloadOutlined>

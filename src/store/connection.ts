@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import request from '../utils/request'
 import { getAll } from '@tauri-apps/api/window'
 
@@ -29,12 +29,15 @@ class ConnectionStore {
       const res = await request<string>('server/version', connection.id)
       connection.version = res.data
       this.update(connection.id, connection)
-      this.openIds = { ...this.openIds }
-      this.openIds[id] = true
+      runInAction(() => {
+        this.openIds[id] = true
+        this.openIds = { ...this.openIds }
+      })
     }
   }
 
   async close(id: number) {
+    this.openIds[id] = false
     this.openIds = { ...this.openIds }
     // close the connection webview
     const allWindow = getAll()
@@ -47,17 +50,16 @@ class ConnectionStore {
         }
       }
     }
-    this.openIds[id] = false
   }
 
   update(id: number, data: Partial<APP.Connection>) {
     const index = this.connections.findIndex((v) => v.id === id)
     if (index > -1) {
-      this.connections = [...this.connections]
       this.connections[index] = {
         ...this.connections[index],
         ...data
       }
+      this.connections = [...this.connections]
     }
   }
 
@@ -74,9 +76,11 @@ class ConnectionStore {
   }
 
   async fetchConnections() {
-    this.connections = (
-      await request<APP.Connection[]>('connections/get', 0)
-    ).data
+    const res = await request<APP.Connection[]>('connections/get', 0)
+
+    runInAction(() => {
+      this.connections = res.data
+    })
   }
 }
 export default ConnectionStore

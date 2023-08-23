@@ -19,7 +19,7 @@ const Row: React.FC<{
   }, [item.message, item.messageNode])
 
   return (
-    <div className="flex font-mono px-2 break-words">
+    <div className="flex font-mono px-2 break-words break-all">
       {item.time !== undefined && (
         <div className="flex-shrink-0 text-gray-800">{item.time}</div>
       )}

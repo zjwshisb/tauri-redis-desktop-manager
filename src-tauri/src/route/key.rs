@@ -3,6 +3,7 @@ use crate::{
     err::{self, CusError},
     key::Key,
     model::redis::ScanResult,
+    response::KeyWithMemory,
 };
 use redis::FromRedisValue;
 use redis::Value;
@@ -242,12 +243,6 @@ pub async fn memory_usage<'r>(
         Value::Int(v) => return Ok(v),
         _ => Ok(0),
     }
-}
-
-#[derive(Serialize)]
-pub struct KeyWithMemory {
-    name: String,
-    memory: i64,
 }
 
 #[derive(Serialize)]
