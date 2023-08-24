@@ -25,7 +25,7 @@ export default async function request<T>(
       message: err as string,
       duration: 3
     })
-    console.log(err)
+    console.log(path, args, err)
     throw err
   }
 }

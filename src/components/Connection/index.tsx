@@ -83,7 +83,7 @@ const Connection: React.FC<{
     isOpen,
     collapse,
     connection.is_cluster,
-    connection.nodes.length,
+    connection.nodes,
     connection.dbs.length
   ])
 
@@ -142,14 +142,10 @@ const Connection: React.FC<{
       >
         {connection.is_cluster
           ? connection.nodes.map((v) => {
-              const active =
-                store.keyInfo.info?.connection.id === connection.id &&
-                store.keyInfo.info?.node === v
               return (
                 <NodeItem
-                  key={v}
+                  key={v.id}
                   node={v}
-                  active={active}
                   connection={connection}
                 ></NodeItem>
               )

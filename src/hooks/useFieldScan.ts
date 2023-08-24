@@ -16,13 +16,13 @@ export function useFieldScan<T>(
   const [loading, setLoading] = React.useState(false)
 
   const getFields = React.useCallback(
-    (reset = false) => {
+    async (reset = false) => {
       if (reset) {
         setMore(true)
         cursor.current = '0'
       }
       setLoading(true)
-      request<{
+      await request<{
         cursor: string
         fields: T[]
       }>(path, keys.connection_id, {

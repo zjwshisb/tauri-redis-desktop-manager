@@ -6,13 +6,14 @@ declare namespace APP {
     auth: string
     version: string
     is_cluster: boolean
-    nodes: string[]
+    nodes: Node[]
     dbs: number[]
     readonly: boolean
   }
 
   interface Node {
     config_epoch: string
+    port: number
     flags: string
     host: string
     id: string

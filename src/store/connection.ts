@@ -12,11 +12,13 @@ class ConnectionStore {
 
   async open(id: number) {
     const connection = this.connections.find((v) => v.id === id)
-    if (connection != null) {
+    if (connection !== undefined) {
       await request('connections/open', connection.id)
       if (connection.is_cluster) {
-        const res = await request<string[]>('cluster/nodes', connection.id)
-        connection.nodes = res.data
+        const res = await request<APP.Node[]>('cluster/nodes', connection.id)
+        connection.nodes = res.data.filter((v) => {
+          return v.flags.includes('master')
+        })
       } else {
         const res = await request<string>('config/databases', connection.id)
         const count = parseInt(res.data)

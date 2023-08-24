@@ -1,4 +1,3 @@
-import useRequest from '@/hooks/useRequest'
 import { Col, Row, Spin, Table } from 'antd'
 import { type ColumnsType } from 'antd/es/table'
 import React from 'react'
@@ -6,11 +5,6 @@ import React from 'react'
 const Node: React.FC<{
   connection: APP.Connection
 }> = ({ connection }) => {
-  const { data, loading } = useRequest<APP.Node[]>(
-    'cluster/node-list',
-    connection.id
-  )
-
   const columns: ColumnsType<APP.Node> = React.useMemo(() => {
     const fields = [
       'id',
@@ -32,14 +26,12 @@ const Node: React.FC<{
     })
   }, [])
 
-  console.log(data)
-
   return (
-    <Spin spinning={loading}>
+    <Spin>
       <Row>
         <Col span={24}>
           <Table
-            dataSource={data?.sort((a, b) =>
+            dataSource={connection.nodes.sort((a, b) =>
               a.config_epoch > b.config_epoch ? 1 : -1
             )}
             pagination={false}

@@ -9,6 +9,7 @@ import Filter, { type FilterForm } from './Components/Filter'
 import { CaretDownFilled, CaretUpFilled } from '@ant-design/icons'
 import { useScanCursor } from '@/hooks/useKeyScan'
 import classNames from 'classnames'
+import useStore from '@/hooks/useStore'
 
 export interface KeyItem {
   name: string
@@ -48,6 +49,8 @@ const MemoryAnalysis: React.FC<{
 
   const init = React.useRef(false)
 
+  const store = useStore()
+
   const getData = React.useCallback(
     async (params: FilterForm) => {
       let path = 'key/analysis'
@@ -55,7 +58,7 @@ const MemoryAnalysis: React.FC<{
         path = 'cluster/analysis'
       }
       await request<APP.ScanLikeResp<KeyItem>>(path, connection.id, {
-        count: 100,
+        count: store.setting.setting.key_count,
         cursor: cursor.current,
         ...params
       }).then((r) => {
@@ -76,7 +79,14 @@ const MemoryAnalysis: React.FC<{
         }
       })
     },
-    [connection.id, connection.is_cluster, cursor, isMore, setCursor]
+    [
+      connection.id,
+      connection.is_cluster,
+      cursor,
+      isMore,
+      setCursor,
+      store.setting.setting.key_count
+    ]
   )
 
   const analysis = React.useCallback(

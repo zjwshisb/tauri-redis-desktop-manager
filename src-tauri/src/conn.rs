@@ -1,20 +1,88 @@
 use std::collections::HashMap;
+use std::fmt::Debug;
 use std::time::Duration;
 
 use crate::err::CusError;
-use crate::model::Connection as Conn;
+use crate::sqlite::Connection as Conn;
+use crate::utils::random_str;
 use crate::{response, utils};
 use chrono::prelude::*;
 use redis::aio::{Connection, ConnectionLike};
 use redis::cluster::ClusterClient;
 use redis::cluster_async::ClusterConnection;
-use redis::Cmd;
 use redis::{Arg, Client, FromRedisValue, Value};
+use redis::{Cmd, IntoConnectionInfo};
 use serde::Serialize;
 use tokio::time::timeout;
 
-use crate::model::redis::Node;
 use tokio::sync::{mpsc::Sender, Mutex};
+
+/**
+ * see https://redis.io/commands/cluster-nodes/
+ */
+#[derive(Serialize, Clone, Debug)]
+pub struct Node {
+    pub id: String,
+    pub host: String,
+    pub port: u16,
+    pub flags: String,
+    pub master: String,
+    pub ping_sent: i64,
+    pub pong_recv: i64,
+    pub config_epoch: String,
+    pub link_state: String,
+    pub slot: String,
+    pub password: Option<String>,
+}
+
+impl Node {
+    pub fn build(s: String) -> Self {
+        let mut v: Vec<&str> = s.split(" ").collect();
+        let get_fn = |v: &mut Vec<&str>, index: usize| -> String {
+            if v.len() > index {
+                return String::from(v.remove(index));
+            }
+            "".to_string()
+        };
+        let mut host = get_fn(&mut v, 1);
+        let mut port = 0;
+        if let Some(u) = host.find("@") {
+            host = host[0..u].to_string();
+            if let Some(u) = host.find(":") {
+                let port_str = host[u + 1..].to_string();
+                host = host[0..u].to_string();
+                dbg!(&port_str);
+                port = port_str.parse().unwrap()
+            }
+        }
+        let node = Self {
+            id: get_fn(&mut v, 0),
+            host: host,
+            port: port,
+            flags: get_fn(&mut v, 0),
+            master: get_fn(&mut v, 0),
+            ping_sent: get_fn(&mut v, 0).parse::<i64>().unwrap_or_default(),
+            pong_recv: get_fn(&mut v, 0).parse::<i64>().unwrap_or_default(),
+            config_epoch: get_fn(&mut v, 0),
+            link_state: get_fn(&mut v, 0),
+            slot: get_fn(&mut v, 0),
+            password: None,
+        };
+        node
+    }
+}
+impl IntoConnectionInfo for Node {
+    fn into_connection_info(self) -> redis::RedisResult<redis::ConnectionInfo> {
+        Ok(redis::ConnectionInfo {
+            addr: redis::ConnectionAddr::Tcp(self.host.clone(), self.port),
+            redis: redis::RedisConnectionInfo {
+                db: 0,
+                username: None,
+                password: self.password,
+            },
+        })
+    }
+}
 
 #[derive(Serialize)]
 pub struct CusCmd {
@@ -35,6 +103,7 @@ pub struct CusConnection {
     pub nodes: Vec<Node>,
     pub db: u8,
     pub created_at: chrono::DateTime<Local>,
+    pub connection_model: Option<Conn>,
 }
 /**
  * custom redis connection
@@ -45,12 +114,13 @@ impl CusConnection {
         let conn = Conn::first(cid)?;
         let b: Box<dyn ConnectionLike + Send>;
         let host = conn.get_host();
+        dbg!(&conn);
         if conn.is_cluster {
-            b = Box::new(Self::get_cluster(&host, &conn.password).await?);
+            b = Box::new(Self::get_cluster(conn.clone()).await?);
         } else {
-            b = Box::new(Self::get_normal(&host, &conn.password).await?);
+            b = Box::new(Self::get_normal(conn.clone()).await?);
         }
-        let conn = Self {
+        Ok(Self {
             id: utils::random_str(32),
             cid,
             conn: b,
@@ -59,39 +129,38 @@ impl CusConnection {
             nodes: vec![],
             db: 0,
             created_at: Local::now(),
-        };
-        return Ok(conn);
+            connection_model: Some(conn),
+        })
     }
     // get the conn with host
-    pub async fn build_anonymous(host: &String, password: &String) -> Result<Self, CusError> {
+    pub async fn build_anonymous<T: redis::IntoConnectionInfo + Debug>(
+        params: T,
+    ) -> Result<Self, CusError> {
         let b: Box<dyn ConnectionLike + Send>;
-        b = Box::new(Self::get_normal(host, password).await?);
-        let conn = Self {
+        b = Box::new(Self::get_normal(params).await?);
+        Ok(Self {
             id: utils::random_str(32),
             cid: 0,
             conn: b,
             is_cluster: false,
-            host: host.clone(),
+            host: String::from(""),
             nodes: vec![],
             db: 0,
             created_at: Local::now(),
-        };
-        return Ok(conn);
+            connection_model: None,
+        })
     }
 
     // get normal redis connection
-    pub async fn get_normal(host: &str, password: &str) -> Result<Connection, CusError> {
-        let client = Client::open(host)?;
+    pub async fn get_normal<T: redis::IntoConnectionInfo + Debug>(
+        params: T,
+    ) -> Result<Connection, CusError> {
+        let client = Client::open(params)?;
+
         let rx = timeout(Duration::from_secs(2), client.get_async_connection()).await;
         match rx {
             Ok(conn_result) => match conn_result {
-                Ok(mut connection) => {
-                    if password != "" {
-                        redis::cmd("auth")
-                            .arg(password)
-                            .query_async(&mut connection)
-                            .await?;
-                    }
+                Ok(connection) => {
                     return Ok(connection);
                 }
                 Err(e) => {
@@ -104,18 +173,14 @@ impl CusConnection {
         }
     }
     // get cluster redis connection
-    pub async fn get_cluster(host: &str, password: &str) -> Result<ClusterConnection, CusError> {
-        let client = ClusterClient::new(vec![host]).unwrap();
+    pub async fn get_cluster<T: redis::IntoConnectionInfo + Debug>(
+        params: T,
+    ) -> Result<ClusterConnection, CusError> {
+        let client = ClusterClient::new(vec![params]).unwrap();
         let rx = timeout(Duration::from_secs(2), client.get_async_connection()).await;
         match rx {
             Ok(conn_result) => match conn_result {
-                Ok(mut connection) => {
-                    if password != "" {
-                        redis::cmd("auth")
-                            .arg(password)
-                            .query_async(&mut connection)
-                            .await?;
-                    }
+                Ok(connection) => {
                     return Ok(connection);
                 }
                 Err(e) => {
@@ -375,7 +440,10 @@ impl ConnectionManager {
             let mut nodes: Vec<Node> = vec![];
             for ss in items {
                 if ss.trim() != "" {
-                    let node = Node::build(ss.to_string());
+                    let mut node = Node::build(ss.to_string());
+                    if let Some(model) = conn.connection_model.clone() {
+                        node.password = model.password
+                    }
                     nodes.push(node)
                 }
             }
@@ -438,5 +506,71 @@ impl ConnectionManager {
 
     pub async fn remove_tx(&self) {
         self.debug_tx.lock().await.remove(0);
+    }
+}
+
+/**
+ * see https://redis.io/commands/slowlog-get/
+ */
+#[derive(Serialize, Clone, Debug, Default)]
+pub struct SlowLog {
+    pub uid: String,
+    pub id: i64,
+    pub processed_at: i64,
+    pub time: i64,
+    pub cmd: String,
+    pub client_ip: String,
+    pub client_name: String,
+}
+
+impl SlowLog {
+    pub fn build(s: &Vec<Value>) -> Self {
+        let mut log = Self::default();
+        if let Some(v) = s.get(0) {
+            log.id = i64::from_redis_value(v).unwrap();
+        }
+        if let Some(v) = s.get(1) {
+            log.processed_at = i64::from_redis_value(v).unwrap();
+        }
+        if let Some(v) = s.get(2) {
+            log.time = i64::from_redis_value(v).unwrap();
+        }
+        if let Some(v) = s.get(3) {
+            let cmd: Vec<String> = Vec::from_redis_value(v).unwrap_or(vec![]);
+            log.cmd = cmd.join(" ")
+        }
+        if let Some(v) = s.get(4) {
+            log.client_ip = String::from_redis_value(&v).unwrap();
+        }
+        if let Some(v) = s.get(5) {
+            log.client_name = String::from_redis_value(&v).unwrap();
+        }
+        log.uid = random_str(32);
+        log
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct ScanResult {
+    pub cursor: String,
+    pub keys: Vec<String>,
+}
+
+impl ScanResult {
+    pub fn build(value: &Value) -> Self {
+        let mut cursor = String::from("0");
+        let mut keys: Vec<String> = vec![];
+        match value {
+            Value::Bulk(s) => {
+                if let Some(first) = s.get(0) {
+                    cursor = String::from_redis_value(first).unwrap();
+                }
+                if let Some(second) = s.get(1) {
+                    keys = Vec::from_redis_value(&second).unwrap();
+                }
+            }
+            _ => {}
+        };
+        Self { cursor, keys }
     }
 }

@@ -73,6 +73,9 @@ const Index: React.FC<{
                   .validateFields()
                   .then((v) => {
                     setTestLoading(true)
+                    if (v.password === '') {
+                      delete v.password
+                    }
                     request<string>('server/ping', 0, v)
                       .then((res) => {
                         if (res.data === 'PONG') {
@@ -92,7 +95,9 @@ const Index: React.FC<{
               type="primary"
               onClick={async () => {
                 const v = await form.validateFields()
-                console.log(v)
+                if (v.password === '') {
+                  delete v.password
+                }
                 if (props.connection == null) {
                   await request('connections/add', 0, v)
                 } else {

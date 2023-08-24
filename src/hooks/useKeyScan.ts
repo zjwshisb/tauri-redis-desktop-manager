@@ -19,7 +19,7 @@ export function useScanCursor<T = string>(connection: APP.Connection) {
     if (connection.is_cluster) {
       return connection.nodes.map((v) => {
         return {
-          node: v,
+          node: v.id,
           cursor: '0'
         }
       })

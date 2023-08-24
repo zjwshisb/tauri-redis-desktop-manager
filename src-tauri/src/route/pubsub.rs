@@ -1,7 +1,7 @@
 use crate::conn::ConnectionManager;
-use crate::model::Connection as Conn;
 use crate::pubsub::{PubsubItem, PubsubManager};
 use crate::response::EventResp;
+use crate::sqlite::Connection as Conn;
 use crate::utils;
 use crate::{conn::CusConnection, err::CusError};
 use futures::stream::StreamExt;
@@ -32,7 +32,7 @@ pub async fn subscribe<'r>(
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
     let model = Conn::first(cid)?;
     let host = model.get_host();
-    let conn: Connection = CusConnection::get_normal(&host, &model.password).await?;
+    let conn: Connection = CusConnection::get_normal(model).await?;
     let mut pubsub = conn.into_pubsub();
     for x in args.channels {
         pubsub.subscribe(&x).await?;
@@ -107,7 +107,7 @@ pub async fn monitor<'r>(
 ) -> Result<String, CusError> {
     let model = Conn::first(cid)?;
     let host = model.get_host();
-    let conn: Connection = CusConnection::get_normal(&host, &model.password).await?;
+    let conn: Connection = CusConnection::get_normal(model).await?;
     let mut monitor: redis::aio::Monitor = conn.into_monitor();
 
     let event_name = utils::random_str(32);

@@ -5,8 +5,7 @@ import request from '@/utils/request'
 
 const NodeItem: React.FC<{
   connection: APP.Connection
-  node: string
-  active: boolean
+  node: APP.Node
 }> = (props) => {
   const [keyCount, setKeyCount] = React.useState(0)
 
@@ -15,7 +14,7 @@ const NodeItem: React.FC<{
   React.useEffect(() => {
     setLoading(true)
     request<number>('cluster/nodesize', props.connection.id, {
-      node: props.node
+      id: props.node.id
     })
       .then((res) => {
         setKeyCount(res.data)
@@ -33,10 +32,12 @@ const NodeItem: React.FC<{
   }, [keyCount, loading])
 
   return (
-    <ItemLayout active={props.active} clickAble={false}>
+    <ItemLayout active={false} clickAble={false}>
       <div className="flex flex-1">
         <CloudServerOutlined className="mr-1 text-sm" />
-        <div>{props.node}</div>
+        <div>
+          {props.node.host}:{props.node.port}
+        </div>
         <div className="ml-2">{child}</div>
       </div>
     </ItemLayout>

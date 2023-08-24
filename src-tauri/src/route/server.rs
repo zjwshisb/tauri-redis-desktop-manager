@@ -1,19 +1,11 @@
-use std::{collections::HashMap, fmt::Debug};
+use std::collections::HashMap;
 
 use crate::{
-    conn::{ConnectionManager, CusConnection},
+    conn::{ConnectionManager, CusConnection, SlowLog},
     err::CusError,
-    model::redis::SlowLog,
+    form::ConnectionForm,
 };
 use redis::{FromRedisValue, Value};
-use serde::Deserialize;
-
-#[derive(Deserialize, Debug)]
-struct PingArgs {
-    host: String,
-    port: i64,
-    password: String,
-}
 
 pub async fn info<'r>(
     cid: u32,
@@ -26,9 +18,8 @@ pub async fn ping<'r>(
     payload: String,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
-    let params: PingArgs = serde_json::from_str(payload.as_str())?;
-    let host = format!("redis://{}:{}", params.host, params.port);
-    let mut conn = CusConnection::build_anonymous(&host, &params.password).await?;
+    let params: ConnectionForm = serde_json::from_str(payload.as_str())?;
+    let mut conn = CusConnection::build_anonymous(params).await?;
     let v = manager
         .execute_with(&mut redis::cmd("ping"), &mut conn)
         .await?;

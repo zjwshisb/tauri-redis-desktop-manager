@@ -27,12 +27,14 @@ export function formatColumns<T>(c: ColumnsType<T>, showIndex: boolean) {
 
 export default function CusTable<T extends object>(
   props: TableProps<T> & {
-    onLoadMore?: () => void
+    onLoadMore?: () => Promise<any>
     more?: boolean
     showIndex?: boolean
   }
 ) {
   const { t } = useTranslation()
+
+  const [loading, setLoading] = React.useState(false)
 
   const { columns, showIndex = true, ...others } = props
 
@@ -54,13 +56,17 @@ export default function CusTable<T extends object>(
       ></Table>
       {others.more !== undefined && (
         <Button
+          loading={loading}
           disabled={!others.more}
           icon={<PlusOutlined />}
           block
           className="my-4"
           onClick={() => {
             if (others.onLoadMore !== undefined) {
-              others.onLoadMore()
+              setLoading(true)
+              others.onLoadMore().finally(() => {
+                setLoading(false)
+              })
             }
           }}
         >
