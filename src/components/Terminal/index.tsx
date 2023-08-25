@@ -27,7 +27,6 @@ const Index: React.FC<{
     let r = rows
     if (filter !== '') {
       r = rows.filter((v) => {
-        console.log(v)
         if (v.message.includes(filter)) {
           return true
         }
@@ -40,9 +39,6 @@ const Index: React.FC<{
         }
         return false
       })
-    }
-    if (r.length > 100) {
-      r.splice(0, r.length - 100)
     }
     return r
   }, [filter, rows])

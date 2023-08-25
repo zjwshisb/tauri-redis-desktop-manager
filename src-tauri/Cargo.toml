@@ -27,6 +27,7 @@ futures = "*"
 rand="*"
 chrono="*"
 hex="*"
+reqwest = { version = "0.11", features = ["json"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

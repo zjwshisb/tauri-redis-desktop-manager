@@ -71,9 +71,9 @@ const Connection: React.FC<{
     if (isOpen && collapse) {
       let count = 0
       if (connection.is_cluster) {
-        count = connection.nodes.length
+        count = connection.nodes !== undefined ? connection.nodes.length : 0
       } else {
-        count = connection.dbs.length
+        count = connection.dbs !== undefined ? connection.dbs.length : 0
       }
       return (22 * count).toString() + 'px'
     } else {
@@ -84,7 +84,7 @@ const Connection: React.FC<{
     collapse,
     connection.is_cluster,
     connection.nodes,
-    connection.dbs.length
+    connection.dbs
   ])
 
   return (
@@ -141,7 +141,7 @@ const Connection: React.FC<{
         }}
       >
         {connection.is_cluster
-          ? connection.nodes.map((v) => {
+          ? connection.nodes?.map((v) => {
               return (
                 <NodeItem
                   key={v.id}
@@ -150,7 +150,7 @@ const Connection: React.FC<{
                 ></NodeItem>
               )
             })
-          : connection.dbs.map((db) => {
+          : connection.dbs?.map((db) => {
               const active =
                 store.keyInfo.info?.connection.id === connection.id &&
                 store.keyInfo.info?.db === db

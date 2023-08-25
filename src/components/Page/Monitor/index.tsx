@@ -5,13 +5,14 @@ import Terminal from '@/components/Terminal'
 import { type TerminalRow } from '@/components/Terminal/Row'
 import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
+import useArrayState from '@/hooks/useArrayState'
 
 const Monitor: React.FC<{
   connection: APP.Connection
 }> = (props) => {
   const [eventName, setEventName] = React.useState<string>('')
 
-  const [rows, setRows] = React.useState<TerminalRow[]>([])
+  const { items, append, clear } = useArrayState<TerminalRow>(100)
 
   const [stop, setStop] = React.useState(false)
 
@@ -30,13 +31,9 @@ const Monitor: React.FC<{
         .listen<string>(eventName, (r) => {
           try {
             const message: APP.EventPayload<string> = JSON.parse(r.payload)
-            setRows((prev) => {
-              return [...prev].concat([
-                {
-                  id: message.id,
-                  message: message.data
-                }
-              ])
+            append({
+              id: message.id,
+              message: message.data
             })
           } catch (e) {}
         })
@@ -49,7 +46,7 @@ const Monitor: React.FC<{
         unListen()
       }
     }
-  }, [eventName, stop])
+  }, [append, eventName, stop])
 
   return (
     <div>
@@ -76,10 +73,8 @@ const Monitor: React.FC<{
       </div>
       <Terminal
         className="h-[500px] w-full"
-        rows={rows}
-        onClear={() => {
-          setRows([])
-        }}
+        rows={items}
+        onClear={clear}
       ></Terminal>
     </div>
   )

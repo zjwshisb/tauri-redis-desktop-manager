@@ -6,8 +6,8 @@ declare namespace APP {
     auth: string
     version: string
     is_cluster: boolean
-    nodes: Node[]
-    dbs: number[]
+    nodes?: Node[]
+    dbs?: number[]
     readonly: boolean
   }
 

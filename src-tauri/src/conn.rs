@@ -114,7 +114,6 @@ impl CusConnection {
         let conn = Conn::first(cid)?;
         let b: Box<dyn ConnectionLike + Send>;
         let host = conn.get_host();
-        dbg!(&conn);
         if conn.is_cluster {
             b = Box::new(Self::get_cluster(conn.clone()).await?);
         } else {

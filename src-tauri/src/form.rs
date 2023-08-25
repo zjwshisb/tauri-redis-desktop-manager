@@ -1,7 +1,4 @@
-use crate::{err::CusError, sqlite};
-
 use ::redis as rds;
-use rusqlite::{self, params};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]

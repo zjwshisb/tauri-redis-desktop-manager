@@ -76,8 +76,6 @@ pub struct Connection {
     pub port: u16,
     pub password: Option<String>,
     pub is_cluster: bool,
-    pub nodes: Vec<String>,
-    pub dbs: Vec<u8>,
     pub readonly: bool,
 }
 
@@ -108,16 +106,16 @@ impl Connection {
             Ok(mut stmt) => {
                 return match stmt.query_row([id], |r| {
                     let mut is_cluster = false;
-                    let i: i64 = r.get(4).unwrap();
+                    let i: i64 = r.get(4).unwrap_or_default();
                     if i > 0 {
                         is_cluster = true
                     }
                     let mut readonly = false;
-                    let i: i64 = r.get(5).unwrap();
+                    let i: i64 = r.get(5).unwrap_or_default();
                     if i > 0 {
                         readonly = true
                     }
-                    let password_str: String = r.get(3).unwrap();
+                    let password_str: String = r.get(3).unwrap_or(String::from(""));
                     let mut password: Option<String> = None;
                     if password_str != "".to_string() {
                         password = Some(password_str.to_string());
@@ -128,8 +126,6 @@ impl Connection {
                         port: r.get(2).unwrap(),
                         password: password,
                         is_cluster,
-                        nodes: vec![],
-                        dbs: vec![],
                         readonly: readonly,
                     })
                 }) {
@@ -219,8 +215,6 @@ impl Connection {
                         password: row.get(3).unwrap(),
                         is_cluster,
                         readonly,
-                        nodes: vec![],
-                        dbs: vec![],
                     })
                 });
                 match connections_result {

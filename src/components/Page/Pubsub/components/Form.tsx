@@ -28,7 +28,7 @@ const Subscribe: React.FC<{
             initialValue={0}
           >
             <Select
-              options={props.connection.dbs.map((v) => {
+              options={props.connection.dbs?.map((v) => {
                 return {
                   label: v,
                   value: v

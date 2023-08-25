@@ -226,7 +226,11 @@ const MemoryAnalysis: React.FC<{
         </div>
       </div>
       <div className="border">
-        {keys.length === 0 && <Empty></Empty>}
+        {keys.length === 0 && (
+          <div className="h-[600px]">
+            <Empty className="py-10"></Empty>
+          </div>
+        )}
         {keys.length !== 0 && (
           <VirtualList
             height={600}

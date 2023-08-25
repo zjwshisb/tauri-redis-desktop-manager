@@ -32,11 +32,11 @@ const FieldViewer: React.FC<{
     return m
   }, [])
 
-  const change = React.useCallback((t: string, c: string) => {
+  const change = React.useCallback(async (t: string, c: string) => {
     const item = formatter[t]
     if (item !== undefined) {
       setIsOrigin(t === 'text')
-      setChild(item.render(c))
+      setChild(await item.render(c))
     }
   }, [])
 
@@ -87,7 +87,7 @@ const FieldViewer: React.FC<{
             style={{
               color: gold.primary
             }}
-            className="absolute bottom-[16px] right-[16px] hover:cursor-pointer"
+            className="absolute bottom-[8px] right-[8px] hover:cursor-pointer"
             onClick={(e) => {
               e.stopPropagation()
               if (types !== 'text') {

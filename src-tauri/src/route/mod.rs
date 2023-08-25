@@ -17,6 +17,7 @@ pub mod list;
 pub mod pubsub;
 pub mod server;
 pub mod set;
+pub mod transfer;
 pub mod zset;
 
 #[tauri::command]
@@ -80,6 +81,7 @@ pub async fn dispatch<'r>(
         "debug/log" => Response::new(debug::log(manager, window).await?),
         "debug/cancel" => Response::new(debug::cancel(manager).await?),
         "debug/clients" => Response::new(debug::clients(manager, pubsub).await?),
+        "transfer/php_unserialize" => Response::new(transfer::php_unserialize(payload).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

@@ -7,6 +7,8 @@ pub fn new_normal() -> CusError {
 #[derive(Debug, thiserror::Error)]
 pub enum CusError {
     #[error(transparent)]
+    Reqwest(#[from] reqwest::Error),
+    #[error(transparent)]
     Io(#[from] std::io::Error),
     #[error(transparent)]
     Redis(#[from] redis::RedisError),

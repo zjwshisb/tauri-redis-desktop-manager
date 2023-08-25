@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import Terminal from '@/components/Terminal'
 import { type TerminalRow } from '@/components/Terminal/Row'
 import Form, { type SubscribeForm } from './components/Form'
+import useArrayState from '@/hooks/useArrayState'
 
 const Pubsub: React.FC<{
   connection: APP.Connection
@@ -13,7 +14,7 @@ const Pubsub: React.FC<{
   const [eventName, setEventName] = React.useState<string>('')
   const [form, setForm] = React.useState<SubscribeForm>()
 
-  const [rows, setRows] = React.useState<TerminalRow[]>([])
+  const { items, append, clear } = useArrayState<TerminalRow>(100)
 
   const { t } = useTranslation()
 
@@ -30,22 +31,18 @@ const Pubsub: React.FC<{
   React.useEffect(() => {
     let unListen: (() => void) | undefined
     if (eventName !== '') {
-      setRows([])
+      clear()
       appWindow
         .listen<string>(eventName, (e) => {
           try {
             const message: APP.EventPayload<APP.PubsubMessage> = JSON.parse(
               e.payload
             )
-            setRows((prev) => {
-              return [...prev].concat([
-                {
-                  id: message.id,
-                  tags: [message.data.channel],
-                  message: message.data.payload,
-                  time: message.time
-                }
-              ])
+            append({
+              id: message.id,
+              tags: [message.data.channel],
+              message: message.data.payload,
+              time: message.time
             })
           } catch (e) {}
         })
@@ -58,7 +55,7 @@ const Pubsub: React.FC<{
         unListen()
       }
     }
-  }, [eventName])
+  }, [append, clear, eventName])
 
   const publish = React.useMemo(() => {
     if (form != null) {
@@ -86,13 +83,7 @@ const Pubsub: React.FC<{
   return (
     <div className="">
       <Form connection={props.connection} onChange={setForm}></Form>
-      <Terminal
-        className="h-[500px]"
-        rows={rows}
-        onClear={() => {
-          setRows([])
-        }}
-      ></Terminal>
+      <Terminal className="h-[500px]" rows={items} onClear={clear}></Terminal>
       <div className="py-2">
         <Divider orientation="left" plain>
           {t('Channel')}

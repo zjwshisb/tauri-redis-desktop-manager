@@ -8,35 +8,38 @@ const item: TypeFormat = {
   key: 'json',
   label: 'json',
 
-  render(content: string) {
-    let error = ''
-    try {
-      const obj = JSON.parse(content)
-      if (lodash.isPlainObject(obj)) {
-        return (
-          <ReactJson
-            validationMessage="error"
-            displayDataTypes={false}
-            indentWidth={2}
-            sortKeys={true}
-            style={{
-              wordBreak: 'break-all'
-            }}
-            collapseStringsAfterLength={200}
-            enableClipboard
-            src={obj}
-            name={false}
-            quotesOnKeys={false}
-            collapsed={1}
-          ></ReactJson>
-        )
-      } else {
-        error = 'Invalid Json Object'
+  async render(content: string) {
+    return await new Promise((resolve) => {
+      let error = ''
+      try {
+        const obj = JSON.parse(content)
+        if (lodash.isPlainObject(obj)) {
+          resolve(
+            <ReactJson
+              validationMessage="error"
+              displayDataTypes={false}
+              indentWidth={2}
+              sortKeys={true}
+              style={{
+                wordBreak: 'break-all'
+              }}
+              collapseStringsAfterLength={200}
+              enableClipboard
+              src={obj}
+              name={false}
+              quotesOnKeys={false}
+              collapsed={1}
+            ></ReactJson>
+          )
+          return
+        } else {
+          error = 'Invalid Json Object'
+        }
+      } catch (e: any) {
+        error = e.toString()
       }
-    } catch (e: any) {
-      error = e.toString()
-    }
-    return <Error message={error} />
+      resolve(<Error message={error} />)
+    })
   }
 }
 

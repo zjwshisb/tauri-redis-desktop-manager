@@ -11,13 +11,18 @@ mod sqlite;
 mod utils;
 use conn::ConnectionManager;
 use pubsub::PubsubManager;
-use tauri::Menu;
+use tauri::{CustomMenuItem, Menu, Submenu};
 
 fn main() {
     sqlite::init_sqlite();
 
     let app_name = "Tauri Redis Desktop Manager";
-    let menu: Menu = Menu::os_default(app_name);
+    let mut menu: Menu = Menu::os_default(app_name);
+
+    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    let close = CustomMenuItem::new("close".to_string(), "Close");
+    let submenu = Submenu::new("Function", Menu::new().add_item(quit).add_item(close));
+    menu = menu.add_submenu(submenu);
 
     tauri::Builder::default()
         .menu(menu)
