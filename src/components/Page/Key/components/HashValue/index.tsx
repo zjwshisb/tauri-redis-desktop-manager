@@ -10,6 +10,7 @@ import IconButton from '@/components/IconButton'
 import context from '../../context'
 import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
+import useTableColumn from '@/hooks/useTableColumn'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -22,6 +23,81 @@ const Index: React.FC<{
 
   const { fields, setFields, getFields, loading, more } =
     useFieldScan<APP.HashField>('key/hash/hscan', keys, params)
+
+  const columns = useTableColumn<APP.Field>(
+    [
+      {
+        dataIndex: 'name',
+        width: 200,
+        title: (
+          <div className="flex items-center justify-center">
+            <div>{t('Field Name')}</div>
+            <div
+              className="ml-2"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              <Input.Search
+                allowClear
+                size="small"
+                onSearch={(e) => {
+                  setParams({
+                    search: e
+                  })
+                }}
+              />
+            </div>
+          </div>
+        )
+      },
+      {
+        dataIndex: 'value',
+        title: t('Field Value'),
+        render(_, record) {
+          return <FieldViewer content={_}></FieldViewer>
+        }
+      }
+    ],
+    {
+      width: 200,
+      fixed: 'right',
+      render(_, record, index) {
+        return (
+          <Space>
+            <Editable connection={connection}>
+              <FieldForm
+                trigger={<IconButton icon={<EditOutlined />} />}
+                keys={keys}
+                field={record}
+                onSuccess={(f) => {
+                  setFields((prev) => {
+                    const newFields = [...prev]
+                    newFields[index] = f
+                    return newFields
+                  })
+                }}
+              />
+            </Editable>
+            <Editable connection={connection}>
+              <DeleteField
+                keys={keys}
+                field={record}
+                onSuccess={() => {
+                  setFields((prev) => {
+                    const newFields = [...prev]
+                    newFields.splice(index, 1)
+                    return newFields
+                  })
+                }}
+              />
+            </Editable>
+          </Space>
+        )
+      }
+    },
+    connection !== undefined && !connection.readonly
+  )
 
   return (
     <div>
@@ -44,78 +120,7 @@ const Index: React.FC<{
         more={more}
         onLoadMore={getFields}
         dataSource={fields}
-        columns={[
-          {
-            dataIndex: 'name',
-            width: 200,
-            title: (
-              <div className="flex items-center justify-center">
-                <div>{t('Field Name')}</div>
-                <div
-                  className="ml-2"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
-                >
-                  <Input.Search
-                    allowClear
-                    size="small"
-                    onSearch={(e) => {
-                      setParams({
-                        search: e
-                      })
-                    }}
-                  />
-                </div>
-              </div>
-            )
-          },
-          {
-            dataIndex: 'value',
-            title: t('Field Value'),
-            render(_, record) {
-              return <FieldViewer content={_}></FieldViewer>
-            }
-          },
-          {
-            title: t('Action'),
-            width: 200,
-            fixed: 'right',
-            render(_, record, index) {
-              return (
-                <Space>
-                  <Editable connection={connection}>
-                    <FieldForm
-                      trigger={<IconButton icon={<EditOutlined />} />}
-                      keys={keys}
-                      field={record}
-                      onSuccess={(f) => {
-                        setFields((prev) => {
-                          const newFields = [...prev]
-                          newFields[index] = f
-                          return newFields
-                        })
-                      }}
-                    />
-                  </Editable>
-                  <Editable connection={connection}>
-                    <DeleteField
-                      keys={keys}
-                      field={record}
-                      onSuccess={() => {
-                        setFields((prev) => {
-                          const newFields = [...prev]
-                          newFields.splice(index, 1)
-                          return newFields
-                        })
-                      }}
-                    />
-                  </Editable>
-                </Space>
-              )
-            }
-          }
-        ]}
+        columns={columns}
       ></CusTable>
     </div>
   )

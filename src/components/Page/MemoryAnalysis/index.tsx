@@ -10,6 +10,7 @@ import { CaretDownFilled, CaretUpFilled } from '@ant-design/icons'
 import { useScanCursor } from '@/hooks/useKeyScan'
 import classNames from 'classnames'
 import useStore from '@/hooks/useStore'
+import Page from '..'
 
 export interface KeyItem {
   name: string
@@ -18,7 +19,8 @@ export interface KeyItem {
 
 const MemoryAnalysis: React.FC<{
   connection: APP.Connection
-}> = ({ connection }) => {
+  pageKey: string
+}> = ({ connection, pageKey }) => {
   const [form, setForm] = React.useState<FilterForm>({
     search: '',
     db: 0,
@@ -156,7 +158,7 @@ const MemoryAnalysis: React.FC<{
   }, [sort])
 
   return (
-    <div>
+    <Page pageKey={pageKey}>
       <div className="flex">
         <Filter value={form} onValueChange={setForm} connection={connection} />
         <div className="mb-2 mr-2">
@@ -164,6 +166,7 @@ const MemoryAnalysis: React.FC<{
             <Button
               loading={loading}
               type="primary"
+              disabled={loading}
               onClick={() => {
                 analysis(formRef.current, true)
               }}
@@ -252,7 +255,7 @@ const MemoryAnalysis: React.FC<{
           </VirtualList>
         )}
       </div>
-    </div>
+    </Page>
   )
 }
 

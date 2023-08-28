@@ -1,7 +1,6 @@
 import { CopyOutlined, CheckOutlined } from '@ant-design/icons'
 import React from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { green } from '@ant-design/colors'
 
 const Copy: React.FC<{
   content: string
@@ -11,7 +10,7 @@ const Copy: React.FC<{
   const [showSuccess, setShowSuccess] = React.useState(false)
 
   if (showSuccess) {
-    return <CheckOutlined style={{ color: green.primary }} />
+    return <CheckOutlined />
   }
   return (
     <CopyToClipboard

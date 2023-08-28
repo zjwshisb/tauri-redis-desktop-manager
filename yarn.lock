@@ -5045,6 +5045,11 @@ react-resize-detector@^7.0.0:
   dependencies:
     lodash "^4.17.21"
 
+react-sticky-box@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.npmmirror.com/react-sticky-box/-/react-sticky-box-2.0.4.tgz#ec5f7f890465bcc13288939044765d818f3503d3"
+  integrity sha512-EcnT4fpyyrBwyy5tsWViBTFBMsJZijDC78s2D/GlqrKuU0vsmW+jNc/Ubs1C4/HF/YmTZ90Y5GIGLQMzScQQbA==
+
 react-textarea-autosize@^8.3.2:
   version "8.4.1"
   resolved "https://registry.npmmirror.com/react-textarea-autosize/-/react-textarea-autosize-8.4.1.tgz#bcfc5462727014b808b14ee916c01e275e8a8335"

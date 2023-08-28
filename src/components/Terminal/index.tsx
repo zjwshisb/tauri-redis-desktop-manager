@@ -10,10 +10,10 @@ const Index: React.FC<{
   rows: TerminalRow[]
   onClear: () => void
   className?: string
-}> = ({ rows, onClear, className }) => {
+  search?: string
+  onSearchChange?: (v: string) => void
+}> = ({ rows, onClear, className, search, onSearchChange }) => {
   const container = React.useRef<HTMLDivElement>(null)
-
-  const [filter, setFilter] = React.useState('')
 
   React.useLayoutEffect(() => {
     if (container.current != null) {
@@ -22,26 +22,6 @@ const Index: React.FC<{
   }, [rows])
 
   const { t } = useTranslation()
-
-  const items = React.useMemo(() => {
-    let r = rows
-    if (filter !== '') {
-      r = rows.filter((v) => {
-        if (v.message.includes(filter)) {
-          return true
-        }
-        if (v.tags !== undefined) {
-          for (const tag of v.tags) {
-            if (tag.includes(filter)) {
-              return true
-            }
-          }
-        }
-        return false
-      })
-    }
-    return r
-  }, [filter, rows])
 
   return (
     <div className={classNames(['flex flex-col', className])}>
@@ -52,22 +32,27 @@ const Index: React.FC<{
       >
         <MacScrollbar ref={container}>
           <div>
-            {items.map((v) => {
+            {rows.map((v) => {
               return <Row item={v} key={v.id}></Row>
             })}
           </div>
         </MacScrollbar>
       </div>
       <div className="flex py-2">
-        <div className="w-[200px]">
-          <Input
-            placeholder="filter"
-            value={filter}
-            onChange={(e) => {
-              setFilter(e.target.value)
-            }}
-          ></Input>
-        </div>
+        {onSearchChange != null && (
+          <div className="w-[200px]">
+            <Input
+              placeholder="filter"
+              value={search}
+              onChange={(e) => {
+                if (onSearchChange !== undefined) {
+                  onSearchChange(e.target.value)
+                }
+              }}
+            ></Input>
+          </div>
+        )}
+
         <Button onClick={onClear} className="ml-2">
           {t('Clear')}
         </Button>

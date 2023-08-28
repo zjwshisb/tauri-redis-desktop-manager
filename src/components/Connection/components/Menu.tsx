@@ -125,7 +125,9 @@ const Menu: React.FC<{
                 connection,
                 type: 'client',
                 key,
-                children: <Client connection={connection}></Client>
+                children: (
+                  <Client connection={connection} pageKey={key}></Client>
+                )
               })
               break
             }
@@ -135,7 +137,7 @@ const Menu: React.FC<{
                 label: key,
                 type: 'info',
                 key,
-                children: <Info connection={connection}></Info>,
+                children: <Info connection={connection} pageKey={key}></Info>,
                 connection
               })
               break
@@ -146,7 +148,7 @@ const Menu: React.FC<{
                 label: key,
                 type: 'node',
                 key,
-                children: <Node connection={connection}></Node>,
+                children: <Node connection={connection} pageKey={key}></Node>,
                 connection
               })
               break
@@ -157,7 +159,9 @@ const Menu: React.FC<{
                 label: key,
                 type: 'slow-log',
                 key,
-                children: <SlowLog connection={connection}></SlowLog>,
+                children: (
+                  <SlowLog connection={connection} pageKey={key}></SlowLog>
+                ),
                 connection
               })
               break
@@ -168,7 +172,9 @@ const Menu: React.FC<{
                 label: key,
                 type: 'config',
                 key,
-                children: <Config connection={connection}></Config>,
+                children: (
+                  <Config connection={connection} pageKey={key}></Config>
+                ),
                 connection
               })
               break
@@ -180,7 +186,10 @@ const Menu: React.FC<{
                 type: 'memory-analysis',
                 key,
                 children: (
-                  <MemoryAnalysis connection={connection}></MemoryAnalysis>
+                  <MemoryAnalysis
+                    connection={connection}
+                    pageKey={key}
+                  ></MemoryAnalysis>
                 ),
                 connection
               })
@@ -192,7 +201,9 @@ const Menu: React.FC<{
                 label: key,
                 type: 'pubsub',
                 key,
-                children: <Pubsub connection={connection}></Pubsub>,
+                children: (
+                  <Pubsub connection={connection} pageKey={key}></Pubsub>
+                ),
                 connection
               })
               break
@@ -203,7 +214,7 @@ const Menu: React.FC<{
                 label: key,
                 type: 'monitor',
                 key,
-                children: <Monitor connection={connection} />,
+                children: <Monitor connection={connection} pageKey={key} />,
                 connection
               })
               break

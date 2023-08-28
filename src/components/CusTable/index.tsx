@@ -2,28 +2,7 @@ import { Table, type TableProps } from 'antd'
 import React from 'react'
 import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { type ColumnsType } from 'antd/es/table'
 import { PlusOutlined } from '@ant-design/icons'
-
-export function formatColumns<T>(c: ColumnsType<T>, showIndex: boolean) {
-  const n = [...c]
-  if (showIndex) {
-    n.unshift({
-      title: '#',
-      width: 100,
-      render(_, __, index) {
-        return index + 1
-      }
-    })
-  }
-
-  n.forEach((v) => {
-    if (v.align === undefined) {
-      v.align = 'center'
-    }
-  })
-  return n
-}
 
 export default function CusTable<T extends object>(
   props: TableProps<T> & {
@@ -34,9 +13,7 @@ export default function CusTable<T extends object>(
 ) {
   const { t } = useTranslation()
 
-  const [loading, setLoading] = React.useState(false)
-
-  const { columns, showIndex = true, ...others } = props
+  const { columns, ...others } = props
 
   return (
     <div>
@@ -47,26 +24,19 @@ export default function CusTable<T extends object>(
         scroll={{
           x: 'auto'
         }}
-        columns={
-          columns !== undefined
-            ? formatColumns<T>(columns, showIndex)
-            : undefined
-        }
+        columns={columns}
         {...others}
       ></Table>
       {others.more !== undefined && (
         <Button
-          loading={loading}
+          loading={others.loading}
           disabled={!others.more}
           icon={<PlusOutlined />}
           block
           className="my-4"
           onClick={() => {
             if (others.onLoadMore !== undefined) {
-              setLoading(true)
-              others.onLoadMore().finally(() => {
-                setLoading(false)
-              })
+              others.onLoadMore()
             }
           }}
         >

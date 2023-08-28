@@ -12,10 +12,10 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize)]
 struct ScanArgs {
     cursor: String,
-    search: String,
+    search: Option<String>,
     db: u8,
     count: i64,
-    types: String,
+    types: Option<String>,
 }
 
 pub async fn scan<'r>(
@@ -29,14 +29,11 @@ pub async fn scan<'r>(
     cmd.arg(&args.cursor)
         .arg(&["count", &args.count.to_string()]);
 
-    if args.search != "" {
-        let mut search = args.search.clone();
-        search.insert_str(0, "*");
-        search.push_str("*");
-        cmd.arg(&["MATCH", &search]);
+    if let Some(search) = args.search {
+        cmd.arg(&["MATCH", format!("*{}*", &search).as_str()]);
     }
-    if args.types != "" {
-        cmd.arg(&["TYPE", &args.types]);
+    if let Some(types) = args.types {
+        cmd.arg(&["TYPE", &types]);
     }
     let value = manager.execute(cid, args.db, &mut cmd).await?;
     Ok(ScanResult::build(&value))
@@ -261,15 +258,13 @@ pub async fn analysis<'r>(
     let mut cmd = redis::cmd("scan");
     cmd.arg(&args.cursor)
         .arg(&["count", &args.count.to_string()]);
-
-    if args.search != "" {
-        let mut search = args.search.clone();
+    if let Some(mut search) = args.search {
         search.insert_str(0, "*");
         search.push_str("*");
         cmd.arg(&["MATCH", &search]);
     }
-    if args.types != "" {
-        cmd.arg(&["TYPE", &args.types]);
+    if let Some(types) = args.types {
+        cmd.arg(&["TYPE", &types]);
     }
     let value = manager.execute(cid, args.db, &mut cmd).await?;
     let result = ScanResult::build(&value);

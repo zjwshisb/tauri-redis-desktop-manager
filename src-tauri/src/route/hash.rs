@@ -11,7 +11,7 @@ struct HScanArgs {
     cursor: String,
     db: u8,
     count: i64,
-    search: String,
+    search: Option<String>,
 }
 #[derive(Serialize)]
 pub struct HScanResp {
@@ -29,9 +29,10 @@ pub async fn hscan<'r>(
     cmd.arg(args.name)
         .arg(args.cursor)
         .arg(&["COUNT", &args.count.to_string()]);
-    if args.search != "" {
-        cmd.arg(&["MATCH", format!("*{}*", args.search.as_str()).as_str()]);
+    if let Some(search) = args.search {
+        cmd.arg(&["MATCH", format!("*{}*", search).as_str()]);
     }
+
     let value = manager.execute(cid, args.db, &mut cmd).await?;
     if let Value::Bulk(s) = value {
         let cursor = String::from_redis_value(s.get(0).unwrap())?;

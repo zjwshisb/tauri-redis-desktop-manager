@@ -49,22 +49,6 @@ const Index: React.FC<{
           </Descriptions.Item>
         </Descriptions>
       </Card>
-      {/* <Row className="mt-4" gutter={20}>
-        <Col span={12}>
-          <Memory items={inKv} />
-        </Col>
-        <Col span={12}>
-          <Network items={inKv} />
-        </Col>
-      </Row>
-      <Row className="mt-4" gutter={20}>
-        <Col span={12}>
-          <Client items={inKv} />
-        </Col>
-        <Col span={12}>
-          <Ops items={inKv} />
-        </Col>
-      </Row> */}
       <Row className="mt-4">
         <Col span={24}>
           <DbInfo items={data} />
@@ -94,6 +78,7 @@ const Index: React.FC<{
                 {
                   title: t('Key'),
                   dataIndex: 'label',
+                  defaultSortOrder: 'ascend',
                   sorter(a, b) {
                     return a.label > b.label ? 1 : -1
                   }

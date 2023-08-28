@@ -1,12 +1,12 @@
 import React from 'react'
-import { Button, Input, Modal, Result, Space, Spin, message } from 'antd'
+import { Button, Input, Modal, Result, Space, message } from 'antd'
 import StringValue from './components/StringValue'
 import HashValue from './components/HashValue'
 import ListValue from './components/ListValue'
 import ZSetValue from './components/ZSetValue'
 import SetValue from './components/SetValue'
 import Name from './components/Name'
-import { ReloadOutlined, DeleteOutlined } from '@ant-design/icons'
+import { DeleteOutlined } from '@ant-design/icons'
 import Copy from '@/components/Copy'
 import useRequest from '@/hooks/useRequest'
 import request from '@/utils/request'
@@ -16,6 +16,7 @@ import TTL from './components/TTL'
 import { getPageKey } from '@/utils'
 import Editable from '@/components/Editable'
 import Context from './context'
+import Page from '..'
 const Index: React.FC<{
   name: string
   connection: APP.Connection
@@ -84,8 +85,8 @@ const Index: React.FC<{
   }
 
   return (
-    <Context.Provider value={connection}>
-      <Spin spinning={loading}>
+    <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
+      <Context.Provider value={connection}>
         {item !== undefined && (
           <div>
             <div className="pb-2">
@@ -136,10 +137,6 @@ const Index: React.FC<{
                   <Space>
                     <Button
                       className="mb-2"
-                      icon={<ReloadOutlined onClick={fetch} />}
-                    ></Button>
-                    <Button
-                      className="mb-2"
                       icon={<Copy content={item.name} />}
                     ></Button>
                     <Editable connection={connection}>
@@ -147,7 +144,6 @@ const Index: React.FC<{
                         className="mb-2"
                         onClick={handleDelete}
                         danger
-                        type="primary"
                         icon={<DeleteOutlined />}
                       ></Button>
                     </Editable>
@@ -158,8 +154,8 @@ const Index: React.FC<{
             <div>{value}</div>
           </div>
         )}
-      </Spin>
-    </Context.Provider>
+      </Context.Provider>
+    </Page>
   )
 }
 

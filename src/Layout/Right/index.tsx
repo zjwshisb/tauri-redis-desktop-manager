@@ -1,9 +1,10 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import { Tabs, Dropdown, Typography, FloatButton } from 'antd'
+import { Tabs, Dropdown, Typography, type TabsProps, theme } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { MacScrollbar } from 'mac-scrollbar'
+import StickyBox from 'react-sticky-box'
 
 const Index: React.FC = () => {
   const store = useStore()
@@ -23,37 +24,45 @@ const Index: React.FC = () => {
         key: 'close'
       },
       {
-        label: t('Close All Tags'),
+        label: t('Close All Tabs'),
         key: 'all'
       },
       {
-        label: t('Close Other Tags'),
+        label: t('Close Other Tabs'),
         key: 'other'
       },
       {
-        label: t('Close Left Tags'),
+        label: t('Close Left Tabs'),
         key: 'left'
       },
       {
-        label: t('Close Right Tags'),
+        label: t('Close Right Tabs'),
         key: 'right'
       }
     ]
   }, [t])
 
-  React.useEffect(() => {
-    console.log(store.page.active)
-  }, [store.page.active])
+  const {
+    token: { colorBgContainer }
+  } = theme.useToken()
+
+  const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
+    <StickyBox offsetTop={0} offsetBottom={20} style={{ zIndex: 1 }}>
+      <DefaultTabBar
+        {...props}
+        style={{ background: colorBgContainer, paddingTop: 10 }}
+      />
+    </StickyBox>
+  )
 
   return (
     <div className={'flex flex-1 h-screen bg-white box-border overflow-hidden'}>
-      <MacScrollbar className="w-full p-4 " ref={ref} id={'container'}>
-        <FloatButton.BackTop
-          target={() => {
-            const target = document.getElementById('container')
-            return target as HTMLElement
-          }}
-        />
+      <MacScrollbar
+        className="w-full px-4 bg-white"
+        style={{ zIndex: 9 }}
+        ref={ref}
+        id={'container'}
+      >
         <div className="pb-8 flex-1">
           {store.page.pages.length === 0 && (
             <div className="w-full h-[500px] flex items-center justify-center">
@@ -62,6 +71,7 @@ const Index: React.FC = () => {
           )}
           {store.page.pages.length > 0 && (
             <Tabs
+              renderTabBar={renderTabBar}
               size="small"
               hideAdd
               onEdit={(targetKey, action) => {
@@ -114,7 +124,7 @@ const Index: React.FC = () => {
                         items: rightMenus
                       }}
                     >
-                      <div className="max-w-xs truncate hover:context-menu">
+                      <div className="max-w-[200px] truncate hover:context-menu">
                         {v.label}
                       </div>
                     </Dropdown>

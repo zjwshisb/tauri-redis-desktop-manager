@@ -11,9 +11,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Debug)]
 struct ScanArgs {
     cursor: Vec<HashMap<String, String>>,
-    search: String,
+    search: Option<String>,
     count: i64,
-    types: String,
+    types: Option<String>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -42,14 +42,11 @@ pub async fn scan<'r>(
                         let mut cmd = redis::cmd("scan");
                         cmd.arg(cursor)
                             .arg(&["count", args.count.to_string().as_str()]);
-                        if args.search != "" {
-                            let mut search = args.search.clone();
-                            search.insert_str(0, "*");
-                            search.push_str("*");
-                            cmd.arg(&["MATCH", &search]);
+                        if let Some(search) = &args.search {
+                            cmd.arg(&["MATCH", &format!("*{}*", search)]);
                         }
-                        if args.types != "" {
-                            cmd.arg(&["TYPE", &args.types]);
+                        if let Some(types) = &args.types {
+                            cmd.arg(&["TYPE", types]);
                         }
                         let value = manager.execute_with(&mut cmd, &mut conn).await?;
                         let mut result = ScanResult::build(&value);
@@ -122,14 +119,11 @@ pub async fn analysis<'r>(
                         let mut cmd = redis::cmd("scan");
                         cmd.arg(cursor)
                             .arg(&["count", args.count.to_string().as_str()]);
-                        if args.search != "" {
-                            let mut search = args.search.clone();
-                            search.insert_str(0, "*");
-                            search.push_str("*");
-                            cmd.arg(&["MATCH", &search]);
+                        if let Some(search) = &args.search {
+                            cmd.arg(&["MATCH", &format!("*{}*", search)]);
                         }
-                        if args.types != "" {
-                            cmd.arg(&["TYPE", &args.types]);
+                        if let Some(types) = &args.types {
+                            cmd.arg(&["TYPE", types]);
                         }
                         let value = manager.execute_with(&mut cmd, &mut conn).await?;
                         let result = ScanResult::build(&value);

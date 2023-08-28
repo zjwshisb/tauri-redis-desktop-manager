@@ -4,8 +4,8 @@ import Error from '../Err'
 import request from '@/utils/request'
 
 const item: TypeFormat = {
-  key: 'phpunseriablize',
-  label: 'phpunseriablize',
+  key: 'php_unserialize',
+  label: 'Php Unserialize',
   render: async (content) => {
     try {
       const res = await request<string>(

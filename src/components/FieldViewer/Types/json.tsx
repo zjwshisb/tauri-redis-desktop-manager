@@ -6,7 +6,7 @@ import Error from '../Err'
 
 const item: TypeFormat = {
   key: 'json',
-  label: 'json',
+  label: 'Json',
 
   async render(content: string) {
     return await new Promise((resolve) => {

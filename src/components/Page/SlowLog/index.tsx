@@ -1,19 +1,21 @@
 import useRequest from '@/hooks/useRequest'
-import { Spin, Table } from 'antd'
+import { Table } from 'antd'
 import React from 'react'
 import dayjs from 'dayjs'
+import Page from '..'
 
 const SlowLog: React.FC<{
   connection: APP.Connection
-}> = ({ connection }) => {
-  const { data, loading } = useRequest<{
+  pageKey: string
+}> = ({ connection, pageKey }) => {
+  const { data, loading, fetch } = useRequest<{
     logs: APP.SlowLog[]
     time: number
     count: number
   }>('server/slow-log', connection.id)
 
   return (
-    <Spin spinning={loading}>
+    <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
       <div className="mb-2">
         <div>slowlog-log-slower-than: {data?.time}us</div>
         <div>slowlog-max-len: {data?.count}</div>
@@ -42,6 +44,7 @@ const SlowLog: React.FC<{
             dataIndex: 'time',
             align: 'center',
             title: 'amount time(us)',
+            defaultSortOrder: 'descend',
             sorter(a, b) {
               return a.time > b.time ? 1 : -1
             }
@@ -63,7 +66,7 @@ const SlowLog: React.FC<{
           }
         ]}
       ></Table>
-    </Spin>
+    </Page>
   )
 }
 export default SlowLog

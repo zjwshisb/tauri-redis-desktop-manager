@@ -55,7 +55,7 @@ const Connection: React.FC<{
           label: key,
           type: 'info',
           key,
-          children: <Info connection={connection}></Info>,
+          children: <Info connection={connection} pageKey={key}></Info>,
           connection
         })
         setCollapse(true)

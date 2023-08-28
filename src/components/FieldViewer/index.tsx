@@ -95,7 +95,7 @@ const FieldViewer: React.FC<{
               }
             }}
           >
-            {types}
+            {formatter[types]?.label}
             <MenuOutlined size={6} className="ml-1 text-xs" />
           </div>
         </Dropdown>

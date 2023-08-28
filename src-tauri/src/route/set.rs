@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 struct SScanArgs {
     cursor: String,
     name: String,
-    search: String,
+    search: Option<String>,
     db: u8,
     count: i64,
 }
@@ -27,8 +27,8 @@ pub async fn sscan<'r>(
     cmd.arg(&args.name)
         .arg(&args.cursor)
         .arg(&["COUNT", &args.count.to_string()]);
-    if args.search != "" {
-        cmd.arg(&["MATCH", &format!("*{}*", args.search)]);
+    if let Some(search) = args.search {
+        cmd.arg(&["MATCH", &format!("*{}*", search)]);
     }
     let values = manager.execute(cid, args.db, &mut cmd).await?;
     if let Value::Bulk(s) = values {

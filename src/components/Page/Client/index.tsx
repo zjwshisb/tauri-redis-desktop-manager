@@ -1,26 +1,12 @@
 import useRequest from '@/hooks/useRequest'
-import {
-  Button,
-  Col,
-  Input,
-  Modal,
-  Row,
-  Space,
-  Spin,
-  Table,
-  Tooltip,
-  message
-} from 'antd'
+import { Col, Input, Modal, Row, Space, Table, Tooltip, message } from 'antd'
 import React from 'react'
-import {
-  DeleteOutlined,
-  QuestionCircleOutlined,
-  ReloadOutlined
-} from '@ant-design/icons'
+import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { type ColumnType } from 'antd/es/table'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import IconButton from '@/components/IconButton'
+import Page from '..'
 
 interface ClientRow {
   id: string
@@ -66,7 +52,8 @@ function clientColumn(title: string, tooltip: string): ColumnType<ClientRow> {
 
 const Client: React.FC<{
   connection: APP.Connection
-}> = ({ connection }) => {
+  pageKey: string
+}> = ({ connection, pageKey }) => {
   const {
     data: clientStr,
     loading,
@@ -113,15 +100,10 @@ const Client: React.FC<{
   )
 
   return (
-    <Spin spinning={loading}>
+    <Page onRefresh={fetch} pageKey={pageKey} loading={loading}>
       <Row gutter={10} className="mb-2">
         <Col xs={24} xl={8} className="mb-2">
           <Input addonBefore={'total'} value={clients.length} readOnly></Input>
-        </Col>
-        <Col xs={24} xl={8} className="mb-2">
-          <Button>
-            <ReloadOutlined onClick={fetch} />
-          </Button>
         </Col>
       </Row>
       <Row>
@@ -222,7 +204,7 @@ const Client: React.FC<{
           ></Table>
         </Col>
       </Row>
-    </Spin>
+    </Page>
   )
 }
 export default Client

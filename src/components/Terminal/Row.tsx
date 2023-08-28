@@ -2,22 +2,14 @@ import React from 'react'
 
 export interface TerminalRow {
   time?: string
-  message: string
+  message: React.ReactNode
   tags?: string[]
   id: string | number
-  messageNode?: React.ReactNode
 }
 
 const Row: React.FC<{
   item: TerminalRow
 }> = ({ item }) => {
-  const message = React.useMemo(() => {
-    if (item.messageNode !== undefined) {
-      return item.messageNode
-    }
-    return item.message
-  }, [item.message, item.messageNode])
-
   return (
     <div className="flex font-mono px-2 break-words break-all">
       {item.time !== undefined && (
@@ -34,7 +26,7 @@ const Row: React.FC<{
           })}
         </div>
       )}
-      <div className="ml-2 font-medium">{message}</div>
+      <div className="ml-2 font-medium">{item.message}</div>
     </div>
   )
 }

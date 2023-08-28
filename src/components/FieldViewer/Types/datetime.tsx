@@ -5,7 +5,7 @@ import Error from '../Err'
 
 const item: TypeFormat = {
   key: 'datetime',
-  label: 'datetime',
+  label: 'Datetime',
   render: async (content) => {
     return await new Promise((resolve) => {
       const time = parseFloat(content)

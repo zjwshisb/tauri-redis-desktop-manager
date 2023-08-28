@@ -1,10 +1,18 @@
-import { Col, Row, Spin, Table } from 'antd'
+import { Col, Row, Table } from 'antd'
 import { type ColumnsType } from 'antd/es/table'
 import React from 'react'
+import Page from '..'
+import useRequest from '@/hooks/useRequest'
 
 const Node: React.FC<{
   connection: APP.Connection
-}> = ({ connection }) => {
+  pageKey: string
+}> = ({ connection, pageKey }) => {
+  const { data, fetch, loading } = useRequest<APP.Node[]>(
+    'cluster/nodes',
+    connection.id
+  )
+
   const columns: ColumnsType<APP.Node> = React.useMemo(() => {
     const fields = [
       'id',
@@ -27,11 +35,11 @@ const Node: React.FC<{
   }, [])
 
   return (
-    <Spin>
+    <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
       <Row>
         <Col span={24}>
           <Table
-            dataSource={connection.nodes.sort((a, b) =>
+            dataSource={data?.sort((a, b) =>
               a.config_epoch > b.config_epoch ? 1 : -1
             )}
             pagination={false}
@@ -45,7 +53,7 @@ const Node: React.FC<{
           ></Table>
         </Col>
       </Row>
-    </Spin>
+    </Page>
   )
 }
 export default Node

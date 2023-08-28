@@ -6,10 +6,18 @@ import { type TerminalRow } from '@/components/Terminal/Row'
 import { Button } from 'antd'
 import { useTranslation } from 'react-i18next'
 import useArrayState from '@/hooks/useArrayState'
+import { useLatest } from 'ahooks'
+import SearchText from '@/components/SearchText'
+import Page from '..'
 
 const Monitor: React.FC<{
   connection: APP.Connection
+  pageKey: string
 }> = (props) => {
+  const [search, setSearch] = React.useState('')
+
+  const searchRef = useLatest(search)
+
   const [eventName, setEventName] = React.useState<string>('')
 
   const { items, append, clear } = useArrayState<TerminalRow>(100)
@@ -31,10 +39,22 @@ const Monitor: React.FC<{
         .listen<string>(eventName, (r) => {
           try {
             const message: APP.EventPayload<string> = JSON.parse(r.payload)
-            append({
-              id: message.id,
-              message: message.data
-            })
+            if (
+              searchRef.current === '' ||
+              message.data
+                .toLocaleLowerCase()
+                .includes(searchRef.current.toLocaleLowerCase())
+            ) {
+              append({
+                id: message.id,
+                message: (
+                  <SearchText
+                    text={message.data}
+                    search={searchRef.current}
+                  ></SearchText>
+                )
+              })
+            }
           } catch (e) {}
         })
         .then((f) => {
@@ -46,10 +66,10 @@ const Monitor: React.FC<{
         unListen()
       }
     }
-  }, [append, eventName, stop])
+  }, [append, eventName, stop, searchRef])
 
   return (
-    <div>
+    <Page pageKey={props.pageKey}>
       <div className="mb-2">
         {!stop && (
           <Button
@@ -72,11 +92,13 @@ const Monitor: React.FC<{
         )}
       </div>
       <Terminal
+        search={search}
+        onSearchChange={setSearch}
         className="h-[500px] w-full"
         rows={items}
         onClear={clear}
       ></Terminal>
-    </div>
+    </Page>
   )
 }
 

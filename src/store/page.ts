@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import type React from 'react'
 import spark from 'spark-md5'
 import { openWindow } from '@/utils'
@@ -103,11 +103,24 @@ class PageStore {
     this.pages = pages
   }
 
+  async openNewWindowPageKey(key: string) {
+    const page = this.pages.find((v) => v.key === key)
+    if (page != null) {
+      await this.openNewWindowPage(page)
+      runInAction(() => {
+        this.removePage(key)
+      })
+    }
+    return await Promise.reject(new Error('Page Not Found'))
+  }
+
   async openNewWindowPage(p: Page) {
-    let url = `/src/windows/detail/index.html?type=${p.type}&cid=${p.connection.id}`
+    let url = `/src/windows/detail/index.html?type=${p.type}&cid=${
+      p.connection.id
+    }&key=${encodeURI(p.key)}`
     switch (p.type) {
       case 'key': {
-        url += `&db=${p.db}&key=${encodeURI(p.key)}&name=${encodeURI(p.name)}`
+        url += `&db=${p.db}&name=${encodeURI(p.name)}`
         break
       }
       case 'monitor': {

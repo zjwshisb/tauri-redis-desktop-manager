@@ -11,7 +11,7 @@ export function useFieldScan<T>(
 
   const [fields, setFields] = React.useState<T[]>([])
   const cursor = React.useRef('0')
-  const [more, setMore] = React.useState(true)
+  const [more, setMore] = React.useState(false)
 
   const [loading, setLoading] = React.useState(false)
 

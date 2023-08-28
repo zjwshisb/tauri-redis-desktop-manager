@@ -68,3 +68,8 @@ export async function openPage(page: Page) {
     store.page.openNewWindowPage(page)
   }
 }
+
+export function isMainWindow() {
+  const window = getCurrent()
+  return window.label === 'main'
+}

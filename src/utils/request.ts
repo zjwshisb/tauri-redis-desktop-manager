@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
 import { invoke } from '@tauri-apps/api/tauri'
 import { notification } from 'antd'
+import { isString } from 'lodash'
 
 export interface Response<T> {
   data: T
@@ -17,6 +19,12 @@ export default async function request<T>(
   }
 ): Promise<Response<T>> {
   try {
+    Object.keys(args).forEach((v) => {
+      if (isString(args[v]) && args[v] === '') {
+        args[v] = null
+      }
+    })
+
     const params = {
       path,
       cid,
@@ -24,7 +32,7 @@ export default async function request<T>(
     }
     const res = await invoke('dispatch', params)
     const data = JSON.parse(res as string)
-
+    console.log(path, args, data)
     return data as Response<T>
   } catch (err) {
     if (option.showNotice) {

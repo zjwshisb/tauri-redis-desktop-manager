@@ -2,17 +2,19 @@ import Editable from '@/components/Editable'
 import IconButton from '@/components/IconButton'
 import useRequest from '@/hooks/useRequest'
 import { EditOutlined } from '@ant-design/icons'
-import { Input, Spin, Table } from 'antd'
+import { Input, Table } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Edit from './Components/Edit'
 
 import Rewrite from './Components/Rewrite'
 import ResetStat from './Components/ResetStat'
+import Page from '..'
 
 const Config: React.FC<{
   connection: APP.Connection
-}> = ({ connection }) => {
+  pageKey: string
+}> = ({ connection, pageKey }) => {
   const { data, loading, fetch } = useRequest<Record<string, string>>(
     'config/all',
     connection.id
@@ -42,7 +44,7 @@ const Config: React.FC<{
   }, [data, search])
 
   return (
-    <Spin spinning={loading}>
+    <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
       <div className="flex mb-2">
         <div className="w-[300px]">
           <Input
@@ -68,6 +70,7 @@ const Config: React.FC<{
             align: 'center',
             dataIndex: 'name',
             width: 300,
+            defaultSortOrder: 'ascend',
             sorter(a, b) {
               return a.name > b.name ? 1 : -1
             }
@@ -95,7 +98,7 @@ const Config: React.FC<{
           }
         ]}
       ></Table>
-    </Spin>
+    </Page>
   )
 }
 export default Config

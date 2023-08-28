@@ -16,7 +16,6 @@ import Node from '@/components/Page/Node'
 import { type Page } from '@/store/page'
 import SlowLog from '@/components/Page/SlowLog'
 import AppLayout from '@/components/AppLayout'
-import { FloatButton } from 'antd'
 import Config from '@/components/Page/Config'
 import MemoryAnalysis from '@/components/Page/MemoryAnalysis'
 
@@ -54,7 +53,11 @@ const App: React.FC = () => {
   const children = React.useMemo(() => {
     let node = <></>
 
-    if (connection != null && store.connection.isOpen(connection.id)) {
+    if (
+      connection != null &&
+      store.connection.isOpen(connection.id) &&
+      params.key != null
+    ) {
       switch (params.type) {
         case 'key': {
           if (
@@ -74,35 +77,44 @@ const App: React.FC = () => {
           break
         }
         case 'info': {
-          node = <Info connection={connection}></Info>
+          node = <Info connection={connection} pageKey={params.key}></Info>
           break
         }
         case 'client': {
-          node = <Client connection={connection}></Client>
+          node = <Client connection={connection} pageKey={params.key}></Client>
           break
         }
         case 'monitor': {
-          node = <Monitor connection={connection}></Monitor>
+          node = (
+            <Monitor connection={connection} pageKey={params.key}></Monitor>
+          )
           break
         }
         case 'pubsub': {
-          node = <Pubsub connection={connection}></Pubsub>
+          node = <Pubsub connection={connection} pageKey={params.key}></Pubsub>
           break
         }
         case 'node': {
-          node = <Node connection={connection}></Node>
+          node = <Node connection={connection} pageKey={params.key}></Node>
           break
         }
         case 'slow-log': {
-          node = <SlowLog connection={connection}></SlowLog>
+          node = (
+            <SlowLog connection={connection} pageKey={params.key}></SlowLog>
+          )
           break
         }
         case 'config': {
-          node = <Config connection={connection}></Config>
+          node = <Config connection={connection} pageKey={params.key}></Config>
           break
         }
         case 'memory-analysis': {
-          node = <MemoryAnalysis connection={connection}></MemoryAnalysis>
+          node = (
+            <MemoryAnalysis
+              connection={connection}
+              pageKey={params.key}
+            ></MemoryAnalysis>
+          )
         }
       }
     }
@@ -119,13 +131,7 @@ const App: React.FC = () => {
   return (
     <AppLayout>
       <MacScrollbar className="p-4  w-full box-border" id="container">
-        <FloatButton.BackTop
-          target={() => {
-            const target = document.getElementById('container')
-            return target as HTMLElement
-          }}
-        />
-        <div className="box-border">{children}</div>
+        <div>{children}</div>
       </MacScrollbar>
     </AppLayout>
   )

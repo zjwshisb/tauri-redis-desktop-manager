@@ -7,9 +7,11 @@ import Terminal from '@/components/Terminal'
 import { type TerminalRow } from '@/components/Terminal/Row'
 import Form, { type SubscribeForm } from './components/Form'
 import useArrayState from '@/hooks/useArrayState'
+import Page from '..'
 
 const Pubsub: React.FC<{
   connection: APP.Connection
+  pageKey: string
 }> = (props) => {
   const [eventName, setEventName] = React.useState<string>('')
   const [form, setForm] = React.useState<SubscribeForm>()
@@ -81,7 +83,7 @@ const Pubsub: React.FC<{
   }, [form, props.connection.id, t])
 
   return (
-    <div className="">
+    <Page pageKey={props.pageKey}>
       <Form connection={props.connection} onChange={setForm}></Form>
       <Terminal className="h-[500px]" rows={items} onClear={clear}></Terminal>
       <div className="py-2">
@@ -90,7 +92,7 @@ const Pubsub: React.FC<{
         </Divider>
         {publish}
       </div>
-    </div>
+    </Page>
   )
 }
 
