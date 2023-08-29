@@ -7,6 +7,7 @@ pub struct ConnectionForm {
     pub host: String,
     pub port: u16,
     pub password: Option<String>,
+    pub username: Option<String>,
     pub is_cluster: bool,
     pub readonly: bool,
 }

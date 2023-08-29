@@ -10,7 +10,6 @@ import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import { Dropdown, Modal, message } from 'antd'
 import { useTranslation } from 'react-i18next'
-import ConnectionForm from '@/components/ConnectionForm'
 
 export interface DBType {
   db: number
@@ -24,30 +23,15 @@ const Index: React.FC<{
 
   const { t } = useTranslation()
 
-  const isOpen = React.useMemo(() => {
-    return store.connection.openIds[connection.id]
-  }, [connection.id, store.connection.openIds])
-
   const connectionMenus = React.useMemo(() => {
     const menus = [
       {
         key: 'edit',
         label: (
-          <ConnectionForm
-            onSuccess={store.connection.fetchConnections}
-            connection={connection}
-            trigger={
-              <div
-                className="flex"
-                onClick={(e) => {
-                  e.stopPropagation()
-                }}
-              >
-                <EditOutlined />
-                <div className="ml-2">{t('Edit Connection')}</div>
-              </div>
-            }
-          ></ConnectionForm>
+          <div className="flex">
+            <EditOutlined />
+            <div className="ml-2">{t('Edit Connection')}</div>
+          </div>
         )
       },
       {
@@ -60,7 +44,7 @@ const Index: React.FC<{
         )
       }
     ]
-    if (isOpen) {
+    if (connection.open === true) {
       menus.unshift({
         key: 'close',
         label: (
@@ -72,7 +56,7 @@ const Index: React.FC<{
       })
     }
     return menus
-  }, [store, connection, t, isOpen])
+  }, [t, connection.open])
 
   return (
     <Dropdown
@@ -92,14 +76,32 @@ const Index: React.FC<{
                   await request('connections/del', 0, {
                     id: connection.id
                   })
-                  store.removeConnection(connection.id)
+                  store.connection.remove(connection.id)
                   message.success(t('Success'))
                 }
               })
               break
             }
+            case 'edit': {
+              store.connection.openForm(connection)
+              // if (connection.open === true) {
+              //   Modal.confirm({
+              //     title: t('Notice'),
+              //     content: t('You must close the connection before editing'),
+              //     async onOk() {
+              //       setFormVisible(true)
+              //       store.closeConnection(connection.id).then(() => {
+              //         setTimeout(() => {}, 0)
+              //       })
+              //     }
+              //   })
+              // } else {
+              //   setFormVisible(true)
+              // }
+              break
+            }
             case 'close': {
-              store.closeConnection(connection.id)
+              store.connection.close(connection.id)
               break
             }
           }

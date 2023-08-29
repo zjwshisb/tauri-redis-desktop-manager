@@ -12,6 +12,12 @@ class KeysStore {
     makeAutoObservable(this)
   }
 
+  remove(cid: number) {
+    if (this.info?.connection.id === cid) {
+      this.info = null
+    }
+  }
+
   set(conn: APP.Connection, db: number = 0, node?: string) {
     this.info = {
       db,
@@ -20,4 +26,6 @@ class KeysStore {
     }
   }
 }
-export default KeysStore
+const obj = new KeysStore()
+export { KeysStore }
+export default obj

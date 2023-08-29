@@ -84,6 +84,7 @@
   "The COUNT option for command SCAN": "SCAN 命令的 COUNT 选项",
   "The COUNT option for command HSCAN,SSCAN,ZSCAN": " HSCAN,SSCAN,ZSCAN 命令的 COUNT 选项",
   "Are you sure delete <{{name}}>?":"确定删除<{{name}}>?",
+  "You must close the connection before editing": "需要关闭链接后才能编辑",
   "Are Sure Open A Monitor Page?":"确定打开一个monitor页面?",
   "Save Log To File": "保存日志到文件",
   "Open In New Window": "新窗口打开",
@@ -99,5 +100,6 @@
   "Continue": "继续",
   "Total Amount": "总数量",
   "Total Memory" :"总内存",
-  "Minimum Size": "最小大小"
+  "Minimum Size": "最小大小",
+  "Username": "用户名"
 }

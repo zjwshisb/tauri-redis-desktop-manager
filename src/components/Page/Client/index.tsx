@@ -1,12 +1,14 @@
 import useRequest from '@/hooks/useRequest'
-import { Col, Input, Modal, Row, Space, Table, Tooltip, message } from 'antd'
+import { Col, Input, Modal, Row, Space, Tooltip, message } from 'antd'
 import React from 'react'
 import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { type ColumnType } from 'antd/es/table'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
 import IconButton from '@/components/IconButton'
 import Page from '..'
+import useTableColumn from '@/hooks/useTableColumn'
+import Editable from '@/components/Editable'
+import CusTable from '@/components/CusTable'
 
 interface ClientRow {
   id: string
@@ -40,7 +42,6 @@ interface ClientRow {
 function clientColumn(title: string, tooltip: string): ColumnType<ClientRow> {
   return {
     dataIndex: title,
-    align: 'center',
     title: (
       <Tooltip title={tooltip}>
         {title}
@@ -59,8 +60,6 @@ const Client: React.FC<{
     loading,
     fetch
   } = useRequest<string>('client/list', connection.id)
-
-  const { t } = useTranslation()
 
   const clients = React.useMemo(() => {
     if (clientStr !== undefined) {
@@ -99,6 +98,72 @@ const Client: React.FC<{
     [connection.id, fetch]
   )
 
+  const columns = useTableColumn(
+    [
+      clientColumn('id', 'a unique 64-bit client ID'),
+      clientColumn('addr', 'address/port of the client'),
+      clientColumn(
+        'laddr',
+        'address/port of local address client connected to (bind address)'
+      ),
+      clientColumn('fd', ' file descriptor corresponding to the socket'),
+      clientColumn('name', 'the name set by the client with CLIENT SETNAME'),
+      clientColumn('age', 'total duration of the connection in seconds'),
+      clientColumn('idle', 'idle time of the connection in seconds'),
+      clientColumn('flags', 'client flags (see below)'),
+      clientColumn('db', 'current database ID'),
+      clientColumn('sub', 'number of channel subscriptions'),
+      clientColumn('psub', 'number of pattern matching subscriptions'),
+      clientColumn(
+        'ssub',
+        'number of shard channel subscriptions. Added in Redis 7.0.3'
+      ),
+      clientColumn('multi', 'number of commands in a MULTI/EXEC context'),
+      clientColumn('qbuf', 'query buffer length (0 means no query pending)'),
+      clientColumn(
+        'qbuf-free',
+        'free space of the query buffer (0 means the buffer is full)'
+      ),
+      clientColumn('argv-mem', 'argv-mem'),
+      clientColumn(
+        'multi-mem',
+        'memory is used up by buffered multi commands. Added in Redis 7.0'
+      ),
+      clientColumn('obl', 'output buffer length'),
+      clientColumn(
+        'oll',
+        'output list length (replies are queued in this list when the buffer is full)'
+      ),
+      clientColumn('omem', 'output buffer memory usage'),
+      clientColumn(
+        'tot-mem',
+        'total memory consumed by this client in its various buffers'
+      ),
+      clientColumn('events', 'file descriptor events (see below)'),
+      clientColumn('cmd', 'last command played'),
+      clientColumn('user', ' the authenticated username of the client'),
+      clientColumn('redir', 'client id of current client tracking redirection'),
+      clientColumn('resp', 'client RESP protocol version. Added in Redis 7.0')
+    ],
+    {
+      render(_, record) {
+        return (
+          <Space>
+            <Editable connection={connection}>
+              <IconButton
+                onClick={() => {
+                  handleKill(record.id)
+                }}
+                icon={<DeleteOutlined />}
+              ></IconButton>
+            </Editable>
+          </Space>
+        )
+      }
+    },
+    !connection.readonly
+  )
+
   return (
     <Page onRefresh={fetch} pageKey={pageKey} loading={loading}>
       <Row gutter={10} className="mb-2">
@@ -108,100 +173,11 @@ const Client: React.FC<{
       </Row>
       <Row>
         <Col span={24}>
-          <Table
-            pagination={false}
-            size="small"
+          <CusTable
             rowKey={'id'}
-            scroll={{
-              x: 'auto'
-            }}
-            bordered
             dataSource={clients}
-            columns={[
-              clientColumn('id', 'a unique 64-bit client ID'),
-              clientColumn('addr', 'address/port of the client'),
-              clientColumn(
-                'laddr',
-                'address/port of local address client connected to (bind address)'
-              ),
-              clientColumn(
-                'fd',
-                ' file descriptor corresponding to the socket'
-              ),
-              clientColumn(
-                'name',
-                'the name set by the client with CLIENT SETNAME'
-              ),
-              clientColumn(
-                'age',
-                'total duration of the connection in seconds'
-              ),
-              clientColumn('idle', 'idle time of the connection in seconds'),
-              clientColumn('flags', 'client flags (see below)'),
-              clientColumn('db', 'current database ID'),
-              clientColumn('sub', 'number of channel subscriptions'),
-              clientColumn('psub', 'number of pattern matching subscriptions'),
-              clientColumn(
-                'ssub',
-                'number of shard channel subscriptions. Added in Redis 7.0.3'
-              ),
-              clientColumn(
-                'multi',
-                'number of commands in a MULTI/EXEC context'
-              ),
-              clientColumn(
-                'qbuf',
-                'query buffer length (0 means no query pending)'
-              ),
-              clientColumn(
-                'qbuf-free',
-                'free space of the query buffer (0 means the buffer is full)'
-              ),
-              clientColumn('argv-mem', 'argv-mem'),
-              clientColumn(
-                'multi-mem',
-                'memory is used up by buffered multi commands. Added in Redis 7.0'
-              ),
-              clientColumn('obl', 'output buffer length'),
-              clientColumn(
-                'oll',
-                'output list length (replies are queued in this list when the buffer is full)'
-              ),
-              clientColumn('omem', 'output buffer memory usage'),
-              clientColumn(
-                'tot-mem',
-                'total memory consumed by this client in its various buffers'
-              ),
-              clientColumn('events', 'file descriptor events (see below)'),
-              clientColumn('cmd', 'last command played'),
-              clientColumn('user', ' the authenticated username of the client'),
-              clientColumn(
-                'redir',
-                'client id of current client tracking redirection'
-              ),
-              clientColumn(
-                'resp',
-                'client RESP protocol version. Added in Redis 7.0'
-              ),
-              {
-                title: t('Action'),
-                fixed: 'right',
-                align: 'center',
-                render(_, record) {
-                  return (
-                    <Space>
-                      <IconButton
-                        onClick={() => {
-                          handleKill(record.id)
-                        }}
-                        icon={<DeleteOutlined />}
-                      ></IconButton>
-                    </Space>
-                  )
-                }
-              }
-            ]}
-          ></Table>
+            columns={columns}
+          ></CusTable>
         </Col>
       </Row>
     </Page>

@@ -28,22 +28,11 @@ pub fn init_sqlite() {
             id    INTEGER PRIMARY KEY,
             host  TEXT NOT NULL,
             port  INTEGER NOT NULL,
+            username TEXT,
             password  TEXT,
             is_cluster INTEGER NOT NULL DEFAULT 0,
             readonly INTEGER NOT NULL DEFAULT 0
         )",
-            (), // empty list of parameters.
-        )
-        .unwrap();
-    client
-        .execute(
-            "CREATE TABLE IF NOT EXISTS logs (
-        id    INTEGER PRIMARY KEY,
-        cmd  TEXT NOT NULL,
-        response  TEXT NOT NULL,
-        host  TEXT NOT NULL,
-        created_at TEXT NOT NULL
-    )",
             (), // empty list of parameters.
         )
         .unwrap();
@@ -71,10 +60,11 @@ fn get_data_path() -> String {
 
 #[derive(Debug, Serialize, Clone)]
 pub struct Connection {
-    pub id: u16,
+    pub id: i64,
     pub host: String,
     pub port: u16,
     pub password: Option<String>,
+    pub username: Option<String>,
     pub is_cluster: bool,
     pub readonly: bool,
 }
@@ -85,7 +75,7 @@ impl redis::IntoConnectionInfo for Connection {
             addr: redis::ConnectionAddr::Tcp(self.host.clone(), self.port),
             redis: redis::RedisConnectionInfo {
                 db: 0,
-                username: None,
+                username: self.username,
                 password: self.password,
             },
         })
@@ -100,18 +90,18 @@ impl Connection {
     pub fn first(id: u32) -> Result<Connection, CusError> {
         let conn = get_sqlite_client()?;
         let stmt_result = conn.prepare(
-            "select id, host, port, password, is_cluster, readonly from connections where id= ?1",
+            "select id, host, port, password, username, is_cluster, readonly from connections where id= ?1",
         );
         match stmt_result {
             Ok(mut stmt) => {
                 return match stmt.query_row([id], |r| {
                     let mut is_cluster = false;
-                    let i: i64 = r.get(4).unwrap_or_default();
+                    let i: i64 = r.get(5).unwrap_or_default();
                     if i > 0 {
                         is_cluster = true
                     }
                     let mut readonly = false;
-                    let i: i64 = r.get(5).unwrap_or_default();
+                    let i: i64 = r.get(6).unwrap_or_default();
                     if i > 0 {
                         readonly = true
                     }
@@ -120,11 +110,17 @@ impl Connection {
                     if password_str != "".to_string() {
                         password = Some(password_str.to_string());
                     }
+                    let username_str: String = r.get(4).unwrap_or(String::from(""));
+                    let mut username: Option<String> = None;
+                    if username_str != "".to_string() {
+                        username = Some(username_str.to_string());
+                    }
                     Ok(Connection {
                         id: r.get(0).unwrap(),
                         host: r.get(1).unwrap(),
                         port: r.get(2).unwrap(),
-                        password: password,
+                        password,
+                        username,
                         is_cluster,
                         readonly: readonly,
                     })
@@ -140,7 +136,7 @@ impl Connection {
             }
         }
     }
-    pub fn save(self) -> Result<Connection, CusError> {
+    pub fn save(&mut self) -> Result<(), CusError> {
         let conn = get_sqlite_client()?;
         if self.id > 0 {
             let mut is_cluster = 0;
@@ -152,28 +148,29 @@ impl Connection {
                 readonly = 1;
             }
             let r = conn.execute(
-                "UPDATE connections set host= ?1,port= ?2, password= ?3, is_cluster= ?4, readonly =?5 where id = ?6",
-                params!(self.host, self.port, self.password,  is_cluster, readonly, self.id),
+                "UPDATE connections set host= ?1,port= ?2, password= ?3,username= ?4, is_cluster= ?5, readonly =?6 where id = ?7",
+                params!(self.host, self.port, self.password, self.username, is_cluster, readonly, self.id),
             );
             match r {
                 Err(e) => {
                     return Err(CusError::App(e.to_string()));
                 }
                 _ => {
-                    return Ok(self);
+                    return Ok(());
                 }
             }
         } else {
             let r = conn.execute(
-                "insert into connections (host, port, password) values(?1, ?2, ?3)",
-                (&self.host, &self.port, &self.password),
+                "insert into connections (host, port, password, username) values(?1, ?2, ?3, ?4)",
+                (&self.host, &self.port, &self.password, &self.username),
             );
             match r {
                 Err(e) => {
                     return Err(CusError::App(e.to_string()));
                 }
-                _ => {
-                    return Ok(self);
+                Ok(_) => {
+                    self.id = conn.last_insert_rowid();
+                    return Ok(());
                 }
             }
         }
@@ -193,13 +190,14 @@ impl Connection {
 
     pub fn all() -> Result<Vec<Connection>, CusError> {
         let conn = crate::sqlite::get_sqlite_client()?;
-        let stmt_result =
-            conn.prepare("select id, host, port, password, is_cluster, readonly from connections");
+        let stmt_result = conn.prepare(
+            "select id, host, port, password, username, is_cluster, readonly from connections",
+        );
         match stmt_result {
             Ok(mut stmt) => {
                 let connections_result = stmt.query_map([], |row| {
                     let mut is_cluster = false;
-                    let i: i64 = row.get(4).unwrap();
+                    let i: i64 = row.get(5).unwrap();
                     if i > 0 {
                         is_cluster = true
                     }
@@ -213,6 +211,7 @@ impl Connection {
                         host: row.get(1).unwrap(),
                         port: row.get(2).unwrap(),
                         password: row.get(3).unwrap(),
+                        username: row.get(4).unwrap(),
                         is_cluster,
                         readonly,
                     })

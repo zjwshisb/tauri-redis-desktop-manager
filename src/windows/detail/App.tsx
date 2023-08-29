@@ -18,13 +18,10 @@ import SlowLog from '@/components/Page/SlowLog'
 import AppLayout from '@/components/AppLayout'
 import Config from '@/components/Page/Config'
 import MemoryAnalysis from '@/components/Page/MemoryAnalysis'
+import { computed } from 'mobx'
 
 const App: React.FC = () => {
   const store = useStore()
-
-  React.useEffect(() => {
-    store.connection.fetchConnections()
-  }, [store.connection])
 
   const params = useSearchParam<{
     name: string
@@ -50,14 +47,10 @@ const App: React.FC = () => {
     }
   }, [connection?.id, store.connection])
 
-  const children = React.useMemo(() => {
+  const children = computed(() => {
     let node = <></>
 
-    if (
-      connection != null &&
-      store.connection.isOpen(connection.id) &&
-      params.key != null
-    ) {
+    if (connection != null && connection.open === true && params.key != null) {
       switch (params.type) {
         case 'key': {
           if (
@@ -65,6 +58,7 @@ const App: React.FC = () => {
             params.db !== undefined &&
             params.key !== undefined
           ) {
+            console.log('hahaha')
             node = (
               <Key
                 connection={connection}
@@ -119,14 +113,7 @@ const App: React.FC = () => {
       }
     }
     return node
-  }, [
-    connection,
-    params.db,
-    params.key,
-    params.name,
-    params.type,
-    store.connection
-  ])
+  }).get()
 
   return (
     <AppLayout>

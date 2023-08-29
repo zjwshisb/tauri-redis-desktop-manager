@@ -17,6 +17,7 @@ import Menu from './components/Menu'
 import { useTranslation } from 'react-i18next'
 import Info from '@/components/Page/Info'
 import { getPageKey } from '@/utils'
+import { computed } from 'mobx'
 
 const Connection: React.FC<{
   connection: APP.Connection
@@ -25,13 +26,10 @@ const Connection: React.FC<{
 
   const [collapse, setCollapse] = React.useState(false)
 
-  const isOpen = React.useMemo(() => {
-    return store.connection.openIds[connection.id]
-  }, [connection.id, store.connection.openIds])
   const { t } = useTranslation()
 
   const icon = React.useMemo(() => {
-    if (isOpen) {
+    if (connection.open === true) {
       if (collapse) {
         return (
           <CaretRightFilled className="text-sm mr-1 rotate-90 transition-all" />
@@ -42,10 +40,10 @@ const Connection: React.FC<{
     } else {
       return <DisconnectOutlined className="text-sm mr-1" />
     }
-  }, [collapse, isOpen])
+  }, [collapse, connection.open])
 
   const onItemClick = React.useCallback(async () => {
-    if (isOpen) {
+    if (connection.open === true) {
       setCollapse((p) => !p)
     } else {
       try {
@@ -61,14 +59,14 @@ const Connection: React.FC<{
         setCollapse(true)
       } catch {}
     }
-  }, [connection, isOpen, store.connection, store.page])
+  }, [connection, store.connection, store.page])
 
   const onItemClickTh = useThrottleFn(onItemClick, {
     wait: 300
   })
 
   const height = React.useMemo(() => {
-    if (isOpen && collapse) {
+    if (connection.open === true && collapse) {
       let count = 0
       if (connection.is_cluster) {
         count = connection.nodes !== undefined ? connection.nodes.length : 0
@@ -80,12 +78,35 @@ const Connection: React.FC<{
       return 0
     }
   }, [
-    isOpen,
-    collapse,
+    connection.open,
     connection.is_cluster,
     connection.nodes,
-    connection.dbs
+    connection.dbs,
+    collapse
   ])
+
+  const children = computed(() => {
+    console.log('test')
+    if (connection.is_cluster) {
+      return connection.nodes?.map((v) => {
+        return <NodeItem key={v.id} node={v} connection={connection}></NodeItem>
+      })
+    } else {
+      return connection.dbs?.map((db) => {
+        const active =
+          store.keyInfo.info?.connection.id === connection.id &&
+          store.keyInfo.info?.db === db
+        return (
+          <DBItem
+            db={db}
+            connection={connection}
+            active={active}
+            key={db}
+          ></DBItem>
+        )
+      })
+    }
+  }).get()
 
   return (
     <div className={'my-2 px-2 box-border'}>
@@ -106,7 +127,7 @@ const Connection: React.FC<{
         </div>
         <div className={'flex-shrink-0 pl-2'}>
           <Space>
-            {isOpen && (
+            {connection.open === true && (
               <>
                 {connection.is_cluster && (
                   <Tooltip title={'keys'}>
@@ -140,29 +161,7 @@ const Connection: React.FC<{
           height
         }}
       >
-        {connection.is_cluster
-          ? connection.nodes?.map((v) => {
-              return (
-                <NodeItem
-                  key={v.id}
-                  node={v}
-                  connection={connection}
-                ></NodeItem>
-              )
-            })
-          : connection.dbs?.map((db) => {
-              const active =
-                store.keyInfo.info?.connection.id === connection.id &&
-                store.keyInfo.info?.db === db
-              return (
-                <DBItem
-                  db={db}
-                  connection={connection}
-                  active={active}
-                  key={db}
-                ></DBItem>
-              )
-            })}
+        {children}
       </div>
     </div>
   )

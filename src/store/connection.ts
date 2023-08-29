@@ -1,13 +1,55 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import request from '../utils/request'
 import { getAll } from '@tauri-apps/api/window'
+import { Modal } from 'antd'
+import pageStore from './page'
+import keysStore from './key'
+interface Form {
+  open: boolean
+  item?: APP.Connection
+}
 
 class ConnectionStore {
   connections: APP.Connection[] = []
-  openIds: Record<number, boolean> = {}
+  form: Form = {
+    open: false,
+    item: undefined
+  }
 
   constructor() {
     makeAutoObservable(this)
+    this.fetchConnections()
+  }
+
+  openForm(connection?: APP.Connection) {
+    if (connection !== undefined && connection.open === true) {
+      Modal.confirm({
+        title: 'Notice',
+        content: 'You must close the connection before editing',
+        onOk: () => {
+          this.close(connection.id)
+          this.form = {
+            open: true,
+            item: connection
+          }
+        }
+      })
+    } else {
+      this.form = {
+        open: true,
+        item: connection
+      }
+    }
+  }
+
+  getForm() {
+    return this.form
+  }
+
+  closeForm() {
+    this.form = {
+      open: false
+    }
   }
 
   async open(id: number) {
@@ -15,42 +57,53 @@ class ConnectionStore {
     if (connection !== undefined) {
       await request('connections/open', connection.id)
       if (connection.is_cluster) {
-        const res = await request<APP.Node[]>('cluster/nodes', connection.id)
-        connection.nodes = res.data.filter((v) => {
-          return v.flags.includes('master')
+        const nodes = await request<APP.Node[]>('cluster/nodes', connection.id)
+        runInAction(() => {
+          connection.nodes = nodes.data.filter((v) => {
+            return v.flags.includes('master')
+          })
         })
       } else {
-        const res = await request<string>('config/databases', connection.id)
-        const count = parseInt(res.data)
+        const db = await request<string>('config/databases', connection.id)
+        const count = parseInt(db.data)
         const dbs: number[] = []
         for (let i = 0; i < count; i++) {
           dbs.push(i)
         }
-        connection.dbs = dbs
+        runInAction(() => {
+          connection.dbs = dbs
+        })
       }
-      const res = await request<string>('server/version', connection.id)
-      connection.version = res.data
-      this.update(connection.id, connection)
+      const version = await request<string>('server/version', connection.id)
       runInAction(() => {
-        this.openIds[id] = true
-        this.openIds = { ...this.openIds }
+        connection.version = version.data
+        connection.open = true
       })
     }
   }
 
   async close(id: number) {
-    this.openIds[id] = false
-    this.openIds = { ...this.openIds }
-    // close the connection webview
-    const allWindow = getAll()
-    for (const x of allWindow) {
-      const index = x.label.indexOf('-')
-      if (index > -1) {
-        const webviewId = x.label.substring(0, index)
-        if (id.toString() === webviewId) {
-          x.close()
+    const connection = this.connections.find((v) => v.id === id)
+    if (connection != null) {
+      await request('connections/close', id)
+      runInAction(() => {
+        connection.open = false
+        connection.dbs = undefined
+        connection.version = undefined
+        connection.nodes = undefined
+        pageStore.removeByConnectionId(id)
+        keysStore.remove(id)
+        const allWindow = getAll()
+        for (const x of allWindow) {
+          const index = x.label.indexOf('-')
+          if (index > -1) {
+            const webviewId = x.label.substring(0, index)
+            if (id.toString() === webviewId) {
+              x.close()
+            }
+          }
         }
-      }
+      })
     }
   }
 
@@ -61,28 +114,28 @@ class ConnectionStore {
         ...this.connections[index],
         ...data
       }
-      this.connections = [...this.connections]
     }
+  }
+
+  add(connection: APP.Connection) {
+    this.connections.push(connection)
   }
 
   remove(id: number) {
     const index = this.connections.findIndex((v) => v.id === id)
     if (index > -1) {
+      this.close(this.connections[index].id)
       this.connections.splice(index, 1)
-      this.connections = [...this.connections]
     }
-  }
-
-  isOpen(id: number) {
-    return this.openIds[id]
   }
 
   async fetchConnections() {
     const res = await request<APP.Connection[]>('connections/get', 0)
-
     runInAction(() => {
       this.connections = res.data
     })
   }
 }
-export default ConnectionStore
+const obj = new ConnectionStore()
+export { ConnectionStore }
+export default obj

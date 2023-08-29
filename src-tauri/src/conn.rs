@@ -112,6 +112,7 @@ impl CusConnection {
     // get the conn with connection id
     pub async fn build(cid: u32) -> Result<Self, CusError> {
         let conn = Conn::first(cid)?;
+        dbg!(&conn);
         let b: Box<dyn ConnectionLike + Send>;
         let host = conn.get_host();
         if conn.is_cluster {

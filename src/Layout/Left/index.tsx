@@ -6,7 +6,6 @@ import { observer } from 'mobx-react-lite'
 import ResizableDiv from '@/components/ResizableDiv'
 import Setting from '@/components/Setting'
 import useStore from '@/hooks/useStore'
-import ConnectionForm from '@/components/ConnectionForm'
 import { PlusOutlined } from '@ant-design/icons'
 import DeBug from '@/components/DeBug'
 import { MacScrollbar } from 'mac-scrollbar'
@@ -16,50 +15,48 @@ const Index: React.FC = () => {
 
   const { t } = useTranslation()
 
-  React.useEffect(() => {
-    store.connection.fetchConnections()
-  }, [store.connection])
-
   return (
-    <ResizableDiv
-      className={'h-screen border-r'}
-      minWidth={200}
-      defaultWidth={300}
-      maxWidth={500}
-    >
-      <div
-        className="flex h-full  bg-white flex-col overflow-hidden"
-        id="connection"
+    <>
+      <ResizableDiv
+        className={'h-screen border-r'}
+        minWidth={200}
+        defaultWidth={300}
+        maxWidth={500}
       >
-        <div className="flex items-center p-2 flex-shrink-0">
-          <div className="flex-1">
-            <ConnectionForm
-              trigger={
-                <Button size="large" block icon={<PlusOutlined />}>
-                  {t('New Connection')}
-                </Button>
-              }
-              onSuccess={() => {
-                store.connection.fetchConnections()
-              }}
-            ></ConnectionForm>
+        <div
+          className="flex h-full  bg-white flex-col overflow-hidden"
+          id="connection"
+        >
+          <div className="flex items-center p-2 flex-shrink-0">
+            <div className="flex-1">
+              <Button
+                size="large"
+                block
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  store.connection.openForm()
+                }}
+              >
+                {t('New Connection')}
+              </Button>
+            </div>
+            <div className="ml-2 flex-shrink-0">
+              <Setting />
+            </div>
+            <div className="ml-2 flex-shrink-0">
+              <DeBug />
+            </div>
           </div>
-          <div className="ml-2 flex-shrink-0">
-            <Setting />
-          </div>
-          <div className="ml-2 flex-shrink-0">
-            <DeBug />
-          </div>
+          <MacScrollbar>
+            <div className={'pr-2'}>
+              {store.connection.connections.map((v) => {
+                return <Connection connection={v} key={v.id}></Connection>
+              })}
+            </div>
+          </MacScrollbar>
         </div>
-        <MacScrollbar>
-          <div className={'pr-2'}>
-            {store.connection.connections.map((v) => {
-              return <Connection connection={v} key={v.id}></Connection>
-            })}
-          </div>
-        </MacScrollbar>
-      </div>
-    </ResizableDiv>
+      </ResizableDiv>
+    </>
   )
 }
 export default observer(Index)

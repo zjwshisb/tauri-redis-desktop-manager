@@ -1,8 +1,9 @@
-import { Col, Row, Table } from 'antd'
+import { Col, Row } from 'antd'
 import { type ColumnsType } from 'antd/es/table'
 import React from 'react'
 import Page from '..'
 import useRequest from '@/hooks/useRequest'
+import CusTable from '@/components/CusTable'
 
 const Node: React.FC<{
   connection: APP.Connection
@@ -38,19 +39,13 @@ const Node: React.FC<{
     <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
       <Row>
         <Col span={24}>
-          <Table
+          <CusTable
             dataSource={data?.sort((a, b) =>
               a.config_epoch > b.config_epoch ? 1 : -1
             )}
-            pagination={false}
-            size="small"
             rowKey={'id'}
-            scroll={{
-              x: 'auto'
-            }}
-            bordered
             columns={columns}
-          ></Table>
+          ></CusTable>
         </Col>
       </Row>
     </Page>

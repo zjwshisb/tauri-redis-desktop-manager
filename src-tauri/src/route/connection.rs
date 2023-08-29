@@ -9,15 +9,17 @@ use tauri::State;
 
 pub fn add(payload: String) -> Result<Connection, CusError> {
     let args: form::ConnectionForm = serde_json::from_str(&payload)?;
-    let connection = Connection {
+    let mut connection = Connection {
         id: 0,
         host: args.host,
         port: args.port,
         password: args.password,
+        username: args.username,
         is_cluster: args.is_cluster,
         readonly: args.readonly,
     };
-    connection.save()
+    connection.save()?;
+    Ok(connection)
 }
 
 pub fn get() -> Result<Vec<Connection>, CusError> {
@@ -44,7 +46,9 @@ pub fn update(payload: String) -> Result<Connection, CusError> {
         connection.port = args.port;
         connection.is_cluster = args.is_cluster;
         connection.readonly = args.readonly;
-        return Ok(connection.save()?);
+        connection.username = args.username;
+        connection.save()?;
+        return Ok(connection);
     }
     Err(CusError::App(String::from("not found")))
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import { CloudServerOutlined, ReloadOutlined } from '@ant-design/icons'
 import ItemLayout from '../ItemLayout'
 import request from '@/utils/request'
+import { autorun } from 'mobx'
 
 const NodeItem: React.FC<{
   connection: APP.Connection
@@ -11,7 +12,7 @@ const NodeItem: React.FC<{
 
   const [loading, setLoading] = React.useState(false)
 
-  React.useEffect(() => {
+  autorun(() => {
     setLoading(true)
     request<number>('cluster/nodesize', props.connection.id, {
       id: props.node.id
@@ -22,7 +23,7 @@ const NodeItem: React.FC<{
       .finally(() => {
         setLoading(false)
       })
-  }, [props.connection, props.node])
+  })
 
   const child = React.useMemo(() => {
     if (loading) {

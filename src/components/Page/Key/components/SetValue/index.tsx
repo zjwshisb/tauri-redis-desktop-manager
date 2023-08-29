@@ -9,6 +9,7 @@ import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
 import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
+import useTableColumn from '@/hooks/useTableColumn'
 
 const Index: React.FC<{
   keys: APP.SetKey
@@ -28,6 +29,70 @@ const Index: React.FC<{
     params
   )
 
+  const data = React.useMemo(() => {
+    return fields.map((v, index) => {
+      return {
+        index: index + 1,
+        value: v
+      }
+    })
+  }, [fields])
+
+  const columns = useTableColumn<APP.IndexValue>(
+    [
+      {
+        title: (
+          <div className="flex items-center justify-center">
+            <div>{t('Value')}</div>
+            <div
+              className="w-30 ml-2"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              <Input.Search
+                allowClear
+                size="small"
+                onSearch={(e) => {
+                  setParams({
+                    search: e
+                  })
+                }}
+              />
+            </div>
+          </div>
+        ),
+        dataIndex: 'value',
+        sorter: (a, b) => {
+          return a.value > b.value ? 1 : -1
+        },
+        render(_) {
+          return <FieldViewer content={_}></FieldViewer>
+        }
+      }
+    ],
+    {
+      width: '200px',
+      fixed: 'right',
+      render(_, record, index) {
+        return (
+          <Space>
+            <Editable connection={connection}>
+              <SRem
+                keys={keys}
+                value={record.value}
+                onSuccess={() => {
+                  onRefresh()
+                }}
+              ></SRem>
+            </Editable>
+          </Space>
+        )
+      }
+    },
+    connection !== undefined && !connection.readonly
+  )
+
   return (
     <div>
       <Space className="pb-2">
@@ -45,66 +110,8 @@ const Index: React.FC<{
         more={more}
         onLoadMore={getFields}
         rowKey={'value'}
-        dataSource={fields.map((v, index) => {
-          return {
-            index: index + 1,
-            value: v
-          }
-        })}
-        columns={[
-          {
-            title: (
-              <div className="flex items-center justify-center">
-                <div>{t('Value')}</div>
-                <div
-                  className="w-30 ml-2"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
-                >
-                  <Input.Search
-                    allowClear
-                    size="small"
-                    onSearch={(e) => {
-                      setParams({
-                        search: e
-                      })
-                    }}
-                  />
-                </div>
-              </div>
-            ),
-            dataIndex: 'value',
-            align: 'center',
-            sorter: (a, b) => {
-              return a.value > b.value ? 1 : -1
-            },
-            render(_) {
-              return <FieldViewer content={_}></FieldViewer>
-            }
-          },
-          {
-            title: t('Action'),
-            width: '200px',
-            fixed: 'right',
-            align: 'center',
-            render(_, record, index) {
-              return (
-                <Space>
-                  <Editable connection={connection}>
-                    <SRem
-                      keys={keys}
-                      value={record.value}
-                      onSuccess={() => {
-                        onRefresh()
-                      }}
-                    ></SRem>
-                  </Editable>
-                </Space>
-              )
-            }
-          }
-        ]}
+        dataSource={data}
+        columns={columns}
       ></CusTable>
     </div>
   )

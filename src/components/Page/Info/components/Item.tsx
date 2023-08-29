@@ -1,9 +1,10 @@
 import React from 'react'
-import { Card, Col, Row, Table, Descriptions, Input } from 'antd'
+import { Card, Col, Row, Descriptions, Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { SearchOutlined } from '@ant-design/icons'
 
 import DbInfo from './DbInfo'
+import CusTable from '@/components/CusTable'
 
 interface Item {
   label: string
@@ -68,10 +69,7 @@ const Index: React.FC<{
                 }}
               />
             </div>
-            <Table
-              bordered
-              size="small"
-              pagination={false}
+            <CusTable
               rowKey={'label'}
               dataSource={items}
               columns={[
@@ -88,7 +86,7 @@ const Index: React.FC<{
                   dataIndex: 'value'
                 }
               ]}
-            ></Table>
+            ></CusTable>
           </Card>
         </Col>
       </Row>

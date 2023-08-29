@@ -4,10 +4,11 @@ declare namespace APP {
     host: string
     port: number
     auth: string
-    version: string
+    version?: string
     is_cluster: boolean
     nodes?: Node[]
     dbs?: number[]
+    open?: boolean
     readonly: boolean
   }
 
@@ -67,6 +68,16 @@ declare namespace APP {
   type ZSetKey = BaseKey<'zset', ZSetField[]>
 
   type SetKey = BaseKey<'set', string[]>
+
+  interface IndexValue {
+    index: number
+    value: string
+  }
+
+  interface NameValue {
+    name: string
+    value: string
+  }
 
   interface EventPayload<T> {
     time: string

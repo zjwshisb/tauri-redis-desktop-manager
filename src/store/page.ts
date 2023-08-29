@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import type React from 'react'
 import spark from 'spark-md5'
 import { openWindow } from '@/utils'
@@ -69,25 +69,29 @@ class PageStore {
     }
   }
 
+  removeByConnectionId(id: number) {
+    this.pages = this.pages.filter((v) => {
+      return v.connection.id !== id
+    })
+  }
+
   removeAllPage() {
     this.pages = []
     this.active = ''
   }
 
   removeLeftPage(index: number) {
-    this.pages = this.pages.slice(index)
+    this.pages.splice(0, index)
   }
 
   removeRightPage(index: number) {
     this.pages.splice(index + 1)
-    this.pages = [...this.pages]
   }
 
   removePage(key: string) {
     const index = this.pages.findIndex((v) => v.key === key)
     if (index > -1) {
       this.pages.splice(index, 1)
-      this.pages = [...this.pages]
       if (key === this.active) {
         if (this.pages.length >= index + 1) {
           this.active = this.pages[index].key
@@ -95,23 +99,17 @@ class PageStore {
           this.active = this.pages[this.pages.length - 1].key
         }
       }
-      console.log(this.active)
     }
-  }
-
-  setPage(pages: Page[]) {
-    this.pages = pages
   }
 
   async openNewWindowPageKey(key: string) {
     const page = this.pages.find((v) => v.key === key)
     if (page != null) {
       await this.openNewWindowPage(page)
-      runInAction(() => {
-        this.removePage(key)
-      })
+      this.removePage(key)
+    } else {
+      return await Promise.reject(new Error('Page Not Found'))
     }
-    return await Promise.reject(new Error('Page Not Found'))
   }
 
   async openNewWindowPage(p: Page) {
@@ -168,7 +166,6 @@ class PageStore {
     const index = this.pages.findIndex((v) => v.key === key)
     if (index > -1) {
       this.pages[index] = page
-      this.pages = [...this.pages]
       if (this.active === key) {
         this.active = page.key
       }
@@ -182,8 +179,9 @@ class PageStore {
     } else {
       this.pages.push(page)
       this.active = page.key
-      this.pages = [...this.pages]
     }
   }
 }
-export default PageStore
+const obj = new PageStore()
+export { PageStore }
+export default obj

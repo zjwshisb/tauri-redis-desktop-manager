@@ -13,14 +13,9 @@ import React from 'react'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import useStore from '@/hooks/useStore'
+import { observer } from 'mobx-react-lite'
 
-const Index: React.FC<{
-  onSuccess: () => void
-  connection?: APP.Connection
-  trigger: React.ReactElement
-}> = (props) => {
-  const [visible, setVisible] = React.useState(false)
-
+const ConnectionForm: React.FC = (props) => {
   const [testLoading, setTestLoading] = React.useState(false)
 
   const [form] = useForm()
@@ -29,29 +24,27 @@ const Index: React.FC<{
 
   const store = useStore()
 
-  const trigger = React.cloneElement(props.trigger, {
-    onClick() {
-      setVisible(true)
-    }
-  })
+  const formItem = store.connection.getForm()
+
   React.useEffect(() => {
-    if (visible && props.connection != null) {
+    if (formItem.open && formItem.item != null) {
       form.setFieldsValue({
-        ...props.connection
+        ...formItem.item
       })
-      console.log(props.connection)
     }
-  }, [form, props.connection, visible])
+  }, [form, formItem.item, formItem.open])
 
   return (
     <div>
-      {trigger}
       <Modal
+        open={formItem.open}
         getContainer={() => {
           return document.getElementsByTagName('body')[0]
         }}
         title={
-          props.connection != null ? t('Edit Connection') : t('New Connection')
+          formItem.item !== undefined
+            ? t('Edit Connection')
+            : t('New Connection')
         }
         bodyStyle={{
           paddingTop: '20px'
@@ -60,7 +53,7 @@ const Index: React.FC<{
           <Space>
             <Button
               onClick={() => {
-                setVisible(false)
+                store.connection.closeForm()
                 form.resetFields()
               }}
             >
@@ -98,42 +91,50 @@ const Index: React.FC<{
                 if (v.password === '') {
                   delete v.password
                 }
-                if (props.connection == null) {
-                  await request('connections/add', 0, v)
+                if (formItem.item === undefined) {
+                  const res = await request<APP.Connection>(
+                    'connections/add',
+                    0,
+                    v
+                  )
+                  store.connection.add(res.data)
                 } else {
-                  await request('connections/update', 0, {
-                    ...v,
-                    id: props.connection.id
-                  })
-                  if (store.connection.isOpen(props.connection.id)) {
-                    store.closeConnection(props.connection.id)
+                  const res = await request<APP.Connection>(
+                    'connections/update',
+                    0,
+                    {
+                      ...v,
+                      id: formItem.item.id
+                    }
+                  )
+                  if (formItem.item.open === true) {
+                    store.connection.close(formItem.item.id)
                   }
+                  store.connection.update(formItem.item.id, res.data)
                 }
-                store.connection.fetchConnections()
+                store.connection.closeForm()
                 message.success(t('Success'))
-                props.onSuccess()
-                setVisible(false)
               }}
             >
               {t('OK')}
             </Button>
           </Space>
         }
-        open={visible}
         onCancel={() => {
-          setVisible(false)
+          store.connection.closeForm()
           form.resetFields()
         }}
         destroyOnClose
       >
         <Form
           form={form}
-          labelCol={{ span: 4 }}
+          labelCol={{ span: 7 }}
           initialValues={{
             port: 6379,
             host: '127.0.0.1',
             password: '',
-            is_cluster: false
+            is_cluster: false,
+            readonly: false
           }}
         >
           <Form.Item name="host" label={t('Host')} rules={[{ required: true }]}>
@@ -146,6 +147,7 @@ const Index: React.FC<{
           <Form.Item name="port" label={t('Port')} rules={[{ required: true }]}>
             <InputNumber min={0}></InputNumber>
           </Form.Item>
+
           <Form.Item name="password" label={t('Password')}>
             <Input.Password
               onClick={(e) => {
@@ -156,6 +158,18 @@ const Index: React.FC<{
               }).toString()}
             ></Input.Password>
           </Form.Item>
+
+          <Form.Item name="username" label={t('Username')}>
+            <Input
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+              placeholder={t('Please Enter {{name}}', {
+                name: t('Username')
+              }).toString()}
+            ></Input>
+          </Form.Item>
+
           <Form.Item
             tooltip={t('Other node will auto discover')}
             name="is_cluster"
@@ -177,4 +191,4 @@ const Index: React.FC<{
     </div>
   )
 }
-export default Index
+export default observer(ConnectionForm)

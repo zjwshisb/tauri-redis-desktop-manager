@@ -11,6 +11,7 @@ import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
 import Editable from '@/components/Editable'
+import useTableColumn from '@/hooks/useTableColumn'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -58,6 +59,15 @@ const Index: React.FC<{
     [keys, store.setting.setting.field_count]
   )
 
+  const data = React.useMemo(() => {
+    return items.map((v, index) => {
+      return {
+        value: v,
+        index
+      }
+    })
+  }, [items])
+
   React.useEffect(() => {
     if (items.length >= keys.length) {
       setMore(false)
@@ -70,6 +80,53 @@ const Index: React.FC<{
     index.current = 0
     getFields(true)
   }, [getFields])
+
+  const columns = useTableColumn<APP.IndexValue>(
+    [
+      {
+        title: t('Index'),
+        dataIndex: 'index',
+        align: 'center',
+        width: 100
+      },
+      {
+        dataIndex: 'value',
+        title: t('Value'),
+        render(_) {
+          return <FieldViewer content={_} />
+        }
+      }
+    ],
+    {
+      title: t('Action'),
+      width: 100,
+      fixed: 'right',
+      render(_, record, index) {
+        return (
+          <Space>
+            <Editable connection={connection}>
+              <LSet
+                keys={keys}
+                index={index}
+                value={record.value}
+                onSuccess={(value, index) => {
+                  setItems((prev) => {
+                    const newState = [...prev]
+                    if (newState.length >= index + 1) {
+                      newState[index] = value
+                    }
+                    return newState
+                  })
+                }}
+              />
+            </Editable>
+          </Space>
+        )
+      }
+    },
+    connection !== undefined && !connection.readonly,
+    false
+  )
 
   return (
     <div>
@@ -97,54 +154,8 @@ const Index: React.FC<{
         loading={loading}
         rowKey={'index'}
         onLoadMore={getFields}
-        dataSource={items.map((v, index) => {
-          return {
-            value: v,
-            index
-          }
-        })}
-        columns={[
-          {
-            title: t('Index'),
-            dataIndex: 'index',
-            align: 'center',
-            width: 100
-          },
-          {
-            dataIndex: 'value',
-            title: t('Value'),
-            render(_) {
-              return <FieldViewer content={_} />
-            }
-          },
-          {
-            title: t('Action'),
-            width: 100,
-            fixed: 'right',
-            render(_, record, index) {
-              return (
-                <Space>
-                  <Editable connection={connection}>
-                    <LSet
-                      keys={keys}
-                      index={index}
-                      value={record.value}
-                      onSuccess={(value, index) => {
-                        setItems((prev) => {
-                          const newState = [...prev]
-                          if (newState.length >= index + 1) {
-                            newState[index] = value
-                          }
-                          return newState
-                        })
-                      }}
-                    />
-                  </Editable>
-                </Space>
-              )
-            }
-          }
-        ]}
+        dataSource={data}
+        columns={columns}
       ></CusTable>
     </div>
   )

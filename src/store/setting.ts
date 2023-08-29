@@ -51,4 +51,6 @@ class SettingStore {
     localStorage.setItem(SETTING_CACHE_KEY, JSON.stringify(this.setting))
   }
 }
-export default SettingStore
+const obj = new SettingStore()
+export { SettingStore }
+export default obj
