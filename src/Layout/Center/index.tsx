@@ -81,10 +81,6 @@ const Index: React.FC<{
     }
   })
 
-  if (info == null) {
-    return <></>
-  }
-
   return (
     <ResizableDiv
       className={'h-screen border-r'}

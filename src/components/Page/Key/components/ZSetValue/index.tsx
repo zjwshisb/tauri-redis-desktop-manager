@@ -59,7 +59,9 @@ const Index: React.FC<{
       {
         dataIndex: 'score',
         title: t('Score'),
-        width: 200,
+        render(_) {
+          return <FieldViewer content={_} typesArr={['datetime', 'text']} />
+        },
         sorter: (a, b) => {
           if (a.score === b.score) {
             return 0

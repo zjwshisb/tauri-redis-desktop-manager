@@ -143,6 +143,7 @@ const Index: React.FC<{
                       <Button
                         className="mb-2"
                         onClick={handleDelete}
+                        type="primary"
                         danger
                         icon={<DeleteOutlined />}
                       ></Button>

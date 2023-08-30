@@ -7,8 +7,10 @@ import ItemLayout from '../ItemLayout'
 const Index: React.FC<{
   active: boolean
   connection: APP.Connection
-  db: number
+  item: APP.Database
 }> = (props) => {
+  const { connection, item } = props
+
   const [keyCount, setKeyCount] = React.useState(0)
 
   const [loading, setLoading] = React.useState(false)
@@ -17,8 +19,8 @@ const Index: React.FC<{
 
   React.useEffect(() => {
     setLoading(true)
-    request<number>('db/dbsize', props.connection?.id, {
-      db: props.db
+    request<number>('db/dbsize', connection.id, {
+      db: item.database
     })
       .then((res) => {
         setKeyCount(res.data)
@@ -26,7 +28,7 @@ const Index: React.FC<{
       .finally(() => {
         setLoading(false)
       })
-  }, [props.connection, props.db])
+  }, [connection.id, item])
 
   const child = React.useMemo(() => {
     if (loading) {
@@ -40,11 +42,11 @@ const Index: React.FC<{
       <div
         className="flex flex-1"
         onClick={() => {
-          store.keyInfo.set(props.connection, props.db)
+          store.keyInfo.set(props.connection, item.database)
         }}
       >
         <DatabaseOutlined className="mr-1 text-sm" />
-        <div className="w-6">{props.db}</div>
+        <div className="w-6">{item.database}</div>
         <div>{child}</div>
       </div>
     </ItemLayout>

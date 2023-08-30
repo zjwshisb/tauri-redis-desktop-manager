@@ -3,7 +3,8 @@ import {
   CaretRightFilled,
   DisconnectOutlined,
   ReloadOutlined,
-  KeyOutlined
+  KeyOutlined,
+  WarningOutlined
 } from '@ant-design/icons'
 import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
@@ -86,7 +87,6 @@ const Connection: React.FC<{
   ])
 
   const children = computed(() => {
-    console.log('test')
     if (connection.is_cluster) {
       return connection.nodes?.map((v) => {
         return <NodeItem key={v.id} node={v} connection={connection}></NodeItem>
@@ -95,13 +95,13 @@ const Connection: React.FC<{
       return connection.dbs?.map((db) => {
         const active =
           store.keyInfo.info?.connection.id === connection.id &&
-          store.keyInfo.info?.db === db
+          store.keyInfo.info?.db === db.database
         return (
           <DBItem
-            db={db}
+            item={db}
             connection={connection}
             active={active}
-            key={db}
+            key={db.database}
           ></DBItem>
         )
       })
@@ -127,6 +127,11 @@ const Connection: React.FC<{
         </div>
         <div className={'flex-shrink-0 pl-2'}>
           <Space>
+            {connection.err !== undefined && (
+              <Tooltip title={connection.err}>
+                <WarningOutlined className="text-orange-600"></WarningOutlined>
+              </Tooltip>
+            )}
             {connection.open === true && (
               <>
                 {connection.is_cluster && (

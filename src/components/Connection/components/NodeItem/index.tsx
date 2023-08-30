@@ -13,7 +13,6 @@ const NodeItem: React.FC<{
   const [loading, setLoading] = React.useState(false)
 
   autorun(() => {
-    setLoading(true)
     request<number>('cluster/nodesize', props.connection.id, {
       id: props.node.id
     })

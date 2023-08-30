@@ -4,6 +4,7 @@ import { getAll } from '@tauri-apps/api/window'
 import { Modal } from 'antd'
 import pageStore from './page'
 import keysStore from './key'
+
 interface Form {
   open: boolean
   item?: APP.Connection
@@ -55,30 +56,44 @@ class ConnectionStore {
   async open(id: number) {
     const connection = this.connections.find((v) => v.id === id)
     if (connection !== undefined) {
-      await request('connections/open', connection.id)
-      if (connection.is_cluster) {
-        const nodes = await request<APP.Node[]>('cluster/nodes', connection.id)
-        runInAction(() => {
-          connection.nodes = nodes.data.filter((v) => {
-            return v.flags.includes('master')
-          })
-        })
-      } else {
-        const db = await request<string>('config/databases', connection.id)
-        const count = parseInt(db.data)
-        const dbs: number[] = []
-        for (let i = 0; i < count; i++) {
-          dbs.push(i)
+      try {
+        await request('connections/open', connection.id)
+        if (connection.err !== undefined) {
+          connection.err = undefined
         }
+        if (connection.is_cluster) {
+          const nodes = await request<APP.Node[]>(
+            'cluster/nodes',
+            connection.id
+          )
+          runInAction(() => {
+            connection.nodes = nodes.data.filter((v) => {
+              return v.flags.includes('master')
+            })
+          })
+        } else {
+          const db = await request<string>('config/databases', connection.id)
+          const count = parseInt(db.data)
+          const dbs: APP.Database[] = []
+          for (let i = 0; i < count; i++) {
+            dbs.push({
+              database: i,
+              count: 0
+            })
+          }
+          runInAction(() => {
+            connection.dbs = dbs
+          })
+        }
+        const version = await request<string>('server/version', connection.id)
         runInAction(() => {
-          connection.dbs = dbs
+          connection.version = version.data
+          connection.open = true
         })
+      } catch (err) {
+        connection.err = err as string
+        console.log(err)
       }
-      const version = await request<string>('server/version', connection.id)
-      runInAction(() => {
-        connection.version = version.data
-        connection.open = true
-      })
     }
   }
 

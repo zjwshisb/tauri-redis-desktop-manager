@@ -5,13 +5,13 @@ import { Tabs, Dropdown, Typography, type TabsProps, theme } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { MacScrollbar } from 'mac-scrollbar'
 import StickyBox from 'react-sticky-box'
+import { computed } from 'mobx'
+import { KeyOutlined } from '@ant-design/icons'
 
 const Index: React.FC = () => {
   const store = useStore()
 
   const { t } = useTranslation()
-
-  const ref = React.useRef<HTMLElement>(null)
 
   const rightMenus = React.useMemo(() => {
     return [
@@ -55,15 +55,67 @@ const Index: React.FC = () => {
     </StickyBox>
   )
 
+  const items = computed(() =>
+    store.page.pages.map((v, index) => {
+      return {
+        label: (
+          <Dropdown
+            trigger={['contextMenu']}
+            menu={{
+              onClick(e) {
+                switch (e.key) {
+                  case 'window': {
+                    store.page.openNewWindowPage(v).then(() => {
+                      store.page.removePage(v.key)
+                    })
+                    break
+                  }
+
+                  case 'close': {
+                    store.page.removePage(v.key)
+                    break
+                  }
+                  case 'all': {
+                    store.page.removeAllPage()
+                    break
+                  }
+                  case 'other': {
+                    store.page.removeOtherPage(index)
+                    break
+                  }
+                  case 'left': {
+                    store.page.removeLeftPage(index)
+                    break
+                  }
+                  case 'right': {
+                    store.page.removeRightPage(index)
+                    break
+                  }
+                }
+              },
+              items: rightMenus
+            }}
+          >
+            <div className="max-w-[200px] truncate hover:context-menu">
+              {v.type === 'key' && <KeyOutlined className="!mr-0" />}
+              {v.label}
+            </div>
+          </Dropdown>
+        ),
+        key: v.key,
+        children: v.children
+      }
+    })
+  )
+
   return (
     <div className={'flex flex-1 h-screen bg-white box-border overflow-hidden'}>
       <MacScrollbar
         className="w-full px-4 bg-white"
         style={{ zIndex: 9 }}
-        ref={ref}
         id={'container'}
       >
-        <div className="pb-8 flex-1">
+        <div className="pb-8 flex-1 h-full">
           {store.page.pages.length === 0 && (
             <div className="w-full h-[500px] flex items-center justify-center">
               <Typography.Title>Tauri Redis Desktop Manager</Typography.Title>
@@ -84,55 +136,7 @@ const Index: React.FC = () => {
               }}
               type="editable-card"
               activeKey={store.page.active}
-              items={store.page.pages.map((v, index) => {
-                return {
-                  label: (
-                    <Dropdown
-                      trigger={['contextMenu']}
-                      menu={{
-                        onClick(e) {
-                          switch (e.key) {
-                            case 'window': {
-                              store.page.openNewWindowPage(v).then(() => {
-                                store.page.removePage(v.key)
-                              })
-                              break
-                            }
-
-                            case 'close': {
-                              store.page.removePage(v.key)
-                              break
-                            }
-                            case 'all': {
-                              store.page.removeAllPage()
-                              break
-                            }
-                            case 'other': {
-                              store.page.removeOtherPage(index)
-                              break
-                            }
-                            case 'left': {
-                              store.page.removeLeftPage(index)
-                              break
-                            }
-                            case 'right': {
-                              store.page.removeRightPage(index)
-                              break
-                            }
-                          }
-                        },
-                        items: rightMenus
-                      }}
-                    >
-                      <div className="max-w-[200px] truncate hover:context-menu">
-                        {v.label}
-                      </div>
-                    </Dropdown>
-                  ),
-                  key: v.key,
-                  children: v.children
-                }
-              })}
+              items={items.get()}
             />
           )}
         </div>

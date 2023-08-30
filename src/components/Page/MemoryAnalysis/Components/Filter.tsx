@@ -49,10 +49,10 @@ const Filter: React.FC<{
             onChange={(v) => {
               update('db', v)
             }}
-            options={connection.dbs.map((v) => {
+            options={connection.dbs?.map((v) => {
               return {
-                label: v,
-                value: v
+                label: v.database,
+                value: v.database
               }
             })}
           ></Select>

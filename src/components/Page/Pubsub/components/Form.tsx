@@ -30,8 +30,8 @@ const Subscribe: React.FC<{
             <Select
               options={props.connection.dbs?.map((v) => {
                 return {
-                  label: v,
-                  value: v
+                  label: v.database,
+                  value: v.database
                 }
               })}
             ></Select>

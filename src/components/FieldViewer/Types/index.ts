@@ -5,7 +5,7 @@ import json from './json'
 import phpunserialize from './phpunserialize'
 
 export interface TypeFormat {
-  key: string
+  key: 'datetime' | 'json' | 'text' | 'php_unserialize'
   label: string
   render: (content: string) => Promise<React.ReactNode>
 }

@@ -44,7 +44,6 @@ export async function openWindow(label: WindowLabel, options: WindowOptions) {
     })
     webview.once('tauri://error', function (e) {
       webview.setFocus()
-      console.log(e)
       reject(webview)
     })
   })

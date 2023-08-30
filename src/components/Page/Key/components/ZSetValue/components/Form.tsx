@@ -64,6 +64,7 @@ const Index: React.FC<{
           rules={[{ required: true }]}
         >
           <InputNumber
+            className="!w-[200px]"
             placeholder={t('Please Enter {{name}}', {
               name: t('Score')
             }).toString()}

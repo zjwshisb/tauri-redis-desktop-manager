@@ -7,9 +7,15 @@ declare namespace APP {
     version?: string
     is_cluster: boolean
     nodes?: Node[]
-    dbs?: number[]
+    dbs?: Database[]
     open?: boolean
     readonly: boolean
+    err?: string
+  }
+
+  interface Database {
+    database: number
+    count: number
   }
 
   interface Node {
