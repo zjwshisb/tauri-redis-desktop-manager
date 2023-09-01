@@ -6,6 +6,13 @@ declare namespace APP {
     auth: string
     version?: string
     is_cluster: boolean
+    ssh_host: string | null
+    ssh_passphrase: string | null
+    ssh_password: string | null
+    ssh_port: number | null
+    ssh_private_key: string | null
+    ssh_timeout: number | null
+    ssh_username: string | null
     nodes?: Node[]
     dbs?: Database[]
     open?: boolean

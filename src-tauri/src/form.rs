@@ -10,6 +10,13 @@ pub struct ConnectionForm {
     pub username: Option<String>,
     pub is_cluster: bool,
     pub readonly: bool,
+    pub ssh_host: Option<String>,
+    pub ssh_port: Option<u16>,
+    pub ssh_password: Option<String>,
+    pub ssh_username: Option<String>,
+    pub ssh_private_key: Option<String>,
+    pub ssh_timeout: Option<u32>,
+    pub ssh_passphrase: Option<String>,
 }
 
 impl rds::IntoConnectionInfo for ConnectionForm {

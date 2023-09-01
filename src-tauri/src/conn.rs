@@ -13,6 +13,9 @@ use redis::cluster_async::ClusterConnection;
 use redis::{Arg, Client, FromRedisValue, Value};
 use redis::{Cmd, IntoConnectionInfo};
 use serde::Serialize;
+use ssh2::Session;
+use std::io::{self};
+use std::{net::TcpListener, sync::Arc};
 use tokio::time::timeout;
 
 use tokio::sync::{mpsc::Sender, Mutex};
@@ -104,6 +107,7 @@ pub struct CusConnection {
     pub db: u8,
     pub created_at: chrono::DateTime<Local>,
     pub connection_model: Option<Conn>,
+    pub ssh_tunnel: bool,
 }
 /**
  * custom redis connection
@@ -112,7 +116,6 @@ impl CusConnection {
     // get the conn with connection id
     pub async fn build(cid: u32) -> Result<Self, CusError> {
         let conn = Conn::first(cid)?;
-        dbg!(&conn);
         let b: Box<dyn ConnectionLike + Send>;
         let host = conn.get_host();
         if conn.is_cluster {
@@ -120,7 +123,11 @@ impl CusConnection {
         } else {
             b = Box::new(Self::get_normal(conn.clone()).await?);
         }
-        Ok(Self {
+        let mut ssh_tunnel = false;
+        if let Some(ssh_host) = &conn.ssh_host {
+            ssh_tunnel = true
+        }
+        let r = Self {
             id: utils::random_str(32),
             cid,
             conn: b,
@@ -130,7 +137,13 @@ impl CusConnection {
             db: 0,
             created_at: Local::now(),
             connection_model: Some(conn),
-        })
+            ssh_tunnel,
+        };
+        if r.ssh_tunnel {
+            let session = Session::new().unwrap();
+            r.create_ssl_tunnel(Arc::new(session));
+        }
+        Ok(r)
     }
     // get the conn with host
     pub async fn build_anonymous<T: redis::IntoConnectionInfo + Debug>(
@@ -148,6 +161,7 @@ impl CusConnection {
             db: 0,
             created_at: Local::now(),
             connection_model: None,
+            ssh_tunnel: false,
         })
     }
 
@@ -265,6 +279,85 @@ impl CusConnection {
             duration: end.timestamp_micros() - start.timestamp_micros(),
         };
         Ok((value, cus_cmd))
+    }
+
+    pub fn create_ssl_tunnel(&self, session: Arc<Session>) -> Result<(), String> {
+        if let Some(conn) = &self.connection_model {
+            if let Some(ssh_host) = &conn.ssh_host {
+                if let Some(ssh_port) = conn.ssh_port {
+                    match TcpListener::bind((conn.host.to_string(), conn.port)) {
+                        Err(err) => {
+                            return {
+                                dbg!(&err);
+                                Err(err.to_string())
+                            }
+                        }
+                        Ok(listener) => {
+                            dbg!(&listener);
+                            match session.channel_direct_tcpip(ssh_host.as_str(), ssh_port, None) {
+                                Err(err) => {
+                                    dbg!(&err);
+                                }
+                                Ok(channel) => {
+                                    session.set_timeout(10000); //increase if you're timing out a lot
+                                    session.set_blocking(false); //very important, otherwise reading from channel will block whil waiting for data that may not arrive
+                                    let mut stream_id = 0;
+
+                                    tokio::task::spawn_blocking(move || {
+                                        'listener_loop: loop {
+                                            match listener.accept() {
+                                                Err(err) => {
+                                                    break 'listener_loop;
+                                                }
+                                                Ok((stream, socket)) => {
+                                                    dbg!(&stream);
+                                                    let mut reader_stream = stream;
+                                                    let mut writer_stream =
+                                                        reader_stream.try_clone().unwrap();
+
+                                                    let mut writer_channel =
+                                                        { channel.stream(stream_id) }; //open two streams on the same channel, so we can read and write seperatly
+                                                    let mut reader_channel =
+                                                        { channel.stream(stream_id) };
+                                                    stream_id += 1; //new TCP streams bound to new channel streams
+
+                                                    //pipe stream output into channel
+                                                    tokio::task::spawn_blocking(move || loop {
+                                                        match io::copy(
+                                                            &mut reader_stream,
+                                                            &mut writer_channel,
+                                                        ) {
+                                                            Ok(_) => (),
+                                                            Err(err) => {
+                                                                break;
+                                                            }
+                                                        }
+                                                    });
+
+                                                    //pipe channel output into stream
+                                                    tokio::task::spawn_blocking(move || loop {
+                                                        match io::copy(
+                                                            &mut reader_channel,
+                                                            &mut writer_stream,
+                                                        ) {
+                                                            Ok(_) => (),
+                                                            Err(err) => {
+                                                                break;
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    };
+                }
+            }
+        }
+        Ok(())
     }
 }
 

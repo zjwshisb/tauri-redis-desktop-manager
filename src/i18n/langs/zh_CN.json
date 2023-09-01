@@ -101,5 +101,8 @@
   "Total Amount": "总数量",
   "Total Memory" :"总内存",
   "Minimum Size": "最小大小",
-  "Username": "用户名"
+  "Username": "用户名",
+  "Private Key":"私钥",
+  "Timeout": "超时时间",
+  "Passphrase": "私钥密码"
 }

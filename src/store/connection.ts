@@ -91,8 +91,10 @@ class ConnectionStore {
           connection.open = true
         })
       } catch (err) {
-        connection.err = err as string
-        console.log(err)
+        runInAction(() => {
+          connection.err = err as string
+        })
+        throw err
       }
     }
   }

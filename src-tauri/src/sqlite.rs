@@ -1,10 +1,10 @@
 use crate::err::CusError;
 use dirs_next;
 use rusqlite::{self, params, Connection as conn, Row};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::fs;
 
-const DATA_NAME: &str = "data1.db";
+const DATA_NAME: &str = "data2.db";
 const DATA_DIR: &str = "redis";
 
 pub fn get_sqlite_client() -> Result<conn, CusError> {
@@ -24,7 +24,14 @@ pub fn init_sqlite() {
             username TEXT,
             password  TEXT,
             is_cluster INTEGER NOT NULL DEFAULT 0,
-            readonly INTEGER NOT NULL DEFAULT 0
+            readonly INTEGER NOT NULL DEFAULT 0,
+            ssh_host  TEXT,
+            ssh_port  INTEGER,
+            ssh_password  TEXT,
+            ssh_username  TEXT,
+            ssh_private_key  TEXT,
+            ssh_timeout  INTEGER,
+            ssh_passphrase  TEXT
         )",
             (), // empty list of parameters.
         )
@@ -51,15 +58,22 @@ fn get_data_path() -> String {
     }
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Connection {
-    pub id: i64,
+    pub id: Option<i64>,
     pub host: String,
     pub port: u16,
     pub password: Option<String>,
     pub username: Option<String>,
     pub is_cluster: bool,
     pub readonly: bool,
+    pub ssh_host: Option<String>,
+    pub ssh_port: Option<u16>,
+    pub ssh_password: Option<String>,
+    pub ssh_username: Option<String>,
+    pub ssh_private_key: Option<String>,
+    pub ssh_timeout: Option<u32>,
+    pub ssh_passphrase: Option<String>,
 }
 
 impl redis::IntoConnectionInfo for Connection {
@@ -99,13 +113,34 @@ impl Connection {
             username: r.get(4).unwrap_or_default(),
             is_cluster,
             readonly: readonly,
+            ssh_host: r.get(7).unwrap_or_default(),
+            ssh_port: r.get(8).unwrap_or_default(),
+            ssh_password: r.get(9).unwrap_or_default(),
+            ssh_username: r.get(10).unwrap_or_default(),
+            ssh_private_key: r.get(11).unwrap_or_default(),
+            ssh_timeout: r.get(12).unwrap_or_default(),
+            ssh_passphrase: r.get(13).unwrap_or_default(),
         }
     }
 
     pub fn first(id: u32) -> Result<Connection, CusError> {
         let conn = get_sqlite_client()?;
         let mut stmt = conn.prepare(
-            "select id, host, port, password, username, is_cluster, readonly from connections where id= ?1",
+            "select id, 
+            host, 
+            port, 
+            password,
+            username,
+            is_cluster,
+            readonly,
+            ssh_host,
+            ssh_port,
+            ssh_password,
+            ssh_username,
+            ssh_private_key,
+            ssh_timeout,
+            ssh_passphrase
+            from connections where id= ?1",
         )?;
         let c = stmt.query_row([id], |r| Ok(Self::build(r)))?;
         Ok(c)
@@ -121,17 +156,67 @@ impl Connection {
         if self.readonly {
             readonly = 1;
         }
-        if self.id > 0 {
+        if let Some(id) = self.id {
             conn.execute(
-                "UPDATE connections set host= ?1,port= ?2, password= ?3,username= ?4, is_cluster= ?5, readonly =?6 where id = ?7",
-                params!(self.host, self.port, self.password, self.username, is_cluster, readonly, self.id),
+                "UPDATE connections set 
+                host= ?1,
+                port= ?2,
+                password= ?3,
+                username= ?4,
+                is_cluster= ?5,
+                readonly =?6,
+                ssh_host =?7,
+                ssh_port =?8,
+                ssh_password =?9,
+                ssh_username =?10,
+                ssh_private_key =?11,
+                ssh_timeout =?12,
+                ssh_passphrase =?13 
+                where id = ?14",
+                params!(
+                    self.host,
+                    self.port,
+                    self.password,
+                    self.username,
+                    is_cluster,
+                    readonly,
+                    self.ssh_host,
+                    self.ssh_port,
+                    self.ssh_password,
+                    self.ssh_username,
+                    self.ssh_private_key,
+                    self.ssh_timeout,
+                    self.ssh_passphrase,
+                    id
+                ),
             )?;
         } else {
             conn.execute(
-                "insert into connections (host, port, password, username, is_cluster, readonly) values(?1, ?2, ?3, ?4, ?5, ?6)",
-                params!(&self.host, &self.port, &self.password, &self.username, is_cluster, readonly),
+                "insert into connections(
+                    host,
+                    port, 
+                    password,
+                    username,
+                    is_cluster,
+                    readonly,
+                    ssh_host,
+                    ssh_port,
+                    ssh_password,
+                    ssh_username,
+                    ssh_private_key,
+                    ssh_timeout,
+                    ssh_passphrase
+                    ) values(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+                params!(
+                    &self.host,
+                    &self.port,
+                    &self.password,
+                    &self.username,
+                    is_cluster,
+                    readonly
+                ),
             )?;
-            self.id = conn.last_insert_rowid();
+            self.id = Some(conn.last_insert_rowid());
         }
         Ok(())
     }
@@ -145,7 +230,21 @@ impl Connection {
     pub fn all() -> Result<Vec<Connection>, CusError> {
         let conn = crate::sqlite::get_sqlite_client()?;
         let mut stmt_result = conn.prepare(
-            "select id, host, port, password, username, is_cluster, readonly from connections",
+            "select id,
+             host, 
+            port,
+             password, 
+            username,
+                is_cluster,
+                readonly , 
+                 ssh_host,
+                ssh_port,
+                ssh_password,
+                ssh_username,
+                ssh_private_key,
+                ssh_timeout,
+                ssh_passphrase
+                from connections",
         )?;
         let connections_result = stmt_result.query_map([], |row| Ok(Self::build(row)))?;
         let mut result: Vec<Connection> = vec![];
