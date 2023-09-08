@@ -6,6 +6,7 @@ declare namespace APP {
     auth: string
     version?: string
     is_cluster: boolean
+    readonly: boolean
     ssh_host: string | null
     ssh_passphrase: string | null
     ssh_password: string | null
@@ -16,8 +17,8 @@ declare namespace APP {
     nodes?: Node[]
     dbs?: Database[]
     open?: boolean
-    readonly: boolean
     err?: string
+    loading?: boolean
   }
 
   interface Database {

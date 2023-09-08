@@ -53,44 +53,50 @@ class ConnectionStore {
     }
   }
 
+  async getInfo(connection: APP.Connection) {
+    if (connection.is_cluster) {
+      const nodes = await request<APP.Node[]>('cluster/nodes', connection.id)
+      runInAction(() => {
+        connection.nodes = nodes.data.filter((v) => {
+          return v.flags.includes('master')
+        })
+      })
+    } else {
+      const db = await request<string>('config/databases', connection.id)
+      const count = parseInt(db.data)
+      const dbs: APP.Database[] = []
+      for (let i = 0; i < count; i++) {
+        dbs.push({
+          database: i,
+          count: 0
+        })
+      }
+      runInAction(() => {
+        connection.dbs = dbs
+      })
+    }
+    const version = await request<string>('server/version', connection.id)
+    runInAction(() => {
+      connection.version = version.data
+      connection.open = true
+    })
+  }
+
   async open(id: number) {
     const connection = this.connections.find((v) => v.id === id)
     if (connection !== undefined) {
       try {
+        connection.loading = true
         await request('connections/open', connection.id)
-        if (connection.err !== undefined) {
-          connection.err = undefined
-        }
-        if (connection.is_cluster) {
-          const nodes = await request<APP.Node[]>(
-            'cluster/nodes',
-            connection.id
-          )
-          runInAction(() => {
-            connection.nodes = nodes.data.filter((v) => {
-              return v.flags.includes('master')
-            })
-          })
-        } else {
-          const db = await request<string>('config/databases', connection.id)
-          const count = parseInt(db.data)
-          const dbs: APP.Database[] = []
-          for (let i = 0; i < count; i++) {
-            dbs.push({
-              database: i,
-              count: 0
-            })
-          }
-          runInAction(() => {
-            connection.dbs = dbs
-          })
-        }
-        const version = await request<string>('server/version', connection.id)
         runInAction(() => {
-          connection.version = version.data
-          connection.open = true
+          if (connection.err !== undefined) {
+            connection.err = undefined
+          }
         })
+        connection.loading = false
+        this.getInfo(connection)
       } catch (err) {
+        connection.loading = false
         runInAction(() => {
           connection.err = err as string
         })

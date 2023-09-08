@@ -1,5 +1,5 @@
 use crate::{
-    conn::{ConnectionManager, CusConnection},
+    conn::{ConnectionManager, ConnectionWrapper},
     err::CusError,
     sqlite::Connection,
 };
@@ -12,7 +12,7 @@ pub fn add(payload: String) -> Result<Connection, CusError> {
     Ok(connection)
 }
 
-pub fn get() -> Result<Vec<Connection>, CusError> {
+pub async fn get() -> Result<Vec<Connection>, CusError> {
     Connection::all()
 }
 
@@ -34,7 +34,8 @@ pub fn update(payload: String) -> Result<Connection, CusError> {
 }
 
 pub async fn open<'r>(cid: u32, manager: State<'r, ConnectionManager>) -> Result<(), CusError> {
-    let conn = CusConnection::build(cid).await?;
+    let connection = Connection::first(cid)?;
+    let conn = ConnectionWrapper::build(connection).await?;
     manager.add(cid, conn).await;
     Ok(())
 }

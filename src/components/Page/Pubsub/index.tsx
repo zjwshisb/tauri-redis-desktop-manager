@@ -53,6 +53,12 @@ const Pubsub: React.FC<{
         })
     }
     return () => {
+      if (eventName !== '') {
+        request('pubsub/cancel', 0, {
+          name: eventName
+        })
+      }
+
       if (unListen != null) {
         unListen()
       }

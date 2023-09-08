@@ -9,6 +9,7 @@ interface Client {
   types: string
   created_at: string
   host: string
+  proxy: string
 }
 
 const Index: React.FC = () => {
@@ -17,7 +18,7 @@ const Index: React.FC = () => {
   useCancelIntercal(fetch, 2000)
 
   const columns: ColumnsType<Client> = React.useMemo(() => {
-    const fields = ['id', 'host', 'types', 'created_at']
+    const fields = ['id', 'host', 'types', 'created_at', 'proxy']
     return fields.map((v) => {
       return {
         dataIndex: v,

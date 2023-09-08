@@ -1,9 +1,9 @@
-use crate::conn::ConnectionManager;
+use crate::conn::{Connectable, ConnectionManager, RedisConnection};
+use crate::err::CusError;
 use crate::pubsub::{PubsubItem, PubsubManager};
 use crate::response::EventResp;
-use crate::sqlite::Connection as Conn;
+use crate::sqlite::Connection as ConnectionModel;
 use crate::utils;
-use crate::{conn::CusConnection, err::CusError};
 use futures::stream::StreamExt;
 use redis::aio::Connection;
 use redis::FromRedisValue;
@@ -30,9 +30,9 @@ pub async fn subscribe<'r>(
     cid: u32,
 ) -> Result<String, CusError> {
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
-    let model = Conn::first(cid)?;
-    let host = model.get_host();
-    let conn: Connection = CusConnection::get_normal(model).await?;
+    let model = ConnectionModel::first(cid)?;
+    let mut connection = RedisConnection::build(model.get_params());
+    let conn: Connection = connection.get_normal().await?;
     let mut pubsub = conn.into_pubsub();
     for x in args.channels {
         pubsub.subscribe(&x).await?;
@@ -43,7 +43,13 @@ pub async fn subscribe<'r>(
     let (tx, rx) = oneshot::channel::<()>();
     pubsub_manager.add(
         event_name.clone(),
-        PubsubItem::new(tx, event_name.clone(), host, "pubsub".to_string()),
+        PubsubItem::new(
+            tx,
+            event_name.clone(),
+            connection.get_host(),
+            "pubsub".to_string(),
+            connection.get_proxy(),
+        ),
     );
     tokio::spawn(async move {
         let event_str = event_name.as_str();
@@ -73,6 +79,7 @@ pub async fn subscribe<'r>(
             _ = rx => {
             }
         }
+        drop(connection);
     });
     Ok(event_name_resp)
 }
@@ -105,10 +112,9 @@ pub async fn monitor<'r>(
     pubsub_manager: State<'r, PubsubManager>,
     cid: u32,
 ) -> Result<String, CusError> {
-    let model = Conn::first(cid)?;
-    let host = model.get_host();
-    let conn: Connection = CusConnection::get_normal(model).await?;
-    let mut monitor: redis::aio::Monitor = conn.into_monitor();
+    let model = ConnectionModel::first(cid)?;
+    let mut connection = RedisConnection::build(model.get_params());
+    let conn: Connection = connection.get_normal().await?;
 
     let event_name = utils::random_str(32);
     let event_name_resp = event_name.clone();
@@ -117,13 +123,19 @@ pub async fn monitor<'r>(
     let (tx, rx) = oneshot::channel::<()>();
     pubsub_manager.add(
         event_name_resp.clone(),
-        PubsubItem::new(tx, event_name.clone(), host, "monitor".to_string()),
+        PubsubItem::new(
+            tx,
+            event_name.clone(),
+            connection.get_host(),
+            "monitor".to_string(),
+            connection.get_proxy(),
+        ),
     );
     tokio::spawn(async move {
         let event_str = event_name.as_str();
+        let mut monitor: redis::aio::Monitor = conn.into_monitor();
         let _ = monitor.monitor().await;
         let mut stream = monitor.into_on_message::<redis::Value>();
-
         tokio::select! {
             _ = async {
                 while let Some(msg) = stream.next().await {
@@ -137,9 +149,9 @@ pub async fn monitor<'r>(
             } => {
             }
             _ = rx => {
-
             }
         }
+        drop(connection);
     });
     Ok(event_name_resp)
 }

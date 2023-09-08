@@ -11,15 +11,23 @@ pub struct PubsubItem {
     pub types: String,
     pub host: String,
     pub id: String,
+    pub proxy: Option<String>,
 }
 impl PubsubItem {
-    pub fn new(tx: oneshot::Sender<()>, id: String, host: String, types: String) -> Self {
+    pub fn new(
+        tx: oneshot::Sender<()>,
+        id: String,
+        host: String,
+        types: String,
+        proxy: Option<String>,
+    ) -> Self {
         Self {
             tx,
             created_at: Local::now(),
             types,
             host,
             id,
+            proxy,
         }
     }
 }
@@ -33,6 +41,7 @@ impl PubsubManager {
     pub fn add(&self, name: String, item: PubsubItem) {
         self.0.lock().unwrap().insert(name, item);
     }
+
     pub fn close(&self, name: &String) {
         if let Some(x) = self.0.lock().unwrap().remove(name) {
             let _ = x.tx.send(());
@@ -47,6 +56,7 @@ impl PubsubManager {
                 host: v.host.clone(),
                 created_at: v.created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
                 types: v.types.clone(),
+                proxy: v.proxy.clone(),
             })
         }
         vec

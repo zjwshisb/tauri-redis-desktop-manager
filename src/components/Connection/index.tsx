@@ -4,7 +4,8 @@ import {
   DisconnectOutlined,
   ReloadOutlined,
   KeyOutlined,
-  WarningOutlined
+  WarningOutlined,
+  LoadingOutlined
 } from '@ant-design/icons'
 import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
@@ -30,6 +31,9 @@ const Connection: React.FC<{
   const { t } = useTranslation()
 
   const icon = React.useMemo(() => {
+    if (connection.loading === true) {
+      return <LoadingOutlined className="text-sm mr-1"></LoadingOutlined>
+    }
     if (connection.open === true) {
       if (collapse) {
         return (
@@ -41,24 +45,26 @@ const Connection: React.FC<{
     } else {
       return <DisconnectOutlined className="text-sm mr-1" />
     }
-  }, [collapse, connection.open])
+  }, [collapse, connection.loading, connection.open])
 
   const onItemClick = React.useCallback(async () => {
-    if (connection.open === true) {
-      setCollapse((p) => !p)
-    } else {
-      try {
-        await store.connection.open(connection.id)
-        const key = getPageKey('info', connection)
-        store.page.addPage({
-          label: key,
-          type: 'info',
-          key,
-          children: <Info connection={connection} pageKey={key}></Info>,
-          connection
-        })
-        setCollapse(true)
-      } catch {}
+    if (connection.loading !== true) {
+      if (connection.open === true) {
+        setCollapse((p) => !p)
+      } else {
+        try {
+          await store.connection.open(connection.id)
+          const key = getPageKey('info', connection)
+          store.page.addPage({
+            label: key,
+            type: 'info',
+            key,
+            children: <Info connection={connection} pageKey={key}></Info>,
+            connection
+          })
+          setCollapse(true)
+        } catch {}
+      }
     }
   }, [connection, store.connection, store.page])
 
@@ -148,7 +154,7 @@ const Connection: React.FC<{
                   <ReloadOutlined
                     className="hover:text-blue-600"
                     onClick={(e) => {
-                      store.connection.open(connection.id)
+                      store.connection.getInfo(connection)
                       e.stopPropagation()
                     }}
                   ></ReloadOutlined>

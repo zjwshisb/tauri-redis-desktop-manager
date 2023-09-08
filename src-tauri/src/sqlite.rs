@@ -1,15 +1,15 @@
-use crate::err::CusError;
+use crate::{conn, err::CusError, ssh};
 use dirs_next;
-use rusqlite::{self, params, Connection as conn, Row};
+use rusqlite::{self, params, Connection as SqliteConnection, Row};
 use serde::{Deserialize, Serialize};
 use std::fs;
 
 const DATA_NAME: &str = "data2.db";
 const DATA_DIR: &str = "redis";
 
-pub fn get_sqlite_client() -> Result<conn, CusError> {
+pub fn get_sqlite_client() -> Result<SqliteConnection, CusError> {
     let path = get_data_path();
-    let conn = conn::open(path)?;
+    let conn = SqliteConnection::open(path)?;
     Ok(conn)
 }
 
@@ -76,24 +76,47 @@ pub struct Connection {
     pub ssh_passphrase: Option<String>,
 }
 
-impl redis::IntoConnectionInfo for Connection {
-    fn into_connection_info(self) -> redis::RedisResult<::redis::ConnectionInfo> {
-        Ok(redis::ConnectionInfo {
-            addr: redis::ConnectionAddr::Tcp(self.host.clone(), self.port),
-            redis: redis::RedisConnectionInfo {
-                db: 0,
-                username: self.username,
-                password: self.password,
-            },
-        })
+impl conn::Connectable for Connection {
+    fn get_params(&self) -> conn::RedisConnectionParams {
+        let redis_params = conn::RedisParam {
+            tcp_host: self.host.clone(),
+            tcp_port: self.port,
+            username: self.username.clone(),
+            password: self.password.clone(),
+            is_cluster: self.is_cluster,
+        };
+        let mut ssh_params = None;
+        if let Some(ssh_host) = &self.ssh_host {
+            let mut port = 22;
+            if let Some(p) = self.ssh_port {
+                port = p
+            }
+            let mut username = String::from("root");
+            if let Some(u) = &self.username {
+                username = u.clone();
+            }
+            let ssh_p = ssh::SshParams {
+                host: ssh_host.clone(),
+                port: port,
+                username: username,
+                password: self.ssh_password.clone(),
+                private_key: self.ssh_private_key.clone(),
+                passphrase: self.ssh_passphrase.clone(),
+                target_host: self.host.clone(),
+                target_port: self.port,
+            };
+            ssh_params = Some(ssh_p);
+        }
+        conn::RedisConnectionParams {
+            redis_params,
+            ssh_params,
+            model_name: String::from("connection"),
+            is_cluster: self.is_cluster,
+        }
     }
 }
 
 impl Connection {
-    pub fn get_host(&self) -> String {
-        return format!("redis://{}:{}", &self.host, &self.port);
-    }
-
     pub fn build(r: &Row) -> Connection {
         let mut is_cluster = false;
         let i: i64 = r.get(5).unwrap_or_default();
@@ -105,10 +128,12 @@ impl Connection {
         if i > 0 {
             readonly = true
         }
+        let host: String = r.get(1).unwrap();
+        let port = r.get(2).unwrap();
         Connection {
             id: r.get(0).unwrap(),
-            host: r.get(1).unwrap(),
-            port: r.get(2).unwrap(),
+            host: host.clone(),
+            port,
             password: r.get(3).unwrap_or_default(),
             username: r.get(4).unwrap_or_default(),
             is_cluster,
@@ -213,7 +238,14 @@ impl Connection {
                     &self.password,
                     &self.username,
                     is_cluster,
-                    readonly
+                    readonly,
+                    self.ssh_host,
+                    self.ssh_port,
+                    self.ssh_password,
+                    self.ssh_username,
+                    self.ssh_private_key,
+                    self.ssh_timeout,
+                    self.ssh_passphrase,
                 ),
             )?;
             self.id = Some(conn.last_insert_rowid());

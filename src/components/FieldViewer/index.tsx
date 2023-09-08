@@ -100,7 +100,7 @@ const FieldViewer: React.FC<{
             style={{
               color: gold.primary
             }}
-            className="absolute bottom-[8px] right-[8px] hover:cursor-pointer"
+            className="ml-2 inline hover:cursor-pointer"
             onClick={(e) => {
               e.stopPropagation()
               if (types !== 'text') {
@@ -120,7 +120,7 @@ const FieldViewer: React.FC<{
   return (
     <Spin spinning={loading}>
       <div
-        className="my-[-16px] py-[16px] break-all"
+        className="break-all"
         onMouseLeave={() => {
           mouseLeave.run()
         }}
@@ -130,7 +130,6 @@ const FieldViewer: React.FC<{
         }}
       >
         {init && child}
-        {typeNode}
         {isFocus && types === 'text' && (
           <Copy
             content={content}
@@ -138,6 +137,7 @@ const FieldViewer: React.FC<{
             className="ml-2"
           ></Copy>
         )}
+        {typeNode}
       </div>
     </Spin>
   )

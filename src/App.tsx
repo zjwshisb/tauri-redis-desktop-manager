@@ -10,12 +10,11 @@ import ConnectionForm from './components/ConnectionForm'
 
 const App: React.FC = () => {
   const store = useStore()
-
   return (
     <AppLayout>
       <ConnectionForm />
       <Left />
-      {store.keyInfo.info != null && (
+      {store.keyInfo.info !== null && (
         <Center info={store.keyInfo.info}></Center>
       )}
       <Right />

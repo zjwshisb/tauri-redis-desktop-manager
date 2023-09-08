@@ -1,9 +1,8 @@
 use crate::{
     conn::ConnectionManager,
-    conn::ScanResult,
     err::{self, CusError},
     key::Key,
-    response::KeyWithMemory,
+    response::{KeyWithMemory, ScanResult},
 };
 use redis::FromRedisValue;
 use redis::Value;

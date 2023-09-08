@@ -34,7 +34,7 @@ const Monitor: React.FC<{
 
   React.useEffect(() => {
     let unListen: undefined | (() => void)
-    if (eventName !== null && !stop) {
+    if (eventName !== '' && !stop) {
       appWindow
         .listen<string>(eventName, (r) => {
           try {
@@ -62,6 +62,11 @@ const Monitor: React.FC<{
         })
     }
     return () => {
+      if (eventName !== '') {
+        request('pubsub/cancel', 0, {
+          name: eventName
+        })
+      }
       if (unListen !== undefined) {
         unListen()
       }

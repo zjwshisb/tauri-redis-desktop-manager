@@ -12,7 +12,7 @@ export interface RequestOptions {
 }
 export default async function request<T>(
   path: string,
-  cid: number | null = 0,
+  cid: number = 0,
   args: Record<string, any> = {},
   option: RequestOptions = {
     showNotice: true

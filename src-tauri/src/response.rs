@@ -1,5 +1,7 @@
 use crate::err::CusError;
 use chrono::prelude::*;
+use redis::FromRedisValue;
+use redis::Value;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -60,10 +62,36 @@ pub struct Conn {
     pub host: String,
     pub created_at: String,
     pub types: String,
+    pub proxy: Option<String>,
 }
 
 #[derive(Serialize)]
 pub struct KeyWithMemory {
     pub name: String,
     pub memory: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ScanResult {
+    pub cursor: String,
+    pub keys: Vec<String>,
+}
+
+impl ScanResult {
+    pub fn build(value: &Value) -> Self {
+        let mut cursor = String::from("0");
+        let mut keys: Vec<String> = vec![];
+        match value {
+            Value::Bulk(s) => {
+                if let Some(first) = s.get(0) {
+                    cursor = String::from_redis_value(first).unwrap();
+                }
+                if let Some(second) = s.get(1) {
+                    keys = Vec::from_redis_value(&second).unwrap();
+                }
+            }
+            _ => {}
+        };
+        Self { cursor, keys }
+    }
 }

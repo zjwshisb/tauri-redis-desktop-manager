@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
 use crate::{
-    conn::{ConnectionManager, CusConnection, Node, ScanResult},
+    conn::{ConnectionManager, ConnectionWrapper},
     err::CusError,
-    response::KeyWithMemory,
+    model::Node,
+    response::{KeyWithMemory, ScanResult},
 };
 use redis::{FromRedisValue, Value};
 use serde::{Deserialize, Serialize};
@@ -38,7 +39,7 @@ pub async fn scan<'r>(
             if let Some(cursor) = x.get("cursor") {
                 for node in nodes.clone() {
                     if &node.id == node_id {
-                        let mut conn = CusConnection::build_anonymous(node).await?;
+                        let mut conn = ConnectionWrapper::build(node).await?;
                         let mut cmd = redis::cmd("scan");
                         cmd.arg(cursor)
                             .arg(&["count", args.count.to_string().as_str()]);
@@ -73,10 +74,10 @@ pub async fn node_size<'r>(
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
     let args: NodeSizeArgs = serde_json::from_str(&payload.as_str())?;
-    let nodes = manager.get_nodes(cid).await?;
+    let nodes: Vec<Node> = manager.get_nodes(cid).await?;
     for n in nodes {
         if n.id == args.id {
-            let mut conn = CusConnection::build_anonymous(n).await?;
+            let mut conn = ConnectionWrapper::build(n).await?;
             let value = manager
                 .execute_with(&mut redis::cmd("dbsize"), &mut conn)
                 .await?;
@@ -115,7 +116,7 @@ pub async fn analysis<'r>(
             if let Some(cursor) = x.get("cursor") {
                 for node in nodes.clone() {
                     if node_id == &node.id {
-                        let mut conn = CusConnection::build_anonymous(node).await?;
+                        let mut conn = ConnectionWrapper::build(node).await?;
                         let mut cmd = redis::cmd("scan");
                         cmd.arg(cursor)
                             .arg(&["count", args.count.to_string().as_str()]);

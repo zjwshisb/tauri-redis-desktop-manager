@@ -24,7 +24,7 @@ const Index: React.FC<{
           <Edit keys={keys} onSuccess={onRefresh} />
         </Editable>
       </div>
-      <Card bodyStyle={{ padding: 16 }}>
+      <Card bodyStyle={{ padding: 8 }}>
         <FieldViewer content={value}></FieldViewer>
       </Card>
     </div>

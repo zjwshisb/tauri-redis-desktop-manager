@@ -30,7 +30,7 @@ pub async fn dispatch<'r>(
     payload: String,
 ) -> Result<String, CusError> {
     let r = match path.as_str() {
-        "connections/get" => Response::new(connection::get()?),
+        "connections/get" => Response::new(connection::get().await?),
         "connections/add" => Response::new(connection::add(payload)?),
         "connections/del" => Response::new(connection::del(payload)?),
         "connections/update" => Response::new(connection::update(payload)?),

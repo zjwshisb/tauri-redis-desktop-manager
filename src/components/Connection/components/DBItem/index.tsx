@@ -46,7 +46,7 @@ const Index: React.FC<{
         }}
       >
         <DatabaseOutlined className="mr-1 text-sm" />
-        <div className="w-6">{item.database}</div>
+        <div className="w-8">{item.database}</div>
         <div>{child}</div>
       </div>
     </ItemLayout>

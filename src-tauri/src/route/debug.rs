@@ -1,15 +1,12 @@
 use crate::{
-    conn::{ConnectionManager, CusCmd},
-    err::CusError,
-    pubsub::PubsubManager,
-    response,
+    conn::ConnectionManager, err::CusError, model::Command, pubsub::PubsubManager, response,
 };
 
 pub async fn log<'r>(
     manager: tauri::State<'r, ConnectionManager>,
     window: tauri::Window,
 ) -> Result<(), CusError> {
-    let (tx, mut rx) = tokio::sync::mpsc::channel::<CusCmd>(32);
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<Command>(32);
     manager.set_tx(tx).await;
     tokio::spawn(async move {
         while let Some(cmd) = rx.recv().await {

@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
 use crate::{
-    conn::{ConnectionManager, CusConnection, SlowLog},
+    conn::{ConnectionManager, ConnectionWrapper},
     err::CusError,
-    form::ConnectionForm,
+    model::SlowLog,
+    sqlite::Connection,
 };
 use redis::{FromRedisValue, Value};
 
@@ -18,11 +19,20 @@ pub async fn ping<'r>(
     payload: String,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
-    let params: ConnectionForm = serde_json::from_str(payload.as_str())?;
-    let mut conn = CusConnection::build_anonymous(params).await?;
+    let params: Connection = serde_json::from_str(payload.as_str())?;
+    let mut conn = ConnectionWrapper::build(params).await?;
     let v = manager
         .execute_with(&mut redis::cmd("ping"), &mut conn)
         .await?;
+    match v {
+        Value::Bulk(_) => {
+            return Ok(String::from("PONG"));
+        }
+        Value::Data(_) => {
+            return Ok(String::from("PONG"));
+        }
+        _ => {}
+    }
     Ok(String::from_redis_value(&v)?)
 }
 

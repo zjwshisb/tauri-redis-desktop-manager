@@ -2,12 +2,13 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod conn;
 mod err;
-mod form;
 mod key;
+mod model;
 mod pubsub;
 mod response;
 mod route;
 mod sqlite;
+mod ssh;
 mod utils;
 use conn::ConnectionManager;
 use pubsub::PubsubManager;

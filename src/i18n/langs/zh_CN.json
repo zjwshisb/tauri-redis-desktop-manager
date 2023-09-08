@@ -72,6 +72,7 @@
   "Close Right Tabs": "关闭右边所有",
   "Are you sure delete this connection?": "确定删除该连接？",
   "Are you sure do this action?": "确定执行此操作?",
+  "Password Or Private Key Required": "请输入密码或者私钥",
   "Delete Connection": "删除连接",
   "Edit Connection": "编辑连接",
   "Close Connection": "关闭连接",
@@ -79,6 +80,7 @@
   "New Connection": "新建连接",
   "Connect Success": "连接成功",
   "Please Enter {{name}}": "请输入{{name}}",
+  "Please Select {{name}}": "请选择{{name}}",
   "Key Load Number": "键加载数量",
   "Field Load Number": "字段加载数量",
   "The COUNT option for command SCAN": "SCAN 命令的 COUNT 选项",
@@ -102,6 +104,7 @@
   "Total Memory" :"总内存",
   "Minimum Size": "最小大小",
   "Username": "用户名",
+  "SSH Tunnel": "SSH 隧道",
   "Private Key":"私钥",
   "Timeout": "超时时间",
   "Passphrase": "私钥密码"
