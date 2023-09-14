@@ -8,9 +8,10 @@ const SearchText: React.FC<{
     if (search !== undefined && search !== '') {
       const a = text.toLowerCase()
       const b = search.toLowerCase()
-      const indexof = a.indexOf(b)
-      if (indexof > -1) {
-        const replace = `<span style="color:#FF6600;">${b}</span>`
+      const start = a.indexOf(b)
+      if (start > -1) {
+        const originValue = text.slice(start, start + search.length)
+        const replace = `<span style="color:#FF6600;">${originValue}</span>`
         const reg = new RegExp(search, 'gi')
         return text.replace(reg, replace)
       }

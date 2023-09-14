@@ -107,5 +107,11 @@
   "SSH Tunnel": "SSH 隧道",
   "Private Key":"私钥",
   "Timeout": "超时时间",
-  "Passphrase": "私钥密码"
+  "Passphrase": "私钥密码",
+  "Restore Key": "复原key",
+  "If ttl is 0 the key is created without any expire, otherwise the specified expire time (in milliseconds) is set.": "如果有效期为0则表示没有失效时间,其他则为多少毫秒失效",
+  "Serialized Value": "序列化值",
+  "The serialized-value created by Dump command": "通过dump命令导出的值",
+  "Replace": "覆盖",
+  "Replace exists key": "覆盖存在的key"
 }

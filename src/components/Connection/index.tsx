@@ -126,10 +126,19 @@ const Connection: React.FC<{
           onClick={onItemClickTh.run}
         >
           {icon}
-          <div className="truncate">
-            <span className="pr-2 text-gray-600">#{connection.id}</span>
-            {connection.host}:{connection.port}
-          </div>
+          <Tooltip
+            mouseEnterDelay={0.6}
+            title={
+              <div className="break-all">
+                {connection.host}:{connection.port}
+              </div>
+            }
+          >
+            <div className="truncate">
+              <span className="pr-2 text-gray-600">#{connection.id}</span>
+              {connection.host}:{connection.port}
+            </div>
+          </Tooltip>
         </div>
         <div className={'flex-shrink-0 pl-2'}>
           <Space>

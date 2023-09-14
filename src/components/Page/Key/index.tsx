@@ -6,6 +6,7 @@ import ListValue from './components/ListValue'
 import ZSetValue from './components/ZSetValue'
 import SetValue from './components/SetValue'
 import Name from './components/Name'
+import Dump from './components/Dump'
 import { DeleteOutlined } from '@ant-design/icons'
 import Copy from '@/components/Copy'
 import useRequest from '@/hooks/useRequest'
@@ -139,6 +140,8 @@ const Index: React.FC<{
                       className="mb-2"
                       icon={<Copy content={item.name} />}
                     ></Button>
+                    <Dump keys={item}></Dump>
+
                     <Editable connection={connection}>
                       <Button
                         className="mb-2"

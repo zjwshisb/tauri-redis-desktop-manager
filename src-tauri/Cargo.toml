@@ -13,18 +13,18 @@ edition = "2021"
 tauri-build = { version = "1.4", features = [] }
 
 [dependencies]
-tauri = { version = "1.4", features = ["dialog-all", "fs-all", "shell-open", "system-tray", "window-all"] }
+tauri = { version = "1.4", features = ["clipboard-all", "dialog-all", "fs-all", "shell-open", "system-tray", "window-all"] }
 tokio-stream = "*"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-redis = { version = "0.23.1", features = ["tokio-comp", "cluster-async", "tokio-rustls-comp"], git="https://github.com/redis-rs/redis-rs.git" }
+redis = { version = "0.23.1", features = ["tokio-comp", "cluster-async", "tokio-rustls-comp", "bytes"], git="https://github.com/redis-rs/redis-rs.git" }
 rusqlite = { version = "0.29.0", features = ["bundled"] }
 dirs-next = "2.0.0"
 thiserror = "1.0.40"
 tokio = { version = "1", features = ["full"] }
 once_cell= "*"
 futures = "*"
-
+bytes="*"
 ssh_jumper="*"
 async-trait="*"
 rand="*"

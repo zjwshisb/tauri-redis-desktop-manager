@@ -12,6 +12,7 @@ mod ssh;
 mod utils;
 use conn::ConnectionManager;
 use pubsub::PubsubManager;
+use redis::ToRedisArgs;
 use tauri::{CustomMenuItem, Menu, Submenu};
 
 fn main() {

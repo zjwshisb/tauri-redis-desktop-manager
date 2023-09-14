@@ -24,17 +24,15 @@ const TTL: React.FC<{
 
   const content = React.useMemo(() => {
     return (
-      <Editable feedback={<Input {...props}></Input>}>
+      <Editable connection={connection} feedback={<Input {...props}></Input>}>
         <Input
           {...props}
           addonAfter={
-            <Editable connection={connection}>
-              <Expire
-                keys={keys}
-                onSuccess={onChange}
-                trigger={<EditOutlined />}
-              />
-            </Editable>
+            <Expire
+              keys={keys}
+              onSuccess={onChange}
+              trigger={<EditOutlined />}
+            />
           }
         ></Input>
       </Editable>

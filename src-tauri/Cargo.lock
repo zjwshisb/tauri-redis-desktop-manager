@@ -3800,6 +3800,7 @@ name = "tauriredis"
 version = "0.0.0"
 dependencies = [
  "async-trait",
+ "bytes",
  "chrono",
  "dirs-next",
  "futures",

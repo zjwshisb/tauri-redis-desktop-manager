@@ -27,7 +27,6 @@ pub async fn php_unserialize(payload: String) -> Result<String, CusError> {
     let resp = String::from_byte_vec(&resp_bytes).unwrap();
     if let Some(s) = resp.get(0) {
         let r: RequestResp = serde_json::from_str(s)?;
-        dbg!(&r);
         if r.ec == 200 {
             if let Some(data) = r.data {
                 return Ok(data);

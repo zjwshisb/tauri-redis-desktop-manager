@@ -11,9 +11,10 @@ import List from './components/List'
 import LoadMore from './components/LoadMore'
 import Key from '@/components/Page/Key'
 import TypeSelect from '@/components/TypeSelect'
-
 import { getPageKey } from '@/utils'
 import Add from './components/Add'
+import Restore from './components/Restore'
+
 import Editable from '@/components/Editable'
 import useKeyScan, { type UseKeyScanFilter } from '@/hooks/useKeyScan'
 import { type KeyInfo } from '@/store/key'
@@ -93,39 +94,45 @@ const Index: React.FC<{
           className="flex flex-col h-screen overflow-hidden   bg-white"
           id={id}
         >
-          <div className="py-2 px-2  bg-white flex item-center border-b">
-            <Input
-              prefix={<SearchOutlined />}
-              placeholder={t('search').toString()}
-              allowClear
-              onChange={(e) => {
-                onSearchChange.run(e.target.value)
-              }}
-            />
-            <div className="flex-shrink-0 flex item-center px-2 justify-center">
-              <Space>
-                <TypeSelect
-                  className="w-28"
-                  selectClassName="w-full"
-                  value={params.types}
-                  connection={info.connection}
-                  onChange={(e) => {
-                    setParams((prev) => {
-                      return {
-                        ...prev,
-                        types: e
-                      }
-                    })
-                  }}
-                />
-                <Tooltip title={t('Refresh')}>
-                  <ReloadOutlined
-                    className="hover:cursor-pointer text-lg"
-                    onClick={() => {
-                      getKeys(true)
+          <div className="py-2 px-2  bg-white  border-b">
+            <div className="flex item-center">
+              <Input
+                prefix={<SearchOutlined />}
+                placeholder={t('search').toString()}
+                allowClear
+                onChange={(e) => {
+                  onSearchChange.run(e.target.value)
+                }}
+              />
+              <div className="px-2">
+                <Space>
+                  <TypeSelect
+                    className="w-28"
+                    selectClassName="w-full"
+                    value={params.types}
+                    connection={info.connection}
+                    onChange={(e) => {
+                      setParams((prev) => {
+                        return {
+                          ...prev,
+                          types: e
+                        }
+                      })
                     }}
                   />
-                </Tooltip>
+                  <Tooltip title={t('Refresh')} placement="bottom">
+                    <ReloadOutlined
+                      className="hover:cursor-pointer text-lg"
+                      onClick={() => {
+                        getKeys(true)
+                      }}
+                    />
+                  </Tooltip>
+                </Space>
+              </div>
+            </div>
+            <div className="pt-2">
+              <Space>
                 <Editable connection={info.connection}>
                   <Add
                     onSuccess={(name: string) => {
@@ -150,6 +157,28 @@ const Index: React.FC<{
                     info={info}
                   />
                 </Editable>
+                <Restore
+                  info={info}
+                  onSuccess={(name: string) => {
+                    const key = getPageKey(name, info.connection, info.db)
+                    store.page.addPage({
+                      key,
+                      label: key,
+                      type: 'key',
+                      connection: info.connection,
+                      name,
+                      db: info.db,
+                      children: (
+                        <Key
+                          name={name}
+                          db={info.db}
+                          connection={info.connection}
+                          pageKey={key}
+                        ></Key>
+                      )
+                    })
+                  }}
+                />
               </Space>
             </div>
           </div>

@@ -21,7 +21,7 @@ const Plus: React.FC<{
   return (
     <CusModal
       trigger={
-        <Tooltip title={t('New Key')}>
+        <Tooltip title={t('New Key')} placement="bottom">
           <PlusOutlined className="hover:cursor-pointer text-lg"></PlusOutlined>
         </Tooltip>
       }

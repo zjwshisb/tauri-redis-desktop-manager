@@ -1,9 +1,13 @@
+use crate::conn::ConnectionManager;
+use crate::err::CusError;
+
+use crate::utils;
 use crate::{
-    conn::ConnectionManager,
-    err::{self, CusError},
+    err::{self},
     key::Key,
     response::{KeyWithMemory, ScanResult},
 };
+
 use redis::FromRedisValue;
 use redis::Value;
 use serde::{Deserialize, Serialize};
@@ -293,4 +297,46 @@ pub async fn analysis<'r>(
         reps.keys.push(i)
     }
     Ok(reps)
+}
+
+pub async fn dump<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
+    let args: GetArgs = serde_json::from_str(&payload)?;
+    let v = manager
+        .execute(cid, args.db, redis::cmd("dump").arg(&args.name))
+        .await?;
+    let vec = Vec::<u8>::from_redis_value(&v)?;
+    dbg!(&vec);
+    Ok(utils::binary_to_redis_str(&vec))
+}
+
+#[derive(Deserialize, Debug)]
+struct RestoreArgs {
+    db: u8,
+    name: String,
+    ttl: u64,
+    replace: Option<bool>,
+    value: String,
+}
+
+pub async fn restore<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
+    let args: RestoreArgs = serde_json::from_str(&payload)?;
+
+    let v = utils::redis_str_to_binary(args.value);
+    let mut cmd = redis::cmd("restore");
+    cmd.arg(args.name).arg(args.ttl).arg(v);
+    if let Some(replace) = args.replace {
+        if replace {
+            cmd.arg("replace");
+        }
+    }
+    let value = manager.execute(cid, args.db, &mut cmd).await?;
+    Ok(String::from_redis_value(&value)?)
 }

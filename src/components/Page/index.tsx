@@ -11,11 +11,13 @@ interface PageProps {
 const Page: React.FC<React.PropsWithChildren<PageProps>> = (props) => {
   return (
     <Spin spinning={props.loading === undefined ? false : props.loading}>
-      <PageFloatButton
-        onRefresh={props.onRefresh}
-        pageKey={props.pageKey}
-      ></PageFloatButton>
-      {props.children}
+      <div className="py-4">
+        <PageFloatButton
+          onRefresh={props.onRefresh}
+          pageKey={props.pageKey}
+        ></PageFloatButton>
+        {props.children}
+      </div>
     </Spin>
   )
 }

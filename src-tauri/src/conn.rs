@@ -189,77 +189,95 @@ impl ConnectionWrapper {
     }
 
     // execute the redis command
-    async fn execute(&mut self, cmd: &mut redis::Cmd) -> Result<(redis::Value, Command), CusError> {
+    async fn execute(
+        &mut self,
+        cmd: &mut redis::Cmd,
+    ) -> Result<(redis::Value, Command), (CusError, Command)> {
         let mut cmd_vec: Vec<String> = vec![];
         for arg in cmd.args_iter() {
             match arg {
-                Arg::Simple(v) => {
-                    let s = String::from_utf8(v.to_vec()).unwrap();
-                    cmd_vec.push(s);
-                }
+                Arg::Simple(v) => match String::from_utf8(v.to_vec()) {
+                    Ok(s) => {
+                        cmd_vec.push(s);
+                    }
+                    Err(s) => {
+                        cmd_vec.push(utils::binary_to_redis_str(&v.to_vec()));
+                    }
+                },
                 Arg::Cursor => {}
             }
         }
         let start = Local::now();
-        let value: redis::Value = cmd.query_async(self).await?;
+        let value_r = cmd.query_async(self).await;
         let end = Local::now();
         let mut rep: Vec<String> = vec![];
-        match &value {
-            Value::Bulk(v) => {
-                for vv in v {
-                    match vv {
-                        Value::Data(vvv) => {
-                            let s = String::from_utf8(vvv.to_vec()).unwrap();
-                            rep.push(s);
-                        }
-                        Value::Bulk(vvv) => {
-                            for vvvv in vvv {
-                                match vvvv {
-                                    Value::Data(vvvvv) => {
-                                        let s = String::from_utf8(vvvvv.to_vec()).unwrap();
-                                        rep.push(s);
-                                    }
-                                    _ => {}
-                                }
-                            }
-                        }
-                        _ => {}
-                    }
-                }
-            }
-            Value::Int(v) => rep.push(v.to_string()),
-            Value::Nil => rep.push(String::from("nil")),
-            Value::Data(v) => {
-                // maybe value is bitmap
-                let s = String::from_utf8(v.to_vec());
-                match s {
-                    Ok(s) => rep.push(s),
-                    Err(_) => {
-                        let i: Vec<u8> = Vec::from_redis_value(&value).unwrap();
-                        let binary = i
-                            .iter()
-                            .map(|u| format!("{:b}", u))
-                            .collect::<Vec<String>>()
-                            .join("");
-
-                        rep.push(binary)
-                    }
-                }
-            }
-            Value::Status(v) => rep.push(v.to_string()),
-            Value::Okay => {
-                rep.push(String::from("OK"));
-            }
-        }
-        let cus_cmd = Command {
+        let mut cus_cmd = Command {
             id: utils::random_str(32),
             cmd: cmd_vec.join(" "),
-            response: rep.join(" "),
+            response: String::new(),
             created_at: Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
             host: self.model.get_host(),
             duration: end.timestamp_micros() - start.timestamp_micros(),
         };
-        Ok((value, cus_cmd))
+        match value_r {
+            Ok(value) => {
+                match &value {
+                    Value::Bulk(v) => {
+                        for vv in v {
+                            match vv {
+                                Value::Data(vvv) => {
+                                    let s = String::from_utf8(vvv.to_vec()).unwrap();
+                                    rep.push(s);
+                                }
+                                Value::Bulk(vvv) => {
+                                    for vvvv in vvv {
+                                        match vvvv {
+                                            Value::Data(vvvvv) => {
+                                                let s = String::from_utf8(vvvvv.to_vec()).unwrap();
+                                                rep.push(s);
+                                            }
+                                            _ => {}
+                                        }
+                                    }
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                    Value::Int(v) => rep.push(v.to_string()),
+                    Value::Nil => rep.push(String::from("nil")),
+                    Value::Data(v) => {
+                        // maybe value is bitmap
+                        let s = String::from_utf8(v.to_vec());
+                        match s {
+                            Ok(s) => rep.push(s),
+                            Err(_) => {
+                                let i: Vec<u8> = Vec::from_redis_value(&value).unwrap();
+                                let binary = i
+                                    .iter()
+                                    .map(|u| format!("{:b}", u))
+                                    .collect::<Vec<String>>()
+                                    .join("");
+
+                                rep.push(binary)
+                            }
+                        }
+                    }
+                    Value::Status(v) => rep.push(v.to_string()),
+                    Value::Okay => {
+                        rep.push(String::from("OK"));
+                    }
+                }
+                cus_cmd.response = rep.join(" ");
+
+                Ok((value, cus_cmd))
+            }
+            Err(err) => {
+                rep.push(err.to_string());
+                cus_cmd.response = rep.join(" ");
+                Err((CusError::App(err.to_string()), cus_cmd))
+            }
+        }
     }
 }
 
@@ -457,11 +475,21 @@ impl ConnectionManager {
         cmd: &mut Cmd,
         conn: &mut ConnectionWrapper,
     ) -> Result<redis::Value, CusError> {
-        let (c, cus_cmd) = conn.execute(cmd).await?;
-        if let Some(tx) = self.debug_tx.lock().await.get_mut(0) {
-            let _ = tx.send(cus_cmd).await;
+        let result = conn.execute(cmd).await;
+        match result {
+            Ok((value, cmd)) => {
+                if let Some(tx) = self.debug_tx.lock().await.get_mut(0) {
+                    let _ = tx.send(cmd).await;
+                }
+                return Ok(value);
+            }
+            Err((err, cmd)) => {
+                if let Some(tx) = self.debug_tx.lock().await.get_mut(0) {
+                    let _ = tx.send(cmd).await;
+                }
+                return Err(err);
+            }
         }
-        return Ok(c);
     }
 
     pub async fn execute(
