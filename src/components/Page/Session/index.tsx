@@ -3,6 +3,7 @@ import useRequest from '@/hooks/useRequest'
 import { Table } from 'antd'
 import { type ColumnsType } from 'antd/es/table'
 import React from 'react'
+import Page from '..'
 
 interface Client {
   id: string
@@ -12,7 +13,7 @@ interface Client {
   proxy: string
 }
 
-const Index: React.FC = () => {
+const Session: React.FC = () => {
   const { data, fetch } = useRequest<Client[]>('debug/clients')
 
   useCancelIntercal(fetch, 2000)
@@ -29,7 +30,7 @@ const Index: React.FC = () => {
   }, [])
 
   return (
-    <div className="mr-6 pt-2">
+    <Page pageKey="session">
       <Table
         dataSource={data}
         size="small"
@@ -41,7 +42,7 @@ const Index: React.FC = () => {
         columns={columns}
         pagination={false}
       ></Table>
-    </div>
+    </Page>
   )
 }
-export default Index
+export default Session

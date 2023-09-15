@@ -7,7 +7,6 @@ import {
   WarningOutlined,
   LoadingOutlined
 } from '@ant-design/icons'
-import classnames from 'classnames'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { useThrottleFn } from 'ahooks'
@@ -30,6 +29,10 @@ const Connection: React.FC<{
 
   const { t } = useTranslation()
 
+  const onTrigger = React.useCallback(() => {
+    setCollapse((prev) => !prev)
+  }, [])
+
   const icon = React.useMemo(() => {
     if (connection.loading === true) {
       return <LoadingOutlined className="text-sm mr-1"></LoadingOutlined>
@@ -37,21 +40,27 @@ const Connection: React.FC<{
     if (connection.open === true) {
       if (collapse) {
         return (
-          <CaretRightFilled className="text-sm mr-1 rotate-90 transition-all" />
+          <CaretRightFilled
+            className="text-sm mr-1 rotate-90 transition-all"
+            onClick={onTrigger}
+          />
         )
       } else {
-        return <CaretRightFilled className="text-sm mr-1 transition-all" />
+        return (
+          <CaretRightFilled
+            className="text-sm mr-1 transition-all"
+            onClick={onTrigger}
+          />
+        )
       }
     } else {
       return <DisconnectOutlined className="text-sm mr-1" />
     }
-  }, [collapse, connection.loading, connection.open])
+  }, [collapse, connection.loading, connection.open, onTrigger])
 
-  const onItemClick = React.useCallback(async () => {
+  const openConnection = React.useCallback(async () => {
     if (connection.loading !== true) {
-      if (connection.open === true) {
-        setCollapse((p) => !p)
-      } else {
+      if (connection.open !== true) {
         try {
           await store.connection.open(connection.id)
           const key = getPageKey('info', connection)
@@ -68,7 +77,7 @@ const Connection: React.FC<{
     }
   }, [connection, store.connection, store.page])
 
-  const onItemClickTh = useThrottleFn(onItemClick, {
+  const onItemClickTh = useThrottleFn(openConnection, {
     wait: 300
   })
 
@@ -115,16 +124,13 @@ const Connection: React.FC<{
   }).get()
 
   return (
-    <div className={'my-2 px-2 box-border'}>
+    <div className={'box-border '}>
       <div
         className={
-          'flex justify-between rounded hover:bg-gray-100 hover:cursor-pointer text-lg'
+          'flex justify-between text-lg px-2 hover:bg-gray-100 hover:cursor-pointer py-1'
         }
       >
-        <div
-          className={'flex overflow-hidden flex-1'}
-          onClick={onItemClickTh.run}
-        >
+        <div className={'flex overflow-hidden flex-1'}>
           {icon}
           <Tooltip
             mouseEnterDelay={0.6}
@@ -134,7 +140,7 @@ const Connection: React.FC<{
               </div>
             }
           >
-            <div className="truncate">
+            <div className="truncate" onDoubleClick={onItemClickTh.run}>
               <span className="pr-2 text-gray-600">#{connection.id}</span>
               {connection.host}:{connection.port}
             </div>
@@ -176,7 +182,7 @@ const Connection: React.FC<{
         </div>
       </div>
       <div
-        className={classnames(['overflow-hidden transition-all'])}
+        className="overflow-hidden transition-all"
         style={{
           height
         }}

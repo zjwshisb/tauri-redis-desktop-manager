@@ -1,14 +1,20 @@
 import React from 'react'
+
+import { Tooltip } from 'antd'
+import { observer } from 'mobx-react-lite'
 import request from '@/utils/request'
 import { event } from '@tauri-apps/api'
 import Terminal, { type TerminalRow } from '@/components/Terminal'
 import { useLatest, useMount, useUnmount } from 'ahooks'
-import { Tooltip } from 'antd'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import useArrayState from '@/hooks/useArrayState'
 import SearchText from '@/components/SearchText'
+import 'mac-scrollbar/dist/mac-scrollbar.css'
 
-const Index: React.FC = () => {
+import AppLayout from '@/components/AppLayout'
+import Page from '@/components/Page'
+
+const App: React.FC = () => {
   const { items, append, clear } = useArrayState<TerminalRow>(100)
 
   const unListenFn = React.useRef<() => void>()
@@ -18,9 +24,9 @@ const Index: React.FC = () => {
   const searchRef = useLatest(search)
 
   const init = React.useRef(false)
-
   useMount(() => {
     if (!init.current) {
+      console.log('test')
       init.current = true
       request('debug/log').then(() => {
         event
@@ -66,17 +72,19 @@ const Index: React.FC = () => {
       unListenFn.current()
     }
   })
-
   return (
-    <div className="mr-6 pt-2">
-      <Terminal
-        className="h-[500px]"
-        rows={items}
-        onClear={clear}
-        search={search}
-        onSearchChange={setSearch}
-      ></Terminal>
-    </div>
+    <AppLayout>
+      <Page pageKey="log" wFull>
+        <Terminal
+          className="h-[500px]"
+          rows={items}
+          onClear={clear}
+          search={search}
+          onSearchChange={setSearch}
+        ></Terminal>
+      </Page>
+    </AppLayout>
   )
 }
-export default Index
+
+export default observer(App)

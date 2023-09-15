@@ -17,7 +17,10 @@ const PageFloatButton: React.FC<{
   }
 
   return (
-    <FloatButton.Group shape="square" style={{ top: '40%', bottom: 'auto' }}>
+    <FloatButton.Group
+      shape="square"
+      style={{ top: '40%', bottom: 'auto', right: 10 }}
+    >
       {isMain && props.pageKey !== undefined && (
         <FloatButton
           icon={<WindowsOutlined />}

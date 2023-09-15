@@ -10,9 +10,9 @@ const ItemLayout: React.FC<
   return (
     <div
       className={classnames([
-        'h-[22px] flex items-center px-2 rounded justify-between',
+        'h-[22px] flex items-center px-4 justify-between',
         clickAble ? 'hover:cursor-pointer' : '',
-        active ? 'bg-blue-50' : '',
+        active ? 'bg-blue-400 text-white' : '',
         clickAble && !active ? 'hover:bg-gray-50' : ''
       ])}
     >

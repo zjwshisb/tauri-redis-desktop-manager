@@ -1,4 +1,4 @@
-import { Button, Form, Select, InputNumber } from 'antd'
+import { Form, Select, InputNumber } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { observer } from 'mobx-react-lite'
@@ -6,7 +6,8 @@ import { SettingOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
 import { useForm } from 'antd/es/form/Form'
 import lodash from 'lodash'
-import CusModal from '../CusModal'
+import CusModal from '../../../../components/CusModal'
+import Template from '../Template'
 
 const Index: React.FC = () => {
   const { i18n, t } = useTranslation()
@@ -17,7 +18,7 @@ const Index: React.FC = () => {
 
   return (
     <CusModal
-      trigger={<Button icon={<SettingOutlined />} size="large"></Button>}
+      trigger={<Template icon={<SettingOutlined />} title="Setting" />}
       destroyOnClose
       title={t('Setting')}
       onOk={async () => {

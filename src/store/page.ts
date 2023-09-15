@@ -71,7 +71,7 @@ class PageStore {
 
   removeByConnectionId(id: number) {
     this.pages = this.pages.filter((v) => {
-      return v.connection.id !== id
+      return v.connection?.id !== id
     })
   }
 
@@ -113,9 +113,17 @@ class PageStore {
   }
 
   async openNewWindowPage(p: Page) {
-    let url = `/src/windows/detail/index.html?type=${p.type}&cid=${
-      p.connection.id
-    }&key=${encodeURI(p.key)}`
+    let url = ''
+    if (p.connection !== undefined) {
+      url = `/src/windows/detail/index.html?type=${p.type}&cid=${
+        p.connection?.id
+      }&key=${encodeURI(p.key)}`
+    } else {
+      url = `/src/windows/detail/index.html?type=${p.type}&key=${encodeURI(
+        p.key
+      )}`
+    }
+
     switch (p.type) {
       case 'key': {
         url += `&db=${p.db}&name=${encodeURI(p.name)}`
@@ -145,6 +153,7 @@ class PageStore {
       case 'config': {
         break
       }
+
       default: {
         url = ''
         break

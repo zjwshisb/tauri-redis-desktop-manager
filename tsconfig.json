@@ -20,6 +20,6 @@
       "@/*": ["src/*"],
     }
   },
-  "include": ["src", "src/windows/debug"],
+  "include": ["src", "src/windows/session"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

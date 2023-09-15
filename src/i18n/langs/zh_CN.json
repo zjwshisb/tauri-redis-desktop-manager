@@ -113,5 +113,6 @@
   "Serialized Value": "序列化值",
   "The serialized-value created by Dump command": "通过dump命令导出的值",
   "Replace": "覆盖",
-  "Replace exists key": "覆盖存在的key"
+  "Replace exists key": "覆盖存在的key",
+  "Debug" :"调试"
 }

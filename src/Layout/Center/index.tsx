@@ -35,7 +35,8 @@ const Index: React.FC<{
   const getListHeight = React.useCallback(() => {
     const container = document.getElementById(id)
     if (container != null) {
-      setListHeight(container.clientHeight - 71 - 30)
+      console.log(container.clientHeight)
+      setListHeight(container.clientHeight - 102 - 30)
     }
   }, [id])
 
@@ -84,55 +85,16 @@ const Index: React.FC<{
 
   return (
     <ResizableDiv
-      className={'h-screen border-r'}
+      className={'border-r'}
       minWidth={200}
       defaultWidth={300}
       maxWidth={800}
     >
-      <Spin spinning={loading}>
-        <div
-          className="flex flex-col h-screen overflow-hidden   bg-white"
-          id={id}
-        >
-          <div className="py-2 px-2  bg-white  border-b">
-            <div className="flex item-center">
-              <Input
-                prefix={<SearchOutlined />}
-                placeholder={t('search').toString()}
-                allowClear
-                onChange={(e) => {
-                  onSearchChange.run(e.target.value)
-                }}
-              />
-              <div className="px-2">
-                <Space>
-                  <TypeSelect
-                    className="w-28"
-                    selectClassName="w-full"
-                    value={params.types}
-                    connection={info.connection}
-                    onChange={(e) => {
-                      setParams((prev) => {
-                        return {
-                          ...prev,
-                          types: e
-                        }
-                      })
-                    }}
-                  />
-                  <Tooltip title={t('Refresh')} placement="bottom">
-                    <ReloadOutlined
-                      className="hover:cursor-pointer text-lg"
-                      onClick={() => {
-                        getKeys(true)
-                      }}
-                    />
-                  </Tooltip>
-                </Space>
-              </div>
-            </div>
-            <div className="pt-2">
-              <Space>
+      <div className="flex flex-col h-full overflow-hidden bg-white" id={id}>
+        <Spin spinning={loading}>
+          <div className="border-b">
+            <div className="bg-[#ECECEC] p-2">
+              <Space className="flex">
                 <Editable connection={info.connection}>
                   <Add
                     onSuccess={(name: string) => {
@@ -179,7 +141,43 @@ const Index: React.FC<{
                     })
                   }}
                 />
+                <Tooltip title={t('Refresh')} placement="bottom">
+                  <ReloadOutlined
+                    className="hover:cursor-pointer text-lg"
+                    onClick={() => {
+                      getKeys(true)
+                    }}
+                  />
+                </Tooltip>
               </Space>
+            </div>
+            <div className="flex item-center p-2">
+              <Input
+                prefix={<SearchOutlined />}
+                placeholder={t('search').toString()}
+                allowClear
+                onChange={(e) => {
+                  onSearchChange.run(e.target.value)
+                }}
+              />
+              <div className="px-2">
+                <Space>
+                  <TypeSelect
+                    className="w-28"
+                    selectClassName="w-full"
+                    value={params.types}
+                    connection={info.connection}
+                    onChange={(e) => {
+                      setParams((prev) => {
+                        return {
+                          ...prev,
+                          types: e
+                        }
+                      })
+                    }}
+                  />
+                </Space>
+              </div>
             </div>
           </div>
           <List info={info} keys={keys} height={listHeight} listRef={listRef} />
@@ -190,8 +188,8 @@ const Index: React.FC<{
               getKeys()
             }}
           />
-        </div>
-      </Spin>
+        </Spin>
+      </div>
     </ResizableDiv>
   )
 }

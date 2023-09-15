@@ -1,17 +1,22 @@
 import React from 'react'
 import PageFloatButton from '../PageFloatButton'
 import { Spin } from 'antd'
+import classNames from 'classnames'
 
 interface PageProps {
   pageKey: string
   onRefresh?: () => void
   loading?: boolean
+  wFull?: boolean
 }
 
 const Page: React.FC<React.PropsWithChildren<PageProps>> = (props) => {
   return (
-    <Spin spinning={props.loading === undefined ? false : props.loading}>
-      <div className="py-4">
+    <Spin
+      className="w-full"
+      spinning={props.loading === undefined ? false : props.loading}
+    >
+      <div className={classNames(['p-4', props.wFull === true && 'w-screen'])}>
         <PageFloatButton
           onRefresh={props.onRefresh}
           pageKey={props.pageKey}

@@ -10,6 +10,7 @@ import { StyleProvider } from '@ant-design/cssinjs'
 import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import { type Locale } from 'antd/es/locale'
+import classNames from 'classnames'
 
 const langs: Record<string, Locale> = {
   zh_CN: zhCN,
@@ -19,8 +20,9 @@ const langs: Record<string, Locale> = {
 const AppLayout: React.FC<
   React.PropsWithChildren<{
     loading?: boolean
+    className?: string
   }>
-> = ({ children, loading }) => {
+> = ({ children, loading, className }) => {
   const { i18n } = useTranslation()
 
   const locale = React.useMemo(() => {
@@ -33,7 +35,12 @@ const AppLayout: React.FC<
       {(loading === undefined || !loading) && (
         <StyleProvider hashPriority="high">
           <Layout>
-            <Layout.Content className="h-screen w-screen bg-white border-t flex">
+            <Layout.Content
+              className={classNames([
+                'h-screen w-screen bg-white flex',
+                className
+              ])}
+            >
               {children}
             </Layout.Content>
           </Layout>

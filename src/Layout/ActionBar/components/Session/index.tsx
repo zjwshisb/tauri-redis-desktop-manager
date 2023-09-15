@@ -1,22 +1,22 @@
-import { Button } from 'antd'
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { BugOutlined } from '@ant-design/icons'
+import Template from '../Template'
 
 import { openWindow } from '@/utils'
-const Index: React.FC = () => {
+const Client: React.FC = () => {
   return (
-    <Button
+    <Template
+      title="Session"
       icon={<BugOutlined />}
-      size="large"
       onClick={() => {
-        openWindow('debug', {
-          url: 'src/windows/debug/index.html',
-          title: 'debug',
+        openWindow('session', {
+          url: 'src/windows/session/index.html',
+          title: 'Session',
           focus: true
         })
       }}
-    ></Button>
+    ></Template>
   )
 }
-export default observer(Index)
+export default observer(Client)

@@ -1,7 +1,14 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import { Tabs, Dropdown, Typography, type TabsProps, theme } from 'antd'
+import {
+  Tabs,
+  Dropdown,
+  Typography,
+  type TabsProps,
+  theme,
+  ConfigProvider
+} from 'antd'
 import { useTranslation } from 'react-i18next'
 import { MacScrollbar } from 'mac-scrollbar'
 import StickyBox from 'react-sticky-box'
@@ -50,7 +57,7 @@ const Index: React.FC = () => {
     <StickyBox offsetTop={0} offsetBottom={20} style={{ zIndex: 1 }}>
       <DefaultTabBar
         {...props}
-        style={{ background: colorBgContainer, paddingTop: 10 }}
+        style={{ background: colorBgContainer, margin: 0 }}
       />
     </StickyBox>
   )
@@ -109,37 +116,54 @@ const Index: React.FC = () => {
   )
 
   return (
-    <div className={'flex flex-1 h-screen bg-white box-border overflow-hidden'}>
+    <div className={'flex flex-1  bg-white box-border overflow-hidden'}>
       <MacScrollbar
-        className="w-full px-4 bg-white"
+        className="w-full  bg-white"
         style={{ zIndex: 9 }}
         id={'container'}
       >
-        <div className="pb-8 flex-1 h-full">
-          {store.page.pages.length === 0 && (
-            <div className="w-full h-[500px] flex items-center justify-center">
-              <Typography.Title>Tauri Redis Desktop Manager</Typography.Title>
-            </div>
-          )}
-          {store.page.pages.length > 0 && (
-            <Tabs
-              renderTabBar={renderTabBar}
-              size="small"
-              hideAdd
-              onEdit={(targetKey, action) => {
-                if (action === 'remove') {
-                  store.page.removePage(targetKey as string)
-                }
-              }}
-              onTabClick={(e) => {
-                store.page.switch(e)
-              }}
-              type="editable-card"
-              activeKey={store.page.active}
-              items={items.get()}
-            />
-          )}
-        </div>
+        <ConfigProvider
+          theme={{
+            components: {
+              Tabs: {
+                cardGutter: 0,
+                cardBg: '#ECECEC',
+                itemActiveColor: '#000000',
+                inkBarColor: '#000000',
+                itemSelectedColor: '#000000'
+              }
+            }
+          }}
+        >
+          <div className="pb-8 flex-1 h-full">
+            {store.page.pages.length === 0 && (
+              <div className="w-full h-[500px] flex items-center justify-center">
+                <Typography.Title>Tauri Redis Desktop Manager</Typography.Title>
+              </div>
+            )}
+            {store.page.pages.length > 0 && (
+              <Tabs
+                style={{
+                  paddingTop: 0
+                }}
+                renderTabBar={renderTabBar}
+                size="small"
+                hideAdd
+                onEdit={(targetKey, action) => {
+                  if (action === 'remove') {
+                    store.page.removePage(targetKey as string)
+                  }
+                }}
+                onTabClick={(e) => {
+                  store.page.switch(e)
+                }}
+                type="editable-card"
+                activeKey={store.page.active}
+                items={items.get()}
+              />
+            )}
+          </div>
+        </ConfigProvider>
       </MacScrollbar>
     </div>
   )
