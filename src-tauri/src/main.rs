@@ -12,19 +12,13 @@ mod ssh;
 mod utils;
 use conn::ConnectionManager;
 use pubsub::PubsubManager;
-use redis::ToRedisArgs;
-use tauri::{CustomMenuItem, Menu, Submenu};
+use tauri::Menu;
 
 fn main() {
     sqlite::init_sqlite();
 
     let app_name = "Tauri Redis Desktop Manager";
-    let mut menu: Menu = Menu::os_default(app_name);
-
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let close = CustomMenuItem::new("close".to_string(), "Close");
-    let submenu = Submenu::new("Function", Menu::new().add_item(quit).add_item(close));
-    menu = menu.add_submenu(submenu);
+    let menu: Menu = Menu::os_default(app_name);
 
     tauri::Builder::default()
         .menu(menu)

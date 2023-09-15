@@ -58,10 +58,7 @@ const Index: React.FC<{
                   })
                   e.stopPropagation()
                 }}
-                className={classNames([
-                  'hover:cursor-pointer border-none h-[37px]',
-                  'hover:bg-gray-100'
-                ])}
+                className={classNames(['border-none h-[37px]', 'active-able'])}
               >
                 <Typography.Text ellipsis={true}>{v}</Typography.Text>
               </List.Item>

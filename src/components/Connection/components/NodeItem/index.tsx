@@ -2,11 +2,13 @@ import React from 'react'
 import { CloudServerOutlined, ReloadOutlined } from '@ant-design/icons'
 import ItemLayout from '../ItemLayout'
 import request from '@/utils/request'
+import useStore from '@/hooks/useStore'
 import { autorun } from 'mobx'
 
 const NodeItem: React.FC<{
   connection: APP.Connection
   node: APP.Node
+  active: boolean
 }> = (props) => {
   const [keyCount, setKeyCount] = React.useState(0)
 
@@ -24,6 +26,8 @@ const NodeItem: React.FC<{
       })
   })
 
+  const store = useStore()
+
   const child = React.useMemo(() => {
     if (loading) {
       return <ReloadOutlined spin />
@@ -32,8 +36,13 @@ const NodeItem: React.FC<{
   }, [keyCount, loading])
 
   return (
-    <ItemLayout active={false} clickAble={false}>
-      <div className="flex flex-1">
+    <ItemLayout active={props.active}>
+      <div
+        className="flex flex-1"
+        onClick={() => {
+          store.keyInfo.set(props.connection, 0)
+        }}
+      >
         <CloudServerOutlined className="mr-1 text-sm" />
         <div>
           {props.node.host}:{props.node.port}

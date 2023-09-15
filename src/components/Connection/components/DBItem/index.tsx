@@ -38,7 +38,7 @@ const Index: React.FC<{
   }, [keyCount, loading])
 
   return (
-    <ItemLayout active={props.active} clickAble={true}>
+    <ItemLayout active={props.active}>
       <div
         className="flex flex-1"
         onClick={() => {

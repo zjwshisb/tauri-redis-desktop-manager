@@ -114,5 +114,7 @@
   "The serialized-value created by Dump command": "通过dump命令导出的值",
   "Replace": "覆盖",
   "Replace exists key": "覆盖存在的key",
-  "Debug" :"调试"
+  "Debug" :"调试",
+  "Log": "日志",
+  "Session": "会话"
 }

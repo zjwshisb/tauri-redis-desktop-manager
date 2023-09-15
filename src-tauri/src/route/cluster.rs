@@ -6,7 +6,7 @@ use crate::{
     model::Node,
     response::{KeyWithMemory, ScanResult},
 };
-use redis::{FromRedisValue, Value};
+use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug)]
@@ -142,11 +142,15 @@ pub async fn analysis<'r>(
                                     &mut conn,
                                 )
                                 .await?;
-                            let mut km = KeyWithMemory { name: k, memory: 0 };
-                            match memory {
-                                Value::Int(i) => km.memory = i,
-                                _ => {}
-                            }
+                            let types = manager
+                                .execute_with(redis::cmd("type").arg(x), &mut conn)
+                                .await?;
+                            let km = KeyWithMemory {
+                                name: k,
+                                memory: i64::from_redis_value(&memory)?,
+                                types: String::from_redis_value(&types)?,
+                            };
+
                             resp.keys.push(km);
                         }
                     }

@@ -3,7 +3,6 @@ import {
   CaretRightFilled,
   DisconnectOutlined,
   ReloadOutlined,
-  KeyOutlined,
   WarningOutlined,
   LoadingOutlined
 } from '@ant-design/icons'
@@ -103,8 +102,16 @@ const Connection: React.FC<{
 
   const children = computed(() => {
     if (connection.is_cluster) {
+      const active = store.keyInfo.info?.connection.id === connection.id
       return connection.nodes?.map((v) => {
-        return <NodeItem key={v.id} node={v} connection={connection}></NodeItem>
+        return (
+          <NodeItem
+            key={v.id}
+            node={v}
+            connection={connection}
+            active={active}
+          ></NodeItem>
+        )
       })
     } else {
       return connection.dbs?.map((db) => {
@@ -125,11 +132,7 @@ const Connection: React.FC<{
 
   return (
     <div className={'box-border '}>
-      <div
-        className={
-          'flex justify-between text-lg px-2 hover:bg-gray-100 hover:cursor-pointer py-1'
-        }
-      >
+      <div className={'flex justify-between text-lg px-2  py-1 active-able'}>
         <div className={'flex overflow-hidden flex-1'}>
           {icon}
           <Tooltip
@@ -155,16 +158,6 @@ const Connection: React.FC<{
             )}
             {connection.open === true && (
               <>
-                {connection.is_cluster && (
-                  <Tooltip title={'keys'}>
-                    <KeyOutlined
-                      onClick={() => {
-                        store.keyInfo.set(connection)
-                      }}
-                    />
-                  </Tooltip>
-                )}
-
                 <Tooltip title={t('Refresh')}>
                   <ReloadOutlined
                     className="hover:text-blue-600"

@@ -36,7 +36,10 @@ export function versionCompare(v1: string, v2: string) {
   return result
 }
 
-export async function openWindow(label: WindowLabel, options: WindowOptions) {
+export async function openWindow(
+  label: WindowLabel,
+  options: WindowOptions
+): Promise<WebviewWindow> {
   return await new Promise((resolve, reject) => {
     const webview = new WebviewWindow(label, options)
     webview.once('tauri://created', function () {

@@ -15,6 +15,7 @@ import Page from '..'
 export interface KeyItem {
   name: string
   memory: number
+  types: string
 }
 
 const MemoryAnalysis: React.FC<{
@@ -49,7 +50,7 @@ const MemoryAnalysis: React.FC<{
 
   const { t } = useTranslation()
 
-  const init = React.useRef(false)
+  // const init = React.useRef(false)
 
   const store = useStore()
 
@@ -117,13 +118,13 @@ const MemoryAnalysis: React.FC<{
     }
   }, [analysis, isInit])
 
-  React.useEffect(() => {
-    if (!init.current) {
-      init.current = true
-      setLoading(true)
-      getData(formRef.current)
-    }
-  }, [getData])
+  // React.useEffect(() => {
+  //   if (!init.current) {
+  //     init.current = true
+  //     setLoading(true)
+  //     getData(formRef.current)
+  //   }
+  // }, [getData])
 
   const sortKeys = React.useMemo(() => {
     const number = sort === 'desc' ? -1 : 1

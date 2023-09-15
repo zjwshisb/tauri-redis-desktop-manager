@@ -4,16 +4,14 @@ import classnames from 'classnames'
 const ItemLayout: React.FC<
   React.PropsWithChildren<{
     active: boolean
-    clickAble: boolean
   }>
-> = ({ children, active, clickAble }) => {
+> = ({ children, active }) => {
   return (
     <div
+      data-active={active}
       className={classnames([
-        'h-[22px] flex items-center px-4 justify-between',
-        clickAble ? 'hover:cursor-pointer' : '',
-        active ? 'bg-blue-400 text-white' : '',
-        clickAble && !active ? 'hover:bg-gray-50' : ''
+        'active-able',
+        'h-[22px] flex items-center px-4 justify-between'
       ])}
     >
       {children}

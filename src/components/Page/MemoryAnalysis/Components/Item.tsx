@@ -31,11 +31,12 @@ const Item = (props: ItemProps, ref: any) => {
           )
         })
       }}
-      className="flex px-2 h-[25px] justify-between items-center border-b  hover:cursor-pointer hover:bg-gray-100 last:border-b-0"
+      className="flex px-2 h-[25px] justify-between items-center border-b last:border-b-0 active-able"
     >
-      <div className="flex overflow-hidden">
-        <div className="w-20 flex-shrink-0">{props.index}.</div>
-        <div className="truncate">{props.item.name}</div>
+      <div className="w-40 flex-shrink-0">{props.index}.</div>
+      <div className="flex flex-1 overflow-hidden">
+        <div className="truncate flex-1">{props.item.name}</div>
+        <div className="ml-10 w-[100ox] flex-shrink-0">{props.item.types}</div>
       </div>
       <div className="ml-4 w-[100px] flex-shrink-0 text-right">
         {memoryFormat(props.item.memory)}

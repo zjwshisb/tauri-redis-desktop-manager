@@ -20,26 +20,6 @@ const Index: React.FC = () => {
           className="flex h-full  bg-[#E7E8E8] flex-col overflow-hidden"
           id="connection"
         >
-          {/* <div className="flex items-center p-2 flex-shrink-0">
-            <div className="flex-1">
-              <Button
-                size="large"
-                block
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  store.connection.openForm()
-                }}
-              >
-                {t('New Connection')}
-              </Button>
-            </div>
-            <div className="ml-2 flex-shrink-0">
-              <Setting />
-            </div>
-            <div className="ml-2 flex-shrink-0">
-              <DeBug />
-            </div>
-          </div> */}
           <MacScrollbar>
             <div>
               {store.connection.connections.map((v) => {

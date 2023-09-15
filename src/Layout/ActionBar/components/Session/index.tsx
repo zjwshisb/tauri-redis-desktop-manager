@@ -2,20 +2,21 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { BugOutlined } from '@ant-design/icons'
 import Template from '../Template'
+import { useOpenWindow } from '@/hooks/useOpenWindow'
 
-import { openWindow } from '@/utils'
 const Client: React.FC = () => {
+  const { open, active } = useOpenWindow('Session', {
+    url: 'src/windows/log/index.html',
+    title: 'debug',
+    focus: true
+  })
+
   return (
     <Template
       title="Session"
+      active={active}
       icon={<BugOutlined />}
-      onClick={() => {
-        openWindow('session', {
-          url: 'src/windows/session/index.html',
-          title: 'Session',
-          focus: true
-        })
-      }}
+      onClick={open}
     ></Template>
   )
 }

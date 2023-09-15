@@ -1,3 +1,5 @@
+const plugin = require('tailwindcss/plugin')
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -16,5 +18,20 @@ export default {
     container: false,
     extend: {}
   },
-  plugins: []
+  plugins: [
+    plugin(function ({ addComponents }) {
+      addComponents({
+        '.active-able': {
+          '&:hover': {
+            backgroundColor: 'rgb(0,0,0, 0.04)',
+            cursor: 'pointer'
+          },
+          '&[data-active=true]': {
+            backgroundColor: 'rgb(96 165 250)',
+            color: '#fff'
+          }
+        }
+      })
+    })
+  ]
 }

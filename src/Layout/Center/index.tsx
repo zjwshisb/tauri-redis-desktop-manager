@@ -1,7 +1,7 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { type ListRef } from 'rc-virtual-list'
-import { Spin, Input, Space, Tooltip } from 'antd'
+import { Spin, Input, Space, Tooltip, Statistic, ConfigProvider } from 'antd'
 import { useDebounceFn } from 'ahooks'
 import useStore from '@/hooks/useStore'
 import ResizableDiv from '@/components/ResizableDiv'
@@ -93,10 +93,35 @@ const Index: React.FC<{
       <div className="flex flex-col h-full overflow-hidden bg-white" id={id}>
         <Spin spinning={loading}>
           <div className="border-b">
-            <div className="bg-[#ECECEC] p-2">
-              <Space className="flex">
-                <Editable connection={info.connection}>
-                  <Add
+            <div className="bg-[#ECECEC] p-2 flex justify-between items-center">
+              <div>
+                <Space className="flex">
+                  <Editable connection={info.connection}>
+                    <Add
+                      onSuccess={(name: string) => {
+                        const key = getPageKey(name, info.connection, info.db)
+                        store.page.addPage({
+                          key,
+                          label: key,
+                          type: 'key',
+                          connection: info.connection,
+                          name,
+                          db: info.db,
+                          children: (
+                            <Key
+                              name={name}
+                              db={info.db}
+                              connection={info.connection}
+                              pageKey={key}
+                            ></Key>
+                          )
+                        })
+                      }}
+                      info={info}
+                    />
+                  </Editable>
+                  <Restore
+                    info={info}
                     onSuccess={(name: string) => {
                       const key = getPageKey(name, info.connection, info.db)
                       store.page.addPage({
@@ -116,40 +141,30 @@ const Index: React.FC<{
                         )
                       })
                     }}
-                    info={info}
                   />
-                </Editable>
-                <Restore
-                  info={info}
-                  onSuccess={(name: string) => {
-                    const key = getPageKey(name, info.connection, info.db)
-                    store.page.addPage({
-                      key,
-                      label: key,
-                      type: 'key',
-                      connection: info.connection,
-                      name,
-                      db: info.db,
-                      children: (
-                        <Key
-                          name={name}
-                          db={info.db}
-                          connection={info.connection}
-                          pageKey={key}
-                        ></Key>
-                      )
-                    })
+                  <Tooltip title={t('Refresh')} placement="bottom">
+                    <ReloadOutlined
+                      className="hover:cursor-pointer text-lg"
+                      onClick={() => {
+                        getKeys(true)
+                      }}
+                    />
+                  </Tooltip>
+                </Space>
+              </div>
+              <div>
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Statistic: {
+                        contentFontSize: 14
+                      }
+                    }
                   }}
-                />
-                <Tooltip title={t('Refresh')} placement="bottom">
-                  <ReloadOutlined
-                    className="hover:cursor-pointer text-lg"
-                    onClick={() => {
-                      getKeys(true)
-                    }}
-                  />
-                </Tooltip>
-              </Space>
+                >
+                  <Statistic value={keys.length}></Statistic>
+                </ConfigProvider>
+              </div>
             </div>
             <div className="flex item-center p-2">
               <Input

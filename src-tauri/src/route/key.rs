@@ -276,9 +276,14 @@ pub async fn analysis<'r>(
         keys: vec![],
     };
     for x in &result.keys {
+        let types = manager
+            .execute(cid, args.db, redis::cmd("type").arg(x))
+            .await?;
+
         let mut i = KeyWithMemory {
             name: x.clone(),
             memory: 0,
+            types: String::from_redis_value(&types)?,
         };
         let m = manager
             .execute(
@@ -309,7 +314,6 @@ pub async fn dump<'r>(
         .execute(cid, args.db, redis::cmd("dump").arg(&args.name))
         .await?;
     let vec = Vec::<u8>::from_redis_value(&v)?;
-    dbg!(&vec);
     Ok(utils::binary_to_redis_str(&vec))
 }
 

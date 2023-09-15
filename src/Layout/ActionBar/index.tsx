@@ -18,7 +18,7 @@ const ActionBar: React.FC = () => {
             <Session />
           </Space>
         </div>
-        <div className="flex">22</div>
+        <div className="flex"></div>
       </div>
     </div>
   )
