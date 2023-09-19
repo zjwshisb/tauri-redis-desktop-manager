@@ -97,14 +97,13 @@ pub async fn publish<'r>(
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
     let args: PublishArgs = serde_json::from_str(&payload)?;
-    let v: redis::Value = manager
+    manager
         .execute(
             cid,
-            args.db,
             redis::cmd("publish").arg(args.channel).arg(args.value),
+            Some(args.db),
         )
-        .await?;
-    Ok(i64::from_redis_value(&v)?)
+        .await
 }
 
 pub async fn monitor<'r>(
@@ -166,5 +165,5 @@ pub async fn cancel<'r>(
 ) -> Result<String, CusError> {
     let args: CancelArgs = serde_json::from_str(&payload)?;
     pubsub_manager.close(&args.name);
-    Ok(String::from("Ok"))
+    Ok(String::from("OK"))
 }

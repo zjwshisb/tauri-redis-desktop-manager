@@ -17,7 +17,7 @@ const Config: React.FC<{
   connection: APP.Connection
   pageKey: string
 }> = ({ connection, pageKey }) => {
-  const { data, loading, fetch } = useRequest<Record<string, string>>(
+  const { data, loading, fetch } = useRequest<APP.Field[]>(
     'config/all',
     connection.id
   )
@@ -28,24 +28,14 @@ const Config: React.FC<{
 
   const item = React.useMemo(() => {
     if (data != null) {
-      return Object.keys(data)
-        .filter((v) => {
-          if (search !== '') {
-            return v.includes(search)
-          }
-          return true
-        })
-        .map((v) => {
-          return {
-            name: v,
-            value: data[v]
-          }
-        })
+      return data.filter((v) => {
+        return v.name.includes(search.toLowerCase())
+      })
     }
     return []
   }, [data, search])
 
-  const columns = useTableColumn<APP.NameValue>(
+  const columns = useTableColumn<APP.Field>(
     [
       {
         title: t('Name'),
@@ -62,6 +52,7 @@ const Config: React.FC<{
       }
     ],
     {
+      width: 200,
       render(record) {
         return (
           <Editable connection={connection}>

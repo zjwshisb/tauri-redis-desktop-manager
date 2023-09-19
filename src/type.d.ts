@@ -61,15 +61,10 @@ declare namespace APP {
 
   interface Field {
     name: string
-    value: string
+    value: string | number | Field[]
   }
 
   type HashField = Field
-
-  interface ZSetField {
-    value: string
-    score: string
-  }
 
   type Key = StringKey | HashKey | ListKey | ZSetKey | SetKey
 
@@ -117,14 +112,14 @@ declare namespace APP {
 
   interface SingleScanLikeResp<T = string> {
     cursor: string
-    keys: T[]
+    values: T[]
   }
   interface ClusterScanLikeResp<T = string> {
     cursor: Array<{
       cursor: string
       node: string
     }>
-    keys: T[]
+    values: T[]
   }
 
   type ScanLikeResp<T = string> = SingleScanLikeResp<T> | ClusterScanLikeResp<T>

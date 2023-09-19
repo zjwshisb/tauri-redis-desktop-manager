@@ -1,7 +1,7 @@
 use crate::{
     err::CusError,
     model::{Command, Node},
-    response,
+    response::{self, Field},
     ssh::{self, SshTunnel},
     utils,
 };
@@ -189,10 +189,13 @@ impl ConnectionWrapper {
     }
 
     // execute the redis command
-    async fn execute(
+    async fn execute<T>(
         &mut self,
         cmd: &mut redis::Cmd,
-    ) -> Result<(redis::Value, Command), (CusError, Command)> {
+    ) -> Result<(T, Command), (CusError, Command)>
+    where
+        T: FromRedisValue,
+    {
         let mut cmd_vec: Vec<String> = vec![];
         for arg in cmd.args_iter() {
             match arg {
@@ -269,8 +272,10 @@ impl ConnectionWrapper {
                     }
                 }
                 cus_cmd.response = rep.join(" ");
-
-                Ok((value, cus_cmd))
+                match T::from_redis_value(&value) {
+                    Ok(v) => Ok((v, cus_cmd)),
+                    Err(err) => Err((CusError::App(err.to_string()), cus_cmd)),
+                }
             }
             Err(err) => {
                 rep.push(err.to_string());
@@ -335,11 +340,7 @@ impl ConnectionManager {
         Ok(())
     }
 
-    pub async fn get_config(
-        &self,
-        id: u32,
-        pattern: &str,
-    ) -> Result<HashMap<String, String>, CusError> {
+    pub async fn get_config(&self, id: u32, pattern: &str) -> Result<Vec<Field>, CusError> {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_config_with(pattern, conn).await;
         }
@@ -350,23 +351,11 @@ impl ConnectionManager {
         &self,
         pattern: &str,
         conn: &mut ConnectionWrapper,
-    ) -> Result<HashMap<String, String>, CusError> {
-        let value: Value = self
+    ) -> Result<Vec<Field>, CusError> {
+        let value: Vec<Value> = self
             .execute_with(redis::cmd("config").arg("get").arg(pattern), conn)
             .await?;
-        let vec: Vec<String> = Vec::from_redis_value(&value)?;
-        let mut map = HashMap::new();
-
-        let mut i: usize = 0;
-        while i < vec.len() {
-            if let Some(key) = vec.get(i) {
-                if let Some(value) = vec.get(i + 1) {
-                    map.insert(key.clone(), value.clone());
-                }
-            }
-            i += 2;
-        }
-        Ok(map)
+        Ok(Field::build_vec(&value)?)
     }
 
     pub async fn get_version(&self, id: u32) -> Result<String, CusError> {
@@ -470,12 +459,15 @@ impl ConnectionManager {
         Ok(wrapper.nodes.to_vec())
     }
 
-    pub async fn execute_with(
+    pub async fn execute_with<T>(
         &self,
         cmd: &mut Cmd,
         conn: &mut ConnectionWrapper,
-    ) -> Result<redis::Value, CusError> {
-        let result = conn.execute(cmd).await;
+    ) -> Result<T, CusError>
+    where
+        T: FromRedisValue,
+    {
+        let result: Result<(T, Command), (CusError, Command)> = conn.execute(cmd).await;
         match result {
             Ok((value, cmd)) => {
                 if let Some(tx) = self.debug_tx.lock().await.get_mut(0) {
@@ -492,18 +484,25 @@ impl ConnectionManager {
         }
     }
 
-    pub async fn execute(
+    pub async fn execute<T>(
         &self,
         id: u32,
-        db: u8,
         cmd: &mut redis::Cmd,
-    ) -> Result<redis::Value, CusError> {
+        db: Option<u8>,
+    ) -> Result<T, CusError>
+    where
+        T: FromRedisValue,
+    {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
-            if !conn.model.get_is_cluster() && conn.db != db {
-                let _ = self
-                    .execute_with(redis::cmd("select").arg(db), conn)
-                    .await?;
-                conn.db = db
+            if !conn.model.get_is_cluster() {
+                if let Some(database) = db {
+                    if database != conn.db {
+                        let _ = self
+                            .execute_with(redis::cmd("select").arg(db), conn)
+                            .await?;
+                        conn.db = database
+                    }
+                }
             }
             let v = self.execute_with(cmd, conn).await?;
             return Ok(v);

@@ -1,6 +1,6 @@
 use crate::conn::ConnectionManager;
 use crate::err::CusError;
-use redis::{self, FromRedisValue};
+use redis::{self};
 use serde::Deserialize;
 use serde_json;
 #[derive(Deserialize)]
@@ -14,8 +14,7 @@ pub async fn dbsize<'r>(
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
     let args: DBSizeArgs = serde_json::from_str(&payload)?;
-    let value: redis::Value = manager
-        .execute(cid, args.db, &mut redis::cmd("dbsize"))
-        .await?;
-    Ok(i64::from_redis_value(&value)?)
+    manager
+        .execute(cid, &mut redis::cmd("dbsize"), Some(args.db))
+        .await
 }

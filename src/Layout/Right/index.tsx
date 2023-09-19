@@ -6,7 +6,6 @@ import {
   Dropdown,
   Typography,
   type TabsProps,
-  theme,
   ConfigProvider
 } from 'antd'
 import { useTranslation } from 'react-i18next'
@@ -49,16 +48,9 @@ const Index: React.FC = () => {
     ]
   }, [t])
 
-  const {
-    token: { colorBgContainer }
-  } = theme.useToken()
-
   const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
     <StickyBox offsetTop={0} offsetBottom={20} style={{ zIndex: 1 }}>
-      <DefaultTabBar
-        {...props}
-        style={{ background: colorBgContainer, margin: 0 }}
-      />
+      <DefaultTabBar {...props} style={{ background: '#ECECEC', margin: 0 }} />
     </StickyBox>
   )
 
@@ -127,10 +119,7 @@ const Index: React.FC = () => {
             components: {
               Tabs: {
                 cardGutter: 0,
-                cardBg: '#ECECEC',
-                itemActiveColor: '#000000',
-                inkBarColor: '#000000',
-                itemSelectedColor: '#000000'
+                cardBg: '#ECECEC'
               }
             }
           }}
@@ -148,6 +137,7 @@ const Index: React.FC = () => {
                 }}
                 renderTabBar={renderTabBar}
                 size="small"
+                className=""
                 hideAdd
                 onEdit={(targetKey, action) => {
                   if (action === 'remove') {

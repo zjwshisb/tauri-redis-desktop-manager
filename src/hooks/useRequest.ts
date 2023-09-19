@@ -34,9 +34,14 @@ export default function useRequest<T>(
     }
   }, [fetch, init])
 
+  const set = React.useCallback((t: T) => {
+    setData(t)
+  }, [])
+
   return {
     error,
     data,
+    set,
     fetch,
     loading,
     init

@@ -24,7 +24,7 @@ export function useFieldScan<T>(
       setLoading(true)
       await request<{
         cursor: string
-        fields: T[]
+        values: T[]
       }>(path, keys.connection_id, {
         name: keys.name,
         db: keys.db,
@@ -40,9 +40,9 @@ export function useFieldScan<T>(
             setMore(true)
           }
           if (reset) {
-            setFields(res.data.fields)
+            setFields(res.data.values)
           } else {
-            setFields((p) => [...p].concat(res.data.fields))
+            setFields((p) => [...p].concat(res.data.values))
           }
         })
         .finally(() => {

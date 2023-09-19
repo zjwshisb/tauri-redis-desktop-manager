@@ -109,13 +109,13 @@ export default function useKeyScan(
           last.current.afterGet(reset)
         }
         if (reset) {
-          setKeys(res.data.keys)
+          setKeys(res.data.values)
         } else {
           setKeys((pre) => {
-            return [...pre].concat(res.data.keys)
+            return [...pre].concat(res.data.values)
           })
         }
-        return res.data.keys
+        return res.data.values
       })
     },
     [

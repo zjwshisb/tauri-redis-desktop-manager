@@ -1,9 +1,9 @@
 use crate::{
     conn::{ConnectionManager, ConnectionWrapper},
     err::CusError,
+    request::IdArgs,
     sqlite::Connection,
 };
-use serde::Deserialize;
 use tauri::State;
 
 pub fn add(payload: String) -> Result<Connection, CusError> {
@@ -16,13 +16,8 @@ pub async fn get() -> Result<Vec<Connection>, CusError> {
     Connection::all()
 }
 
-#[derive(Deserialize)]
-struct DelArgs {
-    id: u32,
-}
-
 pub fn del(payload: String) -> Result<(), CusError> {
-    let args: DelArgs = serde_json::from_str(&payload)?;
+    let args: IdArgs<u32> = serde_json::from_str(&payload)?;
     let conn = Connection::first(args.id)?;
     conn.del()
 }

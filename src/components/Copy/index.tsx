@@ -1,7 +1,7 @@
 import { CopyOutlined, CheckOutlined } from '@ant-design/icons'
 import React from 'react'
 import { clipboard } from '@tauri-apps/api'
-import { message } from 'antd'
+import { Button, type ButtonProps, message } from 'antd'
 import { useTranslation } from 'react-i18next'
 
 const Copy: React.FC<
@@ -9,13 +9,15 @@ const Copy: React.FC<
     content: string
     className?: string
     style?: React.CSSProperties
+    isButton?: boolean
+    buttonProps?: ButtonProps
   }>
-> = ({ content, className, style, children }) => {
+> = ({ content, className, style, children, isButton, buttonProps }) => {
   const [showSuccess, setShowSuccess] = React.useState(false)
 
   const { t } = useTranslation()
 
-  const onCopy = React.useCallback(async () => {
+  const copy = React.useCallback(async () => {
     await clipboard.writeText(content)
     setShowSuccess(true)
     message.success(t('Copy Success'))
@@ -24,16 +26,33 @@ const Copy: React.FC<
     }, 1000)
   }, [content, t])
 
+  const icon = React.useMemo(() => {
+    if (showSuccess) {
+      return <CheckOutlined className={className} style={style} />
+    }
+
+    return (
+      <CopyOutlined
+        className={className}
+        style={style}
+        onClick={() => {
+          if (isButton !== true) {
+            copy()
+          }
+        }}
+      />
+    )
+  }, [className, isButton, copy, showSuccess, style])
+
   if (children !== undefined && React.isValidElement(children)) {
     return React.cloneElement(children as React.ReactElement, {
-      onClick: onCopy
+      onClick: copy
     })
   }
 
-  if (showSuccess) {
-    return <CheckOutlined className={className} />
+  if (isButton === true) {
+    return <Button {...buttonProps} icon={icon} onClick={copy}></Button>
   }
-
-  return <CopyOutlined className={className} style={style} onClick={onCopy} />
+  return icon
 }
 export default Copy

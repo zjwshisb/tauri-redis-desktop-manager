@@ -1,3 +1,5 @@
+use std::string::FromUtf8Error;
+
 use thiserror;
 
 pub fn new_normal() -> CusError {
@@ -16,6 +18,8 @@ pub enum CusError {
     Redis(#[from] redis::RedisError),
     #[error(transparent)]
     Serde(#[from] serde_json::Error),
+    #[error(transparent)]
+    Utf8(#[from] FromUtf8Error),
     #[error("{0}")]
     App(String),
 }

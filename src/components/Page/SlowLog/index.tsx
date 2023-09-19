@@ -4,6 +4,9 @@ import dayjs from 'dayjs'
 import Page from '..'
 import CusTable from '@/components/CusTable'
 import useTableColumn from '@/hooks/useTableColumn'
+import { Button, Modal, message } from 'antd'
+import { useTranslation } from 'react-i18next'
+import request from '@/utils/request'
 
 const SlowLog: React.FC<{
   connection: APP.Connection
@@ -14,6 +17,8 @@ const SlowLog: React.FC<{
     time: number
     count: number
   }>('server/slow-log', connection.id)
+
+  const { t } = useTranslation()
 
   const columns = useTableColumn<APP.SlowLog>([
     {
@@ -54,6 +59,26 @@ const SlowLog: React.FC<{
       <div className="mb-2">
         <div>slowlog-log-slower-than: {data?.time}us</div>
         <div>slowlog-max-len: {data?.count}</div>
+        <Button
+          danger
+          type="primary"
+          onClick={() => {
+            Modal.confirm({
+              title: t('Notice'),
+              content: t(
+                'Are you sure resets the slow log, clearing all entries in it?'
+              ),
+              onOk() {
+                request('server/reset-slow-log', connection.id).then(() => {
+                  message.success(t('Success'))
+                  fetch()
+                })
+              }
+            })
+          }}
+        >
+          {t('Clear')}
+        </Button>
       </div>
       <CusTable
         rowKey={'uid'}

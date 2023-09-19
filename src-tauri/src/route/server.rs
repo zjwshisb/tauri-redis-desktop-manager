@@ -4,7 +4,8 @@ use crate::{
     conn::{ConnectionManager, ConnectionWrapper},
     err::CusError,
     model::SlowLog,
-    sqlite::Connection,
+    response::{self, Field},
+    sqlite::{self, Connection},
 };
 use redis::{FromRedisValue, Value};
 
@@ -21,19 +22,10 @@ pub async fn ping<'r>(
 ) -> Result<String, CusError> {
     let params: Connection = serde_json::from_str(payload.as_str())?;
     let mut conn = ConnectionWrapper::build(params).await?;
-    let v = manager
+    let _ = manager
         .execute_with(&mut redis::cmd("ping"), &mut conn)
         .await?;
-    match v {
-        Value::Bulk(_) => {
-            return Ok(String::from("PONG"));
-        }
-        Value::Data(_) => {
-            return Ok(String::from("PONG"));
-        }
-        _ => {}
-    }
-    Ok(String::from_redis_value(&v)?)
+    Ok(String::from("PONG"))
 }
 
 pub async fn version<'r>(
@@ -55,51 +47,46 @@ pub async fn slow_log<'r>(
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<SlowLogResp, CusError> {
     let config = manager.get_config(cid, "slowlog*").await?;
-
-    let mut time = String::from("0");
-    if let Some(v) = config.get("slowlog-log-slower-than") {
-        time = v.clone();
-    }
-    let mut count = String::from("0");
-    if let Some(v) = config.get("slowlog-max-len") {
-        count = v.clone();
-    }
-    let value = manager
-        .execute(cid, 0, &mut redis::cmd("slowlog").arg("get").arg(&count))
-        .await?;
-    let mut logs: Vec<SlowLog> = vec![];
-    match value {
-        Value::Bulk(v) => {
-            for vv in v {
-                match vv {
-                    Value::Bulk(vvv) => {
-                        if let Some(first) = vvv.get(0) {
-                            match first {
-                                // if cluster
-                                Value::Bulk(_) => {
-                                    for vvvv in vvv {
-                                        match vvvv {
-                                            Value::Bulk(arr) => {
-                                                logs.push(SlowLog::build(&arr));
-                                            }
-                                            _ => {}
-                                        }
-                                    }
-                                }
-                                // normal
-                                Value::Int(_) => {
-                                    logs.push(SlowLog::build(&vvv));
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-                    _ => {}
-                }
-            }
+    let conn = sqlite::Connection::first(cid)?;
+    let mut time = String::default();
+    if let Some(v) = Field::first("slowlog-log-slower-than", &config) {
+        match v.value {
+            response::FieldValue::Str(vv) => time = vv,
+            _ => {}
         }
-        _ => {}
+    }
+    let mut count = String::default();
+    if let Some(v) = Field::first("slowlog-max-len", &config) {
+        match v.value {
+            response::FieldValue::Str(vv) => count = vv,
+            _ => {}
+        }
+    }
+    let value: Vec<Value> = manager
+        .execute(cid, &mut redis::cmd("slowlog").arg("get").arg(&count), None)
+        .await?;
+    let mut logs = vec![];
+    for v in value {
+        let vv: Vec<Value> = Vec::from_redis_value(&v)?;
+        if conn.is_cluster {
+            for vvv in vv {
+                let arr: Vec<Value> = Vec::from_redis_value(&vvv)?;
+                logs.push(SlowLog::build(&arr));
+            }
+        } else {
+            logs.push(SlowLog::build(&vv));
+        }
     }
 
     Ok(SlowLogResp { time, count, logs })
 }
+
+pub async fn reset_slow_log<'r>(
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
+    manager
+        .execute(cid, &mut redis::cmd("SLOWLOG").arg("RESET"), None)
+        .await
+}
+

@@ -22,13 +22,13 @@ const Index: React.FC<{
   const [params, setParams] = React.useState({ search: '' })
 
   const { t } = useTranslation()
-  const { fields, more, loading, getFields } = useFieldScan<APP.ZSetField>(
+  const { fields, more, loading, getFields } = useFieldScan<APP.Field>(
     'key/zset/zscan',
     keys,
     params
   )
 
-  const columns = useTableColumn<APP.ZSetField>(
+  const columns = useTableColumn<APP.Field>(
     [
       {
         title: (
@@ -50,23 +50,25 @@ const Index: React.FC<{
             </div>
           </div>
         ),
-        dataIndex: 'value',
+        dataIndex: 'name',
         align: 'center',
         render(_) {
           return <FieldViewer content={_} />
         }
       },
       {
-        dataIndex: 'score',
+        dataIndex: 'value',
         title: t('Score'),
         render(_) {
           return <FieldViewer content={_} typesArr={['datetime', 'text']} />
         },
         sorter: (a, b) => {
-          if (a.score === b.score) {
+          if (a.value === b.value) {
             return 0
           }
-          return a.score > b.score ? 1 : -1
+          return parseFloat(a.value as string) > parseFloat(b.value as string)
+            ? 1
+            : -1
         }
       }
     ],
@@ -79,7 +81,7 @@ const Index: React.FC<{
             <Editable connection={connection}>
               <ZRem
                 keys={keys}
-                value={record.value}
+                value={record.name}
                 onSuccess={() => {
                   onRefresh()
                 }}

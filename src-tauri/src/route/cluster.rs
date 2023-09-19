@@ -4,35 +4,19 @@ use crate::{
     conn::{ConnectionManager, ConnectionWrapper},
     err::CusError,
     model::Node,
-    response::{KeyWithMemory, ScanResult},
+    request::{self, IdArgs},
+    response::{KeyWithMemory, ScanLikeResult},
 };
-use redis::FromRedisValue;
-use serde::{Deserialize, Serialize};
-
-#[derive(Deserialize, Debug)]
-struct ScanArgs {
-    cursor: Vec<HashMap<String, String>>,
-    search: Option<String>,
-    count: i64,
-    types: Option<String>,
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct ScanResp {
-    pub cursor: Vec<HashMap<String, String>>,
-    pub keys: Vec<String>,
-}
+use redis::{FromRedisValue, Value};
 
 pub async fn scan<'r>(
     cid: u32,
     payload: String,
     manager: tauri::State<'r, ConnectionManager>,
-) -> Result<ScanResp, CusError> {
-    let args: ScanArgs = serde_json::from_str(payload.as_str())?;
-    let mut resp: ScanResp = ScanResp {
-        cursor: vec![],
-        keys: vec![],
-    };
+) -> Result<ScanLikeResult<String, Vec<HashMap<String, String>>>, CusError> {
+    let args: request::ScanLikeArgs<Vec<HashMap<String, String>>> =
+        serde_json::from_str(payload.as_str())?;
+    let mut resp: ScanLikeResult<String, Vec<HashMap<String, String>>> = ScanLikeResult::default();
     let nodes = manager.get_nodes(cid).await?;
     for x in &args.cursor {
         if let Some(node_id) = x.get("node") {
@@ -49,12 +33,12 @@ pub async fn scan<'r>(
                         if let Some(types) = &args.types {
                             cmd.arg(&["TYPE", types]);
                         }
-                        let value = manager.execute_with(&mut cmd, &mut conn).await?;
-                        let mut result = ScanResult::build(&value);
+                        let value: Vec<Value> = manager.execute_with(&mut cmd, &mut conn).await?;
+                        let mut result = ScanLikeResult::<String, String>::build(value)?;
                         let mut node_cursor: HashMap<String, String> = HashMap::new();
                         node_cursor.insert(String::from("cursor"), result.cursor);
                         node_cursor.insert(String::from("node"), node_id.clone());
-                        resp.keys.append(&mut result.keys);
+                        resp.values.append(&mut result.values);
                         resp.cursor.push(node_cursor);
                     }
                 }
@@ -64,16 +48,12 @@ pub async fn scan<'r>(
     Ok(resp)
 }
 
-#[derive(Deserialize, Debug)]
-struct NodeSizeArgs {
-    id: String,
-}
 pub async fn node_size<'r>(
     cid: u32,
     payload: String,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: NodeSizeArgs = serde_json::from_str(&payload.as_str())?;
+    let args: IdArgs<String> = serde_json::from_str(&payload.as_str())?;
     let nodes: Vec<Node> = manager.get_nodes(cid).await?;
     for n in nodes {
         if n.id == args.id {
@@ -91,24 +71,18 @@ pub async fn node<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<Vec<Node>, CusError> {
-    Ok(manager.get_nodes(cid).await?)
+    manager.get_nodes(cid).await
 }
 
-#[derive(Serialize)]
-pub struct AnalysisResp {
-    pub cursor: Vec<HashMap<String, String>>,
-    pub keys: Vec<KeyWithMemory>,
-}
 pub async fn analysis<'r>(
     cid: u32,
     payload: String,
     manager: tauri::State<'r, ConnectionManager>,
-) -> Result<AnalysisResp, CusError> {
-    let args: ScanArgs = serde_json::from_str(payload.as_str())?;
-    let mut resp: AnalysisResp = AnalysisResp {
-        cursor: vec![],
-        keys: vec![],
-    };
+) -> Result<ScanLikeResult<KeyWithMemory, Vec<HashMap<String, String>>>, CusError> {
+    let args: request::ScanLikeArgs<Vec<HashMap<String, String>>> =
+        serde_json::from_str(payload.as_str())?;
+    let mut resp: ScanLikeResult<KeyWithMemory, Vec<HashMap<String, String>>> =
+        ScanLikeResult::default();
     let nodes = manager.get_nodes(cid).await?;
 
     for x in &args.cursor {
@@ -126,14 +100,14 @@ pub async fn analysis<'r>(
                         if let Some(types) = &args.types {
                             cmd.arg(&["TYPE", types]);
                         }
-                        let value = manager.execute_with(&mut cmd, &mut conn).await?;
-                        let result = ScanResult::build(&value);
+                        let value: Vec<Value> = manager.execute_with(&mut cmd, &mut conn).await?;
+                        let result = ScanLikeResult::<String, String>::build(value)?;
                         let mut node_cursor: HashMap<String, String> = HashMap::new();
                         node_cursor.insert(String::from("cursor"), result.cursor);
                         node_cursor.insert(String::from("node"), node_id.clone());
                         resp.cursor.push(node_cursor);
-                        for k in result.keys {
-                            let memory = manager
+                        for k in result.values {
+                            let memory: i64 = manager
                                 .execute_with(
                                     redis::cmd("memory")
                                         .arg("usage")
@@ -142,16 +116,15 @@ pub async fn analysis<'r>(
                                     &mut conn,
                                 )
                                 .await?;
-                            let types = manager
-                                .execute_with(redis::cmd("type").arg(x), &mut conn)
+                            let types: String = manager
+                                .execute_with(redis::cmd("type").arg(&k), &mut conn)
                                 .await?;
                             let km = KeyWithMemory {
                                 name: k,
-                                memory: i64::from_redis_value(&memory)?,
-                                types: String::from_redis_value(&types)?,
+                                memory: memory,
+                                types: types,
                             };
-
-                            resp.keys.push(km);
+                            resp.values.push(km);
                         }
                     }
                 }

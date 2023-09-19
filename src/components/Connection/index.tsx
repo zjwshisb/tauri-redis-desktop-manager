@@ -143,7 +143,7 @@ const Connection: React.FC<{
               </div>
             }
           >
-            <div className="truncate" onDoubleClick={onItemClickTh.run}>
+            <div className="truncate flex-1" onDoubleClick={onItemClickTh.run}>
               <span className="pr-2 text-gray-600">#{connection.id}</span>
               {connection.host}:{connection.port}
             </div>

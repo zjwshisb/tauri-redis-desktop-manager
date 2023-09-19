@@ -1,5 +1,5 @@
 import React from 'react'
-import { type KeyItem } from '..'
+import { type KeyItem } from './index'
 import { getPageKey, memoryFormat, openPage } from '@/utils'
 import Key from '@/components/Page/Key'
 

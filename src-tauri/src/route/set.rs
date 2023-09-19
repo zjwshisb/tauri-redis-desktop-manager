@@ -1,28 +1,15 @@
-use crate::conn::ConnectionManager;
-use crate::err::{self, CusError};
-use redis::{FromRedisValue, Value};
-use serde::{Deserialize, Serialize};
-
-#[derive(Deserialize)]
-struct SScanArgs {
-    cursor: String,
-    name: String,
-    search: Option<String>,
-    db: u8,
-    count: i64,
-}
-#[derive(Serialize)]
-pub struct SScanResp {
-    cursor: String,
-    fields: Vec<String>,
-}
+use crate::err::CusError;
+use crate::request::ItemScanArgs;
+use crate::{conn::ConnectionManager, response::ScanLikeResult};
+use redis::Value;
+use serde::Deserialize;
 
 pub async fn sscan<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
-) -> Result<SScanResp, CusError> {
-    let args: SScanArgs = serde_json::from_str(&payload)?;
+) -> Result<ScanLikeResult<String, String>, CusError> {
+    let args: ItemScanArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("sscan");
     cmd.arg(&args.name)
         .arg(&args.cursor)
@@ -30,24 +17,12 @@ pub async fn sscan<'r>(
     if let Some(search) = args.search {
         cmd.arg(&["MATCH", &format!("*{}*", search)]);
     }
-    let values = manager.execute(cid, args.db, &mut cmd).await?;
-    if let Value::Bulk(s) = values {
-        let cursor = String::from_redis_value(s.get(0).unwrap())?;
-        let mut fields: Vec<String> = vec![];
-        let keys_vec = s.get(1);
-        if let Some(s) = keys_vec {
-            fields = Vec::<String>::from_redis_value(&s)?;
-        };
-        return Ok(SScanResp {
-            cursor: cursor,
-            fields: fields,
-        });
-    }
-    Err(err::new_normal())
+    let values: Vec<Value> = manager.execute(cid, &mut cmd, Some(args.db)).await?;
+    ScanLikeResult::<String, String>::build(values)
 }
 
 #[derive(Deserialize)]
-struct SAddArgs {
+struct ItemArgs {
     name: String,
     db: u8,
     value: String,
@@ -58,32 +33,22 @@ pub async fn sadd<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: SAddArgs = serde_json::from_str(&payload)?;
-    let value = manager
+    let args: ItemArgs = serde_json::from_str(&payload)?;
+    let value: i64 = manager
         .execute(
             cid,
-            args.db,
             redis::cmd("sadd").arg(args.name).arg(args.value),
+            Some(args.db),
         )
         .await?;
-    if let Value::Int(v) = value {
-        match v {
-            0 => {
-                return Err(CusError::App(String::from("value already exists in Set")));
-            }
-            _ => {
-                return Ok(v);
-            }
+    match value {
+        0 => {
+            return Err(CusError::App(String::from("value already exists in Set")));
+        }
+        _ => {
+            return Ok(value);
         }
     }
-    return Err(err::new_normal());
-}
-
-#[derive(Deserialize)]
-struct SRemArgs {
-    name: String,
-    db: u8,
-    value: String,
 }
 
 pub async fn srem<'r>(
@@ -91,23 +56,20 @@ pub async fn srem<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: SRemArgs = serde_json::from_str(payload.as_str())?;
-    let value = manager
+    let args: ItemArgs = serde_json::from_str(payload.as_str())?;
+    let value: i64 = manager
         .execute(
             cid,
-            args.db,
             redis::cmd("srem").arg(args.name).arg(args.value),
+            Some(args.db),
         )
         .await?;
-    if let Value::Int(v) = value {
-        match v {
-            0 => {
-                return Err(CusError::App(String::from("value not exists in Set")));
-            }
-            _ => {
-                return Ok(v);
-            }
+    match value {
+        0 => {
+            return Err(CusError::App(String::from("value not exists in Set")));
+        }
+        _ => {
+            return Ok(value);
         }
     }
-    return Err(err::new_normal());
 }

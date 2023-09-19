@@ -1,21 +1,14 @@
-use crate::{err::CusError, ConnectionManager};
-use redis::{self, FromRedisValue};
-use serde::Deserialize;
+use crate::{err::CusError, request, ConnectionManager};
+use redis::{self};
 
 pub async fn list<'r>(
     _payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
-    let value: redis::Value = manager
-        .execute(cid, 0, redis::cmd("client").arg("list"))
-        .await?;
-    Ok(String::from_redis_value(&value)?)
-}
-
-#[derive(Deserialize)]
-struct KillArgs {
-    id: String,
+    manager
+        .execute(cid, redis::cmd("client").arg("list"), None)
+        .await
 }
 
 pub async fn kill<'r>(
@@ -23,15 +16,14 @@ pub async fn kill<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: KillArgs = serde_json::from_str(&payload)?;
-    let value: redis::Value = manager
+    let args: request::IdArgs<String> = serde_json::from_str(&payload)?;
+    let count: i64 = manager
         .execute(
             cid,
-            0,
             redis::cmd("CLIENT").arg("KILL").arg(&["id", &args.id]),
+            None,
         )
         .await?;
-    let count = i64::from_redis_value(&value)?;
     match count {
         0 => return Err(CusError::App(String::from("Client has been kill"))),
         _ => {

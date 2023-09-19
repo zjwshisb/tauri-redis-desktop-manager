@@ -7,7 +7,7 @@ import CusModal from '@/components/CusModal'
 
 const Index: React.FC<{
   keys: APP.ZSetKey
-  field?: APP.ZSetField
+  field?: APP.Field
   onSuccess: () => void
   trigger: React.ReactElement
 }> = (props) => {
@@ -23,8 +23,8 @@ const Index: React.FC<{
       onOpen={() => {
         if (props.field != null) {
           form.setFieldsValue({
-            value: props.field.value,
-            score: props.field.score
+            value: props.field.name,
+            score: props.field.value
           })
         }
       }}

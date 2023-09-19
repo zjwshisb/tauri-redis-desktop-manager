@@ -5,6 +5,7 @@ mod err;
 mod key;
 mod model;
 mod pubsub;
+mod request;
 mod response;
 mod route;
 mod sqlite;

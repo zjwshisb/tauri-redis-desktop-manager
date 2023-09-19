@@ -116,5 +116,6 @@
   "Replace exists key": "覆盖存在的key",
   "Debug" :"调试",
   "Log": "日志",
-  "Session": "会话"
+  "Session": "会话",
+  "Are you sure resets the slow log, clearing all entries in it?": "确定清除所有慢日志?"
 }

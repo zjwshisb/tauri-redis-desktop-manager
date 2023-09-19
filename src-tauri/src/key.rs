@@ -32,7 +32,9 @@ impl Key {
             memory: 0,
             length: 0,
         };
-        let types_value: Value = manager.execute(cid, db, cmd("type").arg(&key.name)).await?;
+        let types_value: Value = manager
+            .execute(cid, cmd("type").arg(&key.name), Some(db))
+            .await?;
         key.types = String::from_redis_value(&types_value)?;
         if !key.is_none() {
             key.get_ttl(&manager).await?;
@@ -48,11 +50,11 @@ impl Key {
         let memory_value: Value = manager
             .execute(
                 self.connection_id,
-                self.db,
                 cmd("memory")
                     .arg("usage")
                     .arg(&self.name)
                     .arg(&["SAMPLES", "0"]),
+                Some(self.db),
             )
             .await?;
         self.memory = i64::from_redis_value(&memory_value)?;
@@ -63,7 +65,11 @@ impl Key {
         manager: &tauri::State<'r, ConnectionManager>,
     ) -> Result<(), CusError> {
         let ttl_result: Value = manager
-            .execute(self.connection_id, self.db, cmd("ttl").arg(&self.name))
+            .execute(
+                self.connection_id,
+                cmd("ttl").arg(&self.name),
+                Some(self.db),
+            )
             .await?;
         self.ttl = i64::from_redis_value(&ttl_result)?;
         Ok(())
@@ -75,8 +81,8 @@ impl Key {
         let value: Value = manager
             .execute(
                 self.connection_id,
-                self.db,
                 redis::cmd("get").arg(&self.name),
+                Some(self.db),
             )
             .await?;
         let v: Result<String, redis::RedisError> = String::from_redis_value(&value);
@@ -107,7 +113,11 @@ impl Key {
         };
         if cmd != "" {
             let length_value: Value = manager
-                .execute(self.connection_id, self.db, redis::cmd(cmd).arg(&self.name))
+                .execute(
+                    self.connection_id,
+                    redis::cmd(cmd).arg(&self.name),
+                    Some(self.db),
+                )
                 .await?;
             self.length = i64::from_redis_value(&length_value)?;
         }

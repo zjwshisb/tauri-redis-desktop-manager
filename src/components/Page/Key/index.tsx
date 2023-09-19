@@ -136,10 +136,13 @@ const Index: React.FC<{
                 </div>
                 <div className="mb-2 mr-2 w-[200px]">
                   <Space>
-                    <Button
-                      className="mb-2"
-                      icon={<Copy content={item.name} />}
-                    ></Button>
+                    <Copy
+                      content={item.name}
+                      isButton
+                      buttonProps={{
+                        className: 'mb-2'
+                      }}
+                    />
                     <Dump keys={item}></Dump>
 
                     <Editable connection={connection}>

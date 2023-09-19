@@ -117,7 +117,7 @@ const App: React.FC = () => {
 
   return (
     <AppLayout>
-      <MacScrollbar className="px-4  w-full box-border" id="container">
+      <MacScrollbar className="w-full" id="container">
         <div>{children}</div>
       </MacScrollbar>
     </AppLayout>

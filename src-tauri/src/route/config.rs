@@ -1,27 +1,26 @@
-use std::collections::HashMap;
-
 use crate::{
     conn::ConnectionManager,
-    err::{self, CusError},
+    err::CusError,
+    response::{Field, FieldValue},
 };
-use redis::FromRedisValue;
 use serde::Deserialize;
 
 pub async fn get_database<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
-) -> Result<String, CusError> {
-    let value = manager.get_config(cid, "databases").await?;
-    if let Some(v) = value.get("databases") {
-        return Ok(v.clone());
+) -> Result<FieldValue, CusError> {
+    let configs = manager.get_config(cid, "databases").await?;
+    let databases = Field::first("databases", &configs);
+    if let Some(d) = databases {
+        return Ok(d.value);
     }
-    return Err(err::new_normal());
+    return Ok(FieldValue::Nil);
 }
 
 pub async fn get_all<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
-) -> Result<HashMap<String, String>, CusError> {
+) -> Result<Vec<Field>, CusError> {
     let value = manager.get_config(cid, "*").await?;
     Ok(value)
 }
@@ -37,35 +36,32 @@ pub async fn edit<'r>(
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
     let args: EditArgs = serde_json::from_str(&payload)?;
-    let v = manager
+    manager
         .execute(
             cid,
-            0,
             redis::cmd("config")
                 .arg("set")
                 .arg(&args.name)
                 .arg(&args.value),
+            None,
         )
-        .await?;
-    Ok(String::from_redis_value(&v)?)
+        .await
 }
 
 pub async fn rewrite<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
-    let v = manager
-        .execute(cid, 0, redis::cmd("config").arg("rewrite"))
-        .await?;
-    Ok(String::from_redis_value(&v)?)
+    manager
+        .execute(cid, redis::cmd("config").arg("rewrite"), None)
+        .await
 }
 
 pub async fn reset_stat<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
-    let v = manager
-        .execute(cid, 0, redis::cmd("config").arg("resetstat"))
-        .await?;
-    Ok(String::from_redis_value(&v)?)
+    manager
+        .execute(cid, redis::cmd("config").arg("resetstat"), None)
+        .await
 }

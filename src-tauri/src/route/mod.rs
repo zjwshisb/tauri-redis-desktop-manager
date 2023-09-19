@@ -14,6 +14,7 @@ pub mod debug;
 pub mod hash;
 pub mod key;
 pub mod list;
+pub mod memory;
 pub mod pubsub;
 pub mod server;
 pub mod set;
@@ -40,6 +41,8 @@ pub async fn dispatch<'r>(
         "server/info" => Response::new(server::info(cid, manager).await?),
         "server/version" => Response::new(server::version(cid, manager).await?),
         "server/slow-log" => Response::new(server::slow_log(cid, manager).await?),
+        "server/reset-slow-log" => Response::new(server::reset_slow_log(cid, manager).await?),
+
         "key/scan" => Response::new(key::scan(payload, cid, manager).await?),
         "key/hash/hscan" => Response::new(hash::hscan(payload, cid, manager).await?),
         "key/hash/hset" => Response::new(hash::hset(payload, cid, manager).await?),
@@ -61,9 +64,12 @@ pub async fn dispatch<'r>(
         "key/set" => Response::new(key::set(payload, cid, manager).await?),
         "key/dump" => Response::new(key::dump(payload, cid, manager).await?),
         "key/restore" => Response::new(key::restore(payload, cid, manager).await?),
-        "key/memory-usage" => Response::new(key::memory_usage(payload, cid, manager).await?),
         "key/expire" => Response::new(key::expire(payload, cid, manager).await?),
-        "key/analysis" => Response::new(key::analysis(payload, cid, manager).await?),
+        "memory/analysis" => Response::new(memory::analysis(payload, cid, manager).await?),
+        "memory/usage" => Response::new(memory::memory_usage(payload, cid, manager).await?),
+        "memory/doctor" => Response::new(memory::memory_doctor(cid, manager).await?),
+        "memory/stats" => Response::new(memory::memory_stats(cid, manager).await?),
+        "memory/purge" => Response::new(memory::memory_purge(cid, manager).await?),
         "db/dbsize" => Response::new(db::dbsize(payload, cid, manager).await?),
         "client/list" => Response::new(client::list(payload, cid, manager).await?),
         "client/kill" => Response::new(client::kill(payload, cid, manager).await?),
