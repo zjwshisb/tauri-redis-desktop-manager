@@ -93,7 +93,7 @@ const Stats: React.FC<{
             })
           }}
         >
-          Memory Purge
+          MEMORY PURGE
         </Button>
       </div>
       {children}

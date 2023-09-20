@@ -84,13 +84,31 @@ pub async fn expire<'r>(
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
     let args: ExpireArgs = serde_json::from_str(&payload)?;
-    manager
-        .execute(
-            cid,
-            redis::cmd("expire").arg(&args.name).arg(args.ttl),
-            Some(args.db),
-        )
-        .await
+    if args.ttl == -1 {
+        let i: i64 = manager
+            .execute(cid, redis::cmd("PERSIST").arg(&args.name), Some(args.db))
+            .await?;
+        match i {
+            0 => Err(CusError::build(
+                "Key does not exist or does not have an associated timeout.",
+            )),
+            _ => Ok(i),
+        }
+    } else {
+        let i: i64 = manager
+            .execute(
+                cid,
+                redis::cmd("EXPIRE").arg(&args.name).arg(args.ttl),
+                Some(args.db),
+            )
+            .await?;
+        match i {
+            0 => Err(CusError::build(
+                "Key doesn't exist, or operation skipped due to the provided arguments.",
+            )),
+            _ => Ok(i),
+        }
+    }
 }
 
 #[derive(Deserialize)]

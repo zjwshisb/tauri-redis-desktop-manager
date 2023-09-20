@@ -24,6 +24,12 @@ pub enum CusError {
     App(String),
 }
 
+impl CusError {
+    pub fn build(s: &str) -> Self {
+        Self::App(String::from(s))
+    }
+}
+
 // we must manually implement serde::Serialize
 impl serde::Serialize for CusError {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

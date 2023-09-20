@@ -9,7 +9,7 @@ interface ItemProps {
   connection: APP.Connection
   db: number
 }
-const Item = (props: ItemProps, ref: any) => {
+const Item: React.FC<ItemProps> = (props) => {
   return (
     <div
       onClick={() => {
@@ -44,4 +44,4 @@ const Item = (props: ItemProps, ref: any) => {
     </div>
   )
 }
-export default React.forwardRef<any, ItemProps>(Item)
+export default Item

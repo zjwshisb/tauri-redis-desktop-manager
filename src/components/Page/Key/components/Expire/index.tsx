@@ -3,6 +3,7 @@ import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import CusModal from '@/components/CusModal'
+import { useTranslation } from 'react-i18next'
 
 const Index: React.FC<{
   keys: APP.Key
@@ -10,6 +11,8 @@ const Index: React.FC<{
   onSuccess: (ttl: number) => void
 }> = (props) => {
   const [form] = useForm(undefined)
+
+  const { t } = useTranslation()
 
   return (
     <CusModal
@@ -32,8 +35,12 @@ const Index: React.FC<{
       title={'EXPIRE'}
     >
       <Form form={form}>
-        <Form.Item name={'ttl'} label={'TTL'}>
-          <InputNumber min={0}></InputNumber>
+        <Form.Item
+          name={'ttl'}
+          label={'TTL'}
+          tooltip={t('-1 mean PERSIST the key')}
+        >
+          <InputNumber min={-1}></InputNumber>
         </Form.Item>
       </Form>
     </CusModal>
