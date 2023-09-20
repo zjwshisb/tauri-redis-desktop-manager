@@ -26,11 +26,12 @@ If you are interested in this project, It is  very welcome make a PR.
 
 ## Preview
 
-![image](https://github.com/zjwshisb/blog/blob/master/1693385572753.jpg?raw=true)
-![image](https://github.com/zjwshisb/blog/blob/master/1693385437372.jpg?raw=true)
-![image](https://github.com/zjwshisb/blog/blob/master/1693385469981.jpg?raw=true)
-![image](https://github.com/zjwshisb/blog/blob/master/1693385494874.jpg?raw=true)
-![image](https://github.com/zjwshisb/blog/blob/master/1693385551360.jpg?raw=true)
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/6.png?raw=true)
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/1.png?raw=true)
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/2.png?raw=true)
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/3.png?raw=true)
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/5.png?raw=true)
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/7.png?raw=true)
 
 ## LICENSE
 
