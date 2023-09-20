@@ -29,9 +29,10 @@ const ConnectionForm: React.FC = () => {
   const store = useStore()
 
   const formItem = store.connection.getForm()
+  const [isSsh, setIsSsh] = React.useState(false)
 
   React.useEffect(() => {
-    if (formItem.open && formItem.item != null) {
+    if (formItem.open === true && formItem.item != null) {
       let ssh = false
       if (formItem.item.ssh_host !== null) {
         ssh = true
@@ -41,10 +42,12 @@ const ConnectionForm: React.FC = () => {
         ...formItem.item,
         ssh
       })
+    } else {
+      form.setFieldsValue({
+        ssh: isSsh
+      })
     }
-  }, [form, formItem.item, formItem.open])
-
-  const [isSsh, setIsSsh] = React.useState(false)
+  }, [form, formItem.item, formItem.open, isSsh])
 
   React.useEffect(() => {
     if (!isSsh) {

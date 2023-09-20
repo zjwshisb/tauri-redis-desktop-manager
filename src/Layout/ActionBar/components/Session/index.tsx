@@ -6,7 +6,7 @@ import { useOpenWindow } from '@/hooks/useOpenWindow'
 
 const Client: React.FC = () => {
   const { open, active } = useOpenWindow('Session', {
-    url: 'src/windows/log/index.html',
+    url: 'src/windows/session/index.html',
     title: 'debug',
     focus: true
   })
