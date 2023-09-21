@@ -152,6 +152,7 @@ const ConnectionForm: React.FC = () => {
       destroyOnClose
     >
       <Form
+        size="middle"
         form={form}
         layout={'vertical'}
         onValuesChange={(v) => {
@@ -173,7 +174,7 @@ const ConnectionForm: React.FC = () => {
             <Form.Item
               name="host"
               label={t('Host')}
-              rules={[{ required: true }]}
+              rules={[{ required: true, max: 512 }]}
             >
               <Input
                 placeholder={t('Please Enter {{name}}', {
@@ -188,7 +189,31 @@ const ConnectionForm: React.FC = () => {
               label={t('Port')}
               rules={[{ required: true }]}
             >
-              <InputNumber min={0} className="!w-full"></InputNumber>
+              <InputNumber
+                min={0}
+                max={65536}
+                className="!w-full"
+              ></InputNumber>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
+            <Form.Item
+              name="name"
+              rules={[
+                {
+                  max: 255
+                }
+              ]}
+              label={t('Name')}
+              tooltip={t('The name for Connection')}
+            >
+              <Input
+                placeholder={t('Please Enter {{name}}', {
+                  name: t('Name')
+                }).toString()}
+              ></Input>
             </Form.Item>
           </Col>
         </Row>

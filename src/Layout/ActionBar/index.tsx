@@ -4,6 +4,7 @@ import { Space } from 'antd'
 import React from 'react'
 import NewConnection from './components/NewConnection'
 import Session from './components/Session'
+import Migrate from './components/Migrate'
 
 const ActionBar: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const ActionBar: React.FC = () => {
             <Setting></Setting>
             <Log />
             <Session />
+            <Migrate />
           </Space>
         </div>
         <div className="flex"></div>

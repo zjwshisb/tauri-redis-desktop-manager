@@ -137,15 +137,11 @@ const Connection: React.FC<{
           {icon}
           <Tooltip
             mouseEnterDelay={0.6}
-            title={
-              <div className="break-all">
-                {connection.host}:{connection.port}
-              </div>
-            }
+            title={<div className="break-all">{connection.name}</div>}
           >
             <div className="truncate flex-1" onDoubleClick={onItemClickTh.run}>
               <span className="pr-2 text-gray-600">#{connection.id}</span>
-              {connection.host}:{connection.port}
+              {connection.name}
             </div>
           </Tooltip>
         </div>

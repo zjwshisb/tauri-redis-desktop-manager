@@ -1,7 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import request from '../utils/request'
 import { getAll } from '@tauri-apps/api/window'
-import { Modal } from 'antd'
 import pageStore from './page'
 import keysStore from './key'
 
@@ -23,23 +22,9 @@ class ConnectionStore {
   }
 
   openForm(connection?: APP.Connection) {
-    if (connection !== undefined && connection.open === true) {
-      Modal.confirm({
-        title: 'Notice',
-        content: 'You must close the connection before editing',
-        onOk: () => {
-          this.close(connection.id)
-          this.form = {
-            open: true,
-            item: connection
-          }
-        }
-      })
-    } else {
-      this.form = {
-        open: true,
-        item: connection
-      }
+    this.form = {
+      open: true,
+      item: connection
     }
   }
 
@@ -86,18 +71,23 @@ class ConnectionStore {
     const connection = this.connections.find((v) => v.id === id)
     if (connection !== undefined) {
       try {
-        connection.loading = true
+        runInAction(() => {
+          connection.loading = true
+        })
+
         await request('connections/open', connection.id)
         runInAction(() => {
           if (connection.err !== undefined) {
             connection.err = undefined
           }
+          connection.loading = false
         })
-        connection.loading = false
-        this.getInfo(connection)
+
+        await this.getInfo(connection)
       } catch (err) {
-        connection.loading = false
         runInAction(() => {
+          connection.loading = false
+
           connection.err = err as string
         })
         throw err

@@ -2,6 +2,7 @@ declare namespace APP {
   interface Connection {
     id: number
     host: string
+    name: string
     port: number
     auth: string
     version?: string

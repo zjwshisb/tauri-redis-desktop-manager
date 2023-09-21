@@ -83,6 +83,10 @@ const Index: React.FC<{
     }
   })
 
+  React.useEffect(() => {
+    getKeys(true)
+  }, [getKeys])
+
   return (
     <ResizableDiv
       className={'border-r'}

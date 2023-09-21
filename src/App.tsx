@@ -16,7 +16,7 @@ const App: React.FC = () => {
       <ActionBar />
       <div className="flex flex-1 overflow-hidden">
         <ConnectionForm />
-        <Left />
+        {store.connection.connections.length > 0 && <Left />}
         {store.keyInfo.info !== null && (
           <Center info={store.keyInfo.info}></Center>
         )}

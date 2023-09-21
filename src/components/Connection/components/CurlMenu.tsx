@@ -83,21 +83,18 @@ const Index: React.FC<{
               break
             }
             case 'edit': {
-              store.connection.openForm(connection)
-              // if (connection.open === true) {
-              //   Modal.confirm({
-              //     title: t('Notice'),
-              //     content: t('You must close the connection before editing'),
-              //     async onOk() {
-              //       setFormVisible(true)
-              //       store.closeConnection(connection.id).then(() => {
-              //         setTimeout(() => {}, 0)
-              //       })
-              //     }
-              //   })
-              // } else {
-              //   setFormVisible(true)
-              // }
+              if (connection.open === true) {
+                Modal.confirm({
+                  title: t('Notice'),
+                  content: t('You must close the connection before editing'),
+                  onOk: () => {
+                    store.connection.close(connection.id)
+                    store.connection.openForm(connection)
+                  }
+                })
+              } else {
+                store.connection.openForm(connection)
+              }
               break
             }
             case 'close': {

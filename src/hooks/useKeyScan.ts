@@ -81,14 +81,14 @@ export default function useKeyScan(
 
   const [keys, setKeys] = React.useState<string[]>([])
 
-  const [more, setMore] = React.useState(false)
+  const [more, setMore] = React.useState(true)
 
-  const last = useLatest(options)
+  const opts = useLatest(options)
 
   const getKeys = React.useCallback(
     async (reset: boolean = false) => {
-      if (last.current?.beforeGet != null) {
-        last.current?.beforeGet(reset)
+      if (opts.current?.beforeGet != null) {
+        opts.current?.beforeGet(reset)
       }
       if (reset) {
         resetCursor()
@@ -103,10 +103,11 @@ export default function useKeyScan(
         db,
         ...params
       }).then((res) => {
-        setMore(isMore(res.data))
+        const hasMore = isMore(res.data)
+        setMore(hasMore)
         setCursor(res.data)
-        if (last.current?.afterGet != null) {
-          last.current.afterGet(reset)
+        if (opts.current?.afterGet != null) {
+          opts.current.afterGet(reset)
         }
         if (reset) {
           setKeys(res.data.values)
@@ -115,11 +116,14 @@ export default function useKeyScan(
             return [...pre].concat(res.data.values)
           })
         }
-        return res.data.values
+        return {
+          data: res.data,
+          hasMore
+        }
       })
     },
     [
-      last,
+      opts,
       connection.is_cluster,
       connection.id,
       cursor,
@@ -131,10 +135,6 @@ export default function useKeyScan(
       setCursor
     ]
   )
-
-  React.useEffect(() => {
-    getKeys(true)
-  }, [getKeys])
 
   return {
     keys,

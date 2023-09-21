@@ -4,7 +4,7 @@ use rusqlite::{self, params, Connection as SqliteConnection, Row};
 use serde::{Deserialize, Serialize};
 use std::fs;
 
-const DATA_NAME: &str = "data2.db";
+const DATA_NAME: &str = "data3.db";
 const DATA_DIR: &str = "redis";
 
 pub fn get_sqlite_client() -> Result<SqliteConnection, CusError> {
@@ -19,6 +19,7 @@ pub fn init_sqlite() {
         .execute(
             "CREATE TABLE IF NOT EXISTS connections (
             id    INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
             host  TEXT NOT NULL,
             port  INTEGER NOT NULL,
             username TEXT,
@@ -61,6 +62,7 @@ fn get_data_path() -> String {
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Connection {
     pub id: Option<i64>,
+    pub name: Option<String>,
     pub host: String,
     pub port: u16,
     pub password: Option<String>,
@@ -128,23 +130,24 @@ impl Connection {
         if i > 0 {
             readonly = true
         }
-        let host: String = r.get(1).unwrap();
-        let port = r.get(2).unwrap();
+        let host: String = r.get(2).unwrap();
+        let port = r.get(3).unwrap();
         Connection {
             id: r.get(0).unwrap(),
+            name: r.get(1).unwrap(),
             host: host.clone(),
             port,
-            password: r.get(3).unwrap_or_default(),
-            username: r.get(4).unwrap_or_default(),
+            password: r.get(4).unwrap_or_default(),
+            username: r.get(5).unwrap_or_default(),
             is_cluster,
             readonly: readonly,
-            ssh_host: r.get(7).unwrap_or_default(),
-            ssh_port: r.get(8).unwrap_or_default(),
-            ssh_password: r.get(9).unwrap_or_default(),
-            ssh_username: r.get(10).unwrap_or_default(),
-            ssh_private_key: r.get(11).unwrap_or_default(),
-            ssh_timeout: r.get(12).unwrap_or_default(),
-            ssh_passphrase: r.get(13).unwrap_or_default(),
+            ssh_host: r.get(8).unwrap_or_default(),
+            ssh_port: r.get(9).unwrap_or_default(),
+            ssh_password: r.get(10).unwrap_or_default(),
+            ssh_username: r.get(11).unwrap_or_default(),
+            ssh_private_key: r.get(12).unwrap_or_default(),
+            ssh_timeout: r.get(13).unwrap_or_default(),
+            ssh_passphrase: r.get(14).unwrap_or_default(),
         }
     }
 
@@ -152,6 +155,7 @@ impl Connection {
         let conn = get_sqlite_client()?;
         let mut stmt = conn.prepare(
             "select id, 
+            name,
             host, 
             port, 
             password,
@@ -181,24 +185,29 @@ impl Connection {
         if self.readonly {
             readonly = 1;
         }
+        if let None = self.name {
+            self.name = Some(format!("{}:{}", self.host, self.port))
+        }
         if let Some(id) = self.id {
             conn.execute(
                 "UPDATE connections set 
-                host= ?1,
-                port= ?2,
-                password= ?3,
-                username= ?4,
-                is_cluster= ?5,
-                readonly =?6,
-                ssh_host =?7,
-                ssh_port =?8,
-                ssh_password =?9,
-                ssh_username =?10,
-                ssh_private_key =?11,
-                ssh_timeout =?12,
-                ssh_passphrase =?13 
-                where id = ?14",
+                name= ?1,
+                host= ?2,
+                port= ?3,
+                password= ?4,
+                username= ?5,
+                is_cluster= ?6,
+                readonly =?7,
+                ssh_host =?8,
+                ssh_port =?9,
+                ssh_password =?10,
+                ssh_username =?11,
+                ssh_private_key =?12,
+                ssh_timeout =?13,
+                ssh_passphrase =?14 
+                where id = ?15",
                 params!(
+                    self.name,
                     self.host,
                     self.port,
                     self.password,
@@ -218,6 +227,7 @@ impl Connection {
         } else {
             conn.execute(
                 "insert into connections(
+                    name,
                     host,
                     port, 
                     password,
@@ -231,8 +241,9 @@ impl Connection {
                     ssh_private_key,
                     ssh_timeout,
                     ssh_passphrase
-                    ) values(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+                    ) values(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
                 params!(
+                    &self.name,
                     &self.host,
                     &self.port,
                     &self.password,
@@ -263,10 +274,11 @@ impl Connection {
         let conn = crate::sqlite::get_sqlite_client()?;
         let mut stmt_result = conn.prepare(
             "select id,
-             host, 
-            port,
-             password, 
-            username,
+                name,
+                host, 
+                port,
+                password, 
+                username,
                 is_cluster,
                 readonly , 
                  ssh_host,

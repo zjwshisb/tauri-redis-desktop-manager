@@ -20,7 +20,6 @@ fn main() {
 
     let app_name = "Tauri Redis Desktop Manager";
     let menu: Menu = Menu::os_default(app_name);
-
     tauri::Builder::default()
         .menu(menu)
         .manage(PubsubManager::new())
