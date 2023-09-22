@@ -7,38 +7,112 @@ import SubmitBar from '../SubmitBar'
 import classNames from 'classnames'
 import Context from '../../context'
 import Header from '../Header'
-import { Checkbox, Col, Form, Input, Row } from 'antd'
 import { useTranslation } from 'react-i18next'
+import { type ButtonProps, Form, Input, Checkbox, Col, Row, Button } from 'antd'
+import Action, { type ActionRef } from './Action'
 import { useSourceConnection, useTargetConnection } from '../../hooks'
+import { getCurrent } from '@tauri-apps/api/window'
+import { confirm } from '@tauri-apps/api/dialog'
+import { type UnlistenFn } from '@tauri-apps/api/event'
+import { useLatest } from 'ahooks'
 
-const StepOne: React.FC = () => {
+const StepTwo: React.FC = () => {
   const [state, dispatch] = React.useContext(Context)
 
   const { t } = useTranslation()
 
+  const [prevLoading, setPrevLoading] = React.useState(false)
+  const [migrateLoading, setMigrateLoading] = React.useState(false)
+
   const targetConnection = useTargetConnection()
 
   const sourceConnection = useSourceConnection()
+
+  const ref = React.useRef<ActionRef>(null)
+
   const [form] = Form.useForm()
 
+  const changeDisabled = React.useMemo(() => {
+    return prevLoading || migrateLoading
+  }, [migrateLoading, prevLoading])
+
+  const startProps: ButtonProps = React.useMemo(() => {
+    if (!migrateLoading) {
+      return {
+        onClick() {
+          ref.current?.migrate()
+        },
+        disabled: prevLoading,
+        children: t('Start')
+      }
+    } else {
+      return {
+        onClick() {
+          ref.current?.stop()
+        },
+        danger: true,
+        type: 'default',
+        children: t('Stop')
+      }
+    }
+  }, [migrateLoading, prevLoading, ref, t])
+
+  const previewProps: ButtonProps = React.useMemo(() => {
+    if (!prevLoading) {
+      return {
+        disabled: migrateLoading,
+        onClick() {
+          ref.current?.loadKeys()
+        },
+        children: t('Preview')
+      }
+    } else {
+      return {
+        onClick() {
+          ref.current?.stop()
+        },
+        danger: true,
+        type: 'default',
+        children: t('Stop')
+      }
+    }
+  }, [migrateLoading, prevLoading, ref, t])
+
+  const changeDisabledRef = useLatest(changeDisabled)
+  const unListenFn = React.useRef<UnlistenFn>()
+
   React.useEffect(() => {
-    form.setFieldsValue(state.config)
-  }, [form, state.config])
+    const webview = getCurrent()
+    webview
+      .onCloseRequested(async (e) => {
+        if (changeDisabledRef.current) {
+          const confirmed = await confirm(
+            t('Are you sure stop action and quite?')
+          )
+          if (!confirmed) {
+            e.preventDefault()
+          }
+        }
+      })
+      .then((f) => {
+        unListenFn.current = f
+      })
+    return () => {
+      if (unListenFn.current !== undefined) {
+        unListenFn.current()
+      }
+    }
+  }, [changeDisabledRef, t])
 
   if (targetConnection === undefined || sourceConnection === undefined) {
     return <></>
   }
 
   return (
-    <div
-      className={classNames([
-        'w-full flex-col justify-between',
-        state.step === 1 ? 'flex' : 'hidden'
-      ])}
-    >
+    <div className={classNames(['w-full flex-col justify-between flex'])}>
       <div>
         <Header
-          title={t('Config')}
+          title={t('Preview')}
           source={{
             title: sourceConnection.name,
             subTitle: state.value?.source.database?.toString()
@@ -48,26 +122,33 @@ const StepOne: React.FC = () => {
             subTitle: state.value?.target.database?.toString()
           }}
         ></Header>
-        <div className="p-4 ">
-          <Row>
-            <Col span={12} offset={6}>
-              <Form
-                size="small"
-                layout="horizontal"
-                labelCol={{ span: 12 }}
-                form={form}
-              >
+        <div className="p-4">
+          <Form
+            size="small"
+            layout="horizontal"
+            form={form}
+            initialValues={{
+              pattern: '',
+              delete: false,
+              replace: false
+            }}
+          >
+            <Row gutter={20}>
+              <Col span={12}>
                 <Form.Item
                   label={t('Key Pattern')}
                   name={'pattern'}
                   tooltip={t('For Example:foo、*foo、foo*、*foo*')}
                 >
                   <Input
+                    disabled={changeDisabled}
                     placeholder={t('Please Enter {{name}}', {
                       name: t('Key Pattern')
                     }).toString()}
                   ></Input>
                 </Form.Item>
+              </Col>
+              <Col span={6}>
                 <Form.Item
                   label={t('Replace Target Key')}
                   valuePropName={'checked'}
@@ -76,8 +157,10 @@ const StepOne: React.FC = () => {
                     'Replace or not If the target database has the key'
                   )}
                 >
-                  <Checkbox></Checkbox>
+                  <Checkbox disabled={changeDisabled}></Checkbox>
                 </Form.Item>
+              </Col>
+              <Col span={6}>
                 <Form.Item
                   name={'delete'}
                   label={t('Delete Source Key')}
@@ -86,16 +169,57 @@ const StepOne: React.FC = () => {
                     'Delete the key or not in the Source database If had migrated to the target'
                   )}
                 >
-                  <Checkbox></Checkbox>
+                  <Checkbox disabled={changeDisabled}></Checkbox>
                 </Form.Item>
-              </Form>
-            </Col>
-          </Row>
+              </Col>
+            </Row>
+          </Form>
+
+          <Action
+            loading={changeDisabled}
+            onKeyLoadChange={(s) => {
+              switch (s) {
+                case 'stop':
+                  setPrevLoading(false)
+                  break
+                case 'before':
+                  setPrevLoading(true)
+                  break
+                case 'finished':
+                  setPrevLoading(false)
+                  break
+              }
+            }}
+            onMigrateChange={(s) => {
+              switch (s) {
+                case 'stop':
+                  setMigrateLoading(false)
+                  break
+                case 'before':
+                  setMigrateLoading(true)
+                  break
+                case 'finished':
+                  setMigrateLoading(false)
+                  break
+              }
+            }}
+            ref={ref}
+            config={form.getFieldsValue()}
+            target={{
+              connection: targetConnection,
+              database: state.value?.target.database
+            }}
+            source={{
+              connection: sourceConnection,
+              database: state.value?.source.database
+            }}
+          ></Action>
         </div>
       </div>
-
       <SubmitBar
+        nextProps={previewProps}
         prevProps={{
+          disabled: changeDisabled,
           onClick() {
             dispatch({
               type: 'step',
@@ -103,21 +227,14 @@ const StepOne: React.FC = () => {
             })
           }
         }}
-        nextProps={{
-          async onClick() {
-            dispatch({
-              type: 'config',
-              value: await form.getFieldsValue()
-            })
-            dispatch({
-              type: 'step',
-              value: 2
-            })
-          }
-        }}
+        extra={
+          <Button type="primary" {...startProps}>
+            {startProps.children}
+          </Button>
+        }
       ></SubmitBar>
     </div>
   )
 }
 
-export default observer(StepOne)
+export default observer(StepTwo)

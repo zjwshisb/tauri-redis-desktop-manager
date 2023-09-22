@@ -15,6 +15,7 @@ pub mod hash;
 pub mod key;
 pub mod list;
 pub mod memory;
+pub mod migrate;
 pub mod pubsub;
 pub mod server;
 pub mod set;
@@ -70,6 +71,7 @@ pub async fn dispatch<'r>(
         "memory/doctor" => Response::new(memory::memory_doctor(cid, manager).await?),
         "memory/stats" => Response::new(memory::memory_stats(cid, manager).await?),
         "memory/purge" => Response::new(memory::memory_purge(cid, manager).await?),
+        "migrate" => Response::new(migrate::migrate(payload, cid, manager).await?),
         "db/dbsize" => Response::new(db::dbsize(payload, cid, manager).await?),
         "client/list" => Response::new(client::list(payload, cid, manager).await?),
         "client/kill" => Response::new(client::kill(payload, cid, manager).await?),

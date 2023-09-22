@@ -9,6 +9,7 @@ import useArrayState from '@/hooks/useArrayState'
 import { useLatest } from 'ahooks'
 import SearchText from '@/components/SearchText'
 import Page from '..'
+import { type UnlistenFn } from '@tauri-apps/api/event'
 
 const Monitor: React.FC<{
   connection: APP.Connection
@@ -33,7 +34,7 @@ const Monitor: React.FC<{
   }, [props.connection.id])
 
   React.useEffect(() => {
-    let unListen: undefined | (() => void)
+    let unListen: undefined | UnlistenFn
     if (eventName !== '' && !stop) {
       appWindow
         .listen<string>(eventName, (r) => {

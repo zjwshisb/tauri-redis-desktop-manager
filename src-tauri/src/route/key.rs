@@ -24,7 +24,7 @@ pub async fn scan<'r>(
         .arg(&["count", &args.count.to_string()]);
 
     if let Some(search) = args.search {
-        cmd.arg(&["MATCH", format!("*{}*", &search).as_str()]);
+        cmd.arg(&["MATCH", &search]);
     }
     if let Some(types) = args.types {
         cmd.arg(&["TYPE", &types]);

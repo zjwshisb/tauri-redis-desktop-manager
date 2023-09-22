@@ -1,7 +1,15 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { type ListRef } from 'rc-virtual-list'
-import { Spin, Input, Space, Tooltip, Statistic, ConfigProvider } from 'antd'
+import {
+  Spin,
+  Input,
+  Space,
+  Tooltip,
+  Statistic,
+  ConfigProvider,
+  Checkbox
+} from 'antd'
 import { useDebounceFn } from 'ahooks'
 import useStore from '@/hooks/useStore'
 import ResizableDiv from '@/components/ResizableDiv'
@@ -71,6 +79,8 @@ const Index: React.FC<{
     })
   })
 
+  const [exactSearch, setExactSearch] = React.useState(false)
+
   const { keys, getKeys, more } = useKeyScan(info.connection, info.db, params, {
     beforeGet() {
       setLoading(true)
@@ -86,6 +96,34 @@ const Index: React.FC<{
   React.useEffect(() => {
     getKeys(true)
   }, [getKeys])
+
+  React.useEffect(() => {
+    if (exactSearch) {
+      setParams((prev) => {
+        let search = prev.search
+        if (search.startsWith('*')) {
+          search = search.substring(1)
+        }
+        if (search.endsWith('*')) {
+          search = search.substring(0, search.length - 1)
+        }
+        return {
+          ...prev,
+          search
+        }
+      })
+    } else {
+      setParams((prev) => {
+        if (prev.search.length > 0) {
+          return {
+            ...prev,
+            search: `*${prev.search}*`
+          }
+        }
+        return prev
+      })
+    }
+  }, [exactSearch])
 
   return (
     <ResizableDiv
@@ -172,11 +210,25 @@ const Index: React.FC<{
             </div>
             <div className="flex item-center p-2">
               <Input
+                addonAfter={
+                  <Tooltip title={t('Exact Search')} placement="bottom">
+                    <Checkbox
+                      checked={exactSearch}
+                      onChange={(e) => {
+                        setExactSearch(e.target.checked)
+                      }}
+                    />
+                  </Tooltip>
+                }
                 prefix={<SearchOutlined />}
                 placeholder={t('search').toString()}
                 allowClear
                 onChange={(e) => {
-                  onSearchChange.run(e.target.value)
+                  let v = e.target.value
+                  if (!exactSearch) {
+                    v = `*${v}*`
+                  }
+                  onSearchChange.run(v)
                 }}
               />
               <div className="px-2">

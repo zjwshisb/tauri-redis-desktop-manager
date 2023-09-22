@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import Page from '..'
 import CusTable from '@/components/CusTable'
 import useTableColumn from '@/hooks/useTableColumn'
-import { Button, Modal, message } from 'antd'
+import { Button, Descriptions, Modal, message } from 'antd'
 import { useTranslation } from 'react-i18next'
 import request from '@/utils/request'
 
@@ -57,8 +57,20 @@ const SlowLog: React.FC<{
   return (
     <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
       <div className="mb-2">
-        <div>slowlog-log-slower-than: {data?.time}us</div>
-        <div>slowlog-max-len: {data?.count}</div>
+        <Descriptions
+          size="middle"
+          column={2}
+          items={[
+            {
+              label: 'slowlog-log-slower-than',
+              children: data?.time
+            },
+            {
+              label: 'slowlog-max-len',
+              children: data?.count
+            }
+          ]}
+        ></Descriptions>
         <Button
           danger
           type="primary"

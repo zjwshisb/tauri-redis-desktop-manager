@@ -40,9 +40,6 @@ const StepOne: React.FC = () => {
         </div>
       </div>
       <SubmitBar
-        prevProps={{
-          disabled: true
-        }}
         nextProps={{
           onClick() {
             sourceForm

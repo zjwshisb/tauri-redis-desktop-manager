@@ -11,24 +11,15 @@ interface UpdateValue {
   type: 'value'
   value: State['value']
 }
-interface ConfigValue {
-  type: 'config'
-  value: State['config']
-}
 
 export interface State {
-  step: 0 | 1 | 2
+  step: 0 | 1
   value?: {
     source: MigrateItem
     target: MigrateItem
   }
-  config: {
-    pattern: ''
-    replace: boolean
-    delete: boolean
-  }
 }
-export type Action = UpdateStep | UpdateValue | ConfigValue
+export type Action = UpdateStep | UpdateValue
 
 const reducer = (state: State, action: Action) => {
   switch (action.type) {
@@ -41,12 +32,6 @@ const reducer = (state: State, action: Action) => {
       return {
         ...state,
         value: action.value
-      }
-    }
-    case 'config': {
-      return {
-        ...state,
-        config: action.value
       }
     }
   }

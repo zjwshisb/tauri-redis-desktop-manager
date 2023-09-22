@@ -188,6 +188,10 @@ impl ConnectionWrapper {
         Ok(r)
     }
 
+    pub fn is_cluster(&self) -> bool {
+        return self.model.get_is_cluster();
+    }
+
     // execute the redis command
     async fn execute<T>(
         &mut self,
@@ -328,6 +332,13 @@ impl ConnectionManager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             let _ = self.set_name(conn, "tauri-redis".to_string()).await;
         }
+    }
+
+    pub async fn is_cluster(&self, cid: u32) -> bool {
+        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
+            return conn.is_cluster();
+        }
+        return false;
     }
 
     pub async fn set_name(

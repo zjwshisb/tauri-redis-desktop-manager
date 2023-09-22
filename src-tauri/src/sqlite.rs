@@ -121,12 +121,12 @@ impl conn::Connectable for Connection {
 impl Connection {
     pub fn build(r: &Row) -> Connection {
         let mut is_cluster = false;
-        let i: i64 = r.get(5).unwrap_or_default();
+        let i: i64 = r.get(6).unwrap_or_default();
         if i > 0 {
             is_cluster = true
         }
         let mut readonly = false;
-        let i: i64 = r.get(6).unwrap_or_default();
+        let i: i64 = r.get(7).unwrap_or_default();
         if i > 0 {
             readonly = true
         }
@@ -140,7 +140,7 @@ impl Connection {
             password: r.get(4).unwrap_or_default(),
             username: r.get(5).unwrap_or_default(),
             is_cluster,
-            readonly: readonly,
+            readonly,
             ssh_host: r.get(8).unwrap_or_default(),
             ssh_port: r.get(9).unwrap_or_default(),
             ssh_password: r.get(10).unwrap_or_default(),

@@ -15,9 +15,14 @@ const SubmitBar: React.FC<{
   return (
     <div className="flex items-end justify-end p-4 bg-[#EEEEEF]">
       <Space>
-        <Button {...prevProps}>
-          {prevProps?.children !== undefined ? prevProps?.children : t('Prev')}
-        </Button>
+        {prevProps != null && (
+          <Button {...prevProps}>
+            {prevProps?.children !== undefined
+              ? prevProps?.children
+              : t('Prev')}
+          </Button>
+        )}
+
         <Button type="primary" {...nextProps}>
           {nextProps?.children !== undefined ? nextProps?.children : t('Next')}
         </Button>
