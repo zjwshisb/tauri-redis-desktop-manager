@@ -1,5 +1,9 @@
 import React from 'react'
-import { CloudServerOutlined, ReloadOutlined } from '@ant-design/icons'
+import {
+  CloudServerOutlined,
+  ReloadOutlined,
+  KeyOutlined
+} from '@ant-design/icons'
 import ItemLayout from '../ItemLayout'
 import request from '@/utils/request'
 import useStore from '@/hooks/useStore'
@@ -32,22 +36,29 @@ const NodeItem: React.FC<{
     if (loading) {
       return <ReloadOutlined spin />
     }
-    return <span className="">({keyCount})</span>
+    return (
+      <div className="flex items-center text-slate-600 italic">
+        <span>{keyCount}</span>
+        <KeyOutlined />
+      </div>
+    )
   }, [keyCount, loading])
 
   return (
     <ItemLayout active={props.active}>
       <div
-        className="flex flex-1"
+        className="flex flex-1 justify-between"
         onClick={() => {
           store.keyInfo.set(props.connection, 0)
         }}
       >
-        <CloudServerOutlined className="mr-1 text-sm" />
-        <div>
-          {props.node.host}:{props.node.port}
+        <div className="flex">
+          <CloudServerOutlined className="mr-1 text-sm" />
+          <div>
+            {props.node.host}:{props.node.port}
+          </div>
         </div>
-        <div className="ml-2">{child}</div>
+        <div>{child}</div>
       </div>
     </ItemLayout>
   )

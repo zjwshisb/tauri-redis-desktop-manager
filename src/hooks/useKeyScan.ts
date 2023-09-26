@@ -12,6 +12,7 @@ export interface UseKeyScanOptions {
 export interface UseKeyScanFilter {
   types: string
   search: string
+  exact?: boolean
 }
 
 export function useScanCursor<T = string>(connection: APP.Connection) {
@@ -136,9 +137,18 @@ export default function useKeyScan(
     ]
   )
 
+  const getAllKeys = React.useCallback(() => {
+    getKeys().then((res) => {
+      if (res.hasMore) {
+        getAllKeys()
+      }
+    })
+  }, [getKeys])
+
   return {
     keys,
     getKeys,
-    more
+    more,
+    getAllKeys
   }
 }

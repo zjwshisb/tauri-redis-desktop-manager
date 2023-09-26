@@ -88,7 +88,7 @@ const Connection: React.FC<{
       } else {
         count = connection.dbs !== undefined ? connection.dbs.length : 0
       }
-      return (22 * count).toString() + 'px'
+      return (24 * count).toString() + 'px'
     } else {
       return 0
     }
@@ -131,19 +131,14 @@ const Connection: React.FC<{
   }).get()
 
   return (
-    <div className={'box-border '}>
+    <div className={'box-border'}>
       <div className={'flex justify-between text-lg px-2  py-1 active-able'}>
         <div className={'flex overflow-hidden flex-1'}>
           {icon}
-          <Tooltip
-            mouseEnterDelay={0.6}
-            title={<div className="break-all">{connection.name}</div>}
-          >
-            <div className="truncate flex-1" onDoubleClick={onItemClickTh.run}>
-              <span className="pr-2 text-gray-600">#{connection.id}</span>
-              {connection.name}
-            </div>
-          </Tooltip>
+          <div className="truncate flex-1" onDoubleClick={onItemClickTh.run}>
+            <span className="pr-2 text-gray-600">#{connection.id}</span>
+            {connection.name}
+          </div>
         </div>
         <div className={'flex-shrink-0 pl-2'}>
           <Space>

@@ -4,7 +4,7 @@ import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import CusModal from '@/components/CusModal'
 
-const Index: React.FC<{
+const Rename: React.FC<{
   keys: APP.Key
   trigger: React.ReactElement
   onSuccess: (name: string) => void
@@ -43,4 +43,4 @@ const Index: React.FC<{
     </CusModal>
   )
 }
-export default Index
+export default Rename

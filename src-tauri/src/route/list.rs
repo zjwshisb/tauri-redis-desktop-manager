@@ -1,6 +1,7 @@
+use redis::Value;
 use serde::Deserialize;
 
-use crate::{err::CusError, ConnectionManager};
+use crate::{err::CusError, request, ConnectionManager};
 
 #[derive(Deserialize)]
 struct LRangeArgs {
@@ -97,8 +98,76 @@ pub async fn linsert<'r>(
         )
         .await?;
     match value {
-        0 => return Err(CusError::App(String::from("key not exist"))),
+        0 => return Err(CusError::key_not_exists()),
         -1 => return Err(CusError::App(String::from("the pivot wasn't found."))),
         _ => return Ok(value),
+    }
+}
+
+pub async fn lpush<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
+    let args: request::CommonValueArgs = serde_json::from_str(&payload)?;
+    let value: i64 = manager
+        .execute(
+            cid,
+            redis::cmd("lpush").arg(&args.name).arg(&args.value),
+            Some(args.db),
+        )
+        .await?;
+    match value {
+        0 => return Err(CusError::key_not_exists()),
+        _ => return Ok(value),
+    }
+}
+
+pub async fn lpop<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
+    let args: request::NameArgs = serde_json::from_str(&payload)?;
+    let value = manager
+        .execute(cid, redis::cmd("lpop").arg(&args.name), Some(args.db))
+        .await?;
+    match value {
+        Value::Nil => return Err(CusError::key_not_exists()),
+        _ => return Ok(String::from("OK")),
+    }
+}
+
+pub async fn rpush<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<i64, CusError> {
+    let args: request::CommonValueArgs = serde_json::from_str(&payload)?;
+    let value: i64 = manager
+        .execute(
+            cid,
+            redis::cmd("rpush").arg(&args.name).arg(&args.value),
+            Some(args.db),
+        )
+        .await?;
+    match value {
+        0 => return Err(CusError::key_not_exists()),
+        _ => return Ok(value),
+    }
+}
+
+pub async fn rpop<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
+    let args: request::NameArgs = serde_json::from_str(&payload)?;
+    let value = manager
+        .execute(cid, redis::cmd("rpop").arg(&args.name), Some(args.db))
+        .await?;
+    match value {
+        Value::Nil => return Err(CusError::key_not_exists()),
+        _ => return Ok(String::from("OK")),
     }
 }

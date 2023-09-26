@@ -1,15 +1,16 @@
 import React from 'react'
 import useStore from './useStore'
-import { type DefaultOptionType } from 'antd/es/select'
+import { type SelectProps } from 'antd/lib'
 
-export default function useConnectionOption() {
+export default function useConnectionOption(readonlyDisable = true) {
   const store = useStore()
-  return React.useMemo((): DefaultOptionType[] => {
+  return React.useMemo((): SelectProps['options'] => {
     return store.connection.connections.map((v) => {
       return {
         label: v.name,
-        value: v.id
+        value: v.id,
+        disabled: readonlyDisable ? v.readonly : false
       }
     })
-  }, [store.connection.connections])
+  }, [readonlyDisable, store.connection.connections])
 }

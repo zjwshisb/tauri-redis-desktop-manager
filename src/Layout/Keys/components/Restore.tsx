@@ -28,8 +28,6 @@ const Import: React.FC<{
         title={t('Restore Key')}
         onOk={async () => {
           await form.validateFields().then(async (res) => {
-            res.value = res.value.replace('\\\\', '\\')
-            console.log(res)
             await request('key/restore', info.connection.id, {
               ...res,
               db: info?.db
@@ -86,7 +84,6 @@ const Import: React.FC<{
               <Checkbox />
             </Form.Item>
           </VersionAccess>
-
           <Form.Item
             rules={[
               {

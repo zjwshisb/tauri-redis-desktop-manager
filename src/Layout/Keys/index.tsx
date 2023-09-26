@@ -1,31 +1,25 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { type ListRef } from 'rc-virtual-list'
-import {
-  Spin,
-  Input,
-  Space,
-  Tooltip,
-  Statistic,
-  ConfigProvider,
-  Checkbox
-} from 'antd'
+import { Spin, Space, Tooltip, Statistic, ConfigProvider } from 'antd'
 import { useDebounceFn } from 'ahooks'
 import useStore from '@/hooks/useStore'
 import ResizableDiv from '@/components/ResizableDiv'
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
+import { ReloadOutlined, KeyOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import List from './components/List'
-import LoadMore from './components/LoadMore'
+import VirtualKeyList from './components/VirtualKeyList'
+import LoadMore from '@/components/LoadMore'
 import Key from '@/components/Page/Key'
-import TypeSelect from '@/components/TypeSelect'
 import { getPageKey } from '@/utils'
 import Add from './components/Add'
 import Restore from './components/Restore'
+import Filter from './components/Filter'
 
 import Editable from '@/components/Editable'
-import useKeyScan, { type UseKeyScanFilter } from '@/hooks/useKeyScan'
+import useKeyScan from '@/hooks/useKeyScan'
 import { type KeyInfo } from '@/store/key'
+import Context from './context'
+import reducer from './reducer'
 
 const Index: React.FC<{
   info: KeyInfo
@@ -33,6 +27,14 @@ const Index: React.FC<{
   const store = useStore()
 
   const listRef = React.useRef<ListRef>(null)
+
+  const [state, dispatch] = React.useReducer(reducer, {
+    filter: {
+      types: '',
+      search: '',
+      exact: false
+    }
+  })
 
   const id = React.useId()
 
@@ -65,65 +67,26 @@ const Index: React.FC<{
 
   const { t } = useTranslation()
 
-  const [params, setParams] = React.useState<UseKeyScanFilter>({
-    types: '',
-    search: ''
-  })
-
-  const onSearchChange = useDebounceFn((s: string) => {
-    setParams((prev) => {
-      return {
-        ...prev,
-        search: s
+  const { keys, getAllKeys, getKeys, more } = useKeyScan(
+    info.connection,
+    info.db,
+    state.filter,
+    {
+      beforeGet() {
+        setLoading(true)
+      },
+      afterGet(reset: boolean) {
+        if (reset) {
+          listRef.current?.scrollTo(0)
+        }
+        setLoading(false)
       }
-    })
-  })
-
-  const [exactSearch, setExactSearch] = React.useState(false)
-
-  const { keys, getKeys, more } = useKeyScan(info.connection, info.db, params, {
-    beforeGet() {
-      setLoading(true)
-    },
-    afterGet(reset: boolean) {
-      if (reset) {
-        listRef.current?.scrollTo(0)
-      }
-      setLoading(false)
     }
-  })
+  )
 
   React.useEffect(() => {
     getKeys(true)
   }, [getKeys])
-
-  React.useEffect(() => {
-    if (exactSearch) {
-      setParams((prev) => {
-        let search = prev.search
-        if (search.startsWith('*')) {
-          search = search.substring(1)
-        }
-        if (search.endsWith('*')) {
-          search = search.substring(0, search.length - 1)
-        }
-        return {
-          ...prev,
-          search
-        }
-      })
-    } else {
-      setParams((prev) => {
-        if (prev.search.length > 0) {
-          return {
-            ...prev,
-            search: `*${prev.search}*`
-          }
-        }
-        return prev
-      })
-    }
-  }, [exactSearch])
 
   return (
     <ResizableDiv
@@ -132,11 +95,11 @@ const Index: React.FC<{
       defaultWidth={300}
       maxWidth={800}
     >
-      <div className="flex flex-col h-full overflow-hidden bg-white" id={id}>
-        <Spin spinning={loading}>
-          <div className="border-b">
-            <div className="bg-[#ECECEC] p-2 flex justify-between items-center">
-              <div>
+      <Context.Provider value={[state, dispatch]}>
+        <div className="flex flex-col h-full overflow-hidden bg-white" id={id}>
+          <Spin spinning={loading}>
+            <div className="border-b">
+              <div className="bg-[#ECECEC] p-2 flex justify-between items-center">
                 <Space className="flex">
                   <Editable connection={info.connection}>
                     <Add
@@ -193,74 +156,44 @@ const Index: React.FC<{
                     />
                   </Tooltip>
                 </Space>
-              </div>
-              <div>
-                <ConfigProvider
-                  theme={{
-                    components: {
-                      Statistic: {
-                        contentFontSize: 14
+                <div>
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Statistic: {
+                          contentFontSize: 14
+                        }
                       }
-                    }
-                  }}
-                >
-                  <Statistic value={keys.length}></Statistic>
-                </ConfigProvider>
+                    }}
+                  >
+                    <Statistic
+                      prefix={<KeyOutlined />}
+                      value={keys.length}
+                    ></Statistic>
+                  </ConfigProvider>
+                </div>
               </div>
+              <Filter connection={info.connection} />
             </div>
-            <div className="flex item-center p-2">
-              <Input
-                addonAfter={
-                  <Tooltip title={t('Exact Search')} placement="bottom">
-                    <Checkbox
-                      checked={exactSearch}
-                      onChange={(e) => {
-                        setExactSearch(e.target.checked)
-                      }}
-                    />
-                  </Tooltip>
-                }
-                prefix={<SearchOutlined />}
-                placeholder={t('search').toString()}
-                allowClear
-                onChange={(e) => {
-                  let v = e.target.value
-                  if (!exactSearch) {
-                    v = `*${v}*`
-                  }
-                  onSearchChange.run(v)
+            <VirtualKeyList
+              info={info}
+              keys={keys}
+              height={listHeight}
+              listRef={listRef}
+            />
+            <div className="p-2 border-t">
+              <LoadMore
+                disabled={!more}
+                loading={loading}
+                onGetAll={getAllKeys}
+                onGet={() => {
+                  getKeys()
                 }}
               />
-              <div className="px-2">
-                <Space>
-                  <TypeSelect
-                    className="w-28"
-                    selectClassName="w-full"
-                    value={params.types}
-                    connection={info.connection}
-                    onChange={(e) => {
-                      setParams((prev) => {
-                        return {
-                          ...prev,
-                          types: e
-                        }
-                      })
-                    }}
-                  />
-                </Space>
-              </div>
             </div>
-          </div>
-          <List info={info} keys={keys} height={listHeight} listRef={listRef} />
-          <LoadMore
-            disabled={!more}
-            loading={loading}
-            onClick={() => {
-              getKeys()
-            }}
-          />
-        </Spin>
-      </div>
+          </Spin>
+        </div>
+      </Context.Provider>
     </ResizableDiv>
   )
 }

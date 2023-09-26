@@ -6,12 +6,7 @@ import { SearchOutlined } from '@ant-design/icons'
 import DbInfo from './DbInfo'
 import CusTable from '@/components/CusTable'
 
-interface Item {
-  label: string
-  value: string
-}
-
-const Index: React.FC<{
+const Item: React.FC<{
   data: Record<string, string>
 }> = ({ data }) => {
   const { t } = useTranslation()
@@ -19,11 +14,11 @@ const Index: React.FC<{
   const [search, setSearch] = React.useState('')
 
   const items = React.useMemo(() => {
-    const fields: Item[] = []
+    const fields: APP.Field[] = []
     Object.keys(data).forEach((vv) => {
-      if (vv.includes(search)) {
+      if (vv.includes(search.toLocaleLowerCase())) {
         fields.push({
-          label: vv,
+          name: vv,
           value: data[vv]
         })
       }
@@ -70,15 +65,15 @@ const Index: React.FC<{
               />
             </div>
             <CusTable
-              rowKey={'label'}
+              rowKey={'name'}
               dataSource={items}
               columns={[
                 {
                   title: t('Key'),
-                  dataIndex: 'label',
+                  dataIndex: 'name',
                   defaultSortOrder: 'ascend',
                   sorter(a, b) {
-                    return a.label > b.label ? 1 : -1
+                    return a.name > b.name ? 1 : -1
                   }
                 },
                 {
@@ -93,4 +88,4 @@ const Index: React.FC<{
     </div>
   )
 }
-export default Index
+export default Item

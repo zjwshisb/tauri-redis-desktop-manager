@@ -12,7 +12,7 @@ use redis::{FromRedisValue, Value};
 pub async fn info<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
-) -> Result<Vec<HashMap<String, String>>, CusError> {
+) -> Result<HashMap<String, HashMap<String, String>>, CusError> {
     manager.get_info(cid).await
 }
 
@@ -89,4 +89,3 @@ pub async fn reset_slow_log<'r>(
         .execute(cid, &mut redis::cmd("SLOWLOG").arg("RESET"), None)
         .await
 }
-

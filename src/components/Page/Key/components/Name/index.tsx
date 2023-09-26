@@ -7,6 +7,7 @@ import Rename from '../Rename'
 import { useTranslation } from 'react-i18next'
 import Editable from '@/components/Editable'
 import Context from '../../context'
+import Copy from '@/components/Copy'
 const Index: React.FC<{
   keys: APP.Key
   onChange: (name: string) => void
@@ -30,13 +31,26 @@ const Index: React.FC<{
   }, [addonBefore, keys.name])
 
   return (
-    <Editable connection={connection} feedback={<Input {...props}></Input>}>
-      <Input
-        {...props}
-        addonAfter={
-          <Rename trigger={<EditOutlined />} keys={keys} onSuccess={onChange} />
-        }
-      ></Input>
+    <Editable
+      connection={connection}
+      feedback={
+        <Copy content={keys.name}>
+          <Input {...props}></Input>
+        </Copy>
+      }
+    >
+      <Copy content={keys.name}>
+        <Input
+          {...props}
+          addonAfter={
+            <Rename
+              trigger={<EditOutlined />}
+              keys={keys}
+              onSuccess={onChange}
+            />
+          }
+        ></Input>
+      </Copy>
     </Editable>
   )
 }

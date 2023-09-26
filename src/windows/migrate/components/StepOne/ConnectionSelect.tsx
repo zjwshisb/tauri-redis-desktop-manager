@@ -12,8 +12,9 @@ import { type MigrateItem } from '../../reducer'
 const ConnectionSelect: React.FC<{
   title: string
   form: FormInstance<MigrateItem>
-}> = ({ title, form }) => {
-  const connectionOptions = useConnectionOption()
+  readonlyDisabled: boolean
+}> = ({ title, form, readonlyDisabled = true }) => {
+  const connectionOptions = useConnectionOption(readonlyDisabled)
 
   const store = useStore()
 

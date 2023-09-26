@@ -2766,8 +2766,8 @@ checksum = "f2ff9a1f06a88b01621b7ae906ef0211290d1c8a168a15542486a8f61c0833b9"
 
 [[package]]
 name = "redis"
-version = "0.23.1"
-source = "git+https://github.com/redis-rs/redis-rs.git#ed44bad0d680c636f8fe9e13f70078fd7ad9ae01"
+version = "0.23.3"
+source = "git+https://github.com/redis-rs/redis-rs.git#2c8ed3730ecbdc3862441041891ed2bd05360925"
 dependencies = [
  "async-trait",
  "bytes",
@@ -3806,7 +3806,7 @@ dependencies = [
  "futures",
  "hex",
  "once_cell",
- "rand 0.8.5",
+ "rand 0.7.3",
  "redis",
  "reqwest",
  "rusqlite",

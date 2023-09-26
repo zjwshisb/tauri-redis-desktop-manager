@@ -11,6 +11,7 @@ import context from '../../context'
 import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
+import ValueLayout from '../ValueLayout'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -100,20 +101,19 @@ const Index: React.FC<{
   )
 
   return (
-    <div>
-      <div className="pb-2 flex">
-        <Editable connection={connection}>
-          <FieldForm
-            keys={keys}
-            onSuccess={(f) => {
-              setFields((p) => {
-                return [...p].concat([f])
-              })
-            }}
-            trigger={<Button type="primary">{t('Add Field')}</Button>}
-          />
-        </Editable>
-      </div>
+    <ValueLayout
+      actions={
+        <FieldForm
+          keys={keys}
+          onSuccess={(f) => {
+            setFields((p) => {
+              return [...p].concat([f])
+            })
+          }}
+          trigger={<Button type="primary">{t('Add Field')}</Button>}
+        />
+      }
+    >
       <CusTable
         loading={loading}
         rowKey={'name'}
@@ -122,7 +122,7 @@ const Index: React.FC<{
         dataSource={fields}
         columns={columns}
       ></CusTable>
-    </div>
+    </ValueLayout>
   )
 }
 export default Index

@@ -1,13 +1,11 @@
 use crate::err::CusError;
+use crate::utils;
 use ssh_jumper::{
     model::{HostAddress, HostSocketParams, JumpHostAuthParams, SshForwarderEnd, SshTunnelParams},
     SshJumper,
 };
-use std::{borrow::Cow, net::Ipv6Addr};
-use std::{
-    net::{IpAddr, Ipv4Addr, SocketAddr},
-    path::Path,
-};
+use std::borrow::Cow;
+use std::{net::SocketAddr, path::Path};
 use tokio::sync::oneshot::Receiver;
 
 #[derive(Debug, Clone)]
@@ -28,40 +26,10 @@ pub trait SshTunnel {
     fn close_tunnel(&mut self);
 }
 
-fn string_to_ip(s: &String) -> Result<IpAddr, CusError> {
-    let err = Err(CusError::App(String::from("not ip")));
-    let vec: Vec<_> = s.as_str().split(".").collect();
-    if vec.len() == 4 {
-        let mut ip: [u8; 4] = [0; 4];
-        for i in 0..vec.len() {
-            if let Ok(u) = vec[i].parse::<u8>() {
-                ip[i] = u;
-            } else {
-                return err;
-            }
-        }
-        return Ok(IpAddr::V4(Ipv4Addr::new(ip[0], ip[1], ip[2], ip[3])));
-    }
-    if vec.len() == 8 {
-        let mut ip: [u16; 8] = [0; 8];
-        for i in 0..vec.len() {
-            if let Ok(u) = vec[i].parse::<u16>() {
-                ip[i] = u;
-            } else {
-                return err;
-            }
-        }
-        return Ok(IpAddr::V6(Ipv6Addr::new(
-            ip[0], ip[1], ip[2], ip[3], ip[4], ip[5], ip[6], ip[7],
-        )));
-    }
-    err
-}
-
 pub async fn create_tunnel<T: SshTunnel>(t: &mut T) -> Result<Option<()>, CusError> {
     if let Some(config) = t.get_ssh_config() {
         let mut jump_host = HostAddress::HostName(Cow::Borrowed(&config.host));
-        if let Ok(ip_addr) = string_to_ip(&config.host) {
+        if let Ok(ip_addr) = utils::string_to_ip(&config.host) {
             jump_host = HostAddress::IpAddr(ip_addr);
         }
 
@@ -96,7 +64,7 @@ pub async fn create_tunnel<T: SshTunnel>(t: &mut T) -> Result<Option<()>, CusErr
         }
 
         let mut target_host = HostAddress::HostName(Cow::Borrowed(&config.target_host));
-        if let Ok(ip_addr) = string_to_ip(&config.target_host) {
+        if let Ok(ip_addr) = utils::string_to_ip(&config.target_host) {
             target_host = HostAddress::IpAddr(ip_addr);
         }
         let target_socket: HostSocketParams<'_> = HostSocketParams {

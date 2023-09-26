@@ -35,8 +35,16 @@ const StepOne: React.FC = () => {
           target={{ title: t('Target Database') }}
         ></Header>
         <div className="flex pt-4">
-          <ConnectionSelect form={sourceForm} title={t('Source')} />
-          <ConnectionSelect form={targetForm} title={t('Target')} />
+          <ConnectionSelect
+            form={sourceForm}
+            title={t('Source')}
+            readonlyDisabled={false}
+          />
+          <ConnectionSelect
+            form={targetForm}
+            title={t('Target')}
+            readonlyDisabled={true}
+          />
         </div>
       </div>
       <SubmitBar

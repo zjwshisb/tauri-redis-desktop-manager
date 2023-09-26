@@ -31,7 +31,7 @@ pub async fn subscribe<'r>(
 ) -> Result<String, CusError> {
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
     let model = ConnectionModel::first(cid)?;
-    let mut connection = RedisConnection::build(model.get_params());
+    let mut connection = RedisConnection::new(model.get_params());
     let conn: Connection = connection.get_normal().await?;
     let mut pubsub = conn.into_pubsub();
     for x in args.channels {
@@ -112,7 +112,7 @@ pub async fn monitor<'r>(
     cid: u32,
 ) -> Result<String, CusError> {
     let model = ConnectionModel::first(cid)?;
-    let mut connection = RedisConnection::build(model.get_params());
+    let mut connection = RedisConnection::new(model.get_params());
     let conn: Connection = connection.get_normal().await?;
 
     let event_name = utils::random_str(32);

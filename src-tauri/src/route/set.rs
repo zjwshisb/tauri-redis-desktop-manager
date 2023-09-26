@@ -1,8 +1,7 @@
 use crate::err::CusError;
-use crate::request::ItemScanArgs;
+use crate::request::{CommonValueArgs, ItemScanArgs};
 use crate::{conn::ConnectionManager, response::ScanLikeResult};
 use redis::Value;
-use serde::Deserialize;
 
 pub async fn sscan<'r>(
     payload: String,
@@ -21,19 +20,12 @@ pub async fn sscan<'r>(
     ScanLikeResult::<String, String>::build(values)
 }
 
-#[derive(Deserialize)]
-struct ItemArgs {
-    name: String,
-    db: u8,
-    value: String,
-}
-
 pub async fn sadd<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: ItemArgs = serde_json::from_str(&payload)?;
+    let args: CommonValueArgs = serde_json::from_str(&payload)?;
     let value: i64 = manager
         .execute(
             cid,
@@ -43,7 +35,7 @@ pub async fn sadd<'r>(
         .await?;
     match value {
         0 => {
-            return Err(CusError::App(String::from("value already exists in Set")));
+            return Err(CusError::build("Value already exists in Set"));
         }
         _ => {
             return Ok(value);
@@ -56,7 +48,7 @@ pub async fn srem<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: ItemArgs = serde_json::from_str(payload.as_str())?;
+    let args: CommonValueArgs = serde_json::from_str(payload.as_str())?;
     let value: i64 = manager
         .execute(
             cid,
@@ -66,7 +58,7 @@ pub async fn srem<'r>(
         .await?;
     match value {
         0 => {
-            return Err(CusError::App(String::from("value not exists in Set")));
+            return Err(CusError::build("Value not exists in Set"));
         }
         _ => {
             return Ok(value);

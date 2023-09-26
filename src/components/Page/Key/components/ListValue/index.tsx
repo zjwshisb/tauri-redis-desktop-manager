@@ -5,6 +5,10 @@ import { useTranslation } from 'react-i18next'
 import LTrim from './components/LTrim'
 import LSet from './components/LSet'
 import LInsert from './components/LInsert'
+import LPush from './components/LPush'
+import LPop from './components/LPop'
+import RPush from './components/RPush'
+import RPop from './components/RPop'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import CusTable from '@/components/CusTable'
@@ -12,6 +16,7 @@ import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
 import Editable from '@/components/Editable'
 import useTableColumn from '@/hooks/useTableColumn'
+import ValueLayout from '../ValueLayout'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -127,27 +132,49 @@ const Index: React.FC<{
     connection !== undefined && !connection.readonly,
     false
   )
-
   return (
-    <div>
-      <Space className="pb-2">
-        <Editable connection={connection}>
+    <ValueLayout
+      actions={
+        <>
           <LInsert
             keys={keys}
             onSuccess={() => {
               onRefresh()
             }}
           />
-        </Editable>
-        <Editable connection={connection}>
           <LTrim
             keys={keys}
             onSuccess={() => {
               onRefresh()
             }}
           />
-        </Editable>
-      </Space>
+          <LPush
+            keys={keys}
+            onSuccess={() => {
+              onRefresh()
+            }}
+          />
+          <LPop
+            keys={keys}
+            onSuccess={() => {
+              onRefresh()
+            }}
+          />
+          <RPush
+            keys={keys}
+            onSuccess={() => {
+              onRefresh()
+            }}
+          />
+          <RPop
+            keys={keys}
+            onSuccess={() => {
+              onRefresh()
+            }}
+          ></RPop>
+        </>
+      }
+    >
       <CusTable
         showIndex={false}
         more={more}
@@ -157,7 +184,7 @@ const Index: React.FC<{
         dataSource={data}
         columns={columns}
       ></CusTable>
-    </div>
+    </ValueLayout>
   )
 }
 export default observer(Index)

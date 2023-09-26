@@ -9,11 +9,22 @@ const isMain = isMainWindow()
 const PageFloatButton: React.FC<{
   onRefresh?: () => void
   pageKey?: string
-}> = (props) => {
+}> = ({ onRefresh, pageKey }) => {
   const store = useStore()
 
-  if (props.onRefresh === undefined && !isMain) {
-    return <></>
+  if (onRefresh === undefined && !isMain) {
+    return (
+      <>
+        <FloatButton.BackTop
+          style={{ top: '40%', bottom: 'auto', right: 10 }}
+          shape="square"
+          target={() => {
+            const target = document.getElementById('container')
+            return target as HTMLElement
+          }}
+        />
+      </>
+    )
   }
 
   return (
@@ -21,20 +32,20 @@ const PageFloatButton: React.FC<{
       shape="square"
       style={{ top: '40%', bottom: 'auto', right: 10 }}
     >
-      {isMain && props.pageKey !== undefined && (
+      {isMain && pageKey !== undefined && (
         <FloatButton
           icon={<WindowsOutlined />}
           onClick={() => {
-            if (props.pageKey !== undefined) {
-              store.page.openNewWindowPageKey(props.pageKey)
+            if (pageKey !== undefined) {
+              store.page.openNewWindowPageKey(pageKey)
             }
           }}
         ></FloatButton>
       )}
 
-      {props.onRefresh != null && (
+      {onRefresh !== undefined && (
         <FloatButton
-          onClick={props.onRefresh}
+          onClick={onRefresh}
           icon={<ReloadOutlined></ReloadOutlined>}
         ></FloatButton>
       )}

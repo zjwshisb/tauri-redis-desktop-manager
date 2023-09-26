@@ -1,8 +1,8 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import Right from './Layout/Right'
-import Left from './Layout/Left'
-import Center from './Layout/Center'
+import Pages from './Layout/Pages'
+import Connections from './Layout/Connections'
+import Keys from './Layout/Keys'
 
 import AppLayout from './components/AppLayout'
 import useStore from './hooks/useStore'
@@ -16,11 +16,9 @@ const App: React.FC = () => {
       <ActionBar />
       <div className="flex flex-1 overflow-hidden">
         <ConnectionForm />
-        {store.connection.connections.length > 0 && <Left />}
-        {store.keyInfo.info !== null && (
-          <Center info={store.keyInfo.info}></Center>
-        )}
-        <Right />
+        {store.connection.connections.length > 0 && <Connections />}
+        {store.keyInfo.info !== null && <Keys info={store.keyInfo.info}></Keys>}
+        <Pages />
       </div>
     </AppLayout>
   )

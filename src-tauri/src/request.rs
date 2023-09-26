@@ -7,6 +7,7 @@ pub struct ScanLikeArgs<T> {
     pub db: Option<u8>,
     pub count: i64,
     pub types: Option<String>,
+    pub exact: Option<bool>,
 }
 
 #[derive(Deserialize)]
@@ -21,4 +22,17 @@ pub struct ItemScanArgs {
     pub db: u8,
     pub count: i64,
     pub search: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct CommonValueArgs {
+    pub name: String,
+    pub db: u8,
+    pub value: String,
+}
+
+#[derive(Deserialize)]
+pub struct NameArgs {
+    pub name: String,
+    pub db: u8,
 }

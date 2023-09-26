@@ -1,24 +1,19 @@
 use crate::conn::ConnectionManager;
 use crate::err::CusError;
 
+use crate::request::NameArgs;
 use crate::response::{Field, KeyWithMemory, ScanLikeResult};
 use crate::{request, response, sqlite};
 
 use redis::FromRedisValue;
 use redis::Value;
-use serde::Deserialize;
 
-#[derive(Deserialize)]
-struct MemoryUsageArgs {
-    name: String,
-    db: u8,
-}
 pub async fn memory_usage<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: MemoryUsageArgs = serde_json::from_str(&payload)?;
+    let args: NameArgs = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
@@ -57,21 +52,26 @@ pub async fn analysis<'r>(
         let types: String = manager
             .execute(cid, redis::cmd("type").arg(x), args.db)
             .await?;
-        let memory: i64 = manager
-            .execute(
-                cid,
-                redis::cmd("memory")
-                    .arg("usage")
-                    .arg(x)
-                    .arg(&["SAMPLES", "0"]),
-                args.db,
-            )
-            .await?;
-        reps.values.push(KeyWithMemory {
-            name: x.clone(),
-            memory,
-            types,
-        })
+        if types != "none" {
+            let memory = manager
+                .execute(
+                    cid,
+                    redis::cmd("memory")
+                        .arg("usage")
+                        .arg(x)
+                        .arg(&["SAMPLES", "0"]),
+                    args.db,
+                )
+                .await?;
+            match memory {
+                Value::Int(i) => reps.values.push(KeyWithMemory {
+                    name: x.clone(),
+                    memory: i,
+                    types,
+                }),
+                _ => {}
+            }
+        }
     }
     Ok(reps)
 }

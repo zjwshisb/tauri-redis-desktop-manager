@@ -11,7 +11,7 @@ const Sync: React.FC = () => {
     url: 'src/windows/migrate/index.html',
     title: t('Data Migrate').toString(),
     focus: true,
-    minHeight: 600,
+    minHeight: 700,
     minWidth: 600
   })
 

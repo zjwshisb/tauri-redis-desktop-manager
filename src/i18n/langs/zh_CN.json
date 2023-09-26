@@ -133,14 +133,20 @@
   "Replace Target Key": "覆盖目标key",
   "Delete Source Key": "删除源key",
   "Key Pattern": "key匹配模式",
-  "For Example:foo、*foo、foo*、*foo*": "示例: foo、 *foo、 foo*、 *foo*",
+  "'*' is not required": "无需填写'*'",
   "Replace or not If the target database has the key": "当目标数据库存在key时是否覆盖",
   "Delete the key or not in the Source database If had migrated to the target": "当key迁移成功时是否删除源数据库的key",
+  "Are you sure start migrate those keys?": "确定迁移这些key?",
+  "Are you sure flush this database?": "确定清空这个数据库?",
   "Process" : "进度",
   "Total Count": "总计",
   "Success Count": "成功",
   "Failed Count": "失败",
   "Preview": "预览",
   "Start": "开始",
-  "Stop": "停止"
+  "Stop": "停止",
+  "Exact Search": "严格匹配",
+  "Load All": "加载全部",
+  "Are you sure pop a value from the right?": "确认从数组右边移除一个元素?",
+  "Are you sure pop a value from the left?": "确认从数组左边移除一个元素?"
 } 

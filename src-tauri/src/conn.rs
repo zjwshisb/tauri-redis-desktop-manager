@@ -6,6 +6,7 @@ use crate::{
     utils,
 };
 use chrono::prelude::*;
+use futures::future::ok;
 use redis::aio::{Connection, ConnectionLike};
 use redis::cluster::ClusterClient;
 use redis::cluster_async::ClusterConnection;
@@ -85,7 +86,7 @@ impl Drop for RedisConnection {
     }
 }
 impl RedisConnection {
-    pub fn build(params: RedisConnectionParams) -> Self {
+    pub fn new(params: RedisConnectionParams) -> Self {
         Self {
             params: params,
             cancel_tunnel_rx: None,
@@ -170,7 +171,7 @@ impl ConnectionWrapper {
     pub async fn build<T: Connectable>(model: T) -> Result<Self, CusError> {
         let b: Box<dyn ConnectionLike + Send>;
         let params: RedisConnectionParams = model.get_params();
-        let mut connection = RedisConnection::build(params);
+        let mut connection = RedisConnection::new(params);
         let cluster = connection.params.is_cluster;
         if cluster {
             b = Box::new(connection.get_cluster().await?)
@@ -186,6 +187,10 @@ impl ConnectionWrapper {
             conn: b,
         };
         Ok(r)
+    }
+
+    pub fn get_host(&self) -> String {
+        self.model.get_host()
     }
 
     pub fn is_cluster(&self) -> bool {
@@ -207,7 +212,7 @@ impl ConnectionWrapper {
                     Ok(s) => {
                         cmd_vec.push(s);
                     }
-                    Err(s) => {
+                    Err(_) => {
                         cmd_vec.push(utils::binary_to_redis_str(&v.to_vec()));
                     }
                 },
@@ -355,7 +360,7 @@ impl ConnectionManager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_config_with(pattern, conn).await;
         }
-        return Err(CusError::App(String::from("Connection Not Found")));
+        return Err(CusError::reopen());
     }
 
     pub async fn get_config_with(
@@ -373,25 +378,30 @@ impl ConnectionManager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_version_with(conn).await;
         }
-        return Err(CusError::App(String::from("Connection Not Found")));
+        return Err(CusError::reopen());
     }
 
     // get redis server version
     pub async fn get_version_with(&self, conn: &mut ConnectionWrapper) -> Result<String, CusError> {
         let info = self.get_info_with(conn).await?;
-        if let Some(fields) = info.get(0) {
-            if let Some(version) = fields.get("redis_version") {
-                return Ok(version.clone());
+        for x in info.keys() {
+            if let Some(fields) = info.get(x) {
+                if let Some(version) = fields.get("redis_version") {
+                    return Ok(version.clone());
+                }
             }
         }
-        Ok(String::from(""))
+        return Err(CusError::reopen());
     }
 
-    pub async fn get_info(&self, id: u32) -> Result<Vec<HashMap<String, String>>, CusError> {
+    pub async fn get_info(
+        &self,
+        id: u32,
+    ) -> Result<HashMap<String, HashMap<String, String>>, CusError> {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_info_with(conn).await;
         }
-        return Err(CusError::App(String::from("Connection Not Found")));
+        return Err(CusError::reopen());
     }
 
     // get the server info
@@ -400,7 +410,7 @@ impl ConnectionManager {
     pub async fn get_info_with(
         &self,
         conn: &mut ConnectionWrapper,
-    ) -> Result<Vec<HashMap<String, String>>, CusError> {
+    ) -> Result<HashMap<String, HashMap<String, String>>, CusError> {
         let v = self.execute_with(&mut redis::cmd("info"), conn).await?;
         let format_fn = |str_value: String| {
             let arr: Vec<&str> = str_value.split("\r\n").collect();
@@ -417,22 +427,32 @@ impl ConnectionManager {
             }
             return kv;
         };
+        let mut result: HashMap<String, HashMap<String, String>> = HashMap::new();
         match v {
             Value::Data(cc) => {
                 if let Ok(r) = String::from_utf8(cc) {
-                    return Ok(vec![format_fn(r)]);
+                    result.insert(conn.get_host(), format_fn(r));
                 }
             }
             Value::Bulk(vv) => {
-                let mut r: Vec<HashMap<String, String>> = vec![];
                 for vvv in vv {
-                    r.push(format_fn(String::from_redis_value(&vvv)?));
+                    match &vvv {
+                        Value::Bulk(vvvv) => {
+                            if let Some(h) = vvvv.get(0) {
+                                let host = String::from_redis_value(h)?;
+
+                                if let Some(s) = vvvv.get(1) {
+                                    result.insert(host, format_fn(String::from_redis_value(s)?));
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
                 }
-                return Ok(r);
             }
             _ => {}
         }
-        return Err(CusError::App(String::from("Connected Timeout")));
+        Ok(result)
     }
 
     // get cluster server nodes
@@ -440,7 +460,7 @@ impl ConnectionManager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return Ok(self.get_nodes_with(conn).await?);
         }
-        return Err(CusError::App(String::from("Connection Not Found")));
+        return Err(CusError::reopen());
     }
 
     // get cluster server nodes
@@ -518,7 +538,7 @@ impl ConnectionManager {
             let v = self.execute_with(cmd, conn).await?;
             return Ok(v);
         }
-        return Err(CusError::App(String::from("Connection Not Found")));
+        return Err(CusError::reopen());
     }
 
     pub async fn get_conns(&self) -> Vec<response::Conn> {

@@ -29,6 +29,7 @@ export default {
           '&[data-active=true]': {
             backgroundColor: 'rgb(96 165 250)',
             color: '#fff'
+
           }
         }
       })

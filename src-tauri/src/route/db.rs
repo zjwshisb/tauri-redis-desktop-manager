@@ -18,3 +18,14 @@ pub async fn dbsize<'r>(
         .execute(cid, &mut redis::cmd("dbsize"), Some(args.db))
         .await
 }
+
+pub async fn flush<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<String, CusError> {
+    let args: DBSizeArgs = serde_json::from_str(&payload)?;
+    manager
+        .execute(cid, &mut redis::cmd("FLUSHDB"), Some(args.db))
+        .await
+}

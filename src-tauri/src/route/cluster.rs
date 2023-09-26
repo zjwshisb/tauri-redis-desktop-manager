@@ -27,8 +27,16 @@ pub async fn scan<'r>(
                         let mut cmd = redis::cmd("scan");
                         cmd.arg(cursor)
                             .arg(&["count", args.count.to_string().as_str()]);
-                        if let Some(search) = &args.search {
-                            cmd.arg(&["MATCH", &format!("*{}*", search)]);
+                        if let Some(mut search) = args.search.clone() {
+                            match args.exact {
+                                None => search = format!("*{}*", search),
+                                Some(exact) => {
+                                    if !exact {
+                                        search = format!("*{}*", search)
+                                    }
+                                }
+                            }
+                            cmd.arg(&["MATCH", &search]);
                         }
                         if let Some(types) = &args.types {
                             cmd.arg(&["TYPE", types]);

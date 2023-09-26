@@ -8,13 +8,28 @@ import classNames from 'classnames'
 import Context from '../../context'
 import Header from '../Header'
 import { useTranslation } from 'react-i18next'
-import { type ButtonProps, Form, Input, Checkbox, Col, Row, Button } from 'antd'
+import {
+  type ButtonProps,
+  Form,
+  Input,
+  Checkbox,
+  Col,
+  Row,
+  Button,
+  Modal
+} from 'antd'
 import Action, { type ActionRef } from './Action'
 import { useSourceConnection, useTargetConnection } from '../../hooks'
 import { getCurrent } from '@tauri-apps/api/window'
 import { confirm } from '@tauri-apps/api/dialog'
 import { type UnlistenFn } from '@tauri-apps/api/event'
 import { useLatest } from 'ahooks'
+
+interface ConfigForm {
+  pattern: string
+  delete: boolean
+  replace: boolean
+}
 
 const StepTwo: React.FC = () => {
   const [state, dispatch] = React.useContext(Context)
@@ -30,6 +45,12 @@ const StepTwo: React.FC = () => {
 
   const ref = React.useRef<ActionRef>(null)
 
+  const [config, setConfig] = React.useState<ConfigForm>({
+    pattern: '',
+    delete: false,
+    replace: false
+  })
+
   const [form] = Form.useForm()
 
   const changeDisabled = React.useMemo(() => {
@@ -40,7 +61,13 @@ const StepTwo: React.FC = () => {
     if (!migrateLoading) {
       return {
         onClick() {
-          ref.current?.migrate()
+          Modal.confirm({
+            title: t('Notice'),
+            content: t('Are you sure start migrate those keys?'),
+            onOk() {
+              ref.current?.migrate()
+            }
+          })
         },
         disabled: prevLoading,
         children: t('Start')
@@ -123,57 +150,64 @@ const StepTwo: React.FC = () => {
           }}
         ></Header>
         <div className="p-4">
-          <Form
-            size="small"
-            layout="horizontal"
-            form={form}
-            initialValues={{
-              pattern: '',
-              delete: false,
-              replace: false
-            }}
-          >
-            <Row gutter={20}>
-              <Col span={12}>
-                <Form.Item
-                  label={t('Key Pattern')}
-                  name={'pattern'}
-                  tooltip={t('For Example:foo、*foo、foo*、*foo*')}
-                >
-                  <Input
-                    disabled={changeDisabled}
-                    placeholder={t('Please Enter {{name}}', {
-                      name: t('Key Pattern')
-                    }).toString()}
-                  ></Input>
-                </Form.Item>
-              </Col>
-              <Col span={6}>
-                <Form.Item
-                  label={t('Replace Target Key')}
-                  valuePropName={'checked'}
-                  name={'replace'}
-                  tooltip={t(
-                    'Replace or not If the target database has the key'
-                  )}
-                >
-                  <Checkbox disabled={changeDisabled}></Checkbox>
-                </Form.Item>
-              </Col>
-              <Col span={6}>
-                <Form.Item
-                  name={'delete'}
-                  label={t('Delete Source Key')}
-                  valuePropName={'checked'}
-                  tooltip={t(
-                    'Delete the key or not in the Source database If had migrated to the target'
-                  )}
-                >
-                  <Checkbox disabled={changeDisabled}></Checkbox>
-                </Form.Item>
-              </Col>
-            </Row>
-          </Form>
+          <div className="mb-4">
+            <Form<ConfigForm>
+              size="small"
+              layout="horizontal"
+              form={form}
+              onValuesChange={(_, v) => {
+                setConfig(v)
+              }}
+              initialValues={{
+                pattern: '',
+                delete: false,
+                replace: false
+              }}
+            >
+              <Row gutter={20}>
+                <Col span={12}>
+                  <Form.Item
+                    label={t('Key Pattern')}
+                    name={'pattern'}
+                    tooltip={t("'*' is not required")}
+                  >
+                    <Input
+                      disabled={changeDisabled}
+                      placeholder={t('Please Enter {{name}}', {
+                        name: t('Key Pattern')
+                      }).toString()}
+                    ></Input>
+                  </Form.Item>
+                </Col>
+                <Col span={6}>
+                  <Form.Item
+                    label={t('Replace Target Key')}
+                    valuePropName={'checked'}
+                    name={'replace'}
+                    tooltip={t(
+                      'Replace or not If the target database has the key'
+                    )}
+                  >
+                    <Checkbox disabled={changeDisabled}></Checkbox>
+                  </Form.Item>
+                </Col>
+                <Col span={6}>
+                  <Form.Item
+                    name={'delete'}
+                    label={t('Delete Source Key')}
+                    valuePropName={'checked'}
+                    tooltip={t(
+                      'Delete the key or not in the Source database If had migrated to the target'
+                    )}
+                  >
+                    <Checkbox
+                      disabled={changeDisabled || sourceConnection.readonly}
+                    ></Checkbox>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          </div>
 
           <Action
             loading={changeDisabled}
@@ -204,7 +238,7 @@ const StepTwo: React.FC = () => {
               }
             }}
             ref={ref}
-            config={form.getFieldsValue()}
+            config={config}
             target={{
               connection: targetConnection,
               database: state.value?.target.database

@@ -25,12 +25,9 @@ const DbInfo: React.FC<{
         arr.push(i)
       }
       arr.sort((a, b) => {
-        if (a.name === b.name) {
-          return 0
-        } else if (a.name > b.name) {
-          return 1
-        }
-        return -1
+        const db1 = a.name.substring(2)
+        const db2 = b.name.substring(2)
+        return parseInt(db1, 10) - parseInt(db2, 10)
       })
       setInfo(arr)
     })

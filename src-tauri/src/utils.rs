@@ -1,5 +1,9 @@
+use crate::err::CusError;
 use rand::distributions::Alphanumeric;
 use rand::prelude::*;
+
+use std::net::Ipv6Addr;
+use std::net::{IpAddr, Ipv4Addr};
 
 pub fn random_str(length: usize) -> String {
     let mut rng = rand::thread_rng();
@@ -43,4 +47,34 @@ pub fn redis_str_to_binary(s: String) -> Vec<u8> {
         }
     }
     r
+}
+
+pub fn string_to_ip(s: &String) -> Result<IpAddr, CusError> {
+    let err = Err(CusError::App(String::from("not ip")));
+    let vec: Vec<_> = s.as_str().split(".").collect();
+    if vec.len() == 4 {
+        let mut ip: [u8; 4] = [0; 4];
+        for i in 0..vec.len() {
+            if let Ok(u) = vec[i].parse::<u8>() {
+                ip[i] = u;
+            } else {
+                return err;
+            }
+        }
+        return Ok(IpAddr::V4(Ipv4Addr::new(ip[0], ip[1], ip[2], ip[3])));
+    }
+    if vec.len() == 8 {
+        let mut ip: [u16; 8] = [0; 8];
+        for i in 0..vec.len() {
+            if let Ok(u) = vec[i].parse::<u16>() {
+                ip[i] = u;
+            } else {
+                return err;
+            }
+        }
+        return Ok(IpAddr::V6(Ipv6Addr::new(
+            ip[0], ip[1], ip[2], ip[3], ip[4], ip[5], ip[6], ip[7],
+        )));
+    }
+    err
 }

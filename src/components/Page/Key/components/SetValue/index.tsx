@@ -10,6 +10,7 @@ import context from '../../context'
 import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
+import ValueLayout from '../ValueLayout'
 
 const Index: React.FC<{
   keys: APP.SetKey
@@ -94,17 +95,16 @@ const Index: React.FC<{
   )
 
   return (
-    <div>
-      <Space className="pb-2">
-        <Editable connection={connection}>
-          <SAdd
-            keys={keys}
-            onSuccess={() => {
-              onRefresh()
-            }}
-          ></SAdd>
-        </Editable>
-      </Space>
+    <ValueLayout
+      actions={
+        <SAdd
+          keys={keys}
+          onSuccess={() => {
+            onRefresh()
+          }}
+        ></SAdd>
+      }
+    >
       <CusTable
         loading={loading}
         more={more}
@@ -113,7 +113,7 @@ const Index: React.FC<{
         dataSource={data}
         columns={columns}
       ></CusTable>
-    </div>
+    </ValueLayout>
   )
 }
 export default observer(Index)

@@ -12,6 +12,7 @@ import context from '../../context'
 import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
+import ValueLayout from '../ValueLayout'
 
 const Index: React.FC<{
   keys: APP.ZSetKey
@@ -101,20 +102,16 @@ const Index: React.FC<{
     },
     connection !== undefined && !connection.readonly
   )
-
   return (
-    <div>
-      <div className="pb-2">
-        <Space>
-          <Editable connection={connection}>
-            <Form
-              onSuccess={onRefresh}
-              keys={keys}
-              trigger={<Button type="primary">ZAdd</Button>}
-            ></Form>
-          </Editable>
-        </Space>
-      </div>
+    <ValueLayout
+      actions={
+        <Form
+          onSuccess={onRefresh}
+          keys={keys}
+          trigger={<Button type="primary">ZAdd</Button>}
+        ></Form>
+      }
+    >
       <CusTable
         loading={loading}
         more={more}
@@ -123,7 +120,7 @@ const Index: React.FC<{
         dataSource={fields}
         columns={columns}
       ></CusTable>
-    </div>
+    </ValueLayout>
   )
 }
 export default observer(Index)

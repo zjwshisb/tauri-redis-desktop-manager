@@ -1,6 +1,7 @@
 use crate::conn::ConnectionManager;
 use crate::err::CusError;
 
+use crate::request::{CommonValueArgs, NameArgs};
 use crate::{
     err::{self},
     key::Key,
@@ -23,7 +24,15 @@ pub async fn scan<'r>(
     cmd.arg(&args.cursor)
         .arg(&["count", &args.count.to_string()]);
 
-    if let Some(search) = args.search {
+    if let Some(mut search) = args.search {
+        match args.exact {
+            None => search = format!("*{}*", search),
+            Some(exact) => {
+                if !exact {
+                    search = format!("*{}*", search)
+                }
+            }
+        }
         cmd.arg(&["MATCH", &search]);
     }
     if let Some(types) = args.types {
@@ -33,17 +42,12 @@ pub async fn scan<'r>(
     Ok(ScanLikeResult::<String, String>::build(value)?)
 }
 
-#[derive(Deserialize)]
-struct GetArgs {
-    name: String,
-    db: u8,
-}
 pub async fn get<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<Key, CusError> {
-    let args: GetArgs = serde_json::from_str(&payload)?;
+    let args: NameArgs = serde_json::from_str(&payload)?;
     let mut key: Key = Key::build(args.name, args.db, cid, &manager).await?;
     if key.is_none() {
         return Err(CusError::App(format!("{} is not exist", key.get_name())));
@@ -133,19 +137,12 @@ pub async fn rename<'r>(
         .await
 }
 
-#[derive(Deserialize)]
-struct SetArgs {
-    name: String,
-    value: String,
-    db: u8,
-}
-
 pub async fn set<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
-    let args: SetArgs = serde_json::from_str(&payload)?;
+    let args: CommonValueArgs = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
@@ -232,7 +229,7 @@ pub async fn dump<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
-    let args: GetArgs = serde_json::from_str(&payload)?;
+    let args: CommonValueArgs = serde_json::from_str(&payload)?;
     let v: Vec<u8> = manager
         .execute(cid, redis::cmd("dump").arg(&args.name), Some(args.db))
         .await?;
