@@ -63,7 +63,6 @@ impl Node {
             if let Some(u) = host.find(":") {
                 let port_str = host[u + 1..].to_string();
                 host = host[0..u].to_string();
-                dbg!(&port_str);
                 port = port_str.parse().unwrap()
             }
         }

@@ -45,7 +45,7 @@ export default function CusTable<T extends object>(
         className="flex justify-center"
         pagination={false}
         footer={(v) => {
-          return <div>total: {v.length}</div>
+          return <div className="flex justify-end">total: {v.length}</div>
         }}
         bordered
         scroll={{

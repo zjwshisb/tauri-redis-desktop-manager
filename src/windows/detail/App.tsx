@@ -2,7 +2,6 @@ import React from 'react'
 
 import { observer } from 'mobx-react-lite'
 
-import 'mac-scrollbar/dist/mac-scrollbar.css'
 import Key from '@/components/Page/Key'
 
 import useStore from '@/hooks/useStore'

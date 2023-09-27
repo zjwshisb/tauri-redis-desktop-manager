@@ -1,9 +1,9 @@
+import { openWindow } from '@/utils'
 import { makeAutoObservable } from 'mobx'
 
 export interface KeyInfo {
   db: number
   connection: APP.Connection
-  node?: string
 }
 
 class KeysStore {
@@ -18,12 +18,18 @@ class KeysStore {
     }
   }
 
-  set(conn: APP.Connection, db: number = 0, node?: string) {
+  set(conn: APP.Connection, db: number = 0) {
     this.info = {
       db,
-      node,
       connection: conn
     }
+  }
+
+  newWindow(connection: APP.Connection, db: number = 0) {
+    openWindow(`${connection.id}-${db}`, {
+      url: `src/windows/database/index.html?cid=${connection.id}&db=${db}`,
+      title: `${connection.name}@${db}`
+    })
   }
 }
 const obj = new KeysStore()

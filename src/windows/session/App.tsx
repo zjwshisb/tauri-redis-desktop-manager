@@ -2,7 +2,6 @@ import React from 'react'
 
 import { observer } from 'mobx-react-lite'
 
-import 'mac-scrollbar/dist/mac-scrollbar.css'
 import useCancelIntercal from '@/hooks/useCaclelInterval'
 import useRequest from '@/hooks/useRequest'
 import { type ColumnsType } from 'antd/es/table'

@@ -5,12 +5,12 @@ import { Spin, Space, Tooltip, Statistic, ConfigProvider } from 'antd'
 import { useDebounceFn } from 'ahooks'
 import useStore from '@/hooks/useStore'
 import ResizableDiv from '@/components/ResizableDiv'
-import { ReloadOutlined, KeyOutlined } from '@ant-design/icons'
+import { ReloadOutlined, KeyOutlined, WindowsOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import VirtualKeyList from './components/VirtualKeyList'
 import LoadMore from '@/components/LoadMore'
 import Key from '@/components/Page/Key'
-import { getPageKey } from '@/utils'
+import { getPageKey, isMainWindow } from '@/utils'
 import Add from './components/Add'
 import Restore from './components/Restore'
 import Filter from './components/Filter'
@@ -20,6 +20,8 @@ import useKeyScan from '@/hooks/useKeyScan'
 import { type KeyInfo } from '@/store/key'
 import Context from './context'
 import reducer from './reducer'
+
+const isMain = isMainWindow()
 
 const Index: React.FC<{
   info: KeyInfo
@@ -125,28 +127,40 @@ const Index: React.FC<{
                       info={info}
                     />
                   </Editable>
-                  <Restore
-                    info={info}
-                    onSuccess={(name: string) => {
-                      const key = getPageKey(name, info.connection, info.db)
-                      store.page.addPage({
-                        key,
-                        label: key,
-                        type: 'key',
-                        connection: info.connection,
-                        name,
-                        db: info.db,
-                        children: (
-                          <Key
-                            name={name}
-                            db={info.db}
-                            connection={info.connection}
-                            pageKey={key}
-                          ></Key>
-                        )
-                      })
-                    }}
-                  />
+                  <Editable connection={info.connection}>
+                    <Restore
+                      info={info}
+                      onSuccess={(name: string) => {
+                        const key = getPageKey(name, info.connection, info.db)
+                        store.page.addPage({
+                          key,
+                          label: key,
+                          type: 'key',
+                          connection: info.connection,
+                          name,
+                          db: info.db,
+                          children: (
+                            <Key
+                              name={name}
+                              db={info.db}
+                              connection={info.connection}
+                              pageKey={key}
+                            ></Key>
+                          )
+                        })
+                      }}
+                    />
+                  </Editable>
+                  {isMain && (
+                    <Tooltip title={t('Open In New Window')} placement="bottom">
+                      <WindowsOutlined
+                        className="hover:cursor-pointer text-lg"
+                        onClick={() => {
+                          store.keyInfo.newWindow(info.connection, info.db)
+                        }}
+                      ></WindowsOutlined>
+                    </Tooltip>
+                  )}
                   <Tooltip title={t('Refresh')} placement="bottom">
                     <ReloadOutlined
                       className="hover:cursor-pointer text-lg"

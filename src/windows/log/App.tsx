@@ -9,7 +9,6 @@ import { useLatest, useMount, useUnmount } from 'ahooks'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import useArrayState from '@/hooks/useArrayState'
 import SearchText from '@/components/SearchText'
-import 'mac-scrollbar/dist/mac-scrollbar.css'
 
 import AppLayout from '@/components/AppLayout'
 import Page from '@/components/Page'

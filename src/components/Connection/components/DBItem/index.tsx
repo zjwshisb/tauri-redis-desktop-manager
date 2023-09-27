@@ -57,10 +57,14 @@ const Index: React.FC<{
     const m: ItemType[] = []
     if (!connection.readonly) {
       m.push({
-        label: 'flush',
+        label: 'Flush Database',
         key: 'flush'
       })
     }
+    m.push({
+      label: t('Open In New Window'),
+      key: 'window'
+    })
     return m
   }, [connection.readonly])
 
@@ -101,6 +105,10 @@ const Index: React.FC<{
                     message.success(t('Success'))
                   }
                 })
+                break
+              }
+              case 'window': {
+                store.keyInfo.newWindow(connection, item.database)
               }
             }
           },

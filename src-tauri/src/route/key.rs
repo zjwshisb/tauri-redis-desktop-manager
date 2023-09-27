@@ -229,7 +229,7 @@ pub async fn dump<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
-    let args: CommonValueArgs = serde_json::from_str(&payload)?;
+    let args: NameArgs = serde_json::from_str(&payload)?;
     let v: Vec<u8> = manager
         .execute(cid, redis::cmd("dump").arg(&args.name), Some(args.db))
         .await?;

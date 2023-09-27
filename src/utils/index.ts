@@ -41,6 +41,16 @@ export async function openWindow(
   options: WindowOptions
 ): Promise<WebviewWindow> {
   return await new Promise((resolve, reject) => {
+    if (options.titleBarStyle === undefined) {
+      options.titleBarStyle = 'transparent'
+    }
+    if (options.width === undefined) {
+      options.width = 1000
+    }
+    if (options.height === undefined) {
+      options.height = 800
+    }
+    options.tabbingIdentifier = 'test'
     const webview = new WebviewWindow(label, options)
     webview.once('tauri://created', function () {
       resolve(webview)

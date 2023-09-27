@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input, Space, Tooltip, Checkbox } from 'antd'
+import { Input, Tooltip, Checkbox } from 'antd'
 import { useDebounceFn } from 'ahooks'
 import { useTranslation } from 'react-i18next'
 import TypeSelect from '@/components/TypeSelect'
@@ -57,24 +57,20 @@ const Filter: React.FC<{
           onSearchChange.run(e.target.value)
         }}
       />
-      <div className="px-2">
-        <Space>
-          <TypeSelect
-            className="w-28"
-            selectClassName="w-full"
-            value={state.filter.types}
-            connection={connection}
-            onChange={(e) => {
-              dispatch({
-                type: 'filter',
-                value: {
-                  types: e
-                }
-              })
-            }}
-          />
-        </Space>
-      </div>
+      <TypeSelect
+        className="w-28 ml-2"
+        selectClassName="w-full"
+        value={state.filter.types}
+        connection={connection}
+        onChange={(e) => {
+          dispatch({
+            type: 'filter',
+            value: {
+              types: e
+            }
+          })
+        }}
+      />
     </div>
   )
 }
