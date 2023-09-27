@@ -11,6 +11,7 @@ import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
+import LoadMore from '@/components/LoadMore'
 
 const Index: React.FC<{
   keys: APP.SetKey
@@ -24,11 +25,8 @@ const Index: React.FC<{
     search: ''
   })
 
-  const { fields, loading, more, getFields } = useFieldScan<string>(
-    'key/set/sscan',
-    keys,
-    params
-  )
+  const { fields, loading, more, getFields, getAllFields } =
+    useFieldScan<string>('key/set/sscan', keys, params)
 
   const data = React.useMemo(() => {
     return fields.map((v, index) => {
@@ -113,6 +111,14 @@ const Index: React.FC<{
         dataSource={data}
         columns={columns}
       ></CusTable>
+      <div className="py-2 mb-4">
+        <LoadMore
+          disabled={!more}
+          loading={loading}
+          onGet={async () => await getFields()}
+          onGetAll={getAllFields}
+        />
+      </div>
     </ValueLayout>
   )
 }

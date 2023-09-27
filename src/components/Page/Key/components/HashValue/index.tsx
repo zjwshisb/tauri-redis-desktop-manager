@@ -12,6 +12,7 @@ import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
+import LoadMore from '@/components/LoadMore'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -22,7 +23,7 @@ const Index: React.FC<{
   })
   const { t } = useTranslation()
 
-  const { fields, setFields, getFields, loading, more } =
+  const { fields, setFields, getFields, loading, more, getAllFields } =
     useFieldScan<APP.HashField>('key/hash/hscan', keys, params)
 
   const columns = useTableColumn<APP.Field>(
@@ -122,6 +123,14 @@ const Index: React.FC<{
         dataSource={fields}
         columns={columns}
       ></CusTable>
+      <div className="py-2 mb-4">
+        <LoadMore
+          disabled={!more}
+          loading={loading}
+          onGet={async () => await getFields()}
+          onGetAll={getAllFields}
+        />
+      </div>
     </ValueLayout>
   )
 }

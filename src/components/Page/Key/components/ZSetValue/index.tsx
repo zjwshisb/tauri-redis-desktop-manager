@@ -13,6 +13,7 @@ import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
+import LoadMore from '@/components/LoadMore'
 
 const Index: React.FC<{
   keys: APP.ZSetKey
@@ -23,11 +24,8 @@ const Index: React.FC<{
   const [params, setParams] = React.useState({ search: '' })
 
   const { t } = useTranslation()
-  const { fields, more, loading, getFields } = useFieldScan<APP.Field>(
-    'key/zset/zscan',
-    keys,
-    params
-  )
+  const { fields, more, loading, getFields, getAllFields } =
+    useFieldScan<APP.Field>('key/zset/zscan', keys, params)
 
   const columns = useTableColumn<APP.Field>(
     [
@@ -120,6 +118,14 @@ const Index: React.FC<{
         dataSource={fields}
         columns={columns}
       ></CusTable>
+      <div className="py-2 mb-4">
+        <LoadMore
+          disabled={!more}
+          loading={loading}
+          onGet={async () => await getFields()}
+          onGetAll={getAllFields}
+        />
+      </div>
     </ValueLayout>
   )
 }

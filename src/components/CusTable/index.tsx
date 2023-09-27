@@ -1,8 +1,6 @@
+import { useDebounceFn } from 'ahooks'
 import { Table, type TableProps } from 'antd'
 import React from 'react'
-import { Button } from 'antd'
-import { useTranslation } from 'react-i18next'
-import { PlusOutlined } from '@ant-design/icons'
 
 export default function CusTable<T extends object>(
   props: TableProps<T> & {
@@ -11,38 +9,52 @@ export default function CusTable<T extends object>(
     showIndex?: boolean
   }
 ) {
-  const { t } = useTranslation()
-
   const { columns, ...others } = props
 
+  const container = React.useRef<HTMLDivElement>(null)
+
+  // a state for rerender table width
+  const [, setRerender] = React.useState(false)
+
+  const table = React.useRef<HTMLDivElement>(null)
+
+  const db = useDebounceFn(
+    () => {
+      setRerender((p) => !p)
+    },
+    {
+      wait: 100
+    }
+  )
+
+  React.useEffect(() => {
+    window.addEventListener('resize', db.run)
+    table.current?.scrollTo({
+      top: 100000
+    })
+    return () => {
+      window.removeEventListener('resize', db.run)
+    }
+  }, [db.run])
   return (
-    <div>
+    <div ref={container}>
       <Table
+        ref={table}
+        virtual
         size="small"
+        className="flex justify-center"
         pagination={false}
+        footer={(v) => {
+          return <div>total: {v.length}</div>
+        }}
         bordered
         scroll={{
-          x: 'auto'
+          y: 600,
+          x: container.current != null ? container.current.clientWidth - 1 : 0
         }}
         columns={columns}
         {...others}
       ></Table>
-      {others.more !== undefined && (
-        <Button
-          loading={others.loading}
-          disabled={!others.more}
-          icon={<PlusOutlined />}
-          block
-          className="my-4"
-          onClick={() => {
-            if (others.onLoadMore !== undefined) {
-              others.onLoadMore()
-            }
-          }}
-        >
-          {t('Load More')}
-        </Button>
-      )}
     </div>
   )
 }

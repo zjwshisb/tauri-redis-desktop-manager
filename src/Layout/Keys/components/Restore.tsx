@@ -36,10 +36,8 @@ const Import: React.FC<{
             })
           })
         }}
-        onOpenChange={(v) => {
-          if (!v) {
-            form.resetFields()
-          }
+        onClear={() => {
+          form.resetFields()
         }}
       >
         <Form

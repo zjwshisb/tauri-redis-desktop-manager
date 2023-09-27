@@ -9,27 +9,25 @@ const Index: React.FC = () => {
   const store = useStore()
 
   return (
-    <>
-      <ResizableDiv
-        className={'border-r'}
-        minWidth={200}
-        defaultWidth={300}
-        maxWidth={500}
+    <ResizableDiv
+      className={'border-r'}
+      minWidth={200}
+      defaultWidth={300}
+      maxWidth={500}
+    >
+      <div
+        className="flex h-full  bg-[#E7E8E8] flex-col overflow-hidden"
+        id="connection"
       >
-        <div
-          className="flex h-full  bg-[#E7E8E8] flex-col overflow-hidden"
-          id="connection"
-        >
-          <MacScrollbar>
-            <div>
-              {store.connection.connections.map((v) => {
-                return <Connection connection={v} key={v.id}></Connection>
-              })}
-            </div>
-          </MacScrollbar>
-        </div>
-      </ResizableDiv>
-    </>
+        <MacScrollbar>
+          <div>
+            {store.connection.connections.map((v) => {
+              return <Connection connection={v} key={v.id}></Connection>
+            })}
+          </div>
+        </MacScrollbar>
+      </div>
+    </ResizableDiv>
   )
 }
 export default observer(Index)

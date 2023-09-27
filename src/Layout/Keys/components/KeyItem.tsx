@@ -46,7 +46,7 @@ const KeyItem: React.FC<{
           })}
         </div>
       }
-      mouseEnterDelay={1}
+      mouseEnterDelay={0.4}
       placement="bottomLeft"
       onOpenChange={(e) => {
         if (e) {

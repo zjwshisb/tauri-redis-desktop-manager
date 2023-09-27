@@ -17,6 +17,7 @@ import context from '../../context'
 import Editable from '@/components/Editable'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
+import LoadMore from '@/components/LoadMore'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -41,7 +42,7 @@ const Index: React.FC<{
       const start = index.current
       const stop = index.current + store.setting.setting.field_count - 1
       setLoading(true)
-      await request<string[]>('key/list/lrange', keys.connection_id, {
+      return await request<string[]>('key/list/lrange', keys.connection_id, {
         name: keys.name,
         db: keys.db,
         start,
@@ -49,6 +50,7 @@ const Index: React.FC<{
       })
         .then((res) => {
           index.current = stop
+          const more = stop >= keys.length
           if (reset) {
             setItems(res.data)
           } else {
@@ -56,13 +58,30 @@ const Index: React.FC<{
               return [...p].concat(res.data)
             })
           }
+          return {
+            more
+          }
         })
         .finally(() => {
           setLoading(false)
         })
     },
-    [keys, store.setting.setting.field_count]
+    [
+      keys.connection_id,
+      keys.db,
+      keys.length,
+      keys.name,
+      store.setting.setting.field_count
+    ]
   )
+
+  const getAllFields = React.useCallback(() => {
+    getFields().then((res) => {
+      if (res.more) {
+        getAllFields()
+      }
+    })
+  }, [getFields])
 
   const data = React.useMemo(() => {
     return items.map((v, index) => {
@@ -97,6 +116,7 @@ const Index: React.FC<{
       {
         dataIndex: 'value',
         title: t('Value'),
+        width: 'auto',
         render(_) {
           return <FieldViewer content={_} />
         }
@@ -184,6 +204,16 @@ const Index: React.FC<{
         dataSource={data}
         columns={columns}
       ></CusTable>
+      <div className="py-2 mb-4">
+        <LoadMore
+          disabled={!more}
+          loading={loading}
+          onGet={async () => {
+            await getFields()
+          }}
+          onGetAll={getAllFields}
+        ></LoadMore>
+      </div>
     </ValueLayout>
   )
 }

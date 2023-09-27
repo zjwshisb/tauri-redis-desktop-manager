@@ -39,6 +39,7 @@ const App: React.FC = () => {
         return v.id === parseInt(params.cid as string)
       })
     }
+    return undefined
   }, [params.cid, store.connection.connections])
 
   React.useEffect(() => {
@@ -50,7 +51,11 @@ const App: React.FC = () => {
   const children = computed(() => {
     let node = <></>
 
-    if (connection != null && connection.open === true && params.key != null) {
+    if (
+      connection !== undefined &&
+      connection.open === true &&
+      params.key !== undefined
+    ) {
       switch (params.type) {
         case 'key': {
           if (
@@ -58,7 +63,6 @@ const App: React.FC = () => {
             params.db !== undefined &&
             params.key !== undefined
           ) {
-            console.log('hahaha')
             node = (
               <Key
                 connection={connection}

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 const LoadMore: React.FC<{
   disabled: boolean
   onGet: () => void
-  loading: boolean
+  loading?: boolean
   onGetAll: () => void
 }> = ({ disabled, onGet, onGetAll, loading }) => {
   const { t } = useTranslation()

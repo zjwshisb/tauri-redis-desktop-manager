@@ -22,7 +22,7 @@ export function useFieldScan<T>(
         cursor.current = '0'
       }
       setLoading(true)
-      await request<{
+      return await request<{
         cursor: string
         values: T[]
       }>(path, keys.connection_id, {
@@ -34,15 +34,16 @@ export function useFieldScan<T>(
       })
         .then((res) => {
           cursor.current = res.data.cursor
-          if (res.data.cursor === '0') {
-            setMore(false)
-          } else {
-            setMore(true)
-          }
+          const isMore = res.data.cursor !== '0'
+          setMore(isMore)
           if (reset) {
             setFields(res.data.values)
           } else {
             setFields((p) => [...p].concat(res.data.values))
+          }
+          return {
+            fields: res.data.values,
+            more: isMore
           }
         })
         .finally(() => {
@@ -51,6 +52,14 @@ export function useFieldScan<T>(
     },
     [keys, params, path, store.setting.setting.field_count]
   )
+
+  const getAllFields = React.useCallback(() => {
+    getFields().then((res) => {
+      if (res.more) {
+        getAllFields()
+      }
+    })
+  }, [getFields])
 
   React.useEffect(() => {
     getFields(true)
@@ -61,6 +70,7 @@ export function useFieldScan<T>(
     more,
     loading,
     setFields,
-    getFields
+    getFields,
+    getAllFields
   }
 }
