@@ -9,49 +9,58 @@ export default function CusTable<T extends object>(
     showIndex?: boolean
   }
 ) {
-  const { columns, ...others } = props
+  const { columns, virtual = true, ...others } = props
 
   const container = React.useRef<HTMLDivElement>(null)
 
-  // a state for rerender table width
-  const [, setRerender] = React.useState(false)
+  const [scrollX, setScrollX] = React.useState<number>(1000)
 
   const table = React.useRef<HTMLDivElement>(null)
 
   const db = useDebounceFn(
     () => {
-      setRerender((p) => !p)
+      if (container.current !== null) {
+        setScrollX(container.current?.clientWidth - 1)
+      }
     },
     {
       wait: 100
     }
   )
+  React.useEffect(() => {
+    db.run()
+  }, [db])
 
   React.useEffect(() => {
     window.addEventListener('resize', db.run)
-    table.current?.scrollTo({
-      top: 100000
-    })
     return () => {
       window.removeEventListener('resize', db.run)
     }
   }, [db.run])
+
+  const scroll = React.useMemo(() => {
+    if (virtual === true) {
+      return {
+        y: 600,
+        x: scrollX
+      }
+    }
+    return undefined
+  }, [scrollX, virtual])
+
   return (
     <div ref={container}>
       <Table
         ref={table}
-        virtual
+        virtual={virtual}
         size="small"
-        className="flex justify-center"
+        className="w-full"
         pagination={false}
         footer={(v) => {
           return <div className="flex justify-end">total: {v.length}</div>
         }}
         bordered
-        scroll={{
-          y: 600,
-          x: container.current != null ? container.current.clientWidth - 1 : 0
-        }}
+        scroll={scroll}
         columns={columns}
         {...others}
       ></Table>

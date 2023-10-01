@@ -66,6 +66,7 @@ const Item: React.FC<{
             </div>
             <CusTable
               rowKey={'name'}
+              virtual={false}
               dataSource={items}
               columns={[
                 {

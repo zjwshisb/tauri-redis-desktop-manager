@@ -139,7 +139,6 @@ const StepTwo: React.FC = () => {
     <div className={classNames(['w-full flex-col justify-between flex'])}>
       <div>
         <Header
-          title={t('Preview')}
           source={{
             title: sourceConnection.name,
             subTitle: state.value?.source.database?.toString()
@@ -151,6 +150,7 @@ const StepTwo: React.FC = () => {
         ></Header>
         <div className="p-4">
           <div className="mb-4">
+            <div className="text-lg font-medium">{t('Setting')}</div>
             <Form<ConfigForm>
               size="small"
               layout="horizontal"

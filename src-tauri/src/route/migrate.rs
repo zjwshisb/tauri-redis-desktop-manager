@@ -97,9 +97,9 @@ pub async fn migrate<'r>(
                         r.message = s;
                         r.success = true;
                         if args.delete {
-                            manager
+                            let _: Result<i64, CusError> = manager
                                 .execute_with(redis::cmd("del").arg(&k), &mut source_connection)
-                                .await?
+                                .await;
                         }
                     }
                     Err(e) => {

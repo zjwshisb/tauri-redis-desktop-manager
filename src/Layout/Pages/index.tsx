@@ -1,18 +1,13 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import {
-  Tabs,
-  Dropdown,
-  Typography,
-  type TabsProps,
-  ConfigProvider
-} from 'antd'
+import { Tabs, Dropdown, type TabsProps, ConfigProvider } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { MacScrollbar } from 'mac-scrollbar'
 import StickyBox from 'react-sticky-box'
 import { computed } from 'mobx'
 import { KeyOutlined } from '@ant-design/icons'
+import Welcome from './components/Welcome'
 
 const Index: React.FC = () => {
   const store = useStore()
@@ -125,11 +120,7 @@ const Index: React.FC = () => {
           }}
         >
           <div className="pb-8 flex-1 h-full">
-            {store.page.pages.length === 0 && (
-              <div className="w-full h-[500px] flex items-center justify-center">
-                <Typography.Title>Tauri Redis Desktop Manager</Typography.Title>
-              </div>
-            )}
+            {store.page.pages.length === 0 && <Welcome />}
             {store.page.pages.length > 0 && (
               <Tabs
                 style={{

@@ -5,20 +5,19 @@ import React from 'react'
 import NewConnection from './components/NewConnection'
 import Session from './components/Session'
 import Migrate from './components/Migrate'
-import { getAll } from '@tauri-apps/api/window'
-import { listen } from '@tauri-apps/api/event'
+import { type WebviewWindow, getAll } from '@tauri-apps/api/window'
+import { WindowsOutlined } from '@ant-design/icons'
 
 const ActionBar: React.FC = () => {
-  const [count, setCount] = React.useState(0)
+  const [window, setWindow] = React.useState<WebviewWindow[]>([])
+
   React.useEffect(() => {
-    listen('tauri://window-created', (e) => {
-      const all = getAll()
-      setCount(all.length)
-    })
-    listen('tauri://destroyed', () => {
-      const all = getAll()
-      setCount(all.length)
-    })
+    const i = setInterval(() => {
+      setWindow(getAll())
+    }, 1000)
+    return () => {
+      clearInterval(i)
+    }
   }, [])
 
   return (
@@ -34,7 +33,10 @@ const ActionBar: React.FC = () => {
             <Migrate />
           </Space>
         </div>
-        <div className="flex">{count}</div>
+        <div className="flex px-4">
+          <span className="mr-2">{window.length}</span>
+          <WindowsOutlined />
+        </div>
       </div>
     </div>
   )

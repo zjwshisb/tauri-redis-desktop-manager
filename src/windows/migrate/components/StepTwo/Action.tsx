@@ -199,7 +199,8 @@ const Action: React.ForwardRefRenderFunction<ActionRef, ActionProps> = (
   })
 
   return (
-    <div>
+    <div className="mt-4">
+      <div className="text-lg font-medium mb-2">{t('Key List')}</div>
       <div className="border h-[300px]">
         {keys.length === 0 && (
           <div className={'h-full flex items-center justify-center'}>
