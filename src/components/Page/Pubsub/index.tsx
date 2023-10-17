@@ -51,18 +51,16 @@ const Pubsub: React.FC<{
         .then((f) => {
           unListen = f
         })
-    }
-    return () => {
-      if (eventName !== '') {
+      return () => {
         request('pubsub/cancel', 0, {
           name: eventName
         })
-      }
-
-      if (unListen != null) {
-        unListen()
+        if (unListen != null) {
+          unListen()
+        }
       }
     }
+    return () => {}
   }, [append, clear, eventName])
 
   const publish = React.useMemo(() => {

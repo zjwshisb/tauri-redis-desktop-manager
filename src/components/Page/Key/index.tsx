@@ -18,6 +18,7 @@ import { getPageKey } from '@/utils'
 import Editable from '@/components/Editable'
 import Context from './context'
 import Page from '..'
+import JsonValue from './components/JsonValue'
 const Index: React.FC<{
   name: string
   connection: APP.Connection
@@ -55,6 +56,9 @@ const Index: React.FC<{
         }
         case 'set': {
           return <SetValue keys={item} onRefresh={fetch}></SetValue>
+        }
+        case 'ReJSON-RL': {
+          return <JsonValue keys={item} onRefresh={fetch}></JsonValue>
         }
       }
     }

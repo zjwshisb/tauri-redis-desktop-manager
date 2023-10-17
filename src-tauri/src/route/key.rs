@@ -56,6 +56,9 @@ pub async fn get<'r>(
         "string" => {
             key.get_string_value(&manager).await?;
         }
+        "ReJSON-RL" => {
+            key.get_json_value(&manager).await?;
+        }
         _ => (),
     }
     Ok(key)

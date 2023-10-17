@@ -32,10 +32,9 @@ impl Key {
             memory: 0,
             length: 0,
         };
-        let types_value: Value = manager
+        key.types = manager
             .execute(cid, cmd("type").arg(&key.name), Some(db))
             .await?;
-        key.types = String::from_redis_value(&types_value)?;
         if !key.is_none() {
             key.get_ttl(&manager).await?;
             key.get_memory(&manager).await?;
@@ -47,33 +46,56 @@ impl Key {
         &mut self,
         manager: &tauri::State<'r, ConnectionManager>,
     ) -> Result<(), CusError> {
-        let memory_value: Value = manager
-            .execute(
-                self.connection_id,
-                cmd("memory")
-                    .arg("usage")
-                    .arg(&self.name)
-                    .arg(&["SAMPLES", "0"]),
-                Some(self.db),
-            )
-            .await?;
-        self.memory = i64::from_redis_value(&memory_value)?;
+        if self.types == "ReJSON-RL" {
+            self.memory = manager
+                .execute(
+                    self.connection_id,
+                    cmd("JSON.DEBUG").arg("MEMORY").arg(&self.name),
+                    Some(self.db),
+                )
+                .await?
+        } else {
+            self.memory = manager
+                .execute(
+                    self.connection_id,
+                    cmd("memory")
+                        .arg("usage")
+                        .arg(&self.name)
+                        .arg(&["SAMPLES", "0"]),
+                    Some(self.db),
+                )
+                .await?
+        }
         Ok(())
     }
     pub async fn get_ttl<'r>(
         &mut self,
         manager: &tauri::State<'r, ConnectionManager>,
     ) -> Result<(), CusError> {
-        let ttl_result: Value = manager
+        self.ttl = manager
             .execute(
                 self.connection_id,
                 cmd("ttl").arg(&self.name),
                 Some(self.db),
             )
             .await?;
-        self.ttl = i64::from_redis_value(&ttl_result)?;
         Ok(())
     }
+
+    pub async fn get_json_value<'r>(
+        &mut self,
+        manager: &tauri::State<'r, ConnectionManager>,
+    ) -> Result<(), CusError> {
+        self.data = manager
+            .execute(
+                self.connection_id,
+                cmd("JSON.GET").arg(&self.name).arg("$"),
+                Some(self.db),
+            )
+            .await?;
+        Ok(())
+    }
+
     pub async fn get_string_value<'r>(
         &mut self,
         manager: &tauri::State<'r, ConnectionManager>,
@@ -112,14 +134,13 @@ impl Key {
             _ => "",
         };
         if cmd != "" {
-            let length_value: Value = manager
+            self.length = manager
                 .execute(
                     self.connection_id,
                     redis::cmd(cmd).arg(&self.name),
                     Some(self.db),
                 )
                 .await?;
-            self.length = i64::from_redis_value(&length_value)?;
         }
         Ok(())
     }

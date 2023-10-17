@@ -28,10 +28,12 @@ const Monitor: React.FC<{
   const { t } = useTranslation()
 
   React.useEffect(() => {
-    request<string>('pubsub/monitor', props.connection.id).then((res) => {
-      setEventName(res.data)
-    })
-  }, [props.connection.id])
+    if (!stop) {
+      request<string>('pubsub/monitor', props.connection.id).then((res) => {
+        setEventName(res.data)
+      })
+    }
+  }, [props.connection.id, stop])
 
   React.useEffect(() => {
     let unListen: undefined | UnlistenFn
@@ -61,17 +63,16 @@ const Monitor: React.FC<{
         .then((f) => {
           unListen = f
         })
-    }
-    return () => {
-      if (eventName !== '') {
+      return () => {
         request('pubsub/cancel', 0, {
           name: eventName
         })
-      }
-      if (unListen !== undefined) {
-        unListen()
+        if (unListen !== undefined) {
+          unListen()
+        }
       }
     }
+    return () => {}
   }, [append, eventName, stop, searchRef])
 
   return (

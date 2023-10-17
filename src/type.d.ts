@@ -67,9 +67,11 @@ declare namespace APP {
 
   type HashField = Field
 
-  type Key = StringKey | HashKey | ListKey | ZSetKey | SetKey
+  type Key = StringKey | HashKey | ListKey | ZSetKey | SetKey | JsonKey
 
   type StringKey = BaseKey<'string', string>
+
+  type JsonKey = BaseKey<'ReJSON-RL', string>
 
   type HashKey = BaseKey<'hash', Field[]>
 
