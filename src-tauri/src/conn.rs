@@ -6,7 +6,6 @@ use crate::{
     utils,
 };
 use chrono::prelude::*;
-use futures::future::ok;
 use redis::aio::{Connection, ConnectionLike};
 use redis::cluster::ClusterClient;
 use redis::cluster_async::ClusterConnection;

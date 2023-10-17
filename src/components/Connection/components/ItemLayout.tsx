@@ -11,7 +11,7 @@ const ItemLayout: React.FC<
       data-active={active}
       className={classnames([
         'active-able',
-        'h-[24px] flex items-center px-4 justify-between'
+        'h-[24px] flex items-center px-4 justify-between text-slate-600'
       ])}
     >
       {children}

@@ -35,7 +35,7 @@ const Index: React.FC<{
       .finally(() => {
         setLoading(false)
       })
-  }, [connection.id, item.database])
+  }, [connection.id, item])
 
   React.useEffect(() => {
     getCount()
@@ -46,7 +46,7 @@ const Index: React.FC<{
       return <ReloadOutlined spin />
     }
     return (
-      <div className="flex items-center text-slate-600 italic">
+      <div className="flex items-center  italic">
         <span>{keyCount}</span>
         <KeyOutlined className="text-sm" />
       </div>
@@ -70,6 +70,7 @@ const Index: React.FC<{
 
   const children = (
     <div
+      data-active={props.active}
       className="flex flex-1 justify-between"
       onClick={() => {
         store.keyInfo.set(props.connection, item.database)
