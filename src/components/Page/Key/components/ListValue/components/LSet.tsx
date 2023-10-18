@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber } from 'antd'
+import { Form, InputNumber } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
@@ -6,6 +6,7 @@ import { EditOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import CusModal from '@/components/CusModal'
 import IconButton from '@/components/IconButton'
+import FieldInput from '@/components/FieldInput'
 
 const Index: React.FC<{
   keys: APP.ListKey
@@ -47,7 +48,7 @@ const Index: React.FC<{
             <InputNumber readOnly></InputNumber>
           </Form.Item>
           <Form.Item name={'value'} label={t('Value')}>
-            <Input.TextArea rows={20}></Input.TextArea>
+            <FieldInput></FieldInput>
           </Form.Item>
         </Form>
       </CusModal>

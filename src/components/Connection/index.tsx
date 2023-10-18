@@ -143,7 +143,7 @@ const Connection: React.FC<{
         <div className={'flex-shrink-0 pl-2'}>
           <Space>
             {connection.err !== undefined && (
-              <Tooltip title={connection.err}>
+              <Tooltip title={connection.err} color="volcano">
                 <WarningOutlined className="text-orange-600"></WarningOutlined>
               </Tooltip>
             )}

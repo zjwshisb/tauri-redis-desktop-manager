@@ -1,8 +1,9 @@
-import { Form, Input, Button } from 'antd'
+import { Form, Button } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import CusModal from '@/components/CusModal'
+import FieldInput from '@/components/FieldInput'
 
 const LPush: React.FC<{
   keys: APP.ListKey
@@ -36,7 +37,7 @@ const LPush: React.FC<{
           required
           rules={[{ required: true }]}
         >
-          <Input.TextArea rows={20}></Input.TextArea>
+          <FieldInput />
         </Form.Item>
       </Form>
     </CusModal>

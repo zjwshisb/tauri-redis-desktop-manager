@@ -1,9 +1,10 @@
-import { Form, Input, InputNumber } from 'antd'
+import { Form, InputNumber } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import CusModal from '@/components/CusModal'
+import FieldInput from '@/components/FieldInput'
 
 const Index: React.FC<{
   keys: APP.ZSetKey
@@ -50,12 +51,7 @@ const Index: React.FC<{
           required
           rules={[{ required: true }]}
         >
-          <Input
-            readOnly={props.field != null}
-            placeholder={t('Please Enter {{name}}', {
-              name: t('Value')
-            }).toString()}
-          ></Input>
+          <FieldInput readOnly={props.field != null}></FieldInput>
         </Form.Item>
         <Form.Item
           name={'score'}

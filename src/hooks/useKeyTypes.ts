@@ -21,10 +21,13 @@ export default function useKeyTypes() {
         label: t('Set'),
         value: 'set'
       },
-
       {
         label: t('Sorted Set'),
         value: 'zset'
+      },
+      {
+        label: t('JSON'),
+        value: 'ReJSON-RL'
       }
     ]
   }, [t])

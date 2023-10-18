@@ -4,6 +4,7 @@ import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import CusModal from '@/components/CusModal'
+import FieldInput from '@/components/FieldInput'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -25,6 +26,7 @@ const Index: React.FC<{
 
   return (
     <CusModal
+      width={800}
       trigger={props.trigger}
       onOk={async () => {
         await request<number>('key/hash/hset', props.keys.connection_id, {
@@ -60,7 +62,7 @@ const Index: React.FC<{
           label={t('Field Value')}
           rules={[{ required: true }]}
         >
-          <Input.TextArea rows={20}></Input.TextArea>
+          <FieldInput></FieldInput>
         </Form.Item>
       </Form>
     </CusModal>

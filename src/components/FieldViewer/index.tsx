@@ -58,7 +58,7 @@ const FieldViewer: React.FC<{
       let type = 'text'
       try {
         const u = JSON.parse(content)
-        if (lodash.isPlainObject(u)) {
+        if (lodash.isObject(u)) {
           type = 'json'
         }
       } catch (_) {}

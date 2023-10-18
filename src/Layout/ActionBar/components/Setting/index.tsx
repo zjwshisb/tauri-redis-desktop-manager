@@ -6,7 +6,6 @@ import { SettingOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
 import { useForm } from 'antd/es/form/Form'
 import lodash from 'lodash'
-import { getVersion } from '@tauri-apps/api/app'
 import CusModal from '@/components/CusModal'
 import Template from '../Template'
 
@@ -16,14 +15,6 @@ const Index: React.FC = () => {
   const store = useStore()
 
   const [form] = useForm()
-
-  const [version, setVersion] = React.useState('')
-
-  React.useEffect(() => {
-    getVersion().then((r) => {
-      setVersion(r)
-    })
-  }, [])
 
   return (
     <CusModal
@@ -78,10 +69,7 @@ const Index: React.FC = () => {
           >
             <InputNumber min={1} />
           </Form.Item>
-        </Form>
-        <div>
-          {t('Version')}: {version}
-        </div>
+        </Form>{' '}
       </div>
     </CusModal>
   )

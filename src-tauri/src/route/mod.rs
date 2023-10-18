@@ -12,6 +12,7 @@ pub mod connection;
 pub mod db;
 pub mod debug;
 pub mod hash;
+pub mod json;
 pub mod key;
 pub mod list;
 pub mod memory;
@@ -43,6 +44,7 @@ pub async fn dispatch<'r>(
         "server/version" => Response::new(server::version(cid, manager).await?),
         "server/slow-log" => Response::new(server::slow_log(cid, manager).await?),
         "server/reset-slow-log" => Response::new(server::reset_slow_log(cid, manager).await?),
+        "server/module" => Response::new(server::module(cid, manager).await?),
 
         "key/scan" => Response::new(key::scan(payload, cid, manager).await?),
         "key/hash/hscan" => Response::new(hash::hscan(payload, cid, manager).await?),
@@ -99,6 +101,7 @@ pub async fn dispatch<'r>(
         "debug/cancel" => Response::new(debug::cancel(manager).await?),
         "debug/clients" => Response::new(debug::clients(manager, pubsub).await?),
         "transfer/php_unserialize" => Response::new(transfer::php_unserialize(payload).await?),
+        "json/set" => Response::new(json::set(payload, cid, manager).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

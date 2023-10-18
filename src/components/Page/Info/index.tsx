@@ -17,7 +17,7 @@ const Info: React.FC<{
     if (data !== undefined) {
       const keys = Object.keys(data).sort()
       if (keys?.length === 1) {
-        return <Item data={data[keys[0]]}></Item>
+        return <Item data={data[keys[0]]} connection={connection}></Item>
       } else {
         return (
           <Tabs
@@ -27,7 +27,9 @@ const Info: React.FC<{
               return {
                 label: `${server}`,
                 key: server,
-                children: <Item data={data[server]}></Item>
+                children: (
+                  <Item data={data[server]} connection={connection}></Item>
+                )
               }
             })}
           ></Tabs>
@@ -35,7 +37,7 @@ const Info: React.FC<{
       }
     }
     return <></>
-  }, [data])
+  }, [connection, data])
   return (
     <Page onRefresh={fetch} pageKey={pageKey} loading={loading}>
       {node}

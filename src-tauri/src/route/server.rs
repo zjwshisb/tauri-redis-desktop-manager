@@ -89,3 +89,54 @@ pub async fn reset_slow_log<'r>(
         .execute(cid, &mut redis::cmd("SLOWLOG").arg("RESET"), None)
         .await
 }
+
+pub async fn module<'r>(
+    cid: u32,
+    manager: tauri::State<'r, ConnectionManager>,
+) -> Result<Vec<HashMap<String, String>>, CusError> {
+    let arr: Vec<redis::Value> = manager
+        .execute(cid, redis::cmd("MODULE").arg("LIST"), None)
+        .await?;
+    let mut resp: Vec<HashMap<String, String>> = vec![];
+    for v in arr {
+        match v {
+            Value::Bulk(v) => {
+                let mut i = 0;
+                let length = v.len();
+                let mut item: HashMap<String, String> = HashMap::new();
+                while i < length {
+                    let field_o = v.get(i);
+                    i = i + 1;
+                    if let Some(filed) = field_o {
+                        let field_str = String::from_redis_value(filed)?;
+                        let value_o = v.get(i);
+                        i = i + 1;
+                        if let Some(value) = value_o {
+                            let mut value_str = String::from("");
+                            match value {
+                                Value::Data(vv) => {
+                                    value_str = String::from_utf8(vv.to_vec())?;
+                                }
+                                Value::Int(vv) => value_str = vv.to_string(),
+                                Value::Bulk(vv) => {
+                                    let mut a = vec![];
+                                    for x in vv {
+                                        let s = String::from_redis_value(x)?;
+                                        a.push(s)
+                                    }
+                                    value_str = a.join(",");
+                                }
+                                _ => {}
+                            }
+                            item.insert(field_str, value_str);
+                        }
+                    }
+                }
+                resp.push(item);
+            }
+            _ => {}
+        }
+    }
+
+    Ok(resp)
+}

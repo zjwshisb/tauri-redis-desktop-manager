@@ -222,6 +222,19 @@ pub async fn add<'r>(
                 .await?;
             return Ok(v.to_string());
         }
+        "json" => {
+            let v: String = manager
+                .execute(
+                    cid,
+                    redis::cmd("JSON.SET")
+                        .arg(&args.name)
+                        .arg("$")
+                        .arg("{\"rust\": \"hello world\" }"),
+                    Some(args.db),
+                )
+                .await?;
+            return Ok(v.to_string());
+        }
         _ => {}
     }
     Err(err::new_normal())

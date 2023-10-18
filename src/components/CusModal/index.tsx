@@ -1,5 +1,6 @@
 import { Modal, message, type ModalProps } from 'antd'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const CusModal: React.FC<
   {
@@ -8,10 +9,13 @@ const CusModal: React.FC<
     onOk: () => Promise<any>
     onOpenChange?: (v: boolean) => void
     onOpen?: () => void
+    // the callback when modal close
     onClear?: () => void
   } & Omit<ModalProps, 'onOk'>
 > = (props) => {
   const { onOk, onCancel, onOpen, showOkNotice = true, ...otherProps } = props
+
+  const { t } = useTranslation()
 
   const [open, setOpen] = React.useState(false)
 
@@ -70,7 +74,7 @@ const CusModal: React.FC<
           onOk()
             .then(() => {
               if (showOkNotice) {
-                message.success('Success')
+                message.success(t('Success'))
               }
               onOpenChange(false)
             })

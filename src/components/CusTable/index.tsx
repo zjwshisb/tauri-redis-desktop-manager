@@ -39,7 +39,7 @@ export default function CusTable<T extends object>(
   }, [db.run])
 
   const scroll = React.useMemo(() => {
-    if (virtual === true) {
+    if (virtual) {
       return {
         y: 600,
         x: scrollX

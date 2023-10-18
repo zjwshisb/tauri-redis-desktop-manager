@@ -4,11 +4,14 @@ import { useTranslation } from 'react-i18next'
 import { SearchOutlined } from '@ant-design/icons'
 
 import DbInfo from './DbInfo'
+import Module from './Module'
 import CusTable from '@/components/CusTable'
+import VersionAccess from '@/components/VersionAccess'
 
 const Item: React.FC<{
   data: Record<string, string>
-}> = ({ data }) => {
+  connection: APP.Connection
+}> = ({ data, connection }) => {
   const { t } = useTranslation()
 
   const [search, setSearch] = React.useState('')
@@ -45,14 +48,23 @@ const Item: React.FC<{
           </Descriptions.Item>
         </Descriptions>
       </Card>
+
       <Row className="mt-4">
         <Col span={24}>
           <DbInfo items={data} />
         </Col>
       </Row>
+
+      <VersionAccess connection={connection} version="4.0.0">
+        <Row className="mt-4">
+          <Col span={24}>
+            <Module connection={connection} />
+          </Col>
+        </Row>
+      </VersionAccess>
       <Row className="mt-4">
         <Col span={24}>
-          <Card title={t('All Info')}>
+          <Card title={t('Info')}>
             <div className="mb-2 w-[200px]">
               <Input
                 prefix={<SearchOutlined />}
