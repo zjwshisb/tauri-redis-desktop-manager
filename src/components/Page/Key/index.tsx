@@ -131,13 +131,15 @@ const Index: React.FC<{
                     suffix={'bytes'}
                   ></Input>
                 </div>
-                <div className="mb-2 mr-2 w-[200px]">
-                  <Input
-                    addonBefore={t('Length')}
-                    value={item.length}
-                    readOnly
-                  ></Input>
-                </div>
+                {item.types !== 'ReJSON-RL' && (
+                  <div className="mb-2 mr-2 w-[200px]">
+                    <Input
+                      addonBefore={t('Length')}
+                      value={item.length}
+                      readOnly
+                    ></Input>
+                  </div>
+                )}
                 <div className="mb-2 mr-2 w-[200px]">
                   <Space>
                     <Copy

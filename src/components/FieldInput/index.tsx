@@ -59,6 +59,7 @@ const FieldInput: React.FC<{
       return (
         <Card bodyStyle={{ padding: 8 }}>
           <ReactJson
+            displayDataTypes={false}
             style={{
               wordBreak: 'break-all'
             }}

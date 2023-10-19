@@ -37,7 +37,7 @@ const NodeItem: React.FC<{
       return <ReloadOutlined spin />
     }
     return (
-      <div className="flex items-center text-slate-600 italic">
+      <div className="flex items-center italic">
         <span>{keyCount}</span>
         <KeyOutlined />
       </div>
