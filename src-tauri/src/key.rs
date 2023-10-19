@@ -1,4 +1,5 @@
 use crate::err::CusError;
+use crate::response::FieldValue;
 use crate::ConnectionManager;
 use redis::FromRedisValue;
 use redis::{cmd, Value};
@@ -9,7 +10,7 @@ pub struct Key {
     name: String,
     types: String,
     ttl: i64,
-    data: String,
+    data: FieldValue,
     connection_id: u32,
     db: u8,
     memory: i64,
@@ -26,7 +27,7 @@ impl Key {
             name: name,
             types: "".into(),
             ttl: -2,
-            data: String::from(""),
+            data: FieldValue::Nil,
             connection_id: cid,
             db,
             memory: 0,
@@ -86,13 +87,15 @@ impl Key {
         &mut self,
         manager: &tauri::State<'r, ConnectionManager>,
     ) -> Result<(), CusError> {
-        self.data = manager
-            .execute(
-                self.connection_id,
-                cmd("JSON.GET").arg(&self.name).arg("$"),
-                Some(self.db),
-            )
-            .await?;
+        self.data = FieldValue::Str(
+            manager
+                .execute(
+                    self.connection_id,
+                    cmd("JSON.GET").arg(&self.name).arg("$"),
+                    Some(self.db),
+                )
+                .await?,
+        );
         Ok(())
     }
 
@@ -109,14 +112,15 @@ impl Key {
             .await?;
         let v: Result<String, redis::RedisError> = String::from_redis_value(&value);
         match v {
-            Ok(s) => self.data = s,
+            Ok(s) => self.data = FieldValue::Str(s),
             Err(_) => {
                 let i: Vec<u8> = Vec::from_redis_value(&value).unwrap();
-                self.data = i
-                    .iter()
-                    .map(|u| format!("{:b}", u))
-                    .collect::<Vec<String>>()
-                    .join("");
+                self.data = FieldValue::Str(
+                    i.iter()
+                        .map(|u| format!("{:b}", u))
+                        .collect::<Vec<String>>()
+                        .join(""),
+                );
             }
         }
         Ok(())

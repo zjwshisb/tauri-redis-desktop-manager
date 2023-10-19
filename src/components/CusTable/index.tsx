@@ -7,9 +7,10 @@ export default function CusTable<T extends object>(
     onLoadMore?: () => Promise<any>
     more?: boolean
     showIndex?: boolean
+    showFooter?: boolean
   }
 ) {
-  const { columns, virtual = true, ...others } = props
+  const { columns, virtual = true, showFooter = true, ...others } = props
 
   const container = React.useRef<HTMLDivElement>(null)
 
@@ -48,6 +49,16 @@ export default function CusTable<T extends object>(
     return undefined
   }, [scrollX, virtual])
 
+  const footer = React.useMemo(() => {
+    if (!showFooter) {
+      return undefined
+    }
+    const footerRender = (v: readonly T[]) => {
+      return <div className="flex justify-end">total: {v.length}</div>
+    }
+    return footerRender
+  }, [showFooter])
+
   return (
     <div ref={container}>
       <Table
@@ -56,9 +67,7 @@ export default function CusTable<T extends object>(
         size="small"
         className="w-full"
         pagination={false}
-        footer={(v) => {
-          return <div className="flex justify-end">total: {v.length}</div>
-        }}
+        footer={footer}
         bordered
         scroll={scroll}
         columns={columns}

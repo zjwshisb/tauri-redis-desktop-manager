@@ -1,21 +1,18 @@
 import React from 'react'
-import { Button, Card } from 'antd'
+import { Button, Card, Form } from 'antd'
 
 import ValueLayout from '../ValueLayout'
 import ReactJson from 'react-json-view'
 import lodash from 'lodash'
 import request from '@/utils/request'
-import connectionContext from '../../context'
-import Editable from '@/components/Editable'
 import { useTranslation } from 'react-i18next'
-import FieldEditor from '@/components/FieldEditor'
+import ModalForm from '@/components/ModalForm'
+import FieldInput from '@/components/FieldInput'
 
 const JsonValue: React.FC<{
   keys: APP.JsonKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
-  const connection = React.useContext(connectionContext)
-
   const { t } = useTranslation()
 
   const formatValue = React.useMemo(() => {
@@ -38,29 +35,38 @@ const JsonValue: React.FC<{
     if (!value.json) {
       return value.value
     }
-    return <ReactJson src={value.value} name={false}></ReactJson>
+    return (
+      <ReactJson
+        src={value.value}
+        name={false}
+        displayDataTypes={false}
+      ></ReactJson>
+    )
   }, [value.json, value.value])
 
   return (
     <ValueLayout
       actions={
-        <Editable connection={connection}>
-          <FieldEditor
-            title={t('Edit')}
-            trigger={<Button type="primary">{t('Edit')}</Button>}
-            defaultValue={formatValue}
-            onSubmit={async (v) => {
-              await request('json/set', keys.connection_id, {
-                db: keys.db,
-                path: '$',
-                name: keys.name,
-                value: v
-              }).then(() => {
-                onRefresh()
-              })
-            }}
-          ></FieldEditor>
-        </Editable>
+        <ModalForm
+          width={800}
+          onSubmit={async (v) => {
+            await request('json/set', keys.connection_id, {
+              db: keys.db,
+              path: '$',
+              name: keys.name,
+              value: v.value
+            }).then(() => {
+              onRefresh()
+            })
+          }}
+          defaultValue={{ value: formatValue }}
+          title={t('Edit')}
+          trigger={<Button type="primary">{t('Edit')}</Button>}
+        >
+          <Form.Item name={'value'}>
+            <FieldInput />
+          </Form.Item>
+        </ModalForm>
       }
     >
       <Card bodyStyle={{ padding: 8 }}>{children}</Card>

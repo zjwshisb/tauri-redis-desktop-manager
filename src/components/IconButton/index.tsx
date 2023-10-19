@@ -6,7 +6,7 @@ const IconButton: React.FC<{
   onClick?: () => void
 }> = ({ icon, onClick }) => {
   const children = React.cloneElement(icon, {
-    className: 'hover:cursor-point',
+    className: 'hover:cursor-pointer',
     style: {
       fontSize: '14px',
       color: blue.primary

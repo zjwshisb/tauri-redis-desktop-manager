@@ -1,20 +1,17 @@
 import React from 'react'
-import { Button, Card } from 'antd'
+import { Button, Card, Form } from 'antd'
 import FieldViewer from '@/components/FieldViewer'
 import request from '@/utils/request'
 import ValueLayout from '../ValueLayout'
-import FieldEditor from '@/components/FieldEditor'
 import { useTranslation } from 'react-i18next'
-import Editable from '@/components/Editable'
-import connectionContext from '../../context'
+import ModalForm from '@/components/ModalForm'
+import FieldInput from '@/components/FieldInput'
 
 const Index: React.FC<{
   keys: APP.StringKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
   const [value, setValue] = React.useState(keys.data)
-
-  const connection = React.useContext(connectionContext)
 
   const { t } = useTranslation()
 
@@ -25,23 +22,25 @@ const Index: React.FC<{
   return (
     <ValueLayout
       actions={
-        <Editable connection={connection}>
-          <FieldEditor
-            onSubmit={async (value) => {
-              return await request('key/set', keys.connection_id, {
-                db: keys.db,
-                name: keys.name,
-                value
-              }).then(() => {
-                onRefresh()
-                return true
-              })
-            }}
-            defaultValue={keys.data}
-            title={t('Edit')}
-            trigger={<Button type="primary">{t('Edit')}</Button>}
-          ></FieldEditor>
-        </Editable>
+        <ModalForm
+          title={t('Edit')}
+          trigger={<Button type="primary">{t('Edit')}</Button>}
+          onSubmit={async (v) => {
+            await request('key/set', keys.connection_id, {
+              db: keys.db,
+              name: keys.name,
+              value: v.value
+            })
+            onRefresh()
+          }}
+          defaultValue={{
+            value
+          }}
+        >
+          <Form.Item name={'value'} rules={[{ required: true }]} required>
+            <FieldInput />
+          </Form.Item>
+        </ModalForm>
       }
     >
       <Card bodyStyle={{ padding: 8 }}>

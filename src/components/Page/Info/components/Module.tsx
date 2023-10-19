@@ -1,8 +1,9 @@
 import React from 'react'
-import { Card, Table } from 'antd'
+import { Card } from 'antd'
 import { useTranslation } from 'react-i18next'
 import request from '@/utils/request'
 import useRequest from '@/hooks/useRequest'
+import CusTable from '@/components/CusTable'
 
 interface ModuleInterface {
   name: string
@@ -24,10 +25,10 @@ const Module: React.FC<{
 
   return (
     <Card title={t('Module')} className="w-full">
-      <Table
+      <CusTable
+        virtual={false}
         rowKey={'name'}
-        bordered
-        pagination={false}
+        showFooter={false}
         dataSource={data}
         columns={[
           { dataIndex: 'name', title: 'name', align: 'center' },
@@ -35,7 +36,7 @@ const Module: React.FC<{
           { dataIndex: 'path', title: 'path', align: 'center' },
           { dataIndex: 'args', title: 'args', align: 'center' }
         ]}
-      ></Table>
+      ></CusTable>
     </Card>
   )
 }

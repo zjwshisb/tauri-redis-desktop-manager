@@ -85,10 +85,10 @@ const CusModal: React.FC<
         }}
         open={isOpen}
         onCancel={(e) => {
+          onOpenChange(false)
           if (onCancel != null) {
             onCancel(e)
           }
-          onOpenChange(false)
         }}
         {...otherProps}
       >

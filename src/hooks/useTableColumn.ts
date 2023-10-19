@@ -1,10 +1,10 @@
-import { type TableColumnType, type TableColumnsType } from 'antd'
 import React from 'react'
+import { type ColumnType } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
 
 export default function useTableColumn<T>(
-  columns: TableColumnsType<T>,
-  action?: TableColumnType<T>,
+  columns: Array<ColumnType<T>>,
+  action?: ColumnType<T>,
   showAction = true,
   showIndex = true
 ) {
@@ -26,9 +26,13 @@ export default function useTableColumn<T>(
         title: t('Action')
       })
     }
+
     for (const x of cols) {
       if (x.align === undefined) {
         x.align = 'center'
+      }
+      if (x.title === undefined && x.dataIndex !== undefined) {
+        x.title = x.dataIndex
       }
     }
     return cols

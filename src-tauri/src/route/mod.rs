@@ -20,6 +20,7 @@ pub mod migrate;
 pub mod pubsub;
 pub mod server;
 pub mod set;
+pub mod topk;
 pub mod transfer;
 pub mod zset;
 
@@ -102,6 +103,9 @@ pub async fn dispatch<'r>(
         "debug/clients" => Response::new(debug::clients(manager, pubsub).await?),
         "transfer/php_unserialize" => Response::new(transfer::php_unserialize(payload).await?),
         "json/set" => Response::new(json::set(payload, cid, manager).await?),
+        "topk/list" => Response::new(topk::list(payload, cid, manager).await?),
+        "topk/info" => Response::new(topk::info(payload, cid, manager).await?),
+        "topk/add" => Response::new(topk::add(payload, cid, manager).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

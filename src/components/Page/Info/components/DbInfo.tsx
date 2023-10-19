@@ -1,6 +1,7 @@
 import React from 'react'
-import { Card, Table } from 'antd'
+import { Card } from 'antd'
 import { useTranslation } from 'react-i18next'
+import CusTable from '@/components/CusTable'
 
 const DbInfo: React.FC<{
   items: Record<string, string>
@@ -35,10 +36,10 @@ const DbInfo: React.FC<{
 
   return (
     <Card title={t('DB')} className="mt-4">
-      <Table
+      <CusTable
         dataSource={info}
-        bordered
-        pagination={false}
+        virtual={false}
+        showFooter={false}
         rowKey={'name'}
         columns={[
           {
@@ -62,7 +63,7 @@ const DbInfo: React.FC<{
             align: 'center'
           }
         ]}
-      ></Table>
+      ></CusTable>
     </Card>
   )
 }

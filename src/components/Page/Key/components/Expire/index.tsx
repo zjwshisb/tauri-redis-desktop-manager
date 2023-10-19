@@ -1,49 +1,41 @@
 import { Form, InputNumber } from 'antd'
 import React from 'react'
-import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
-import CusModal from '@/components/CusModal'
 import { useTranslation } from 'react-i18next'
+import ModalForm from '@/components/ModalForm'
 
 const Index: React.FC<{
   keys: APP.Key
   trigger: React.ReactElement
   onSuccess: (ttl: number) => void
 }> = (props) => {
-  const [form] = useForm(undefined)
-
   const { t } = useTranslation()
 
   return (
-    <CusModal
-      trigger={props.trigger}
-      onOpen={() => {
-        form.setFieldsValue({
-          ttl: props.keys.ttl
-        })
-      }}
-      onOk={async () => {
-        const ttl: number = form.getFieldValue('ttl')
+    <ModalForm
+      onSubmit={async (v) => {
         await request<number>('key/expire', props.keys.connection_id, {
           name: props.keys.name,
-          ttl,
+          ttl: v.ttl,
           db: props.keys.db
         }).then(() => {
-          props.onSuccess(ttl)
+          props.onSuccess(v.ttl)
         })
       }}
       title={'EXPIRE'}
+      trigger={props.trigger}
+      defaultValue={{
+        ttl: props.keys.ttl
+      }}
     >
-      <Form form={form}>
-        <Form.Item
-          name={'ttl'}
-          label={'TTL'}
-          tooltip={t('-1 mean PERSIST the key')}
-        >
-          <InputNumber min={-1}></InputNumber>
-        </Form.Item>
-      </Form>
-    </CusModal>
+      <Form.Item
+        name={'ttl'}
+        label={'TTL'}
+        tooltip={t('-1 mean PERSIST the key')}
+      >
+        <InputNumber min={-1}></InputNumber>
+      </Form.Item>
+    </ModalForm>
   )
 }
 export default Index

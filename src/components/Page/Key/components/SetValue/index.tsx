@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
-import Editable from '@/components/Editable'
+import { isReadonly } from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
@@ -76,20 +76,18 @@ const Index: React.FC<{
       render(_, record, index) {
         return (
           <Space>
-            <Editable connection={connection}>
-              <SRem
-                keys={keys}
-                value={record.value}
-                onSuccess={() => {
-                  onRefresh()
-                }}
-              ></SRem>
-            </Editable>
+            <SRem
+              keys={keys}
+              value={record.value}
+              onSuccess={() => {
+                onRefresh()
+              }}
+            ></SRem>
           </Space>
         )
       }
     },
-    connection !== undefined && !connection.readonly
+    isReadonly(connection)
   )
 
   return (

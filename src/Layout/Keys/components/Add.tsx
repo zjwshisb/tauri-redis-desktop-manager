@@ -2,11 +2,10 @@ import { type KeyInfo } from '@/store/key'
 import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
 import { Form, Input, Select, Tooltip } from 'antd'
-import { useForm } from 'antd/es/form/Form'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import CusModal from '@/components/CusModal'
 import useKeyTypes from '@/hooks/useKeyTypes'
+import ModalForm from '@/components/ModalForm'
 
 const Plus: React.FC<{
   onSuccess: (name: string) => void
@@ -14,59 +13,42 @@ const Plus: React.FC<{
 }> = (props) => {
   const { t } = useTranslation()
 
-  const [form] = useForm()
-
   const keyTypes = useKeyTypes()
 
   return (
-    <CusModal
+    <ModalForm
+      defaultValue={{
+        types: 'string'
+      }}
       trigger={
         <Tooltip title={t('New Key')} placement="bottom">
           <PlusOutlined className="hover:cursor-pointer text-lg"></PlusOutlined>
         </Tooltip>
       }
       title={t('New Key')}
-      onOk={async () => {
-        await form.validateFields().then(async (res) => {
-          await request('key/add', props.info.connection.id, {
-            ...res,
-            db: props.info?.db
-          }).then(() => {
-            props.onSuccess(res.name)
-          })
+      onSubmit={async (v) => {
+        await request('key/add', props.info.connection.id, {
+          db: props.info?.db,
+          ...v
         })
-      }}
-      onCancel={() => {
-        form.resetFields()
+        props.onSuccess(v.name)
       }}
     >
-      <Form
-        layout="vertical"
-        form={form}
-        initialValues={{
-          types: 'string'
-        }}
+      <Form.Item name="name" label={t('Key Name')} rules={[{ required: true }]}>
+        <Input
+          placeholder={t('Please Enter {{name}}', {
+            name: t('Key Name')
+          }).toString()}
+        ></Input>
+      </Form.Item>
+      <Form.Item
+        name="types"
+        label={t('Key Type')}
+        rules={[{ required: true }]}
       >
-        <Form.Item
-          name="name"
-          label={t('Key Name')}
-          rules={[{ required: true }]}
-        >
-          <Input
-            placeholder={t('Please Enter {{name}}', {
-              name: t('Key Name')
-            }).toString()}
-          ></Input>
-        </Form.Item>
-        <Form.Item
-          name="types"
-          label={t('Key Type')}
-          rules={[{ required: true }]}
-        >
-          <Select options={keyTypes}></Select>
-        </Form.Item>
-      </Form>
-    </CusModal>
+        <Select options={keyTypes}></Select>
+      </Form.Item>
+    </ModalForm>
   )
 }
 export default Plus

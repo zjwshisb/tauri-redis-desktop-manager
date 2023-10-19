@@ -60,14 +60,21 @@ declare namespace APP {
     length: number
   }
 
-  interface Field {
+  interface Field<T = string | number | Field[]> {
     name: string
-    value: string | number | Field[]
+    value: T
   }
 
   type HashField = Field
 
-  type Key = StringKey | HashKey | ListKey | ZSetKey | SetKey | JsonKey
+  type Key =
+    | StringKey
+    | HashKey
+    | ListKey
+    | ZSetKey
+    | SetKey
+    | JsonKey
+    | TopKKey
 
   type StringKey = BaseKey<'string', string>
 
@@ -80,6 +87,8 @@ declare namespace APP {
   type ZSetKey = BaseKey<'zset', ZSetField[]>
 
   type SetKey = BaseKey<'set', string[]>
+
+  type TopKKey = BaseKey<'TopK-TYPE', Array<Field<number>>>
 
   interface IndexValue {
     index: number

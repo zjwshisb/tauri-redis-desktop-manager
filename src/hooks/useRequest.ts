@@ -5,7 +5,8 @@ import request from '../utils/request'
 export default function useRequest<T>(
   cmd: string,
   cid: number = 0,
-  args: Record<string, any> = {}
+  args: Record<string, any> = {},
+  immediately = true
 ) {
   const [data, setData] = React.useState<T>()
   const [loading, setLoading] = React.useState(false)
@@ -29,10 +30,10 @@ export default function useRequest<T>(
   }, [cmd, cid, argsRef])
 
   React.useEffect(() => {
-    if (!init) {
+    if (immediately) {
       fetch()
     }
-  }, [fetch, init])
+  }, [fetch, immediately])
 
   const set = React.useCallback((t: T) => {
     setData(t)

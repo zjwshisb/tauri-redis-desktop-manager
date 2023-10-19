@@ -1,10 +1,9 @@
 import { Form, Input } from 'antd'
 import React from 'react'
-import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
-import CusModal from '@/components/CusModal'
 import FieldInput from '@/components/FieldInput'
+import ModalForm from '@/components/ModalForm'
 
 const Index: React.FC<{
   keys: APP.HashKey
@@ -12,8 +11,6 @@ const Index: React.FC<{
   trigger: React.ReactElement
   onSuccess: (newField: APP.HashField) => void
 }> = (props) => {
-  const [form] = useForm()
-
   const { t } = useTranslation()
 
   const isEdit = React.useMemo(() => {
@@ -25,47 +22,43 @@ const Index: React.FC<{
   }, [isEdit, t])
 
   return (
-    <CusModal
+    <ModalForm
+      title={title}
       width={800}
+      defaultValue={{
+        name: props.field?.name,
+        value: props.field?.value
+      }}
       trigger={props.trigger}
-      onOk={async () => {
+      onSubmit={async (v) => {
         await request<number>('key/hash/hset', props.keys.connection_id, {
           name: props.keys.name,
-          field: form.getFieldValue('name'),
-          value: form.getFieldValue('value'),
+          field: v.name,
+          value: v.value,
           db: props.keys.db
         }).then(() => {
-          props.onSuccess(form.getFieldsValue())
+          props.onSuccess({
+            name: v.name,
+            value: v.value
+          })
         })
       }}
-      title={title}
-      onClear={() => {
-        form.resetFields()
-      }}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          ...props.field
-        }}
+      <Form.Item
+        name={'name'}
+        label={t('Field Name')}
+        rules={[{ required: true }]}
       >
-        <Form.Item
-          name={'name'}
-          label={t('Field Name')}
-          rules={[{ required: true }]}
-        >
-          <Input readOnly={isEdit}></Input>
-        </Form.Item>
-        <Form.Item
-          name={'value'}
-          label={t('Field Value')}
-          rules={[{ required: true }]}
-        >
-          <FieldInput></FieldInput>
-        </Form.Item>
-      </Form>
-    </CusModal>
+        <Input readOnly={isEdit}></Input>
+      </Form.Item>
+      <Form.Item
+        name={'value'}
+        label={t('Field Value')}
+        rules={[{ required: true }]}
+      >
+        <FieldInput></FieldInput>
+      </Form.Item>
+    </ModalForm>
   )
 }
 export default Index

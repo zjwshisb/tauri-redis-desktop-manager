@@ -19,6 +19,12 @@ import Editable from '@/components/Editable'
 import Context from './context'
 import Page from '..'
 import JsonValue from './components/JsonValue'
+import TopKValue from './components/TopkValue'
+
+function isShowLength(types: APP.Key['types']) {
+  return types !== 'ReJSON-RL' && types !== 'TopK-TYPE'
+}
+
 const Index: React.FC<{
   name: string
   connection: APP.Connection
@@ -59,6 +65,9 @@ const Index: React.FC<{
         }
         case 'ReJSON-RL': {
           return <JsonValue keys={item} onRefresh={fetch}></JsonValue>
+        }
+        case 'TopK-TYPE': {
+          return <TopKValue keys={item} onRefresh={fetch}></TopKValue>
         }
       }
     }
@@ -131,7 +140,7 @@ const Index: React.FC<{
                     suffix={'bytes'}
                   ></Input>
                 </div>
-                {item.types !== 'ReJSON-RL' && (
+                {isShowLength(item.types) && (
                   <div className="mb-2 mr-2 w-[200px]">
                     <Input
                       addonBefore={t('Length')}

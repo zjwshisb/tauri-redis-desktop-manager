@@ -1,46 +1,34 @@
 import { Form, Input } from 'antd'
 import React from 'react'
-import { useForm } from 'antd/es/form/Form'
 import request from '@/utils/request'
-import CusModal from '@/components/CusModal'
+import ModalForm from '@/components/ModalForm'
 
 const Rename: React.FC<{
   keys: APP.Key
   trigger: React.ReactElement
   onSuccess: (name: string) => void
 }> = (props) => {
-  const [form] = useForm()
-
   return (
-    <CusModal
+    <ModalForm
       width={'800px'}
+      defaultValue={{
+        name: props.keys.name
+      }}
       trigger={props.trigger}
-      onOk={async () => {
-        const newName: string = form.getFieldValue('name')
+      onSubmit={async (v) => {
         await request<number>('key/rename', props.keys.connection_id, {
           name: props.keys.name,
-          new_name: newName,
+          new_name: v.name,
           db: props.keys.db
-        }).then(() => {
-          props.onSuccess(newName)
         })
+        props.onSuccess(v.name)
       }}
       title={'RENAME'}
-      onCancel={() => {
-        form.resetFields()
-      }}
     >
-      <Form
-        form={form}
-        initialValues={{
-          name: props.keys.name
-        }}
-      >
-        <Form.Item name={'name'} label={'Name'} rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-      </Form>
-    </CusModal>
+      <Form.Item name={'name'} label={'Name'} rules={[{ required: true }]}>
+        <Input />
+      </Form.Item>
+    </ModalForm>
   )
 }
 export default Rename

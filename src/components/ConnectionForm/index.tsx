@@ -32,7 +32,7 @@ const ConnectionForm: React.FC = () => {
   const [isSsh, setIsSsh] = React.useState(false)
 
   React.useEffect(() => {
-    if (formItem.open === true && formItem.item != null) {
+    if (formItem.open && formItem.item != null) {
       let ssh = false
       if (formItem.item.ssh_host !== null) {
         ssh = true
