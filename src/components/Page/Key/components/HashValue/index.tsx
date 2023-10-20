@@ -24,12 +24,12 @@ const Index: React.FC<{
   const { t } = useTranslation()
 
   const { fields, setFields, getFields, loading, more, getAllFields } =
-    useFieldScan<APP.HashField>('key/hash/hscan', keys, params)
+    useFieldScan<APP.Field>('key/hash/hscan', keys, params)
 
   const columns = useTableColumn<APP.Field>(
     [
       {
-        dataIndex: 'name',
+        dataIndex: 'field',
         width: 200,
         title: (
           <div className="flex items-center justify-center">

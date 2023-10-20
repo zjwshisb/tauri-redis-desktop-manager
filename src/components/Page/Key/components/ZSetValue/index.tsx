@@ -49,7 +49,7 @@ const Index: React.FC<{
             </div>
           </div>
         ),
-        dataIndex: 'name',
+        dataIndex: 'field',
         align: 'center',
         render(_) {
           return <FieldViewer content={_} />
@@ -65,9 +65,7 @@ const Index: React.FC<{
           if (a.value === b.value) {
             return 0
           }
-          return parseFloat(a.value as string) > parseFloat(b.value as string)
-            ? 1
-            : -1
+          return parseFloat(a.value) > parseFloat(b.value) ? 1 : -1
         }
       }
     ],
@@ -80,7 +78,7 @@ const Index: React.FC<{
             <Editable connection={connection}>
               <ZRem
                 keys={keys}
-                value={record.name}
+                value={record.field}
                 onSuccess={() => {
                   onRefresh()
                 }}

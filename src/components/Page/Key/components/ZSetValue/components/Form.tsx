@@ -15,10 +15,7 @@ const Index: React.FC<{
 
   return (
     <ModalForm
-      defaultValue={{
-        field: props.field?.name,
-        value: props.field?.value
-      }}
+      defaultValue={props.field}
       trigger={props.trigger}
       onSubmit={async (v) => {
         await request<number>('key/zset/zadd', props.keys.connection_id, {

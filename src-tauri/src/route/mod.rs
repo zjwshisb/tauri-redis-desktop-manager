@@ -20,6 +20,7 @@ pub mod migrate;
 pub mod pubsub;
 pub mod server;
 pub mod set;
+pub mod timeseries;
 pub mod topk;
 pub mod transfer;
 pub mod zset;

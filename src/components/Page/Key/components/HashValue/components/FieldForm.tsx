@@ -7,9 +7,9 @@ import ModalForm from '@/components/ModalForm'
 
 const Index: React.FC<{
   keys: APP.HashKey
-  field?: APP.HashField
+  field?: APP.Field
   trigger: React.ReactElement
-  onSuccess: (newField: APP.HashField) => void
+  onSuccess: (newField: APP.Field) => void
 }> = (props) => {
   const { t } = useTranslation()
 
@@ -26,7 +26,7 @@ const Index: React.FC<{
       title={title}
       width={800}
       defaultValue={{
-        field: props.field?.name,
+        field: props.field?.field,
         value: props.field?.value
       }}
       trigger={props.trigger}
@@ -37,7 +37,7 @@ const Index: React.FC<{
           db: props.keys.db
         }).then(() => {
           props.onSuccess({
-            name: v.name,
+            field: v.field,
             value: v.value
           })
         })

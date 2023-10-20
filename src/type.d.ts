@@ -60,12 +60,10 @@ declare namespace APP {
     length: number
   }
 
-  interface Field<T = string | number | Field[]> {
-    name: string
+  interface Field<T extends string | number | Field[] = string> {
+    field: string
     value: T
   }
-
-  type HashField = Field
 
   type Key =
     | StringKey
@@ -84,11 +82,13 @@ declare namespace APP {
 
   type ListKey = BaseKey<'list', string[]>
 
-  type ZSetKey = BaseKey<'zset', ZSetField[]>
+  type ZSetKey = BaseKey<'zset', Field[]>
 
   type SetKey = BaseKey<'set', string[]>
 
   type TopKKey = BaseKey<'TopK-TYPE', Array<Field<number>>>
+
+  type TimeSeriesKey = BaseKey<'TSDB-TYPE', any>
 
   interface IndexValue {
     index: number

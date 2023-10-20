@@ -72,47 +72,54 @@ impl Serialize for FieldValue {
             }
             FieldValue::Vec(v) => v.serialize(serializer),
             FieldValue::Int(i) => i.serialize(serializer),
-            FieldValue::Nil => serializer.serialize_str(""),
+            FieldValue::Nil => serializer.serialize_none(),
         }
     }
 }
 
 #[derive(Serialize, Debug, Default, Clone)]
 pub struct Field {
-    pub name: String,
+    pub field: String,
     pub value: FieldValue,
 }
 
 impl Field {
-    pub fn first(name: &str, vec: &Vec<Field>) -> Option<Field> {
+    pub fn first(field: &str, vec: &Vec<Field>) -> Option<Field> {
         for x in vec {
-            if x.name == name {
+            if x.field == field {
                 return Some(x.clone());
             }
         }
         return None;
     }
-    pub fn build_vec(v: &Vec<Value>) -> Result<Vec<Self>, CusError> {
-        let length = v.len();
+    pub fn build_vec(value_vec: &Vec<Value>) -> Result<Vec<Self>, CusError> {
+        let length = value_vec.len();
         let mut i = 0;
         let mut r = vec![];
         while i < length {
-            if let Some(n) = v.get(i) {
+            if let Some(field) = value_vec.get(i) {
                 let mut f = Field::default();
-                let name = String::from_redis_value(n)?;
-                f.name = name;
-                if let Some(vv) = v.get(i + 1) {
-                    match vv {
-                        Value::Data(vvv) => {
-                            f.value = FieldValue::Str(String::from_utf8_lossy(&vvv).to_string());
+                f.field = String::from_redis_value(field)?;
+                if let Some(value) = value_vec.get(i + 1) {
+                    match value {
+                        Value::Data(v) => {
+                            f.value = FieldValue::Str(String::from_utf8_lossy(&v).to_string());
                         }
-                        Value::Int(vvv) => {
-                            f.value = FieldValue::Int(*vvv);
+                        Value::Int(v) => {
+                            f.value = FieldValue::Int(*v);
                         }
-                        Value::Bulk(vvv) => {
-                            f.value = FieldValue::Vec(Self::build_vec(vvv)?);
+                        Value::Bulk(v) => {
+                            f.value = FieldValue::Vec(Self::build_vec(v)?);
                         }
-                        _ => {}
+                        Value::Okay => {
+                            f.value = FieldValue::Str("OK".to_string());
+                        }
+                        Value::Nil => {
+                            f.value = FieldValue::Nil;
+                        }
+                        Value::Status(s) => {
+                            f.value = FieldValue::Str(s.to_string());
+                        }
                     }
                     r.push(f);
                 }
@@ -121,12 +128,6 @@ impl Field {
         }
         Ok(r)
     }
-}
-
-#[derive(Serialize)]
-pub struct ScoreField {
-    pub value: String,
-    pub score: String,
 }
 
 #[derive(Serialize)]

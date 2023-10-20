@@ -9,6 +9,7 @@ import useTableColumn from '@/hooks/useTableColumn'
 import { PlusOutlined } from '@ant-design/icons'
 import IconButton from '@/components/IconButton'
 import ModalForm from '@/components/ModalForm'
+import { type Field } from 'ahooks/lib/useFusionTable/types'
 
 const TopKValue: React.FC<{
   keys: APP.TopKKey
@@ -28,9 +29,7 @@ const TopKValue: React.FC<{
     false
   )
 
-  const { data: info, fetch: infoFetch } = useRequest<
-    Record<string, string | number>
-  >(
+  const { data: info, fetch: infoFetch } = useRequest<Field[]>(
     'topk/info',
     keys.connection_id,
     {
@@ -45,10 +44,10 @@ const TopKValue: React.FC<{
     infoFetch()
   }, [fetch, infoFetch, keys])
 
-  const columns = useTableColumn<APP.Field>(
+  const columns = useTableColumn<APP.Field<number>>(
     [
       {
-        dataIndex: 'name'
+        dataIndex: 'field'
       },
       {
         dataIndex: 'value',
@@ -61,7 +60,7 @@ const TopKValue: React.FC<{
           <Space>
             <ModalForm
               defaultValue={{
-                field: record.name,
+                field: record.field,
                 count: 1
               }}
               onSubmit={async (v) => {
@@ -99,14 +98,12 @@ const TopKValue: React.FC<{
           <div className="mb-4">
             <Descriptions
               size="small"
-              items={Object.keys(info)
-                .sort((a, b) => (a > b ? 1 : -1))
-                .map((v) => {
-                  return {
-                    label: v,
-                    children: info[v]
-                  }
-                })}
+              items={info.map((v) => {
+                return {
+                  label: v.field,
+                  children: v.value
+                }
+              })}
             ></Descriptions>{' '}
           </div>
         )

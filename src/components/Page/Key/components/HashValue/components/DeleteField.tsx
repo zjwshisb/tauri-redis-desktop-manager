@@ -7,8 +7,8 @@ import IconButton from '@/components/IconButton'
 
 const Index: React.FC<{
   keys: APP.Key
-  field: APP.HashField
-  onSuccess: (f: APP.HashField) => void
+  field: APP.Field
+  onSuccess: (f: APP.Field) => void
 }> = ({ field, keys, onSuccess }) => {
   const { t } = useTranslation()
 
@@ -18,12 +18,12 @@ const Index: React.FC<{
         Modal.confirm({
           title: t('Notice'),
           content: t('Are you sure delete <{{name}}>?', {
-            name: field.name
+            name: field.field
           }),
           async onOk() {
             await request('key/hash/hdel', keys.connection_id, {
               name: keys.name,
-              fields: [field.name],
+              fields: [field.field],
               db: keys.db
             })
             message.success('Success')
