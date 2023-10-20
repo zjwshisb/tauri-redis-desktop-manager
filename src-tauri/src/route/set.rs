@@ -25,7 +25,7 @@ pub async fn sadd<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: CommonValueArgs = serde_json::from_str(&payload)?;
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
         .execute(
             cid,

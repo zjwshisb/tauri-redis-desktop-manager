@@ -2,7 +2,7 @@ use crate::{
     err::CusError,
     model::{Command, Node},
     response::{self, Field},
-    ssh::{self, SshTunnel},
+    ssh::{self, SshProxy},
     utils,
 };
 use chrono::prelude::*;
@@ -60,7 +60,7 @@ pub struct RedisConnection {
     pub tunnel_addr: Option<SocketAddr>,
 }
 
-impl ssh::SshTunnel for RedisConnection {
+impl SshProxy for RedisConnection {
     fn get_ssh_config(&self) -> Option<ssh::SshParams> {
         self.params.ssh_params.clone()
     }
@@ -92,15 +92,18 @@ impl RedisConnection {
             tunnel_addr: None,
         }
     }
+    // get the ssl proxy
     pub fn get_proxy(&self) -> Option<String> {
         if let Some(addr) = self.tunnel_addr {
             return Some(format!("{}:{}", addr.ip().to_string(), addr.port()));
         }
         return None;
     }
+    // the server is cluster or not
     pub fn get_is_cluster(&self) -> bool {
         self.params.is_cluster
     }
+    // get the connection host
     pub fn get_host(&self) -> String {
         format!(
             "redis://{}:{}",
@@ -108,6 +111,9 @@ impl RedisConnection {
             self.params.redis_params.tcp_port
         )
     }
+    // get the redis params
+    // if proxy set
+    // host/port will be replace
     pub fn get_redis_params(&self) -> RedisParam {
         let mut params = self.params.redis_params.clone();
         if let Some(addr) = self.tunnel_addr {
@@ -337,14 +343,6 @@ impl ConnectionManager {
             let _ = self.set_name(conn, "tauri-redis".to_string()).await;
         }
     }
-
-    pub async fn is_cluster(&self, cid: u32) -> bool {
-        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
-            return conn.is_cluster();
-        }
-        return false;
-    }
-
     pub async fn set_name(
         &self,
         conn: &mut ConnectionWrapper,
@@ -489,6 +487,7 @@ impl ConnectionManager {
         Ok(wrapper.nodes.to_vec())
     }
 
+    // execute redis cmd with connection
     pub async fn execute_with<T>(
         &self,
         cmd: &mut Cmd,
@@ -513,17 +512,17 @@ impl ConnectionManager {
             }
         }
     }
-
+    // execute redis cmd with cid
     pub async fn execute<T>(
         &self,
-        id: u32,
+        cid: u32,
         cmd: &mut redis::Cmd,
         db: Option<u8>,
     ) -> Result<T, CusError>
     where
         T: FromRedisValue,
     {
-        if let Some(conn) = self.map.lock().await.get_mut(&id) {
+        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
             if !conn.model.get_is_cluster() {
                 if let Some(database) = db {
                     if database != conn.db {
@@ -540,6 +539,7 @@ impl ConnectionManager {
         return Err(CusError::reopen());
     }
 
+    // get connected connections info
     pub async fn get_conns(&self) -> Vec<response::Conn> {
         let mut vec = vec![];
         for (_, v) in self.map.lock().await.iter() {
@@ -554,14 +554,17 @@ impl ConnectionManager {
         vec
     }
 
+    // remove  connected connection
     pub async fn remove(&self, id: u32) {
         self.map.lock().await.remove(&id);
     }
 
+    // set debug tx
     pub async fn set_tx(&self, tx: Sender<Command>) {
         self.debug_tx.lock().await.insert(0, tx);
     }
 
+    // remove debug tx
     pub async fn remove_tx(&self) {
         self.debug_tx.lock().await.remove(0);
     }

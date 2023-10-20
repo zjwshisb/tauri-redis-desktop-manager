@@ -106,6 +106,8 @@ pub async fn dispatch<'r>(
         "topk/list" => Response::new(topk::list(payload, cid, manager).await?),
         "topk/info" => Response::new(topk::info(payload, cid, manager).await?),
         "topk/add" => Response::new(topk::add(payload, cid, manager).await?),
+        "topk/incrby" => Response::new(topk::incrby(payload, cid, manager).await?),
+        "topk/reserve" => Response::new(topk::reserve(payload, cid, manager).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

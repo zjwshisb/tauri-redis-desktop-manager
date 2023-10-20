@@ -2,7 +2,7 @@ import React from 'react'
 
 import useRequest from '@/hooks/useRequest'
 import CusTable from '@/components/CusTable'
-import { Button, Descriptions, Form, Input, Space } from 'antd'
+import { Button, Descriptions, Form, Input, InputNumber, Space } from 'antd'
 import ValueLayout from '../ValueLayout'
 import request from '@/utils/request'
 import useTableColumn from '@/hooks/useTableColumn'
@@ -59,7 +59,33 @@ const TopKValue: React.FC<{
       render(value, record, index) {
         return (
           <Space>
-            <IconButton icon={<PlusOutlined></PlusOutlined>}></IconButton>
+            <ModalForm
+              defaultValue={{
+                field: record.name,
+                count: 1
+              }}
+              onSubmit={async (v) => {
+                await request('topk/incrby', keys.connection_id, {
+                  db: keys.db,
+                  name: keys.name,
+                  field: v.field,
+                  value: v.count
+                }).then(() => {
+                  onRefresh()
+                })
+              }}
+              title="TOPK.INCRBY"
+              trigger={
+                <IconButton icon={<PlusOutlined></PlusOutlined>}></IconButton>
+              }
+            >
+              <Form.Item name={'field'} label={'name'}>
+                <Input readOnly />
+              </Form.Item>
+              <Form.Item name={'count'} label={'count'}>
+                <InputNumber min={0} max={99999999} />
+              </Form.Item>
+            </ModalForm>
           </Space>
         )
       }

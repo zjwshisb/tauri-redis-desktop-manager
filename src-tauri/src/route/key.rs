@@ -160,6 +160,7 @@ struct AddArgs {
     name: String,
     types: String,
     db: u8,
+    value: Option<String>,
 }
 
 pub async fn add<'r>(
@@ -173,63 +174,20 @@ pub async fn add<'r>(
             let v: Value = manager
                 .execute(
                     cid,
-                    redis::cmd("set").arg(&args.name).arg("Hello World"),
+                    redis::cmd("set").arg(&args.name).arg(args.value),
                     Some(args.db),
                 )
                 .await?;
             return Ok(String::from_redis_value(&v)?);
         }
-        "hash" => {
-            let v: i64 = manager
-                .execute(
-                    cid,
-                    redis::cmd("HSET")
-                        .arg(&args.name)
-                        .arg("rust")
-                        .arg("Hello World"),
-                    Some(args.db),
-                )
-                .await?;
-            return Ok(v.to_string());
-        }
-        "set" => {
-            let v: i64 = manager
-                .execute(
-                    cid,
-                    redis::cmd("sadd").arg(&args.name).arg("rust"),
-                    Some(args.db),
-                )
-                .await?;
-            return Ok(v.to_string());
-        }
-        "list" => {
-            let v: i64 = manager
-                .execute(
-                    cid,
-                    redis::cmd("lpush").arg(&args.name).arg("Hello World"),
-                    Some(args.db),
-                )
-                .await?;
-            return Ok(v.to_string());
-        }
-        "zset" => {
-            let v: i64 = manager
-                .execute(
-                    cid,
-                    redis::cmd("zadd").arg(&args.name).arg("9999").arg("rust"),
-                    Some(args.db),
-                )
-                .await?;
-            return Ok(v.to_string());
-        }
-        "json" => {
+        "ReJSON-RL" => {
             let v: String = manager
                 .execute(
                     cid,
                     redis::cmd("JSON.SET")
                         .arg(&args.name)
                         .arg("$")
-                        .arg("{\"rust\": \"hello world\" }"),
+                        .arg(args.value),
                     Some(args.db),
                 )
                 .await?;

@@ -16,31 +16,35 @@ const Index: React.FC<{
   return (
     <ModalForm
       defaultValue={{
-        value: props.field?.name,
-        score: props.field?.value
+        field: props.field?.name,
+        value: props.field?.value
       }}
       trigger={props.trigger}
       onSubmit={async (v) => {
         await request<number>('key/zset/zadd', props.keys.connection_id, {
           name: props.keys.name,
           db: props.keys.db,
-          value: v.value,
-          score: parseFloat(v.score)
+          value: [
+            {
+              field: v.field,
+              value: v.value.toString()
+            }
+          ]
         })
         props.onSuccess()
       }}
       title={'ZADD'}
     >
       <Form.Item
-        name={'value'}
-        label={t('Value')}
+        name={'field'}
+        label={t('Field')}
         required
         rules={[{ required: true }]}
       >
         <FieldInput readOnly={props.field != null}></FieldInput>
       </Form.Item>
       <Form.Item
-        name={'score'}
+        name={'value'}
         label={t('Score')}
         required
         rules={[{ required: true }]}

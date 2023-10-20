@@ -18,7 +18,7 @@ const Index: React.FC<{
         await request<number>('key/set/sadd', props.keys.connection_id, {
           name: props.keys.name,
           db: props.keys.db,
-          ...v
+          value: [v.value]
         })
         props.onSuccess()
       }}

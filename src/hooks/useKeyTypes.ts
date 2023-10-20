@@ -1,7 +1,10 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function useKeyTypes() {
+export default function useKeyTypes(): Array<{
+  label: string
+  value: APP.Key['types']
+}> {
   const { t } = useTranslation()
   return React.useMemo(() => {
     return [
@@ -28,6 +31,10 @@ export default function useKeyTypes() {
       {
         label: t('JSON'),
         value: 'ReJSON-RL'
+      },
+      {
+        label: t('Top-k'),
+        value: 'TopK-TYPE'
       }
     ]
   }, [t])

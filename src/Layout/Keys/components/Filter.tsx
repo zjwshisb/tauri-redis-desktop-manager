@@ -58,7 +58,7 @@ const Filter: React.FC<{
         }}
       />
       <TypeSelect
-        className="w-28 ml-2"
+        className="!w-28 ml-2 flex-shrink-0"
         selectClassName="w-full"
         value={state.filter.types}
         connection={connection}

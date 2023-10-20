@@ -20,13 +20,13 @@ pub struct SshParams {
     pub target_port: u16,
 }
 
-pub trait SshTunnel {
+pub trait SshProxy {
     fn store_addr(&mut self, addr: SocketAddr, rx: Receiver<SshForwarderEnd>);
     fn get_ssh_config(&self) -> Option<SshParams>;
     fn close_tunnel(&mut self);
 }
-
-pub async fn create_tunnel<T: SshTunnel>(t: &mut T) -> Result<Option<()>, CusError> {
+// create ssh proxy
+pub async fn create_tunnel<T: SshProxy>(t: &mut T) -> Result<Option<()>, CusError> {
     if let Some(config) = t.get_ssh_config() {
         let mut jump_host = HostAddress::HostName(Cow::Borrowed(&config.host));
         if let Ok(ip_addr) = utils::string_to_ip(&config.host) {

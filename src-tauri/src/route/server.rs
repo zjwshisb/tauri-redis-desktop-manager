@@ -27,7 +27,7 @@ pub async fn ping<'r>(
         .await?;
     Ok(String::from("PONG"))
 }
-
+// get redis server version
 pub async fn version<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
@@ -41,7 +41,7 @@ pub struct SlowLogResp {
     count: String,
     logs: Vec<SlowLog>,
 }
-
+// get slow logs
 pub async fn slow_log<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
@@ -81,6 +81,7 @@ pub async fn slow_log<'r>(
     Ok(SlowLogResp { time, count, logs })
 }
 
+// reset slow log
 pub async fn reset_slow_log<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
@@ -89,7 +90,7 @@ pub async fn reset_slow_log<'r>(
         .execute(cid, &mut redis::cmd("SLOWLOG").arg("RESET"), None)
         .await
 }
-
+// get redis server module
 pub async fn module<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,

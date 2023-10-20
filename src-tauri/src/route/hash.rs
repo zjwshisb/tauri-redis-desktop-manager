@@ -1,6 +1,6 @@
 use crate::conn::ConnectionManager;
 use crate::err::CusError;
-use crate::request::ItemScanArgs;
+use crate::request::{CommonValueArgs, FieldValueItem, ItemScanArgs};
 use crate::response::{Field, ScanLikeResult};
 use redis::Value;
 use serde::Deserialize;
@@ -23,28 +23,18 @@ pub async fn hscan<'r>(
     ScanLikeResult::<Field, String>::build(value)
 }
 
-#[derive(Deserialize)]
-struct HSetArgs {
-    name: String,
-    field: String,
-    value: String,
-    db: u8,
-}
 pub async fn hset<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: HSetArgs = serde_json::from_str(&payload)?;
-    manager
-        .execute(
-            cid,
-            redis::cmd("hset")
-                .arg(&args.name)
-                .arg(&[args.field, args.value]),
-            Some(args.db),
-        )
-        .await
+    let args: CommonValueArgs<Vec<FieldValueItem<String>>> = serde_json::from_str(&payload)?;
+    let mut cmd = redis::cmd("hset");
+    cmd.arg(&args.name);
+    for x in args.value {
+        cmd.arg(&[x.field, x.value]);
+    }
+    manager.execute(cid, &mut cmd, Some(args.db)).await
 }
 #[derive(Deserialize)]
 struct HDelArgs {

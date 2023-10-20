@@ -2,9 +2,10 @@ import { Form } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import CusModal from '@/components/CusModal'
-import { type FormProps } from 'antd/lib'
+import { type FormInstance, type FormProps } from 'antd/lib'
 
-const ModalForm: React.FC<
+const ModalForm: React.ForwardRefRenderFunction<
+  FormInstance,
   React.PropsWithChildren<{
     defaultValue?: Record<string, any>
     trigger: React.ReactElement
@@ -13,14 +14,19 @@ const ModalForm: React.FC<
     title?: React.ReactNode
     showOkNotice?: boolean
     onFieldsChange?: FormProps['onFieldsChange']
+    onValueChange?: FormProps['onValuesChange']
+    onCancel?: () => void
   }>
-> = (props) => {
+> = (props, ref: React.ForwardedRef<FormInstance>) => {
   const [form] = useForm()
+
+  React.useImperativeHandle(ref, () => form)
 
   const { showOkNotice = true, width = 800 } = props
 
   return (
     <CusModal
+      onCancel={props.onCancel}
       showOkNotice={showOkNotice}
       destroyOnClose
       width={width}
@@ -40,6 +46,7 @@ const ModalForm: React.FC<
       title={props.title}
     >
       <Form
+        onValuesChange={props.onValueChange}
         onFieldsChange={props.onFieldsChange}
         layout="vertical"
         form={form}
@@ -52,4 +59,4 @@ const ModalForm: React.FC<
     </CusModal>
   )
 }
-export default ModalForm
+export default React.forwardRef(ModalForm)

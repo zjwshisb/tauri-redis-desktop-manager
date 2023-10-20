@@ -87,7 +87,7 @@ const Index: React.FC<{
         )
       }
     },
-    isReadonly(connection)
+    !isReadonly(connection)
   )
 
   return (

@@ -26,15 +26,14 @@ const Index: React.FC<{
       title={title}
       width={800}
       defaultValue={{
-        name: props.field?.name,
+        field: props.field?.name,
         value: props.field?.value
       }}
       trigger={props.trigger}
       onSubmit={async (v) => {
         await request<number>('key/hash/hset', props.keys.connection_id, {
           name: props.keys.name,
-          field: v.name,
-          value: v.value,
+          value: [v],
           db: props.keys.db
         }).then(() => {
           props.onSuccess({
@@ -45,7 +44,7 @@ const Index: React.FC<{
       }}
     >
       <Form.Item
-        name={'name'}
+        name={'field'}
         label={t('Field Name')}
         rules={[{ required: true }]}
       >

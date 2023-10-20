@@ -76,7 +76,8 @@ const FieldInput: React.FC<{
 
   return (
     <div>
-      <div className="mb-2">
+      {children}
+      <div className="mt-1">
         <Radio.Group
           size="small"
           onChange={(e) => {
@@ -95,7 +96,6 @@ const FieldInput: React.FC<{
           <Radio.Button value="json">Json</Radio.Button>
         </Radio.Group>
       </div>
-      {children}
     </div>
   )
 }

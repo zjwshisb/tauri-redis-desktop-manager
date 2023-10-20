@@ -43,6 +43,7 @@ impl Key {
         }
         Ok(key)
     }
+
     pub async fn get_memory<'r>(
         &mut self,
         manager: &tauri::State<'r, ConnectionManager>,
@@ -69,6 +70,7 @@ impl Key {
         }
         Ok(())
     }
+
     pub async fn get_ttl<'r>(
         &mut self,
         manager: &tauri::State<'r, ConnectionManager>,

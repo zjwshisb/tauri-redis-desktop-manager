@@ -29,6 +29,10 @@ const TypeSelect: React.FC<{
     <VersionAccess version="6.0.0" connection={props.connection}>
       <div className={props.className}>
         <Select
+          allowClear
+          onClear={() => {
+            props.onChange('')
+          }}
           className={props.selectClassName}
           options={options}
           value={props.value}

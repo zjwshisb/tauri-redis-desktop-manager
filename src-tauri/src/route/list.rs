@@ -109,7 +109,7 @@ pub async fn lpush<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: request::CommonValueArgs = serde_json::from_str(&payload)?;
+    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
         .execute(
             cid,
@@ -143,7 +143,7 @@ pub async fn rpush<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<i64, CusError> {
-    let args: request::CommonValueArgs = serde_json::from_str(&payload)?;
+    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
         .execute(
             cid,
