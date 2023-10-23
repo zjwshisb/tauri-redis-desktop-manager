@@ -1,22 +1,18 @@
 use redis::Value;
 use serde::Deserialize;
 
-use crate::{err::CusError, request, ConnectionManager};
-
-#[derive(Deserialize)]
-struct LRangeArgs {
-    name: String,
-    start: i64,
-    stop: i64,
-    db: u8,
-}
+use crate::{
+    err::CusError,
+    request::{self, RangeArgs},
+    ConnectionManager,
+};
 
 pub async fn lrange<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<Vec<String>, CusError> {
-    let args: LRangeArgs = serde_json::from_str(&payload)?;
+    let args: RangeArgs = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
@@ -59,7 +55,7 @@ pub async fn ltrim<'r>(
     cid: u32,
     manager: tauri::State<'r, ConnectionManager>,
 ) -> Result<String, CusError> {
-    let args: LRangeArgs = serde_json::from_str(&payload)?;
+    let args: RangeArgs = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,

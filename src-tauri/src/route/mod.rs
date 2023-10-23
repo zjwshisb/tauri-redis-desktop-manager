@@ -109,7 +109,22 @@ pub async fn dispatch<'r>(
         "topk/add" => Response::new(topk::add(payload, cid, manager).await?),
         "topk/incrby" => Response::new(topk::incrby(payload, cid, manager).await?),
         "topk/reserve" => Response::new(topk::reserve(payload, cid, manager).await?),
+        "timeseries/info" => Response::new(timeseries::info(payload, cid, manager).await?),
+        "timeseries/range" => Response::new(timeseries::range(payload, cid, manager).await?),
+        "timeseries/add" => Response::new(timeseries::add(payload, cid, manager).await?),
+        "timeseries/del" => Response::new(timeseries::del(payload, cid, manager).await?),
+        "timeseries/incrby" => Response::new(timeseries::incrby(payload, cid, manager).await?),
+        "timeseries/alter" => Response::new(timeseries::alter(payload, cid, manager).await?),
+        "timeseries/create-rule" => {
+            Response::new(timeseries::create_rule(payload, cid, manager).await?)
+        }
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
+    match &r {
+        Err(e) => {
+            dbg!(e);
+        }
+        Ok(r) => {}
+    }
     r
 }

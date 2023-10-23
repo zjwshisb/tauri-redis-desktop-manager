@@ -16,6 +16,7 @@ const ModalForm: React.ForwardRefRenderFunction<
     onFieldsChange?: FormProps['onFieldsChange']
     onValueChange?: FormProps['onValuesChange']
     onCancel?: () => void
+    document_url?: string
   }>
 > = (props, ref: React.ForwardedRef<FormInstance>) => {
   const [form] = useForm()

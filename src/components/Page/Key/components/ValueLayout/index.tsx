@@ -15,7 +15,8 @@ const ValueLayout: React.FC<
 
   return (
     <div>
-      {header}
+      {header !== undefined && <div className="mb-4">{header}</div>}
+
       <Editable connection={connection}>
         <div className="pb-2 flex items-center">
           <Space>{actions}</Space>

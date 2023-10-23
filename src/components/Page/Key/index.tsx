@@ -20,9 +20,10 @@ import { getPageKey } from '@/utils'
 import Editable from '@/components/Editable'
 import Context from './context'
 import Page from '..'
+import TimeSeriesValue from './components/TimeSeriesValue'
 
 function isShowLength(types: APP.Key['types']) {
-  return types !== 'ReJSON-RL' && types !== 'TopK-TYPE'
+  return types !== 'ReJSON-RL' && types !== 'TopK-TYPE' && types !== 'TSDB-TYPE'
 }
 
 const Index: React.FC<{
@@ -68,6 +69,9 @@ const Index: React.FC<{
         }
         case 'TopK-TYPE': {
           return <TopKValue keys={item} onRefresh={fetch}></TopKValue>
+        }
+        case 'TSDB-TYPE': {
+          return <TimeSeriesValue keys={item} onRefresh={fetch} />
         }
       }
     }

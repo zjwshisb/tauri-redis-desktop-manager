@@ -35,6 +35,10 @@ export default function useKeyTypes(): Array<{
       {
         label: t('Top-k'),
         value: 'TopK-TYPE'
+      },
+      {
+        label: t('Time Series'),
+        value: 'TSDB-TYPE'
       }
     ]
   }, [t])

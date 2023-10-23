@@ -50,3 +50,11 @@ pub struct FieldValueArgs<T> {
     pub value: T,
     pub db: u8,
 }
+
+#[derive(Deserialize)]
+pub struct RangeArgs {
+    pub name: String,
+    pub start: i64,
+    pub stop: i64,
+    pub db: u8,
+}

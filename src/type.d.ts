@@ -60,7 +60,7 @@ declare namespace APP {
     length: number
   }
 
-  interface Field<T extends string | number | Field[] = string> {
+  interface Field<T extends string | number | Field[] | Field[][] = string> {
     field: string
     value: T
   }
@@ -73,6 +73,7 @@ declare namespace APP {
     | SetKey
     | JsonKey
     | TopKKey
+    | TimeSeriesKey
 
   type StringKey = BaseKey<'string', string>
 

@@ -51,6 +51,7 @@ where
 pub enum FieldValue {
     Str(String),
     Vec(Vec<Field>),
+    DimVec(Vec<Vec<Field>>),
     Int(i64),
     Nil,
 }
@@ -71,7 +72,8 @@ impl Serialize for FieldValue {
                 return serializer.serialize_str(s);
             }
             FieldValue::Vec(v) => v.serialize(serializer),
-            FieldValue::Int(i) => i.serialize(serializer),
+            FieldValue::Int(v) => v.serialize(serializer),
+            FieldValue::DimVec(v) => v.serialize(serializer),
             FieldValue::Nil => serializer.serialize_none(),
         }
     }
@@ -92,6 +94,27 @@ impl Field {
         }
         return None;
     }
+    pub fn build_by_bulk_vec(value_vec: &Vec<Value>) -> Result<Vec<Self>, CusError> {
+        let mut r = vec![];
+        for x in value_vec {
+            match x {
+                Value::Bulk(v) => {
+                    if let Some(value) = v.get(0) {
+                        if let Some(field) = v.get(1) {
+                            r.push(Field {
+                                field: String::from_redis_value(field)?,
+                                value: FieldValue::Int(i64::from_redis_value(value)?),
+                            })
+                        }
+                    }
+                }
+                _ => {
+                    return Err(CusError::build("un match redis value type"));
+                }
+            }
+        }
+        Ok(r)
+    }
     pub fn build_vec(value_vec: &Vec<Value>) -> Result<Vec<Self>, CusError> {
         let length = value_vec.len();
         let mut i = 0;
@@ -109,7 +132,30 @@ impl Field {
                             f.value = FieldValue::Int(*v);
                         }
                         Value::Bulk(v) => {
-                            f.value = FieldValue::Vec(Self::build_vec(v)?);
+                            // judge by first element type
+                            if let Some(first) = v.get(0) {
+                                match first {
+                                    Value::Bulk(_) => {
+                                        let mut dim_vec = vec![];
+                                        for vv in v {
+                                            match vv {
+                                                Value::Bulk(vvv) => {
+                                                    dim_vec.push(Self::build_vec(vvv)?)
+                                                }
+                                                _ => {
+                                                    return Err(CusError::build(
+                                                        "un match redis value type",
+                                                    ));
+                                                }
+                                            }
+                                        }
+                                        f.value = FieldValue::DimVec(dim_vec);
+                                    }
+                                    _ => {
+                                        f.value = FieldValue::Vec(Self::build_vec(v)?);
+                                    }
+                                }
+                            }
                         }
                         Value::Okay => {
                             f.value = FieldValue::Str("OK".to_string());

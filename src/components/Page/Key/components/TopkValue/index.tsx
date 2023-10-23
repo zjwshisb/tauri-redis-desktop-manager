@@ -81,7 +81,11 @@ const TopKValue: React.FC<{
               <Form.Item name={'field'} label={'name'}>
                 <Input readOnly />
               </Form.Item>
-              <Form.Item name={'count'} label={'count'}>
+              <Form.Item
+                name={'count'}
+                label={'count'}
+                rules={[{ required: true }]}
+              >
                 <InputNumber min={0} max={99999999} />
               </Form.Item>
             </ModalForm>
@@ -98,6 +102,7 @@ const TopKValue: React.FC<{
           <div className="mb-4">
             <Descriptions
               size="small"
+              bordered
               items={info.map((v) => {
                 return {
                   label: v.field,

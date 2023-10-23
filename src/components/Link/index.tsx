@@ -5,11 +5,13 @@ import spark from 'spark-md5'
 const Link: React.FC<
   React.PropsWithChildren<{
     href: string
+    className?: string
     options?: Omit<WindowOptions, 'href'>
   }>
-> = ({ href, children, options }) => {
+> = ({ href, children, className, options }) => {
   return (
     <a
+      className={className}
       href="#"
       onClick={() => {
         openWindow(spark.hash(href), {
