@@ -2,6 +2,7 @@ import React from 'react'
 import { Card, Input, Radio } from 'antd'
 import lodash from 'lodash'
 import ReactJson, { type InteractionProps } from 'react-json-view'
+import { useTranslation } from 'react-i18next'
 
 const FieldInput: React.FC<{
   value?: string
@@ -41,11 +42,14 @@ const FieldInput: React.FC<{
     [onChange]
   )
 
+  const { t } = useTranslation()
+
   const children = React.useMemo(() => {
     if (types === 'text') {
       return (
         <Input.TextArea
           readOnly={readOnly}
+          placeholder={t('Please Enter').toString()}
           value={value}
           onChange={(e) => {
             if (onChange !== undefined) {
@@ -72,7 +76,7 @@ const FieldInput: React.FC<{
         </Card>
       )
     }
-  }, [jsonValue, onChange, onJsonChange, readOnly, types, value])
+  }, [jsonValue, onChange, onJsonChange, readOnly, t, types, value])
 
   return (
     <div>

@@ -114,16 +114,20 @@ pub async fn dispatch<'r>(
         "timeseries/add" => Response::new(timeseries::add(payload, cid, manager).await?),
         "timeseries/del" => Response::new(timeseries::del(payload, cid, manager).await?),
         "timeseries/incrby" => Response::new(timeseries::incrby(payload, cid, manager).await?),
+        "timeseries/decrby" => Response::new(timeseries::decrby(payload, cid, manager).await?),
+        "timeseries/create" => Response::new(timeseries::create(payload, cid, manager).await?),
         "timeseries/alter" => Response::new(timeseries::alter(payload, cid, manager).await?),
         "timeseries/create-rule" => {
             Response::new(timeseries::create_rule(payload, cid, manager).await?)
         }
+        "timeseries/delete-rule" => {
+            Response::new(timeseries::delete_rule(payload, cid, manager).await?)
+        }
+
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     match &r {
-        Err(e) => {
-            dbg!(e);
-        }
+        Err(e) => {}
         Ok(r) => {}
     }
     r

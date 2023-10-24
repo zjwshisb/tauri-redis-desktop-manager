@@ -8,8 +8,11 @@ import CusTable from '@/components/CusTable'
 
 import Add from './components/Add'
 import Del from './components/Del'
-import IncrBy from './components/Incrby'
+import Incrby from './components/Incrby'
+import Decrby from './components/Decrby'
 import Alter from './components/Alter'
+import DeleteRule from './components/DeleteRule'
+
 import CreateRule from './components/CreateRule'
 import useTableColumn from '@/hooks/useTableColumn'
 
@@ -102,8 +105,10 @@ const TimeSeriesValue: React.FC<{
             <Alter keys={keys} info={info} onSuccess={onRefresh} />
           )}
           <Add keys={keys} onSuccess={onRefresh} />
-          <IncrBy keys={keys} onSuccess={onRefresh} />
+          <Incrby keys={keys} onSuccess={onRefresh} />
+          <Decrby keys={keys} onSuccess={onRefresh} />
           <CreateRule keys={keys} onSuccess={onRefresh} />
+          <DeleteRule keys={keys} onSuccess={onRefresh} />
           <Del keys={keys} onSuccess={onRefresh} />
         </Space>
       }

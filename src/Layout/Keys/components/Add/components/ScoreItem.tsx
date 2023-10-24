@@ -43,12 +43,17 @@ const TopK: React.FC = () => {
                   name={[name, 'value']}
                   rules={[{ required: true }]}
                 >
-                  <InputNumber className="!w-40" stringMode />
+                  <InputNumber
+                    placeholder={t('Please Enter').toString()}
+                    className="!w-full"
+                    stringMode
+                  />
                 </Form.Item>
               </Col>
               <Col span={1}>
                 {fields.length > 1 && (
                   <MinusCircleOutlined
+                    className="text-red-600 ml-2"
                     onClick={() => {
                       remove(name)
                     }}

@@ -3,6 +3,8 @@ import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import CusModal from '@/components/CusModal'
 import { type FormInstance, type FormProps } from 'antd/lib'
+import Link from '../Link'
+import { LinkOutlined } from '@ant-design/icons'
 
 const ModalForm: React.ForwardRefRenderFunction<
   FormInstance,
@@ -16,7 +18,7 @@ const ModalForm: React.ForwardRefRenderFunction<
     onFieldsChange?: FormProps['onFieldsChange']
     onValueChange?: FormProps['onValuesChange']
     onCancel?: () => void
-    document_url?: string
+    documentUrl?: string
   }>
 > = (props, ref: React.ForwardedRef<FormInstance>) => {
   const [form] = useForm()
@@ -44,7 +46,16 @@ const ModalForm: React.ForwardRefRenderFunction<
         const v = await form.validateFields()
         return await props.onSubmit(v)
       }}
-      title={props.title}
+      title={
+        <div>
+          {props.title}
+          {props.documentUrl !== undefined && (
+            <Link href={props.documentUrl} className="ml-2">
+              <LinkOutlined />
+            </Link>
+          )}
+        </div>
+      }
     >
       <Form
         onValuesChange={props.onValueChange}

@@ -10,6 +10,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import IconButton from '@/components/IconButton'
 import ModalForm from '@/components/ModalForm'
 import { type Field } from 'ahooks/lib/useFusionTable/types'
+import { useTranslation } from 'react-i18next'
 
 const TopKValue: React.FC<{
   keys: APP.TopKKey
@@ -44,14 +45,17 @@ const TopKValue: React.FC<{
     infoFetch()
   }, [fetch, infoFetch, keys])
 
+  const { t } = useTranslation()
+
   const columns = useTableColumn<APP.Field<number>>(
     [
       {
-        dataIndex: 'field'
+        dataIndex: 'field',
+        title: 'Value'
       },
       {
         dataIndex: 'value',
-        title: 'count'
+        title: 'Count'
       }
     ],
     {
@@ -59,6 +63,8 @@ const TopKValue: React.FC<{
         return (
           <Space>
             <ModalForm
+              width={400}
+              documentUrl="https://redis.io/commands/topk.incrby/"
               defaultValue={{
                 field: record.field,
                 count: 1
@@ -79,14 +85,19 @@ const TopKValue: React.FC<{
               }
             >
               <Form.Item name={'field'} label={'name'}>
-                <Input readOnly />
+                <Input readOnly placeholder={t('Please Enter').toString()} />
               </Form.Item>
               <Form.Item
                 name={'count'}
                 label={'count'}
                 rules={[{ required: true }]}
               >
-                <InputNumber min={0} max={99999999} />
+                <InputNumber
+                  min={0}
+                  className="!w-full"
+                  max={99999999}
+                  placeholder={t('Please Enter').toString()}
+                />
               </Form.Item>
             </ModalForm>
           </Space>
@@ -116,6 +127,7 @@ const TopKValue: React.FC<{
       loading={loading}
       actions={
         <ModalForm
+          documentUrl="https://redis.io/commands/topk.add/"
           title="TOPK.ADD"
           trigger={<Button type="primary">TOPK.ADD</Button>}
           onSubmit={async (v) => {
@@ -129,7 +141,7 @@ const TopKValue: React.FC<{
           }}
         >
           <Form.Item required rules={[{ required: true }]} name={'value'}>
-            <Input.TextArea />
+            <Input.TextArea placeholder={t('Please Enter').toString()} />
           </Form.Item>
         </ModalForm>
       }

@@ -10,6 +10,8 @@ import TopKItem from './components/TopkItem'
 import ArrayItem from './components/ArrayItem'
 import FiledItem from './components/FieldItem'
 import ScoreItem from './components/ScoreItem'
+import TimeSeriesItem from './components/TimeSeriesItem'
+
 import { type FormInstance } from 'antd/lib'
 import FieldInput from '@/components/FieldInput'
 
@@ -30,6 +32,9 @@ const Plus: React.FC<{
       case 'TopK-TYPE': {
         form.current?.setFieldValue('value', undefined)
         return <TopKItem />
+      }
+      case 'TSDB-TYPE': {
+        return <TimeSeriesItem type="create" />
       }
       case 'string':
       case 'ReJSON-RL': {
@@ -87,6 +92,9 @@ const Plus: React.FC<{
       }
       case 'zset': {
         return 'key/zset/zadd'
+      }
+      case 'TSDB-TYPE': {
+        return 'timeseries/create'
       }
       default: {
         return 'key/add'

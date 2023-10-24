@@ -5,7 +5,7 @@ import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 
-const Incrby: React.FC<{
+const Decrby: React.FC<{
   keys: APP.TimeSeriesKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
@@ -13,12 +13,12 @@ const Incrby: React.FC<{
 
   return (
     <ModalForm
-      title={'TS.INCRBY'}
+      title={'TS.DECRBY'}
       width={400}
-      documentUrl="https://redis.io/commands/ts.incrby/"
-      trigger={<Button type="primary">TS.INCRBY</Button>}
+      documentUrl="https://redis.io/commands/ts.decrby/"
+      trigger={<Button type="primary">TS.DECRBY</Button>}
       onSubmit={async (v) => {
-        await request('timeseries/incrby', keys.connection_id, {
+        await request('timeseries/decrby', keys.connection_id, {
           db: keys.db,
           name: keys.name,
           ...v
@@ -31,7 +31,7 @@ const Incrby: React.FC<{
         name="field"
         label="Value"
         rules={[{ required: true }]}
-        tooltip="is numeric value of the addend (double)."
+        tooltip="is numeric value of the subtrahend (double)."
       >
         <InputNumber
           stringMode
@@ -53,4 +53,4 @@ const Incrby: React.FC<{
     </ModalForm>
   )
 }
-export default Incrby
+export default Decrby

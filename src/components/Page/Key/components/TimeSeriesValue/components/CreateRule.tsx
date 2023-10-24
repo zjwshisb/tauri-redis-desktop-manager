@@ -13,6 +13,7 @@ const CreateRule: React.FC<{
 
   return (
     <ModalForm
+      documentUrl="https://redis.io/commands/ts.createrule/"
       defaultValue={{
         source_key: keys.name
       }}

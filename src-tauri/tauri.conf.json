@@ -64,7 +64,7 @@
         "fullscreen": false,
         "resizable": true,
         "title": "Tauri Desktop Redis Manager",
-        "width": 1000,
+        "width": 1400,
         "height": 1000,
         "titleBarStyle": "Overlay"
       }

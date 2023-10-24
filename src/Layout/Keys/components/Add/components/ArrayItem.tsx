@@ -47,7 +47,7 @@ const TopK: React.FC = () => {
                   <Col>
                     {fields.length > 1 && (
                       <MinusCircleOutlined
-                        className="text-red-600"
+                        className="text-red-600 ml-2"
                         onClick={() => {
                           remove(field.name)
                         }}

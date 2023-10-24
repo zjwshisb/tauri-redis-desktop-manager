@@ -17,7 +17,10 @@
 + Key Memory Analysis  
 + Multiwindow Support
 + Debug Log
-+ English|Chinese Language Support
++ Data Migrate
++ JSON Type Support
++ Time Series Type Support
++ TopK Type Support
 
 ## Devlopment
 
