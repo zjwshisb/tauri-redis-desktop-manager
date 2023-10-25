@@ -16,7 +16,7 @@ const Add: React.FC<{
       title={'TS.ADD'}
       width={400}
       documentUrl="https://redis.io/commands/ts.add/"
-      trigger={<Button type="primary">TS.ADD</Button>}
+      trigger={<Button type="primary">ADD</Button>}
       onSubmit={async (v) => {
         await request('timeseries/add', keys.connection_id, {
           db: keys.db,

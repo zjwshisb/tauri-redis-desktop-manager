@@ -1,7 +1,7 @@
 import { type KeyInfo } from '@/store/key'
 import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
-import { Form, Input, Select, Tooltip } from 'antd'
+import { Form, Input, InputNumber, Select, Tooltip } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import useKeyTypes from '@/hooks/useKeyTypes'
@@ -35,6 +35,17 @@ const Plus: React.FC<{
       }
       case 'TSDB-TYPE': {
         return <TimeSeriesItem type="create" />
+      }
+      case 'TDIS-TYPE': {
+        return (
+          <Form.Item
+            name={'compression'}
+            label={'Compression'}
+            tooltip="is a controllable tradeoff between accuracy and memory consumption. 100 is a common value for normal uses. 1000 is more accurate. If no value is passed by default the compression will be 100."
+          >
+            <InputNumber className="!w-[300px]"></InputNumber>
+          </Form.Item>
+        )
       }
       case 'string':
       case 'ReJSON-RL': {
@@ -95,6 +106,9 @@ const Plus: React.FC<{
       }
       case 'TSDB-TYPE': {
         return 'timeseries/create'
+      }
+      case 'TDIS-TYPE': {
+        return 'tdigest/create'
       }
       default: {
         return 'key/add'

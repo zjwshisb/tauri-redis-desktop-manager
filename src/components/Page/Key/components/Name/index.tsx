@@ -7,7 +7,7 @@ import Rename from '../Rename'
 import Editable from '@/components/Editable'
 import Context from '../../context'
 import Copy from '@/components/Copy'
-const Index: React.FC<{
+const Name: React.FC<{
   keys: APP.Key
   onChange: (name: string) => void
 }> = ({ keys, onChange }) => {
@@ -46,4 +46,4 @@ const Index: React.FC<{
   )
 }
 
-export default Index
+export default Name

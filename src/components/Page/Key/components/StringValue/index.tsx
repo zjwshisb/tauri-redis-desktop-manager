@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
 import FieldInput from '@/components/FieldInput'
 
-const Index: React.FC<{
+const StringValue: React.FC<{
   keys: APP.StringKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
@@ -49,4 +49,4 @@ const Index: React.FC<{
     </ValueLayout>
   )
 }
-export default Index
+export default StringValue

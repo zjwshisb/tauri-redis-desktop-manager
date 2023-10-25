@@ -7,6 +7,8 @@ import ZSetValue from './components/ZSetValue'
 import SetValue from './components/SetValue'
 import JsonValue from './components/JsonValue'
 import TopKValue from './components/TopkValue'
+import TimeSeriesValue from './components/TimeSeriesValue'
+import TDigestValue from './components/TDigestValue'
 import Name from './components/Name'
 import Dump from './components/Dump'
 import { DeleteOutlined } from '@ant-design/icons'
@@ -20,10 +22,14 @@ import { getPageKey } from '@/utils'
 import Editable from '@/components/Editable'
 import Context from './context'
 import Page from '..'
-import TimeSeriesValue from './components/TimeSeriesValue'
 
 function isShowLength(types: APP.Key['types']) {
-  return types !== 'ReJSON-RL' && types !== 'TopK-TYPE' && types !== 'TSDB-TYPE'
+  return (
+    types !== 'ReJSON-RL' &&
+    types !== 'TopK-TYPE' &&
+    types !== 'TSDB-TYPE' &&
+    types !== 'TDIS-TYPE'
+  )
 }
 
 const Index: React.FC<{
@@ -62,16 +68,19 @@ const Index: React.FC<{
           return <ZSetValue keys={item} onRefresh={fetch} />
         }
         case 'set': {
-          return <SetValue keys={item} onRefresh={fetch}></SetValue>
+          return <SetValue keys={item} onRefresh={fetch} />
         }
         case 'ReJSON-RL': {
-          return <JsonValue keys={item} onRefresh={fetch}></JsonValue>
+          return <JsonValue keys={item} onRefresh={fetch} />
         }
         case 'TopK-TYPE': {
-          return <TopKValue keys={item} onRefresh={fetch}></TopKValue>
+          return <TopKValue keys={item} onRefresh={fetch} />
         }
         case 'TSDB-TYPE': {
           return <TimeSeriesValue keys={item} onRefresh={fetch} />
+        }
+        case 'TDIS-TYPE': {
+          return <TDigestValue keys={item} onRefresh={fetch} />
         }
       }
     }

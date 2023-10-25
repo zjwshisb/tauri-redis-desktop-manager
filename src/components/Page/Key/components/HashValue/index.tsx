@@ -14,7 +14,7 @@ import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
 
-const Index: React.FC<{
+const HashValue: React.FC<{
   keys: APP.HashKey
 }> = ({ keys }) => {
   const connection = useContext(context)
@@ -134,4 +134,4 @@ const Index: React.FC<{
     </ValueLayout>
   )
 }
-export default Index
+export default HashValue

@@ -19,7 +19,7 @@ const CreateRule: React.FC<{
       }}
       title={'TS.CREATERULE'}
       width={400}
-      trigger={<Button type="primary">TS.CREATERULE</Button>}
+      trigger={<Button type="primary">CREATERULE</Button>}
       onSubmit={async (v) => {
         await request('timeseries/create-rule', keys.connection_id, {
           db: keys.db,

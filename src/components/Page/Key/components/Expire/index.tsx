@@ -4,7 +4,7 @@ import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
 
-const Index: React.FC<{
+const Expire: React.FC<{
   keys: APP.Key
   trigger: React.ReactElement
   onSuccess: (ttl: number) => void
@@ -38,4 +38,4 @@ const Index: React.FC<{
     </ModalForm>
   )
 }
-export default Index
+export default Expire

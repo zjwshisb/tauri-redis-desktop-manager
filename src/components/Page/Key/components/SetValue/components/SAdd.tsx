@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import FieldInput from '@/components/FieldInput'
 import ModalForm from '@/components/ModalForm'
 
-const Index: React.FC<{
+const SAdd: React.FC<{
   keys: APP.SetKey
   onSuccess: () => void
 }> = (props) => {
@@ -22,7 +22,7 @@ const Index: React.FC<{
         })
         props.onSuccess()
       }}
-      title={'Insert'}
+      title={'SADD'}
     >
       <Form.Item
         name={'value'}
@@ -35,4 +35,4 @@ const Index: React.FC<{
     </ModalForm>
   )
 }
-export default Index
+export default SAdd

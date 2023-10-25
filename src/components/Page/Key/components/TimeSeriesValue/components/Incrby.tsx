@@ -16,7 +16,7 @@ const Incrby: React.FC<{
       title={'TS.INCRBY'}
       width={400}
       documentUrl="https://redis.io/commands/ts.incrby/"
-      trigger={<Button type="primary">TS.INCRBY</Button>}
+      trigger={<Button type="primary">INCRBY</Button>}
       onSubmit={async (v) => {
         await request('timeseries/incrby', keys.connection_id, {
           db: keys.db,

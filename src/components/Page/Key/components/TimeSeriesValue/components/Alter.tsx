@@ -40,7 +40,7 @@ const Alter: React.FC<{
       title={'TS.ALTER'}
       documentUrl="https://redis.io/commands/ts.alter/"
       width={400}
-      trigger={<Button type="primary">TS.ALTER</Button>}
+      trigger={<Button type="primary">ALTER</Button>}
       onSubmit={async (v) => {
         await request('timeseries/alter', keys.connection_id, {
           db: keys.db,

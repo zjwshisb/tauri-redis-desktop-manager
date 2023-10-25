@@ -3,7 +3,7 @@ import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
 
-const Index: React.FC<{
+const LTrim: React.FC<{
   keys: APP.ListKey
   onSuccess: () => void
 }> = (props) => {
@@ -39,4 +39,4 @@ const Index: React.FC<{
     </ModalForm>
   )
 }
-export default Index
+export default LTrim

@@ -4,7 +4,7 @@ import request from '@/utils/request'
 import FieldInput from '@/components/FieldInput'
 import ModalForm from '@/components/ModalForm'
 
-const Index: React.FC<{
+const LInsert: React.FC<{
   keys: APP.ListKey
   onSuccess: () => void
 }> = (props) => {
@@ -51,4 +51,4 @@ const Index: React.FC<{
     </ModalForm>
   )
 }
-export default Index
+export default LInsert

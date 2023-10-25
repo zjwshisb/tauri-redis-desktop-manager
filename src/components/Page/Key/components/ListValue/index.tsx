@@ -14,12 +14,12 @@ import useStore from '@/hooks/useStore'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
-import Editable from '@/components/Editable'
+import { isReadonly } from '@/components/Editable'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
 
-const Index: React.FC<{
+const ListValue: React.FC<{
   keys: APP.ListKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
@@ -129,27 +129,25 @@ const Index: React.FC<{
       render(_, record, index) {
         return (
           <Space>
-            <Editable connection={connection}>
-              <LSet
-                keys={keys}
-                index={index}
-                value={record.value}
-                onSuccess={(value, index) => {
-                  setItems((prev) => {
-                    const newState = [...prev]
-                    if (newState.length >= index + 1) {
-                      newState[index] = value
-                    }
-                    return newState
-                  })
-                }}
-              />
-            </Editable>
+            <LSet
+              keys={keys}
+              index={index}
+              value={record.value}
+              onSuccess={(value, index) => {
+                setItems((prev) => {
+                  const newState = [...prev]
+                  if (newState.length >= index + 1) {
+                    newState[index] = value
+                  }
+                  return newState
+                })
+              }}
+            />
           </Space>
         )
       }
     },
-    connection !== undefined && !connection.readonly,
+    !isReadonly(connection),
     false
   )
   return (
@@ -217,4 +215,4 @@ const Index: React.FC<{
     </ValueLayout>
   )
 }
-export default observer(Index)
+export default observer(ListValue)

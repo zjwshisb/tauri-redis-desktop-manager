@@ -16,7 +16,7 @@ const Decrby: React.FC<{
       title={'TS.DECRBY'}
       width={400}
       documentUrl="https://redis.io/commands/ts.decrby/"
-      trigger={<Button type="primary">TS.DECRBY</Button>}
+      trigger={<Button type="primary">DECRBY</Button>}
       onSubmit={async (v) => {
         await request('timeseries/decrby', keys.connection_id, {
           db: keys.db,

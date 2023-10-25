@@ -3,13 +3,13 @@ import { Button, Space, Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import ZRem from './components/ZRem'
 import { observer } from 'mobx-react-lite'
-import Form from './components/Form'
+import FieldForm from './components/FieldForm'
 import { EditOutlined } from '@ant-design/icons'
 import CusTable from '@/components/CusTable'
 import IconButton from '@/components/IconButton'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
-import Editable from '@/components/Editable'
+import { isReadonly } from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
@@ -75,37 +75,33 @@ const Index: React.FC<{
       render(_, record) {
         return (
           <Space>
-            <Editable connection={connection}>
-              <ZRem
-                keys={keys}
-                value={record.field}
-                onSuccess={() => {
-                  onRefresh()
-                }}
-              ></ZRem>
-            </Editable>
-            <Editable connection={connection}>
-              <Form
-                onSuccess={onRefresh}
-                keys={keys}
-                field={record}
-                trigger={<IconButton icon={<EditOutlined />} />}
-              ></Form>
-            </Editable>
+            <ZRem
+              keys={keys}
+              value={record.field}
+              onSuccess={() => {
+                onRefresh()
+              }}
+            ></ZRem>
+            <FieldForm
+              onSuccess={onRefresh}
+              keys={keys}
+              field={record}
+              trigger={<IconButton icon={<EditOutlined />} />}
+            ></FieldForm>
           </Space>
         )
       }
     },
-    connection !== undefined && !connection.readonly
+    !isReadonly(connection)
   )
   return (
     <ValueLayout
       actions={
-        <Form
+        <FieldForm
           onSuccess={onRefresh}
           keys={keys}
-          trigger={<Button type="primary">ZAdd</Button>}
-        ></Form>
+          trigger={<Button type="primary">ZADD</Button>}
+        ></FieldForm>
       }
     >
       <CusTable

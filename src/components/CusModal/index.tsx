@@ -11,9 +11,17 @@ const CusModal: React.FC<
     onOpen?: () => void
     // the callback when modal close
     onClear?: () => void
+    autoClose?: boolean
   } & Omit<ModalProps, 'onOk'>
 > = (props) => {
-  const { onOk, onCancel, onOpen, showOkNotice = true, ...otherProps } = props
+  const {
+    onOk,
+    onCancel,
+    onOpen,
+    showOkNotice = true,
+    autoClose = true,
+    ...otherProps
+  } = props
 
   const { t } = useTranslation()
 
@@ -76,7 +84,9 @@ const CusModal: React.FC<
               if (showOkNotice) {
                 message.success(t('Success'))
               }
-              onOpenChange(false)
+              if (autoClose) {
+                onOpenChange(false)
+              }
             })
             .catch(() => {})
             .finally(() => {

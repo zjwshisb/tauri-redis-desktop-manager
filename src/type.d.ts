@@ -74,6 +74,7 @@ declare namespace APP {
     | JsonKey
     | TopKKey
     | TimeSeriesKey
+    | TDigestKey
 
   type StringKey = BaseKey<'string', string>
 
@@ -89,7 +90,9 @@ declare namespace APP {
 
   type TopKKey = BaseKey<'TopK-TYPE', Array<Field<number>>>
 
-  type TimeSeriesKey = BaseKey<'TSDB-TYPE', any>
+  type TimeSeriesKey = BaseKey<'TSDB-TYPE', Array<Field<number>>>
+
+  type TDigestKey = BaseKey<'TDIS-TYPE', number[]>
 
   interface IndexValue {
     index: number

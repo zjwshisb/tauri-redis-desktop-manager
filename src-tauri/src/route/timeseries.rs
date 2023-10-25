@@ -20,7 +20,6 @@ pub async fn info<'r>(
             Some(args.db),
         )
         .await?;
-    dbg!(&value);
     let resp = Field::build_vec(&value)?;
     Ok(resp)
 }

@@ -7,7 +7,7 @@ import IconButton from '@/components/IconButton'
 import FieldInput from '@/components/FieldInput'
 import ModalForm from '@/components/ModalForm'
 
-const Index: React.FC<{
+const LSet: React.FC<{
   keys: APP.ListKey
   index: number
   value: string
@@ -41,4 +41,4 @@ const Index: React.FC<{
     </ModalForm>
   )
 }
-export default Index
+export default LSet

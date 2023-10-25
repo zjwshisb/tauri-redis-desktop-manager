@@ -16,7 +16,7 @@ const Del: React.FC<{
       title={'TS.DEL'}
       documentUrl="https://redis.io/commands/ts.del/"
       width={400}
-      trigger={<Button type="primary">TS.DEL</Button>}
+      trigger={<Button type="primary">DEL</Button>}
       onSubmit={async (v) => {
         await request('timeseries/del', keys.connection_id, {
           db: keys.db,

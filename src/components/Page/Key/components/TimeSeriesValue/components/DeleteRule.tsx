@@ -19,7 +19,7 @@ const DeleteRule: React.FC<{
       }}
       title={'TS.CREATERULE'}
       width={400}
-      trigger={<Button type="primary">TS.DELETERULE</Button>}
+      trigger={<Button type="primary">DELETERULE</Button>}
       onSubmit={async (v) => {
         await request('timeseries/delete-rule', keys.connection_id, {
           db: keys.db,

@@ -5,7 +5,7 @@ import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import IconButton from '@/components/IconButton'
 
-const Index: React.FC<{
+const DeleteField: React.FC<{
   keys: APP.Key
   field: APP.Field
   onSuccess: (f: APP.Field) => void
@@ -35,4 +35,4 @@ const Index: React.FC<{
     ></IconButton>
   )
 }
-export default Index
+export default DeleteField

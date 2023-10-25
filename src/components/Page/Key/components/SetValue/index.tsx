@@ -13,7 +13,7 @@ import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
 
-const Index: React.FC<{
+const SetValue: React.FC<{
   keys: APP.SetKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
@@ -120,4 +120,4 @@ const Index: React.FC<{
     </ValueLayout>
   )
 }
-export default observer(Index)
+export default observer(SetValue)

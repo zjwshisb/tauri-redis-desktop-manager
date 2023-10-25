@@ -151,9 +151,11 @@
   "Load All": "加载全部",
   "Are you sure pop a value from the right?": "确认从数组右边移除一个元素?",
   "Are you sure pop a value from the left?": "确认从数组左边移除一个元素?",
+  "Are you sure reset the key?": "确定重置该键?",
   "Flush Database": "清空数据",
   "Module": "模块",
   "At least 1 value": "至少需要设置一个值",
   "Add Value": "新增值",
-  "Copy Success": "复制成功"
+  "Copy Success": "复制成功",
+  "Reset": "重置"
 } 

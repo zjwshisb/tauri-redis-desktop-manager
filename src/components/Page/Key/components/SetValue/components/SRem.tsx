@@ -5,7 +5,7 @@ import request from '@/utils/request'
 import IconButton from '@/components/IconButton'
 import { useTranslation } from 'react-i18next'
 
-const Index: React.FC<{
+const SRem: React.FC<{
   keys: APP.Key
   value: string
   onSuccess: (f: string) => void
@@ -35,4 +35,4 @@ const Index: React.FC<{
     ></IconButton>
   )
 }
-export default Index
+export default SRem

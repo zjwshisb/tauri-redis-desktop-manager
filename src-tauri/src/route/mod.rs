@@ -20,6 +20,7 @@ pub mod migrate;
 pub mod pubsub;
 pub mod server;
 pub mod set;
+pub mod tdigest;
 pub mod timeseries;
 pub mod topk;
 pub mod transfer;
@@ -123,12 +124,22 @@ pub async fn dispatch<'r>(
         "timeseries/delete-rule" => {
             Response::new(timeseries::delete_rule(payload, cid, manager).await?)
         }
-
+        "tdigest/create" => Response::new(tdigest::create(payload, cid, manager).await?),
+        "tdigest/info" => Response::new(tdigest::info(payload, cid, manager).await?),
+        "tdigest/add" => Response::new(tdigest::add(payload, cid, manager).await?),
+        "tdigest/rank" => Response::new(tdigest::rank(payload, cid, manager).await?),
+        "tdigest/by-rank" => Response::new(tdigest::by_rank(payload, cid, manager).await?),
+        "tdigest/rev-rank" => Response::new(tdigest::rev_rank(payload, cid, manager).await?),
+        "tdigest/by-rev-rank" => Response::new(tdigest::by_rev_rank(payload, cid, manager).await?),
+        "tdigest/quantile" => Response::new(tdigest::quantile(payload, cid, manager).await?),
+        "tdigest/cdf" => Response::new(tdigest::cdf(payload, cid, manager).await?),
+        "tdigest/reset" => Response::new(tdigest::reset(payload, cid, manager).await?),
+        "tdigest/max" => Response::new(tdigest::max(payload, cid, manager).await?),
+        "tdigest/min" => Response::new(tdigest::min(payload, cid, manager).await?),
+        "tdigest/trimmed-mean" => {
+            Response::new(tdigest::trimmed_mean(payload, cid, manager).await?)
+        }
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
-    match &r {
-        Err(e) => {}
-        Ok(r) => {}
-    }
     r
 }

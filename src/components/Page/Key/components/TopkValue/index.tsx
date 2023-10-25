@@ -129,7 +129,7 @@ const TopKValue: React.FC<{
         <ModalForm
           documentUrl="https://redis.io/commands/topk.add/"
           title="TOPK.ADD"
-          trigger={<Button type="primary">TOPK.ADD</Button>}
+          trigger={<Button type="primary">ADD</Button>}
           onSubmit={async (v) => {
             await request('topk/add', keys.connection_id, {
               name: keys.name,

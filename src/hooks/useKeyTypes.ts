@@ -39,6 +39,10 @@ export default function useKeyTypes(): Array<{
       {
         label: t('Time Series'),
         value: 'TSDB-TYPE'
+      },
+      {
+        label: t('T-Digest'),
+        value: 'TDIS-TYPE'
       }
     ]
   }, [t])
