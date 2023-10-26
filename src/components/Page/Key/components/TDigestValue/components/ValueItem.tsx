@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Form, InputNumber } from 'antd'
 import { useTranslation } from 'react-i18next'
-import FormListItem from '@/components/FormListItem/Index'
+import FormListItem from '@/components/FormListItem'
 
 const ValueItem: React.FC<{
   label?: string

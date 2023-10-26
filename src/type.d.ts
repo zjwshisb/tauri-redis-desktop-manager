@@ -54,7 +54,7 @@ declare namespace APP {
     value: T
   }
 
-  interface BaseKey<T, V> {
+  interface BaseKey<T, V, ST = T> {
     name: string
     types: T
     ttl: number
@@ -63,6 +63,7 @@ declare namespace APP {
     db: number
     connection_id: number
     length: number
+    sub_types: ST
   }
 
   type Key =
@@ -76,6 +77,7 @@ declare namespace APP {
     | TimeSeriesKey
     | TDigestKey
     | BloomFilterKey
+    | HyperLogLogKey
 
   type StringKey = BaseKey<'string', string>
 
@@ -96,6 +98,8 @@ declare namespace APP {
   type TDigestKey = BaseKey<'TDIS-TYPE', number[]>
 
   type BloomFilterKey = BaseKey<'MBbloom--', string[]>
+
+  type HyperLogLogKey = BaseKey<'string', 'string', 'HyperLogLog'>
 
   interface IndexValue {
     index: number

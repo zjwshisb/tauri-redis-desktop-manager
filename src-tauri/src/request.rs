@@ -38,8 +38,8 @@ pub struct FieldValueItem<T = String> {
 }
 
 #[derive(Deserialize)]
-pub struct NameArgs {
-    pub name: String,
+pub struct NameArgs<T = String> {
+    pub name: T,
     pub db: u8,
 }
 

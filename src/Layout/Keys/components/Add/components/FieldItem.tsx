@@ -2,7 +2,7 @@ import { Form, Input, Row, Col } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import FieldInput from '@/components/FieldInput'
-import FormListItem from '@/components/FormListItem/Index'
+import FormListItem from '@/components/FormListItem'
 
 const FieldItem: React.FC = () => {
   const { t } = useTranslation()

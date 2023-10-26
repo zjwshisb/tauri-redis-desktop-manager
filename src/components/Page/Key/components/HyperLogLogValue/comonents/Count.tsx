@@ -1,47 +1,43 @@
 import React from 'react'
 
 import { Button, Form, Input } from 'antd'
-import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
 import FormListItem from '@/components/FormListItem'
+import { useTranslation } from 'react-i18next'
+import ModalQueryForm from '@/components/ModalQueryForm'
 
 const Add: React.FC<{
-  keys: APP.BloomFilterKey
-  onSuccess: () => void
-}> = ({ keys, onSuccess }) => {
+  keys: APP.HyperLogLogKey
+}> = ({ keys }) => {
   const { t } = useTranslation()
 
   return (
-    <ModalForm
+    <ModalQueryForm
       defaultValue={{
-        value: [undefined]
+        name: [keys.name]
       }}
-      title={'BF.MADD'}
-      documentUrl="https://redis.io/commands/bf.madd/"
+      title={'PFCOUNT'}
+      documentUrl="https://redis.io/commands/pfcount/"
       width={400}
-      trigger={<Button type="primary">MADD</Button>}
-      onSubmit={async (v) => {
-        await request('bloom-filter/madd', keys.connection_id, {
+      trigger={<Button type="primary">PFCOUNT</Button>}
+      onQuery={async (v) => {
+        const res = await request('hyperloglog/pfcount', keys.connection_id, {
           db: keys.db,
-          name: keys.name,
           ...v
-        }).then(() => {
-          onSuccess()
         })
+        return res.data
       }}
     >
       <FormListItem
+        name="name"
         itemProps={{
-          tooltip: 'is an item to add.'
+          label: 'Name'
         }}
-        name="value"
-        renderItem={({ key, name, ...restField }) => {
+        renderItem={({ name, ...restField }) => {
           return (
             <Form.Item
               {...restField}
               name={[name]}
-              required={true}
               rules={[{ required: true }]}
             >
               <Input placeholder={t('Please Enter').toString()} />
@@ -49,7 +45,7 @@ const Add: React.FC<{
           )
         }}
       ></FormListItem>
-    </ModalForm>
+    </ModalQueryForm>
   )
 }
 export default Add

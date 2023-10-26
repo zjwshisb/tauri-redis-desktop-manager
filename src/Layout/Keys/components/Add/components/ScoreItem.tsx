@@ -2,7 +2,7 @@ import { Form, Row, Col, InputNumber } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import FieldInput from '@/components/FieldInput'
-import FormListItem from '@/components/FormListItem/Index'
+import FormListItem from '@/components/FormListItem'
 
 const ScoreItem: React.FC = () => {
   const { t } = useTranslation()

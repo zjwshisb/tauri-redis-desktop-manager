@@ -9,6 +9,7 @@ use serde::Serialize;
 pub struct Key {
     name: String,
     types: String,
+    sub_types: String,
     ttl: i64,
     data: FieldValue,
     connection_id: u32,
@@ -26,6 +27,7 @@ impl Key {
         let mut key: Key = Key {
             name: name,
             types: "".into(),
+            sub_types: "".into(),
             ttl: -2,
             data: FieldValue::Nil,
             connection_id: cid,
@@ -36,12 +38,31 @@ impl Key {
         key.types = manager
             .execute(cid, cmd("type").arg(&key.name), Some(db))
             .await?;
+        key.get_sub_types(manager).await;
         if !key.is_none() {
             key.get_ttl(&manager).await?;
             key.get_memory(&manager).await?;
             key.get_length(&manager).await?;
         }
         Ok(key)
+    }
+
+    pub async fn get_sub_types<'r>(&mut self, manager: &tauri::State<'r, ConnectionManager>) {
+        if self.types == "string" {
+            if let Ok(_) = manager
+                .execute::<Value>(
+                    self.connection_id,
+                    cmd("PFCOUNT").arg(&self.name),
+                    Some(self.db),
+                )
+                .await
+            {
+                self.sub_types = String::from("HyperLogLog");
+                return;
+            }
+        }
+
+        self.sub_types = self.types.clone()
     }
 
     pub async fn get_memory<'r>(
@@ -131,8 +152,9 @@ impl Key {
         &mut self,
         manager: &tauri::State<'r, ConnectionManager>,
     ) -> Result<(), CusError> {
-        let cmd = match self.types.as_str() {
+        let cmd = match self.sub_types.as_str() {
             "string" => "STRLEN",
+            "HyperLogLog" => "PFCOUNT",
             "hash" => "HLEN",
             "list" => "LLEN",
             "set" => "SCARD",

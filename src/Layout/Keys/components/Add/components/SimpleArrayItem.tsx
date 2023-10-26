@@ -1,10 +1,9 @@
-import { Form } from 'antd'
+import { Form, Input } from 'antd'
 import React from 'react'
-import FieldInput from '@/components/FieldInput'
 import FormListItem from '@/components/FormListItem'
 import { useTranslation } from 'react-i18next'
 
-const ArrayItem: React.FC = () => {
+const SimpleArrayItem: React.FC = () => {
   const { t } = useTranslation()
 
   return (
@@ -17,7 +16,7 @@ const ArrayItem: React.FC = () => {
             name={[field.name]}
             rules={[{ required: true }]}
           >
-            <FieldInput />
+            <Input />
           </Form.Item>
         )
       }}
@@ -28,4 +27,4 @@ const ArrayItem: React.FC = () => {
     ></FormListItem>
   )
 }
-export default ArrayItem
+export default SimpleArrayItem

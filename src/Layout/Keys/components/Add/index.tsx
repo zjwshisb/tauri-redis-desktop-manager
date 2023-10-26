@@ -12,6 +12,7 @@ import FiledItem from './components/FieldItem'
 import ScoreItem from './components/ScoreItem'
 import TimeSeriesItem from './components/TimeSeriesItem'
 import BloomFilterItem from './components/BloomFilterItem'
+import SimpleArrayItem from './components/SimpleArrayItem'
 
 import { type FormInstance } from 'antd/lib'
 import FieldInput from '@/components/FieldInput'
@@ -26,7 +27,7 @@ const Plus: React.FC<{
 
   const form = React.useRef<FormInstance>(null)
 
-  const [types, setTypes] = React.useState<APP.Key['types']>()
+  const [types, setTypes] = React.useState<APP.Key['sub_types']>()
 
   const additionFormItem = React.useMemo(() => {
     switch (types) {
@@ -87,6 +88,10 @@ const Plus: React.FC<{
       case 'MBbloom--': {
         return <BloomFilterItem />
       }
+      case 'HyperLogLog': {
+        form.current?.setFieldValue('value', [undefined])
+        return <SimpleArrayItem />
+      }
     }
     return <></>
   }, [t, types])
@@ -116,6 +121,9 @@ const Plus: React.FC<{
       }
       case 'MBbloom--': {
         return 'bloom-filter/reserve'
+      }
+      case 'HyperLogLog': {
+        return 'hyperloglog/pfadd'
       }
       default: {
         return 'key/add'
