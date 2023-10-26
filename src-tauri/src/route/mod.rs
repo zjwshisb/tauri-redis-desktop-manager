@@ -13,6 +13,7 @@ pub mod connection;
 pub mod db;
 pub mod debug;
 pub mod hash;
+pub mod hyperloglog;
 pub mod json;
 pub mod key;
 pub mod list;
@@ -145,6 +146,10 @@ pub async fn dispatch<'r>(
         "bloom-filter/reserve" => Response::new(bloom::reserve(payload, cid, manager).await?),
         "bloom-filter/madd" => Response::new(bloom::madd(payload, cid, manager).await?),
         "bloom-filter/exists" => Response::new(bloom::exists(payload, cid, manager).await?),
+
+        "hyperloglog/pfcount" => Response::new(hyperloglog::pfcount(payload, cid, manager).await?),
+        "hyperloglog/pfadd" => Response::new(hyperloglog::pfadd(payload, cid, manager).await?),
+
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

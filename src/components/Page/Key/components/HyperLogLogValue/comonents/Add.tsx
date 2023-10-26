@@ -3,11 +3,11 @@ import React from 'react'
 import { Button, Form, Input } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
 import FormListItem from '@/components/FormListItem'
+import { useTranslation } from 'react-i18next'
 
 const Add: React.FC<{
-  keys: APP.BloomFilterKey
+  keys: APP.HyperLogLogKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
   const { t } = useTranslation()
@@ -17,12 +17,12 @@ const Add: React.FC<{
       defaultValue={{
         value: [undefined]
       }}
-      title={'BF.MADD'}
-      documentUrl="https://redis.io/commands/bf.madd/"
+      title={'PFADD'}
+      documentUrl="https://redis.io/commands/pfadd/"
       width={400}
-      trigger={<Button type="primary">MADD</Button>}
+      trigger={<Button type="primary">PFADD</Button>}
       onSubmit={async (v) => {
-        await request('bloom-filter/madd', keys.connection_id, {
+        await request('hyperloglog/pfadd', keys.connection_id, {
           db: keys.db,
           name: keys.name,
           ...v
@@ -32,16 +32,15 @@ const Add: React.FC<{
       }}
     >
       <FormListItem
-        itemProps={{
-          tooltip: 'is an item to add.'
-        }}
         name="value"
-        renderItem={({ key, name, ...restField }) => {
+        itemProps={{
+          label: 'Value'
+        }}
+        renderItem={({ name, ...restField }) => {
           return (
             <Form.Item
               {...restField}
               name={[name]}
-              required={true}
               rules={[{ required: true }]}
             >
               <Input placeholder={t('Please Enter').toString()} />

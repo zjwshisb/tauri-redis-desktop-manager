@@ -14,12 +14,16 @@ const Name: React.FC<{
   const connection = React.useContext(Context)
 
   const props: InputProps = React.useMemo(() => {
+    let types = keys.types
+    if (keys.sub_types !== keys.types) {
+      types += `(${keys.sub_types})`
+    }
     return {
       value: keys.name,
       readOnly: true,
-      addonBefore: keys.types
+      addonBefore: types
     }
-  }, [keys.name, keys.types])
+  }, [keys.name, keys.sub_types, keys.types])
 
   return (
     <Editable

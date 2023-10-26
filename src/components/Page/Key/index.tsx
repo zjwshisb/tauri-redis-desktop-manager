@@ -10,6 +10,7 @@ import TopKValue from './components/TopkValue'
 import TimeSeriesValue from './components/TimeSeriesValue'
 import TDigestValue from './components/TDigestValue'
 import BloomFilterValue from './components/BloomFilterValue'
+import HyperLogLogValue from './components/HyperLogLogValue'
 import Name from './components/Name'
 import Dump from './components/Dump'
 import { DeleteOutlined } from '@ant-design/icons'
@@ -56,7 +57,14 @@ const Key: React.FC<{
     if (item !== undefined) {
       switch (item.types) {
         case 'string': {
-          return <StringValue keys={item} onRefresh={fetch} />
+          switch (item.sub_types) {
+            case 'HyperLogLog': {
+              return <HyperLogLogValue keys={item} onRefresh={fetch} />
+            }
+            default: {
+              return <StringValue keys={item} onRefresh={fetch} />
+            }
+          }
         }
         case 'hash': {
           return <HashValue keys={item} onRefresh={fetch} />
