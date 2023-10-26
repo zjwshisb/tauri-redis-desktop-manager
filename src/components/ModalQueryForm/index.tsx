@@ -20,6 +20,7 @@ interface ModalQueryFormProps<T> {
   documentUrl?: string
   resultRender?: (v: T) => React.ReactNode
   ref?: React.ForwardedRef<FormInstance>
+  queryWithOpen?: boolean
 }
 function ModalQueryForm<T>(
   props: React.PropsWithChildren<ModalQueryFormProps<T>>,
@@ -29,7 +30,7 @@ function ModalQueryForm<T>(
 
   React.useImperativeHandle(ref, () => form)
 
-  const { width = 800 } = props
+  const { width = 800, queryWithOpen = false, onQuery } = props
 
   const { t } = useTranslation()
 
@@ -51,6 +52,13 @@ function ModalQueryForm<T>(
     }
     return <></>
   }, [props, result])
+
+  const query = React.useCallback(async () => {
+    const v = await form.validateFields()
+    onQuery(v).then((res) => {
+      setResult(res)
+    })
+  }, [form, onQuery])
 
   return (
     <CusModal
@@ -81,14 +89,12 @@ function ModalQueryForm<T>(
       }}
       onOpen={() => {
         form.setFieldsValue(props.defaultValue)
+        if (queryWithOpen) {
+          query()
+        }
       }}
       trigger={props.trigger}
-      onOk={async () => {
-        const v = await form.validateFields()
-        props.onQuery(v).then((res) => {
-          setResult(res)
-        })
-      }}
+      onOk={query}
       title={
         <div>
           {props.title}

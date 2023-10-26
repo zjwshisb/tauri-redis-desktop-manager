@@ -16,7 +16,6 @@ import CurlMenu from './components/CurlMenu'
 import Menu from './components/Menu'
 import { useTranslation } from 'react-i18next'
 import Info from '@/components/Page/Info'
-import { getPageKey } from '@/utils'
 import { computed } from 'mobx'
 
 const Connection: React.FC<{
@@ -34,42 +33,33 @@ const Connection: React.FC<{
 
   const icon = React.useMemo(() => {
     if (connection.loading === true) {
-      return <LoadingOutlined className="text-sm mr-1"></LoadingOutlined>
+      return <LoadingOutlined></LoadingOutlined>
     }
     if (connection.open === true) {
       if (collapse) {
-        return (
-          <CaretRightFilled
-            className="text-sm mr-1 rotate-90 transition-all"
-            onClick={onTrigger}
-          />
-        )
+        return <CaretRightFilled className="rotate-90 transition-all" />
       } else {
-        return (
-          <CaretRightFilled
-            className="text-sm mr-1 transition-all"
-            onClick={onTrigger}
-          />
-        )
+        return <CaretRightFilled className="transition-all" />
       }
     } else {
-      return <DisconnectOutlined className="text-sm mr-1" />
+      return <DisconnectOutlined />
     }
-  }, [collapse, connection.loading, connection.open, onTrigger])
+  }, [collapse, connection.loading, connection.open])
 
   const openConnection = React.useCallback(async () => {
     if (connection.loading !== true) {
       if (connection.open !== true) {
         try {
           await store.connection.open(connection.id)
-          const key = getPageKey('info', connection)
-          store.page.addPage({
-            label: key,
-            type: 'info',
-            key,
-            children: <Info connection={connection} pageKey={key}></Info>,
-            connection
-          })
+          store.page.addCreatePage(
+            {
+              type: 'info',
+              name: 'info',
+              connection
+            },
+            ({ key }) => <Info connection={connection} pageKey={key}></Info>
+          )
+
           setCollapse(true)
         } catch {}
       }
@@ -133,9 +123,13 @@ const Connection: React.FC<{
   return (
     <div className={'box-border'}>
       <div className={'flex justify-between text-lg px-2  py-1 active-able'}>
-        <div className={'flex overflow-hidden flex-1'}>
-          {icon}
-          <div className="truncate flex-1" onDoubleClick={onItemClickTh.run}>
+        <div className={'flex overflow-hidden flex-1 items-center'}>
+          <span className="text-sm mr-1 ">{icon}</span>
+          <div
+            className="truncate flex-1"
+            onDoubleClick={onItemClickTh.run}
+            onClick={onTrigger}
+          >
             <span className="pr-2 text-gray-600">#{connection.id}</span>
             {connection.name}
           </div>
@@ -161,7 +155,12 @@ const Connection: React.FC<{
                 <Menu connection={connection} />
               </>
             )}
-            <CurlMenu connection={connection} />
+            <CurlMenu
+              connection={connection}
+              onOpen={() => {
+                setCollapse(true)
+              }}
+            />
           </Space>
         </div>
       </div>

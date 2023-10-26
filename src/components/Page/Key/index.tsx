@@ -18,7 +18,6 @@ import request from '@/utils/request'
 import useStore from '@/hooks/useStore'
 import { useTranslation } from 'react-i18next'
 import TTL from './components/TTL'
-import { getPageKey } from '@/utils'
 import Editable from '@/components/Editable'
 import Context from './context'
 import Page from '..'
@@ -32,7 +31,7 @@ function isShowLength(types: APP.Key['types']) {
   )
 }
 
-const Index: React.FC<{
+const Key: React.FC<{
   name: string
   connection: APP.Connection
   db: number
@@ -59,7 +58,7 @@ const Index: React.FC<{
           return <StringValue keys={item} onRefresh={fetch} />
         }
         case 'hash': {
-          return <HashValue keys={item} />
+          return <HashValue keys={item} onRefresh={fetch} />
         }
         case 'list': {
           return <ListValue keys={item} onRefresh={fetch} />
@@ -116,36 +115,35 @@ const Index: React.FC<{
       <Context.Provider value={connection}>
         {item !== undefined && (
           <div>
-            <div className="pb-2">
+            <div className="mb-2">
               <div className="w-full mb-2">
                 <Name
                   keys={item}
                   onChange={(newName) => {
-                    const newPageKey = getPageKey(newName, connection, db)
-                    store.page.updatePage(pageKey, {
-                      type: 'key',
-                      label: newPageKey,
-                      key: newPageKey,
-                      connection,
-                      name: newName,
-                      db,
-                      children: (
-                        <Index
+                    const newPage = store.page.createPage(
+                      {
+                        type: 'key',
+                        connection,
+                        name: newName
+                      },
+                      ({ key }) => (
+                        <Key
                           name={newName}
                           connection={connection}
                           db={db}
-                          pageKey={newPageKey}
-                        ></Index>
+                          pageKey={key}
+                        ></Key>
                       )
-                    })
+                    )
+                    store.page.updatePage(pageKey, newPage)
                   }}
                 ></Name>
               </div>
-              <div className="w-full flex flex-wrap">
-                <div className="mb-2 mr-2 w-[200px]">
+              <Space wrap>
+                <div className="w-[200px]">
                   <TTL keys={item} onChange={fetch}></TTL>
                 </div>
-                <div className="mb-2 mr-2 w-[200px]">
+                <div className="w-[200px]">
                   <Input
                     addonBefore={t('Memory')}
                     value={item.memory}
@@ -154,7 +152,7 @@ const Index: React.FC<{
                   ></Input>
                 </div>
                 {isShowLength(item.types) && (
-                  <div className="mb-2 mr-2 w-[200px]">
+                  <div className="w-[200px]">
                     <Input
                       addonBefore={t('Length')}
                       value={item.length}
@@ -162,29 +160,18 @@ const Index: React.FC<{
                     ></Input>
                   </div>
                 )}
-                <div className="mb-2 mr-2 w-[200px]">
-                  <Space>
-                    <Copy
-                      content={item.name}
-                      isButton
-                      buttonProps={{
-                        className: 'mb-2'
-                      }}
-                    />
-                    <Dump keys={item}></Dump>
+                <Copy content={item.name} isButton />
+                <Dump keys={item}></Dump>
 
-                    <Editable connection={connection}>
-                      <Button
-                        className="mb-2"
-                        onClick={handleDelete}
-                        type="primary"
-                        danger
-                        icon={<DeleteOutlined />}
-                      ></Button>
-                    </Editable>
-                  </Space>
-                </div>
-              </div>
+                <Editable connection={connection}>
+                  <Button
+                    onClick={handleDelete}
+                    type="primary"
+                    danger
+                    icon={<DeleteOutlined />}
+                  ></Button>
+                </Editable>
+              </Space>
             </div>
             <div>{value}</div>
           </div>
@@ -194,4 +181,4 @@ const Index: React.FC<{
   )
 }
 
-export default Index
+export default Key

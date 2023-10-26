@@ -1,30 +1,28 @@
-import { Button, Modal } from 'antd'
+import { Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
+import ModalQueryForm from '@/components/ModalQueryForm'
 
 const Max: React.FC<{
   keys: APP.TDigestKey
 }> = (props) => {
-  const { t } = useTranslation()
-
   return (
-    <Button
-      type="primary"
-      onClick={() => {
-        request<string>('tdigest/max', props.keys.connection_id, {
-          name: props.keys.name,
-          db: props.keys.db
-        }).then((res) => {
-          Modal.success({
-            title: t('Maximum Observation Value'),
-            content: res.data
-          })
-        })
+    <ModalQueryForm
+      title="TDIGEST.MAX"
+      queryWithOpen={true}
+      onQuery={async () => {
+        const res = await request<string>(
+          'tdigest/max',
+          props.keys.connection_id,
+          {
+            name: props.keys.name,
+            db: props.keys.db
+          }
+        )
+        return res.data
       }}
-    >
-      MAX
-    </Button>
+      trigger={<Button type="primary">MAX</Button>}
+    ></ModalQueryForm>
   )
 }
 export default Max

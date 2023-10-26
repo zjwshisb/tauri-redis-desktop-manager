@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import VirtualKeyList from './components/VirtualKeyList'
 import LoadMore from '@/components/LoadMore'
 import Key from '@/components/Page/Key'
-import { getPageKey, isMainWindow } from '@/utils'
+import { isMainWindow } from '@/utils'
 import Add from './components/Add'
 import Restore from './components/Restore'
 import Filter from './components/Filter'
@@ -106,15 +106,14 @@ const Index: React.FC<{
                   <Editable connection={info.connection}>
                     <Add
                       onSuccess={(name: string) => {
-                        const key = getPageKey(name, info.connection, info.db)
-                        store.page.addPage({
-                          key,
-                          label: key,
-                          type: 'key',
-                          connection: info.connection,
-                          name,
-                          db: info.db,
-                          children: (
+                        store.page.addCreatePage(
+                          {
+                            type: 'key',
+                            connection: info.connection,
+                            name,
+                            db: info.db
+                          },
+                          ({ key }) => (
                             <Key
                               name={name}
                               db={info.db}
@@ -122,7 +121,7 @@ const Index: React.FC<{
                               pageKey={key}
                             ></Key>
                           )
-                        })
+                        )
                       }}
                       info={info}
                     />
@@ -131,15 +130,14 @@ const Index: React.FC<{
                     <Restore
                       info={info}
                       onSuccess={(name: string) => {
-                        const key = getPageKey(name, info.connection, info.db)
-                        store.page.addPage({
-                          key,
-                          label: key,
-                          type: 'key',
-                          connection: info.connection,
-                          name,
-                          db: info.db,
-                          children: (
+                        store.page.addCreatePage(
+                          {
+                            type: 'key',
+                            connection: info.connection,
+                            name,
+                            db: info.db
+                          },
+                          ({ key }) => (
                             <Key
                               name={name}
                               db={info.db}
@@ -147,7 +145,7 @@ const Index: React.FC<{
                               pageKey={key}
                             ></Key>
                           )
-                        })
+                        )
                       }}
                     />
                   </Editable>

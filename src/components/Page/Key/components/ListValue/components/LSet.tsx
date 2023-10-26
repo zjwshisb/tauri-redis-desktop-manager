@@ -35,7 +35,7 @@ const LSet: React.FC<{
       <Form.Item name={'index'} label={t('Index')}>
         <InputNumber readOnly></InputNumber>
       </Form.Item>
-      <Form.Item name={'value'} label={t('Value')}>
+      <Form.Item name={'value'} label={t('Value')} rules={[{ required: true }]}>
         <FieldInput></FieldInput>
       </Form.Item>
     </ModalForm>

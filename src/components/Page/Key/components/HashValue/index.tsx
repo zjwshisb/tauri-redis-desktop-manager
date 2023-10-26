@@ -16,6 +16,7 @@ import LoadMore from '@/components/LoadMore'
 
 const HashValue: React.FC<{
   keys: APP.HashKey
+  onRefresh: () => void
 }> = ({ keys }) => {
   const connection = useContext(context)
   const [params, setParams] = useState({

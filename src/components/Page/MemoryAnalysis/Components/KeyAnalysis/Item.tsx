@@ -1,7 +1,8 @@
 import React from 'react'
 import { type KeyItem } from './index'
-import { getPageKey, memoryFormat, openPage } from '@/utils'
+import { memoryFormat } from '@/utils'
 import Key from '@/components/Page/Key'
+import useStore from '@/hooks/useStore'
 
 interface ItemProps {
   item: KeyItem
@@ -10,18 +11,18 @@ interface ItemProps {
   db: number
 }
 const Item: React.FC<ItemProps> = (props) => {
+  const store = useStore()
   return (
     <div
       onClick={() => {
-        const key = getPageKey(props.item.name, props.connection, props.db)
-        openPage({
-          key,
-          label: key,
-          connection: props.connection,
-          name: props.item.name,
-          db: props.db,
-          type: 'key',
-          children: (
+        const page = store.page.createPage(
+          {
+            connection: props.connection,
+            name: props.item.name,
+            db: props.db,
+            type: 'key'
+          },
+          ({ key }) => (
             <Key
               name={props.item.name}
               db={props.db}
@@ -29,7 +30,8 @@ const Item: React.FC<ItemProps> = (props) => {
               pageKey={key}
             ></Key>
           )
-        })
+        )
+        store.page.openPage(page)
       }}
       className="flex px-2 h-[25px] justify-between items-center border-b last:border-b-0 active-able"
     >

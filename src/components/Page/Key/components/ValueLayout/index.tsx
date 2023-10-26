@@ -17,7 +17,7 @@ const ValueLayout: React.FC<
   const toolbar = React.useMemo(() => {
     if (actions !== undefined || readonlyAction !== undefined) {
       return (
-        <div className="pb-2 flex items-center">
+        <div className="flex items-center mb-2">
           <Space wrap={true}>
             {!isReadonly(connection) && actions}
             {readonlyAction}
@@ -29,11 +29,11 @@ const ValueLayout: React.FC<
   }, [actions, connection, readonlyAction])
 
   return (
-    <div>
-      {header !== undefined && <div className="mb-4">{header}</div>}
+    <Spin spinning={loading}>
+      {header !== undefined && <div className="mb-2">{header}</div>}
       {toolbar}
-      <Spin spinning={loading}>{children}</Spin>
-    </div>
+      <div>{children}</div>
+    </Spin>
   )
 }
 export default ValueLayout

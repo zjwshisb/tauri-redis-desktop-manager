@@ -9,6 +9,8 @@ const LTrim: React.FC<{
 }> = (props) => {
   return (
     <ModalForm
+      width={400}
+      documentUrl="https://redis.io/commands/ltrim/"
       trigger={<Button type="primary">LTRIM</Button>}
       onSubmit={async (v) => {
         await request<number>('key/list/ltrim', props.keys.connection_id, {
@@ -26,7 +28,7 @@ const LTrim: React.FC<{
         required
         rules={[{ required: true }]}
       >
-        <InputNumber min={0}></InputNumber>
+        <InputNumber min={0} precision={0} className="!w-full"></InputNumber>
       </Form.Item>
       <Form.Item
         name={'stop'}
@@ -34,7 +36,12 @@ const LTrim: React.FC<{
         required
         rules={[{ required: true }]}
       >
-        <InputNumber min={0} max={props.keys.length - 1}></InputNumber>
+        <InputNumber
+          min={0}
+          className="!w-full"
+          max={props.keys.length - 1}
+          precision={0}
+        ></InputNumber>
       </Form.Item>
     </ModalForm>
   )

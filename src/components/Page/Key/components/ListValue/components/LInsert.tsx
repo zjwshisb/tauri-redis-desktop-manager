@@ -10,6 +10,7 @@ const LInsert: React.FC<{
 }> = (props) => {
   return (
     <ModalForm
+      documentUrl="https://redis.io/commands/linsert/"
       defaultValue={{}}
       trigger={<Button type="primary">LINSERT</Button>}
       onSubmit={async (v) => {

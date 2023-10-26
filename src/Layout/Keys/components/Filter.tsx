@@ -1,11 +1,9 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { Input, Tooltip, Checkbox } from 'antd'
-import { useDebounceFn } from 'ahooks'
 import { useTranslation } from 'react-i18next'
 import TypeSelect from '@/components/TypeSelect'
 
-import { SearchOutlined } from '@ant-design/icons'
 import context from '../context'
 
 const Filter: React.FC<{
@@ -21,20 +19,23 @@ const Filter: React.FC<{
     setSearch(state.filter.search)
   }, [state.filter.search])
 
-  const onSearchChange = useDebounceFn((search: string) => {
-    dispatch({
-      type: 'filter',
-      value: {
-        search
-      }
-    })
-  })
+  const handleSearch = React.useCallback(
+    (search: string) => {
+      dispatch({
+        type: 'filter',
+        value: {
+          search
+        }
+      })
+    },
+    [dispatch]
+  )
 
   return (
     <div className="flex item-center p-2">
-      <Input
+      <Input.Search
         value={search}
-        addonAfter={
+        addonBefore={
           <Tooltip title={t('Exact Search')} placement="bottom">
             <Checkbox
               checked={state.filter.exact}
@@ -49,12 +50,13 @@ const Filter: React.FC<{
             />
           </Tooltip>
         }
-        prefix={<SearchOutlined />}
         placeholder={t('search').toString()}
         allowClear
+        onSearch={(v) => {
+          handleSearch(v)
+        }}
         onChange={(e) => {
           setSearch(e.target.value)
-          onSearchChange.run(e.target.value)
         }}
       />
       <TypeSelect

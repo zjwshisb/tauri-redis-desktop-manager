@@ -3,7 +3,8 @@ import {
   DeleteOutlined,
   EditOutlined,
   PoweroffOutlined,
-  AppstoreOutlined
+  AppstoreOutlined,
+  EyeOutlined
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
@@ -18,7 +19,8 @@ export interface DBType {
 
 const Index: React.FC<{
   connection: APP.Connection
-}> = ({ connection }) => {
+  onOpen: (c: APP.Connection) => void
+}> = ({ connection, onOpen }) => {
   const store = useStore()
 
   const { t } = useTranslation()
@@ -51,6 +53,16 @@ const Index: React.FC<{
           <div className="flex">
             <PoweroffOutlined />
             <div className="ml-2">{t('Close Connection')}</div>
+          </div>
+        )
+      })
+    } else {
+      menus.unshift({
+        key: 'open',
+        label: (
+          <div className="flex">
+            <EyeOutlined />
+            <div className="ml-2">{t('Open Connection')}</div>
           </div>
         )
       })
@@ -95,6 +107,12 @@ const Index: React.FC<{
               } else {
                 store.connection.openForm(connection)
               }
+              break
+            }
+            case 'open': {
+              store.connection.open(connection.id).then(() => {
+                onOpen(connection)
+              })
               break
             }
             case 'close': {

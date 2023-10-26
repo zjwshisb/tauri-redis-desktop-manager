@@ -14,7 +14,6 @@ import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { Dropdown } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { getPageKey } from '@/utils'
 import Client from '@/components/Page/Client'
 import Info from '@/components/Page/Info'
 import Node from '@/components/Page/Node'
@@ -119,104 +118,106 @@ const Menu: React.FC<{
         onClick(e) {
           switch (e.key) {
             case 'client': {
-              const key = getPageKey('client', connection)
-              store.page.addPage({
-                label: key,
-                connection,
-                type: 'client',
-                key,
-                children: (
+              store.page.addCreatePage(
+                {
+                  connection,
+                  type: 'client',
+                  name: 'client'
+                },
+                ({ key }) => (
                   <Client connection={connection} pageKey={key}></Client>
                 )
-              })
+              )
               break
             }
             case 'info': {
-              const key = getPageKey('info', connection)
-              store.page.addPage({
-                label: key,
-                type: 'info',
-                key,
-                children: <Info connection={connection} pageKey={key}></Info>,
-                connection
-              })
+              store.page.addCreatePage(
+                {
+                  type: 'info',
+                  name: 'info',
+                  connection
+                },
+                ({ key }) => <Info connection={connection} pageKey={key}></Info>
+              )
               break
             }
             case 'node': {
-              const key = getPageKey('node', connection)
-              store.page.addPage({
-                label: key,
-                type: 'node',
-                key,
-                children: <Node connection={connection} pageKey={key}></Node>,
-                connection
-              })
+              store.page.addCreatePage(
+                {
+                  type: 'node',
+                  name: 'node',
+                  connection
+                },
+                ({ key }) => <Node connection={connection} pageKey={key}></Node>
+              )
               break
             }
             case 'slow-log': {
-              const key = getPageKey('slow-log', connection)
-              store.page.addPage({
-                label: key,
-                type: 'slow-log',
-                key,
-                children: (
+              store.page.addCreatePage(
+                {
+                  type: 'slow-log',
+                  name: 'slow-log',
+                  connection
+                },
+                ({ key }) => (
                   <SlowLog connection={connection} pageKey={key}></SlowLog>
-                ),
-                connection
-              })
+                )
+              )
               break
             }
             case 'config': {
-              const key = getPageKey('config', connection)
-              store.page.addPage({
-                label: key,
-                type: 'config',
-                key,
-                children: (
+              store.page.addCreatePage(
+                {
+                  type: 'config',
+                  name: 'config',
+                  connection
+                },
+                ({ key }) => (
                   <Config connection={connection} pageKey={key}></Config>
-                ),
-                connection
-              })
+                )
+              )
               break
             }
             case 'memory': {
-              const key = getPageKey('memory', connection)
-              store.page.addPage({
-                label: key,
-                type: 'memory-analysis',
-                key,
-                children: (
+              store.page.addCreatePage(
+                {
+                  type: 'memory-analysis',
+                  name: 'memory-analysis',
+
+                  connection
+                },
+                ({ key }) => (
                   <MemoryAnalysis
                     connection={connection}
                     pageKey={key}
                   ></MemoryAnalysis>
-                ),
-                connection
-              })
+                )
+              )
               break
             }
             case 'pubsub': {
-              const key = getPageKey('pubsub', connection)
-              store.page.addPage({
-                label: key,
-                type: 'pubsub',
-                key,
-                children: (
+              store.page.addCreatePage(
+                {
+                  type: 'pubsub',
+                  name: 'pubsub',
+
+                  connection
+                },
+                ({ key }) => (
                   <Pubsub connection={connection} pageKey={key}></Pubsub>
-                ),
-                connection
-              })
+                )
+              )
               break
             }
             case 'monitor': {
-              const key = getPageKey('monitor', connection)
-              store.page.addPage({
-                label: key,
-                type: 'monitor',
-                key,
-                children: <Monitor connection={connection} pageKey={key} />,
-                connection
-              })
+              store.page.addCreatePage(
+                {
+                  type: 'monitor',
+                  name: 'monitor',
+                  connection
+                },
+                ({ key }) => <Monitor connection={connection} pageKey={key} />
+              )
               break
             }
           }

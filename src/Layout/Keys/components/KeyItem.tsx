@@ -3,8 +3,8 @@ import { observer } from 'mobx-react-lite'
 import { Typography, List, Popover } from 'antd'
 import useStore from '@/hooks/useStore'
 import classNames from 'classnames'
-import { getPageKey } from '@/utils'
 import Key from '@/components/Page/Key'
+import { SearchOutlined } from '@ant-design/icons'
 import context from '../context'
 
 const KeyItem: React.FC<{
@@ -28,19 +28,19 @@ const KeyItem: React.FC<{
           {prefix.map((v, index) => {
             const str = prefix.slice(0, index + 1).join(':')
             return (
-              <div
-                key={v}
-                className="active-able p-2"
-                onClick={() => {
-                  dispatch({
-                    type: 'filter',
-                    value: {
-                      search: str
-                    }
-                  })
-                }}
-              >
-                {str}
+              <div key={v} className="p-2 flex items-center">
+                <span>{str}</span>
+                <SearchOutlined
+                  className="ml-2 text-blue-600"
+                  onClick={() => {
+                    dispatch({
+                      type: 'filter',
+                      value: {
+                        search: str
+                      }
+                    })
+                  }}
+                ></SearchOutlined>
               </div>
             )
           })}
@@ -58,15 +58,14 @@ const KeyItem: React.FC<{
       <List.Item
         key={name}
         onClick={(e) => {
-          const key = getPageKey(name, connection, db)
-          store.page.addPage({
-            key,
-            label: key,
-            connection,
-            name,
-            db,
-            type: 'key',
-            children: (
+          store.page.addCreatePage(
+            {
+              connection,
+              name,
+              db,
+              type: 'key'
+            },
+            ({ key }) => (
               <Key
                 name={name}
                 db={db}
@@ -74,7 +73,7 @@ const KeyItem: React.FC<{
                 pageKey={key}
               ></Key>
             )
-          })
+          )
           e.stopPropagation()
         }}
         className={classNames(['border-none h-[37px]', 'active-able'])}

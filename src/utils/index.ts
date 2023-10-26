@@ -1,19 +1,9 @@
-import { store } from '@/store'
-import { type Page } from '@/store/page'
 import {
   WebviewWindow,
   getCurrent,
   type WindowLabel,
   type WindowOptions
 } from '@tauri-apps/api/window'
-
-export function getPageKey(name: string, conn: APP.Connection, db?: number) {
-  let key = `${conn.id}|${name}`
-  if (db !== undefined) {
-    key += `@${db}`
-  }
-  return key
-}
 
 export function versionCompare(v1: string, v2: string) {
   const sources = v1.split('.')
@@ -70,15 +60,6 @@ export function memoryFormat(memory: number) {
     return (memory / 1024).toFixed(1) + 'KB'
   }
   return (memory / 1024 / 1024).toFixed(1) + 'MB'
-}
-
-export async function openPage(page: Page) {
-  const current = getCurrent()
-  if (current.label === 'main') {
-    store.page.addPage(page)
-  } else {
-    store.page.openNewWindowPage(page)
-  }
 }
 
 export function isMainWindow() {

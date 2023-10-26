@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import type React from 'react'
 import spark from 'spark-md5'
-import { openWindow } from '@/utils'
+import { isMainWindow, openWindow } from '@/utils'
 
 export type Page =
   | MonitorPage
@@ -14,43 +14,29 @@ export type Page =
   | ConfigPage
   | MemoryAnalysisPage
 
-interface BasePage {
+interface BasePage<T> {
   label: React.ReactNode
   key: string
   children: React.ReactNode
   connection: APP.Connection
-}
-
-type PubsubPage = BasePage & {
-  type: 'pubsub'
-}
-type ClientPage = BasePage & {
-  type: 'client'
-}
-type NodePage = BasePage & {
-  type: 'node'
-}
-
-type MonitorPage = BasePage & {
-  type: 'monitor'
-}
-type InfoPage = BasePage & {
-  type: 'info'
-}
-type KeyPage = BasePage & {
-  type: 'key'
+  type: T
   name: string
-  db: number
+  db?: number
 }
-type SlowLogPage = BasePage & {
-  type: 'slow-log'
-}
-type ConfigPage = BasePage & {
-  type: 'config'
-}
-type MemoryAnalysisPage = BasePage & {
-  type: 'memory-analysis'
-}
+
+type PubsubPage = BasePage<'pubsub'>
+type ClientPage = BasePage<'client'>
+type NodePage = BasePage<'node'>
+
+type MonitorPage = BasePage<'monitor'>
+type InfoPage = BasePage<'info'>
+type KeyPage = BasePage<'key'>
+type SlowLogPage = BasePage<'slow-log'>
+type ConfigPage = BasePage<'config'>
+type MemoryAnalysisPage = BasePage<'memory-analysis'>
+
+type CreatePageProps = Omit<Page, 'key' | 'children' | 'label'>
+type RenderChildrenFn = (props: Omit<Page, 'children'>) => React.ReactNode
 
 class PageStore {
   pages: Page[] = []
@@ -126,7 +112,7 @@ class PageStore {
 
     switch (p.type) {
       case 'key': {
-        url += `&db=${p.db}&name=${encodeURI(p.name)}`
+        url += `&db=${p.db as number}&name=${encodeURI(p.name)}`
         break
       }
       case 'monitor': {
@@ -171,6 +157,22 @@ class PageStore {
     }
   }
 
+  getPageKey(name: string, conn: APP.Connection, db?: number) {
+    let key = `${conn.id}|${name}`
+    if (db !== undefined) {
+      key += `@${db}`
+    }
+    return key
+  }
+
+  openPage(page: Page) {
+    if (isMainWindow()) {
+      this.addPage(page)
+    } else {
+      this.openNewWindowPage(page)
+    }
+  }
+
   updatePage(key: string, page: Page) {
     const index = this.pages.findIndex((v) => v.key === key)
     if (index > -1) {
@@ -179,6 +181,24 @@ class PageStore {
         this.active = page.key
       }
     }
+  }
+
+  createPage(p: CreatePageProps, renderChildren: RenderChildrenFn): Page {
+    const key = this.getPageKey(p.name, p.connection, p.db)
+    const props = {
+      key,
+      label: key,
+      ...p
+    }
+    return {
+      children: renderChildren(props),
+      ...props
+    }
+  }
+
+  addCreatePage(p: CreatePageProps, render: RenderChildrenFn) {
+    const page = this.createPage(p, render)
+    this.addPage(page)
   }
 
   addPage(page: Page) {

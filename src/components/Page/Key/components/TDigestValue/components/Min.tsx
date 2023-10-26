@@ -1,30 +1,28 @@
-import { Button, Modal } from 'antd'
+import { Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
+import ModalQueryForm from '@/components/ModalQueryForm'
 
 const Min: React.FC<{
   keys: APP.TDigestKey
 }> = (props) => {
-  const { t } = useTranslation()
-
   return (
-    <Button
-      type="primary"
-      onClick={() => {
-        request<string>('tdigest/min', props.keys.connection_id, {
-          name: props.keys.name,
-          db: props.keys.db
-        }).then((res) => {
-          Modal.success({
-            title: t('Minimum Observation Value'),
-            content: res.data
-          })
-        })
+    <ModalQueryForm
+      title="TDIGEST.MIN"
+      queryWithOpen={true}
+      onQuery={async () => {
+        const res = await request<string>(
+          'tdigest/min',
+          props.keys.connection_id,
+          {
+            name: props.keys.name,
+            db: props.keys.db
+          }
+        )
+        return res.data
       }}
-    >
-      MIN
-    </Button>
+      trigger={<Button type="primary">MIN</Button>}
+    ></ModalQueryForm>
   )
 }
 export default Min

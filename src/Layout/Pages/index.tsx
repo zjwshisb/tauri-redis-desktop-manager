@@ -64,7 +64,6 @@ const Index: React.FC = () => {
                     })
                     break
                   }
-
                   case 'close': {
                     store.page.removePage(v.key)
                     break
@@ -128,7 +127,6 @@ const Index: React.FC = () => {
                 }}
                 renderTabBar={renderTabBar}
                 size="small"
-                className=""
                 hideAdd
                 onEdit={(targetKey, action) => {
                   if (action === 'remove') {

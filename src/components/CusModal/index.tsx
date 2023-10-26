@@ -9,7 +9,6 @@ const CusModal: React.FC<
     onOk: () => Promise<any>
     onOpenChange?: (v: boolean) => void
     onOpen?: () => void
-    // the callback when modal close
     onClear?: () => void
     autoClose?: boolean
   } & Omit<ModalProps, 'onOk'>
@@ -40,20 +39,6 @@ const CusModal: React.FC<
     return <></>
   }, [otherProps.trigger, props.trigger])
 
-  React.useEffect(() => {
-    if (open && onOpen !== undefined) {
-      onOpen()
-    }
-  }, [open, onOpen])
-
-  React.useEffect(() => {
-    if (!open) {
-      if (otherProps.onClear !== undefined) {
-        otherProps.onClear()
-      }
-    }
-  }, [open, otherProps])
-
   const isOpen = React.useMemo(() => {
     if (otherProps.open !== undefined) {
       return otherProps.open
@@ -61,21 +46,25 @@ const CusModal: React.FC<
     return open
   }, [open, otherProps.open])
 
-  const onOpenChange = React.useCallback(
-    (v: boolean) => {
-      setOpen(v)
-      if (otherProps.onOpenChange != null) {
-        otherProps.onOpenChange(v)
-      }
-    },
-    [otherProps]
-  )
-
   return (
     <>
       {trigger}
       <Modal
         destroyOnClose
+        afterOpenChange={(v) => {
+          if (otherProps.onOpenChange != null) {
+            otherProps.onOpenChange(v)
+          }
+          if (!v) {
+            if (otherProps.onClear !== undefined) {
+              otherProps.onClear()
+            }
+          } else {
+            if (onOpen != null) {
+              onOpen()
+            }
+          }
+        }}
         confirmLoading={confirmLoading}
         onOk={() => {
           setConfirmLoading(true)
@@ -85,7 +74,7 @@ const CusModal: React.FC<
                 message.success(t('Success'))
               }
               if (autoClose) {
-                onOpenChange(false)
+                setOpen(false)
               }
             })
             .catch(() => {})
@@ -95,7 +84,7 @@ const CusModal: React.FC<
         }}
         open={isOpen}
         onCancel={(e) => {
-          onOpenChange(false)
+          setOpen(false)
           if (onCancel != null) {
             onCancel(e)
           }

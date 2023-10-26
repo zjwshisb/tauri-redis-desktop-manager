@@ -78,6 +78,8 @@
   "Close Connection": "关闭连接",
   "Test Connection": "测试连接",
   "New Connection": "新建连接",
+  "Open Connection": "打开连接",
+
   "Connect Success": "连接成功",
   "Please Enter {{name}}": "请输入{{name}}",
   "Please Enter": "请输入",
