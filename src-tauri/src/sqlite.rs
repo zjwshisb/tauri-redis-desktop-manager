@@ -3,9 +3,8 @@ use dirs_next;
 use rusqlite::{self, params, Connection as SqliteConnection, Row};
 use serde::{Deserialize, Serialize};
 use std::fs;
-
-const DATA_NAME: &str = "data3.db";
 const DATA_DIR: &str = "redis";
+const DATA_NAME: &str = "data3.db";
 
 pub fn get_sqlite_client() -> Result<SqliteConnection, CusError> {
     let path = get_data_path();
