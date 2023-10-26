@@ -29,7 +29,7 @@ const Config: React.FC<{
   const item = React.useMemo(() => {
     if (data != null) {
       return data.filter((v) => {
-        return v.name.includes(search.toLowerCase())
+        return v.field.includes(search.toLowerCase())
       })
     }
     return []
@@ -39,11 +39,11 @@ const Config: React.FC<{
     [
       {
         title: t('Name'),
-        dataIndex: 'name',
+        dataIndex: 'field',
         width: 300,
         defaultSortOrder: 'ascend',
         sorter(a, b) {
-          return a.name > b.name ? 1 : -1
+          return a.field > b.field ? 1 : -1
         }
       },
       {
@@ -85,7 +85,12 @@ const Config: React.FC<{
         <Rewrite connection={connection}></Rewrite>
         <ResetStat connection={connection}></ResetStat>
       </div>
-      <CusTable rowKey={'name'} dataSource={item} columns={columns}></CusTable>
+      <CusTable
+        rowKey={'name'}
+        dataSource={item}
+        columns={columns}
+        virtual={false}
+      ></CusTable>
     </Page>
   )
 }

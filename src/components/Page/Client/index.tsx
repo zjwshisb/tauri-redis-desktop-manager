@@ -1,5 +1,5 @@
 import useRequest from '@/hooks/useRequest'
-import { Col, Input, Modal, Row, Space, Tooltip, message } from 'antd'
+import { Modal, Space, Tooltip, message } from 'antd'
 import React from 'react'
 import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { type ColumnType } from 'antd/es/table'
@@ -166,20 +166,12 @@ const Client: React.FC<{
 
   return (
     <Page onRefresh={fetch} pageKey={pageKey} loading={loading}>
-      <Row gutter={10} className="mb-2">
-        <Col xs={24} xl={8} className="mb-2">
-          <Input addonBefore={'total'} value={clients.length} readOnly></Input>
-        </Col>
-      </Row>
-      <Row>
-        <Col span={24}>
-          <CusTable
-            rowKey={'id'}
-            dataSource={clients}
-            columns={columns}
-          ></CusTable>
-        </Col>
-      </Row>
+      <CusTable
+        virtual={false}
+        rowKey={'id'}
+        dataSource={clients}
+        columns={columns}
+      ></CusTable>
     </Page>
   )
 }

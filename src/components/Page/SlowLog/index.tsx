@@ -94,6 +94,7 @@ const SlowLog: React.FC<{
       </div>
       <CusTable
         rowKey={'uid'}
+        virtual={false}
         dataSource={data?.logs}
         columns={columns}
       ></CusTable>

@@ -5,7 +5,7 @@ import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import IconButton from '@/components/IconButton'
 
-const DeleteField: React.FC<{
+const HDel: React.FC<{
   keys: APP.Key
   field: APP.Field
   onSuccess: (f: APP.Field) => void
@@ -35,4 +35,4 @@ const DeleteField: React.FC<{
     ></IconButton>
   )
 }
-export default DeleteField
+export default HDel

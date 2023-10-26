@@ -1,4 +1,3 @@
-import { Col, Row } from 'antd'
 import { type ColumnsType } from 'antd/es/table'
 import React from 'react'
 import Page from '..'
@@ -37,17 +36,14 @@ const Node: React.FC<{
 
   return (
     <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
-      <Row>
-        <Col span={24}>
-          <CusTable
-            dataSource={data?.sort((a, b) =>
-              a.config_epoch > b.config_epoch ? 1 : -1
-            )}
-            rowKey={'id'}
-            columns={columns}
-          ></CusTable>
-        </Col>
-      </Row>
+      <CusTable
+        virtual={false}
+        dataSource={data?.sort((a, b) =>
+          a.config_epoch > b.config_epoch ? 1 : -1
+        )}
+        rowKey={'id'}
+        columns={columns}
+      ></CusTable>
     </Page>
   )
 }

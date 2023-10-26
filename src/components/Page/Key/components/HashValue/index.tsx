@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react'
 import { Button, Space, Input } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
-import FieldForm from './components/FieldForm'
-import DeleteField from './components/DeleteField'
+import HSet from './components/HSet'
+import HDel from './components/Hdel'
 import { useTranslation } from 'react-i18next'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
@@ -17,14 +17,14 @@ import LoadMore from '@/components/LoadMore'
 const HashValue: React.FC<{
   keys: APP.HashKey
   onRefresh: () => void
-}> = ({ keys }) => {
+}> = ({ keys, onRefresh }) => {
   const connection = useContext(context)
   const [params, setParams] = useState({
     search: ''
   })
   const { t } = useTranslation()
 
-  const { fields, setFields, getFields, loading, more, getAllFields } =
+  const { fields, getFields, loading, more, getAllFields } =
     useFieldScan<APP.Field>('key/hash/hscan', keys, params)
 
   const columns = useTableColumn<APP.Field>(
@@ -69,31 +69,15 @@ const HashValue: React.FC<{
         return (
           <Space>
             <Editable connection={connection}>
-              <FieldForm
+              <HSet
                 trigger={<IconButton icon={<EditOutlined />} />}
                 keys={keys}
                 field={record}
-                onSuccess={(f) => {
-                  setFields((prev) => {
-                    const newFields = [...prev]
-                    newFields[index] = f
-                    return newFields
-                  })
-                }}
+                onSuccess={onRefresh}
               />
             </Editable>
             <Editable connection={connection}>
-              <DeleteField
-                keys={keys}
-                field={record}
-                onSuccess={() => {
-                  setFields((prev) => {
-                    const newFields = [...prev]
-                    newFields.splice(index, 1)
-                    return newFields
-                  })
-                }}
-              />
+              <HDel keys={keys} field={record} onSuccess={onRefresh} />
             </Editable>
           </Space>
         )
@@ -105,14 +89,10 @@ const HashValue: React.FC<{
   return (
     <ValueLayout
       actions={
-        <FieldForm
+        <HSet
           keys={keys}
-          onSuccess={(f) => {
-            setFields((p) => {
-              return [...p].concat([f])
-            })
-          }}
-          trigger={<Button type="primary">{t('Add Field')}</Button>}
+          onSuccess={onRefresh}
+          trigger={<Button type="primary">{'HSET'}</Button>}
         />
       }
     >

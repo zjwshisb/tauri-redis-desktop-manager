@@ -1,9 +1,9 @@
 import useCancelIntercal from '@/hooks/useCaclelInterval'
 import useRequest from '@/hooks/useRequest'
-import { Table } from 'antd'
 import { type ColumnsType } from 'antd/es/table'
 import React from 'react'
 import Page from '..'
+import CusTable from '@/components/CusTable'
 
 interface Client {
   id: string
@@ -31,17 +31,13 @@ const Session: React.FC = () => {
 
   return (
     <Page pageKey="session">
-      <Table
+      <CusTable
+        virtual={false}
         dataSource={data}
-        size="small"
         rowKey={'id'}
-        scroll={{
-          x: 'auto'
-        }}
         bordered
         columns={columns}
-        pagination={false}
-      ></Table>
+      ></CusTable>
     </Page>
   )
 }

@@ -14,13 +14,15 @@ interface FormListItemProps {
   name: string
   itemProps?: Omit<FormItemProps, 'name'>
   canBeZero?: boolean
+  showAdd?: boolean
 }
 
 const FormListItem: React.FC<FormListItemProps> = ({
   renderItem,
   name,
   canBeZero = false,
-  itemProps = {}
+  itemProps = {},
+  showAdd = true
 }) => {
   const { label = 'Value' } = itemProps
 
@@ -47,17 +49,19 @@ const FormListItem: React.FC<FormListItemProps> = ({
                 </Row>
               )
             })}
-            <Form.Item>
-              <Button
-                type="dashed"
-                onClick={() => {
-                  add()
-                }}
-                block
-                icon={<PlusOutlined />}
-              ></Button>
-              <Form.ErrorList errors={errors} />
-            </Form.Item>
+            {showAdd && (
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => {
+                    add()
+                  }}
+                  block
+                  icon={<PlusOutlined />}
+                ></Button>
+                <Form.ErrorList errors={errors} />
+              </Form.Item>
+            )}
           </>
         )}
       </Form.List>
