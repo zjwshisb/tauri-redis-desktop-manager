@@ -2,7 +2,7 @@ import { Col, Form, InputNumber, Row } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-const TopK: React.FC = () => {
+const TopKItem: React.FC = () => {
   const { t } = useTranslation()
 
   return (
@@ -64,4 +64,4 @@ const TopK: React.FC = () => {
     </>
   )
 }
-export default TopK
+export default TopKItem

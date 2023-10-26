@@ -5,6 +5,7 @@ use crate::err::CusError;
 use crate::pubsub::PubsubManager;
 use crate::response::Response;
 
+pub mod bloom;
 pub mod client;
 pub mod cluster;
 pub mod config;
@@ -139,6 +140,11 @@ pub async fn dispatch<'r>(
         "tdigest/trimmed-mean" => {
             Response::new(tdigest::trimmed_mean(payload, cid, manager).await?)
         }
+
+        "bloom-filter/info" => Response::new(bloom::info(payload, cid, manager).await?),
+        "bloom-filter/reserve" => Response::new(bloom::reserve(payload, cid, manager).await?),
+        "bloom-filter/madd" => Response::new(bloom::madd(payload, cid, manager).await?),
+        "bloom-filter/exists" => Response::new(bloom::exists(payload, cid, manager).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

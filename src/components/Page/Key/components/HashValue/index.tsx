@@ -118,7 +118,7 @@ const HashValue: React.FC<{
     >
       <CusTable
         loading={loading}
-        rowKey={'name'}
+        rowKey={'field'}
         more={more}
         onLoadMore={getFields}
         dataSource={fields}

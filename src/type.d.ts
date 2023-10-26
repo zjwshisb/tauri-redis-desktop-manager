@@ -49,6 +49,11 @@ declare namespace APP {
     client_name: string
   }
 
+  interface Field<T extends string | number | Field[] | Field[][] = string> {
+    field: string
+    value: T
+  }
+
   interface BaseKey<T, V> {
     name: string
     types: T
@@ -58,11 +63,6 @@ declare namespace APP {
     db: number
     connection_id: number
     length: number
-  }
-
-  interface Field<T extends string | number | Field[] | Field[][] = string> {
-    field: string
-    value: T
   }
 
   type Key =
@@ -75,6 +75,7 @@ declare namespace APP {
     | TopKKey
     | TimeSeriesKey
     | TDigestKey
+    | BloomFilterKey
 
   type StringKey = BaseKey<'string', string>
 
@@ -93,6 +94,8 @@ declare namespace APP {
   type TimeSeriesKey = BaseKey<'TSDB-TYPE', Array<Field<number>>>
 
   type TDigestKey = BaseKey<'TDIS-TYPE', number[]>
+
+  type BloomFilterKey = BaseKey<'MBbloom--', string[]>
 
   interface IndexValue {
     index: number

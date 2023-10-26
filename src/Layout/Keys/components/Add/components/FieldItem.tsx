@@ -1,79 +1,45 @@
-import { Form, Button, Input, Row, Col } from 'antd'
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { Form, Input, Row, Col } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import FieldInput from '@/components/FieldInput'
+import FormListItem from '@/components/FormListItem/Index'
 
-const TopK: React.FC = () => {
+const FieldItem: React.FC = () => {
   const { t } = useTranslation()
 
   return (
-    <Form.List
+    <FormListItem
       name="value"
-      rules={[
-        {
-          validator: async (_, names) => {
-            if (names === undefined || names.length < 1) {
-              return await Promise.reject(
-                new Error(t('At least 1 value').toString())
-              )
-            }
-          }
-        }
-      ]}
-    >
-      {(fields, { add, remove }, { errors }) => (
-        <>
-          {fields.map(({ key, name, ...restField }) => (
-            <Row key={key} gutter={20}>
-              <Col span={8}>
-                <Form.Item
-                  {...restField}
-                  name={[name, 'field']}
-                  label={t('Field Name')}
-                  rules={[{ required: true }]}
-                >
-                  <Input placeholder={t('Field Name').toString()} />
-                </Form.Item>
-              </Col>
-              <Col span={15}>
-                <Form.Item
-                  {...restField}
-                  label={t('Field Value')}
-                  name={[name, 'value']}
-                  rules={[{ required: true }]}
-                >
-                  <FieldInput />
-                </Form.Item>
-              </Col>
-              <Col span={1}>
-                {fields.length > 1 && (
-                  <MinusCircleOutlined
-                    className="text-red-600 ml-2"
-                    onClick={() => {
-                      remove(name)
-                    }}
-                  />
-                )}
-              </Col>
-            </Row>
-          ))}
-          <Form.Item>
-            <Button
-              type="dashed"
-              onClick={() => {
-                add()
-              }}
-              block
-              icon={<PlusOutlined />}
-            >
-              {t('Add Field')}
-            </Button>
-            <Form.ErrorList errors={errors} />
-          </Form.Item>
-        </>
-      )}
-    </Form.List>
+      renderItem={({ name, ...restField }) => {
+        return (
+          <Row gutter={20}>
+            <Col span={12}>
+              <Form.Item
+                {...restField}
+                name={[name, 'field']}
+                label={t('Field Name')}
+                rules={[{ required: true }]}
+              >
+                <Input placeholder={t('Field Name').toString()} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                {...restField}
+                label={t('Field Value')}
+                name={[name, 'value']}
+                rules={[{ required: true }]}
+              >
+                <FieldInput />
+              </Form.Item>
+            </Col>
+          </Row>
+        )
+      }}
+      itemProps={{
+        label: t('Value')
+      }}
+    ></FormListItem>
   )
 }
-export default TopK
+export default FieldItem

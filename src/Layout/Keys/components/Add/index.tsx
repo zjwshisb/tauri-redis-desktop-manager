@@ -11,6 +11,7 @@ import ArrayItem from './components/ArrayItem'
 import FiledItem from './components/FieldItem'
 import ScoreItem from './components/ScoreItem'
 import TimeSeriesItem from './components/TimeSeriesItem'
+import BloomFilterItem from './components/BloomFilterItem'
 
 import { type FormInstance } from 'antd/lib'
 import FieldInput from '@/components/FieldInput'
@@ -83,6 +84,9 @@ const Plus: React.FC<{
         form.current?.setFieldValue('value', [undefined])
         return <ArrayItem />
       }
+      case 'MBbloom--': {
+        return <BloomFilterItem />
+      }
     }
     return <></>
   }, [t, types])
@@ -109,6 +113,9 @@ const Plus: React.FC<{
       }
       case 'TDIS-TYPE': {
         return 'tdigest/create'
+      }
+      case 'MBbloom--': {
+        return 'bloom-filter/reserve'
       }
       default: {
         return 'key/add'

@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { Button, Form, InputNumber, Row, Col, Input, Select } from 'antd'
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { Form, InputNumber, Row, Col, Input, Select } from 'antd'
 import { useTranslation } from 'react-i18next'
+import FormListItem from '@/components/FormListItem/Index'
 
 const TimeSeriesItem: React.FC<{
   type: 'alter' | 'create'
@@ -69,62 +69,39 @@ const TimeSeriesItem: React.FC<{
           ]}
         />
       </Form.Item>
-      <Form.Item
-        label="LABELS"
-        tooltip="is set of label-value pairs that represent metadata labels of the key and serve as a secondary index."
-      >
-        <Form.List name="labels">
-          {(fields, { add, remove }, { errors }) => (
-            <>
-              {fields.map(({ key, name, ...restField }) => {
-                console.log(key, name)
-                return (
-                  <Row key={key} gutter={20}>
-                    <Col span={10}>
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'field']}
-                        rules={[{ required: true }]}
-                      >
-                        <Input placeholder={t('Please Enter').toString()} />
-                      </Form.Item>
-                    </Col>
-                    <Col span={10}>
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'value']}
-                        rules={[{ required: true }]}
-                      >
-                        <Input placeholder={t('Please Enter').toString()} />
-                      </Form.Item>
-                    </Col>
-                    <Col span={4}>
-                      <MinusCircleOutlined
-                        onClick={() => {
-                          remove(name)
-                        }}
-                      />
-                    </Col>
-                  </Row>
-                )
-              })}
-              <Form.Item>
-                <Button
-                  type="dashed"
-                  onClick={() => {
-                    add()
-                  }}
-                  block
-                  icon={<PlusOutlined />}
+      <FormListItem
+        name="labels"
+        itemProps={{
+          label: 'LABELS',
+          tooltip:
+            'is set of label-value pairs that represent metadata labels of the key and serve as a secondary index.'
+        }}
+        canBeZero
+        renderItem={({ key, name, ...restField }) => {
+          return (
+            <Row key={key} gutter={20}>
+              <Col span={12}>
+                <Form.Item
+                  {...restField}
+                  name={[name, 'field']}
+                  rules={[{ required: true }]}
                 >
-                  Add Label
-                </Button>
-                <Form.ErrorList errors={errors} />
-              </Form.Item>
-            </>
-          )}
-        </Form.List>
-      </Form.Item>
+                  <Input placeholder={t('Please Enter').toString()} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  {...restField}
+                  name={[name, 'value']}
+                  rules={[{ required: true }]}
+                >
+                  <Input placeholder={t('Please Enter').toString()} />
+                </Form.Item>
+              </Col>
+            </Row>
+          )
+        }}
+      ></FormListItem>
     </>
   )
 }

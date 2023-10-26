@@ -9,6 +9,7 @@ import JsonValue from './components/JsonValue'
 import TopKValue from './components/TopkValue'
 import TimeSeriesValue from './components/TimeSeriesValue'
 import TDigestValue from './components/TDigestValue'
+import BloomFilterValue from './components/BloomFilterValue'
 import Name from './components/Name'
 import Dump from './components/Dump'
 import { DeleteOutlined } from '@ant-design/icons'
@@ -80,6 +81,9 @@ const Key: React.FC<{
         }
         case 'TDIS-TYPE': {
           return <TDigestValue keys={item} onRefresh={fetch} />
+        }
+        case 'MBbloom--': {
+          return <BloomFilterValue keys={item} onRefresh={fetch} />
         }
       }
     }

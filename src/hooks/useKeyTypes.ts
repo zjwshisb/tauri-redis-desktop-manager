@@ -43,6 +43,10 @@ export default function useKeyTypes(): Array<{
       {
         label: t('T-Digest'),
         value: 'TDIS-TYPE'
+      },
+      {
+        label: t('Bloom Filter'),
+        value: 'MBbloom--'
       }
     ]
   }, [t])

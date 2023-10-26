@@ -5,7 +5,7 @@ import CusModal from '@/components/CusModal'
 import { type FormInstance, type FormProps } from 'antd/lib'
 import Link from '../Link'
 import { LinkOutlined } from '@ant-design/icons'
-import { isString } from 'lodash'
+import { isNumber, isString } from 'lodash'
 import { useTranslation } from 'react-i18next'
 
 interface ModalQueryFormProps<T> {
@@ -39,7 +39,7 @@ function ModalQueryForm<T>(
   const resultNode = React.useMemo(() => {
     if (result !== undefined) {
       if (props.resultRender === undefined) {
-        if (isString(result)) {
+        if (isString(result) || isNumber(result)) {
           return (
             <Form.Item label="Result">
               <Card bodyStyle={{ padding: 8 }}>{result}</Card>

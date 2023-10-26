@@ -159,5 +159,6 @@
   "At least 1 value": "至少需要设置一个值",
   "Add Value": "新增值",
   "Copy Success": "复制成功",
-  "Reset": "重置"
+  "Reset": "重置",
+  "Bloom Filter": "布隆过滤器"
 } 

@@ -137,6 +137,7 @@ impl Key {
             "list" => "LLEN",
             "set" => "SCARD",
             "zset" => "ZCARD",
+            "MBbloom--" => "BF.CARD",
             _ => "",
         };
         if cmd != "" {
