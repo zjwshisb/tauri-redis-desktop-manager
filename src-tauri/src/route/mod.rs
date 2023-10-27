@@ -37,6 +37,8 @@ pub async fn dispatch<'r>(
     cid: u32,
     payload: String,
 ) -> Result<String, CusError> {
+    dbg!(&path);
+    dbg!(&payload);
     let r = match path.as_str() {
         "connections/get" => Response::new(connection::get().await?),
         "connections/add" => Response::new(connection::add(payload)?),

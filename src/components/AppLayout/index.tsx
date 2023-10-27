@@ -1,5 +1,8 @@
 import React from 'react'
+import 'xterm/css/xterm.css'
+
 import 'antd/dist/reset.css'
+
 import '@/App.css'
 import 'mac-scrollbar/dist/mac-scrollbar.css'
 import '@/i18n'

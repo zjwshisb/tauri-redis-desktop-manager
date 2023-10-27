@@ -18,6 +18,7 @@ import AppLayout from '@/components/AppLayout'
 import Config from '@/components/Page/Config'
 import MemoryAnalysis from '@/components/Page/MemoryAnalysis'
 import { computed } from 'mobx'
+import Terminal from '@/components/Page/Terminal'
 
 const App: React.FC = () => {
   const store = useStore()
@@ -103,6 +104,12 @@ const App: React.FC = () => {
         }
         case 'config': {
           node = <Config connection={connection} pageKey={params.key}></Config>
+          break
+        }
+        case 'terminal': {
+          node = (
+            <Terminal connection={connection} pageKey={params.key}></Terminal>
+          )
           break
         }
         case 'memory-analysis': {

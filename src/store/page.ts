@@ -13,6 +13,7 @@ export type Page =
   | SlowLogPage
   | ConfigPage
   | MemoryAnalysisPage
+  | TerminalPage
 
 interface BasePage<T> {
   label: React.ReactNode
@@ -34,6 +35,7 @@ type KeyPage = BasePage<'key'>
 type SlowLogPage = BasePage<'slow-log'>
 type ConfigPage = BasePage<'config'>
 type MemoryAnalysisPage = BasePage<'memory-analysis'>
+type TerminalPage = BasePage<'terminal'>
 
 type CreatePageProps = Omit<Page, 'key' | 'children' | 'label'>
 type RenderChildrenFn = (props: Omit<Page, 'children'>) => React.ReactNode
@@ -139,7 +141,9 @@ class PageStore {
       case 'config': {
         break
       }
-
+      case 'terminal': {
+        break
+      }
       default: {
         url = ''
         break

@@ -73,9 +73,7 @@ const ConnectionForm: React.FC = () => {
       title={
         formItem.item !== undefined ? t('Edit Connection') : t('New Connection')
       }
-      bodyStyle={{
-        paddingTop: '20px'
-      }}
+      styles={{}}
       footer={
         <Space>
           <Button
