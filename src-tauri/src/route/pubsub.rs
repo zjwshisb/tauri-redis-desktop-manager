@@ -6,7 +6,7 @@ use crate::sqlite::Connection as ConnectionModel;
 use crate::utils;
 use futures::stream::StreamExt;
 use redis::aio::Connection;
-use redis::FromRedisValue;
+use redis::{cmd, FromRedisValue};
 use serde::{Deserialize, Serialize};
 
 use tauri::State;
@@ -113,11 +113,15 @@ pub async fn monitor<'r>(
 ) -> Result<String, CusError> {
     let model = ConnectionModel::first(cid)?;
     let mut connection = RedisConnection::new(model.get_params());
-    let conn: Connection = connection.get_normal().await?;
+    let mut conn: Connection = connection.get_normal().await?;
 
     let event_name = utils::random_str(32);
     let event_name_resp = event_name.clone();
-
+    redis::cmd("CLIENT")
+        .arg("SETNAME")
+        .arg("monitor")
+        .query_async(&mut conn)
+        .await?;
     // a channel to stop loop when frontend close the page
     let (tx, rx) = oneshot::channel::<()>();
     pubsub_manager.add(

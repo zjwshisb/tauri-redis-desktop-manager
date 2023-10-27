@@ -4,6 +4,7 @@ import { FitAddon } from 'xterm-addon-fit'
 
 interface XTermProps {
   className?: string
+  welcome?: string
 }
 
 const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
@@ -36,6 +37,10 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
         const fit = new FitAddon()
         term.loadAddon(fit)
         term.blur()
+        if (props.welcome !== undefined) {
+          term.writeln(props.welcome)
+        }
+
         // term.onKey((e) => {
         //   switch (e.domEvent.key) {
         //     case 'Enter': {
@@ -72,7 +77,7 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
         // term.focus()
       }
     }
-  }, [term])
+  }, [term, props.welcome])
 
   return <div ref={div} className={props.className}></div>
 }

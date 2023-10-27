@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { appWindow } from '@tauri-apps/api/window'
 import request from '@/utils/request'
-import { Button, Input } from 'antd'
+import { Button, Input, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import Page from '..'
 import { type UnlistenFn } from '@tauri-apps/api/event'
@@ -28,7 +28,7 @@ const Monitor: React.FC<{
     const res = await request<string>('pubsub/monitor', cid)
     eventName.current = res.data
     appWindow
-      .listen<string>(res.data, (r) => {
+      .listen<string>(eventName.current, (r) => {
         try {
           const message: APP.EventPayload<string> = JSON.parse(r.payload)
           if (search.current !== '') {
@@ -47,23 +47,25 @@ const Monitor: React.FC<{
       .then((f) => {
         setStatus(1)
         cancelFn.current = f
-        console.log(f)
       })
   }, [])
 
   const cancel = React.useCallback(() => {
     if (cancelFn.current !== undefined) {
       cancelFn.current()
+      cancelFn.current = undefined
     }
     if (eventName.current !== undefined) {
       request('pubsub/cancel', 0, {
         name: eventName.current
       })
+      eventName.current = undefined
     }
+    setStatus(0)
   }, [])
 
   React.useEffect(() => {
-    appWindow.once(TauriEvent.WINDOW_DESTROYED, () => {
+    appWindow.listen(TauriEvent.WINDOW_DESTROYED, () => {
       cancel()
     })
   }, [cancel])
@@ -74,31 +76,37 @@ const Monitor: React.FC<{
 
   return (
     <Page pageKey={props.pageKey}>
-      <div className="mb-2">
-        {status === 0 && (
-          <Button
-            type="primary"
-            onClick={async () => {
-              listen(props.connection.id)
-            }}
-          >
-            Start
-          </Button>
-        )}
-        {status === 1 && (
-          <Button danger onClick={() => {}}>
-            {t('Suspend')}
-          </Button>
-        )}
-      </div>
-      <XTerm ref={term} className="h-[600px] w-full" />
-      <Input
-        className="!w-[200px]"
-        placeholder={t('Filter').toString()}
-        onChange={(e) => {
-          search.current = e.target.value
-        }}
+      <XTerm
+        ref={term}
+        className="h-[600px] w-full"
+        welcome="click start button to start monitor"
       />
+      <div>
+        <Space>
+          {status === 0 && (
+            <Button
+              type="primary"
+              onClick={async () => {
+                listen(props.connection.id)
+              }}
+            >
+              {t('Start')}
+            </Button>
+          )}
+          {status === 1 && (
+            <Button type="primary" danger onClick={cancel}>
+              {t('Stop')}
+            </Button>
+          )}
+          <Input
+            className="!w-[200px]"
+            placeholder={t('Filter').toString()}
+            onChange={(e) => {
+              search.current = e.target.value
+            }}
+          />
+        </Space>
+      </div>
     </Page>
   )
 }
