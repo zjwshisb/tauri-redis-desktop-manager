@@ -71,8 +71,6 @@ const SetValue: React.FC<{
       }
     ],
     {
-      width: '200px',
-      fixed: 'right',
       render(_, record, index) {
         return (
           <Space>

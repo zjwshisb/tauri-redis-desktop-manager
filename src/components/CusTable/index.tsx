@@ -1,6 +1,7 @@
 import { useDebounceFn } from 'ahooks'
 import { Table, type TableProps } from 'antd'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function CusTable<T extends object>(
   props: TableProps<T> & {
@@ -16,12 +17,16 @@ export default function CusTable<T extends object>(
 
   const [scrollX, setScrollX] = React.useState<number>(1000)
 
-  const table = React.useRef<HTMLDivElement>(null)
+  const { t } = useTranslation()
 
   const db = useDebounceFn(
     () => {
       if (container.current !== null) {
-        setScrollX(container.current?.clientWidth - 1)
+        let containerWith = container.current?.clientWidth - 1
+        if (containerWith <= 1000) {
+          containerWith = 1000
+        }
+        setScrollX(containerWith)
       }
     },
     {
@@ -32,10 +37,13 @@ export default function CusTable<T extends object>(
     db.run()
   }, [db])
 
-  React.useEffect(() => {
-    window.addEventListener('resize', db.run)
-    return () => {
-      window.removeEventListener('resize', db.run)
+  React.useLayoutEffect(() => {
+    const div = container.current
+    if (div !== null) {
+      div.addEventListener('resize', db.run)
+      return () => {
+        div.removeEventListener('resize', db.run)
+      }
     }
   }, [db.run])
 
@@ -45,8 +53,11 @@ export default function CusTable<T extends object>(
         y: 600,
         x: scrollX
       }
+    } else {
+      return {
+        x: 'auto'
+      }
     }
-    return undefined
   }, [scrollX, virtual])
 
   const footer = React.useMemo(() => {
@@ -54,15 +65,18 @@ export default function CusTable<T extends object>(
       return undefined
     }
     const footerRender = (v: readonly T[]) => {
-      return <div className="flex justify-end">total: {v.length}</div>
+      return (
+        <div className="flex justify-end">
+          {t('total')}:{v.length}
+        </div>
+      )
     }
     return footerRender
-  }, [showFooter])
+  }, [showFooter, t])
 
   return (
     <div ref={container}>
       <Table
-        ref={table}
         virtual={virtual}
         size="small"
         className="w-full"

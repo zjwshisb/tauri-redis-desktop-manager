@@ -6,7 +6,7 @@ use crate::sqlite::Connection as ConnectionModel;
 use crate::utils;
 use futures::stream::StreamExt;
 use redis::aio::Connection;
-use redis::{cmd, FromRedisValue};
+use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
 
 use tauri::State;
@@ -54,7 +54,9 @@ pub async fn subscribe<'r>(
     tokio::spawn(async move {
         let event_str = event_name.as_str();
         let mut stream = pubsub.on_message();
+
         tokio::select! {
+
             _ = async {
                 while let Some(msg) = stream.next().await {
                     let channel_r: Result<redis::Value, redis::RedisError> = msg.get_channel::<redis::Value>();
@@ -154,7 +156,6 @@ pub async fn monitor<'r>(
             _ = rx => {
             }
         }
-        drop(connection);
     });
     Ok(event_name_resp)
 }

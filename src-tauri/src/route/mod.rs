@@ -23,6 +23,7 @@ pub mod pubsub;
 pub mod server;
 pub mod set;
 pub mod tdigest;
+pub mod terminal;
 pub mod timeseries;
 pub mod topk;
 pub mod transfer;
@@ -152,6 +153,7 @@ pub async fn dispatch<'r>(
         "hyperloglog/pfcount" => Response::new(hyperloglog::pfcount(payload, cid, manager).await?),
         "hyperloglog/pfadd" => Response::new(hyperloglog::pfadd(payload, cid, manager).await?),
 
+        "terminal/open" => Response::new(terminal::open(payload, cid, manager, window).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r
