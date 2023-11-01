@@ -52,7 +52,7 @@ const Monitor: React.FC<{
       <XTerm
         readonly={true}
         ref={term}
-        className="h-[500px] w-full overflow-hidden rounded"
+        className="h-[396px] w-full overflow-hidden rounded"
         welcome="click start button to start monitor"
       />
       <div className="mt-2">
