@@ -13,6 +13,7 @@ const Expire: React.FC<{
 
   return (
     <ModalForm
+      width={400}
       onSubmit={async (v) => {
         await request<number>('key/expire', props.keys.connection_id, {
           name: props.keys.name,
@@ -33,7 +34,7 @@ const Expire: React.FC<{
         label={'TTL'}
         tooltip={t('-1 mean PERSIST the key')}
       >
-        <InputNumber min={-1}></InputNumber>
+        <InputNumber min={-1} className="!w-full"></InputNumber>
       </Form.Item>
     </ModalForm>
   )

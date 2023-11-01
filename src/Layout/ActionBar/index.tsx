@@ -7,18 +7,20 @@ import Session from './components/Session'
 import Migrate from './components/Migrate'
 import { type WebviewWindow, getAll } from '@tauri-apps/api/window'
 import { WindowsOutlined } from '@ant-design/icons'
+import { TauriEvent } from '@tauri-apps/api/event'
+import { useTauriEvent } from '@/hooks/useTauriEvent'
 
 const ActionBar: React.FC = () => {
-  const [window, setWindow] = React.useState<WebviewWindow[]>([])
+  const [window, setWindow] = React.useState<WebviewWindow[]>(getAll())
 
-  React.useEffect(() => {
-    const i = setInterval(() => {
+  useTauriEvent(TauriEvent.WINDOW_CREATED, () => {
+    setWindow(getAll())
+  })
+  useTauriEvent(TauriEvent.WINDOW_DESTROYED, () => {
+    setTimeout(() => {
       setWindow(getAll())
-    }, 1000)
-    return () => {
-      clearInterval(i)
-    }
-  }, [])
+    }, 300)
+  })
 
   return (
     <div className="h-[85px] w-full flex-shrink-0 border-b  bg-[#F1F1F1] flex flex-col">

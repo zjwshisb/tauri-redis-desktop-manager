@@ -45,7 +45,7 @@ const Index: React.FC = () => {
 
   const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
     <StickyBox offsetTop={0} offsetBottom={20} style={{ zIndex: 1 }}>
-      <DefaultTabBar {...props} style={{ background: '#ECECEC', margin: 0 }} />
+      <DefaultTabBar {...props} className="bg-gray-100 m-0" />
     </StickyBox>
   )
 

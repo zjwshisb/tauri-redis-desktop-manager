@@ -157,7 +157,7 @@ const Key: React.FC<{
                 </div>
                 <div className="w-[200px]">
                   <Input
-                    addonBefore={t('Memory')}
+                    addonBefore={'Memory Usage'}
                     value={item.memory}
                     readOnly
                     suffix={'bytes'}
@@ -166,7 +166,7 @@ const Key: React.FC<{
                 {isShowLength(item.types) && (
                   <div className="w-[200px]">
                     <Input
-                      addonBefore={t('Length')}
+                      addonBefore={'Length'}
                       value={item.length}
                       readOnly
                     ></Input>

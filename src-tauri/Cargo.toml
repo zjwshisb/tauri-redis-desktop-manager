@@ -31,6 +31,7 @@ rand="*"
 chrono="*"
 hex="*"
 reqwest = { version = "0.11", features = ["json"] }
+encoding = "0.2"
 
 
 [features]

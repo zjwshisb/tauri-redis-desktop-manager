@@ -110,18 +110,16 @@ const TopKValue: React.FC<{
     <ValueLayout
       header={
         info != null && (
-          <div className="mb-4">
-            <Descriptions
-              size="small"
-              bordered
-              items={info.map((v) => {
-                return {
-                  label: v.field,
-                  children: v.value
-                }
-              })}
-            ></Descriptions>{' '}
-          </div>
+          <Descriptions
+            size="small"
+            bordered
+            items={info.map((v) => {
+              return {
+                label: v.field,
+                children: v.value
+              }
+            })}
+          ></Descriptions>
         )
       }
       loading={loading}

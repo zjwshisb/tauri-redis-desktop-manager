@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 import { invoke } from '@tauri-apps/api/tauri'
 import { notification } from 'antd'
-import { isString } from 'lodash'
+import { isObject, isString } from 'lodash'
 
 export interface Response<T> {
   data: T
@@ -13,15 +13,17 @@ export interface RequestOptions {
 export default async function request<T>(
   path: string,
   cid: number = 0,
-  args: Record<string, any> = {},
+  args: Record<string, any> | string = {},
   option: RequestOptions = {
     showNotice: true
   }
 ): Promise<Response<T>> {
   try {
     Object.keys(args).forEach((v) => {
-      if (isString(args[v]) && args[v] === '') {
-        args[v] = null
+      if (isObject(args)) {
+        if (isString(args[v]) && args[v] === '') {
+          args[v] = null
+        }
       }
     })
 

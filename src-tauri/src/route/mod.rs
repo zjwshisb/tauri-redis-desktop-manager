@@ -154,6 +154,7 @@ pub async fn dispatch<'r>(
         "hyperloglog/pfadd" => Response::new(hyperloglog::pfadd(payload, cid, manager).await?),
 
         "terminal/open" => Response::new(terminal::open(payload, cid, manager, window).await?),
+        "terminal/transfer" => Response::new(terminal::transfer(payload).await?),
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

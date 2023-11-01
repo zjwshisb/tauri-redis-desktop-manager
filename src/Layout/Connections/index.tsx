@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite'
 import ResizableDiv from '@/components/ResizableDiv'
 import useStore from '@/hooks/useStore'
 import { MacScrollbar } from 'mac-scrollbar'
+import ConnectionForm from '@/components/ConnectionForm'
 
 const Index: React.FC = () => {
   const store = useStore()
@@ -19,6 +20,7 @@ const Index: React.FC = () => {
         className="flex h-full  bg-[#E7E8E8] flex-col overflow-hidden"
         id="connection"
       >
+        <ConnectionForm />
         <MacScrollbar>
           <div>
             {store.connection.connections.map((v) => {

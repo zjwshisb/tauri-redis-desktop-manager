@@ -4,8 +4,7 @@ import {
   DisconnectOutlined,
   ReloadOutlined,
   WarningOutlined,
-  LoadingOutlined,
-  CommentOutlined
+  LoadingOutlined
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
@@ -18,7 +17,6 @@ import Menu from './components/Menu'
 import { useTranslation } from 'react-i18next'
 import Info from '@/components/Page/Info'
 import { computed } from 'mobx'
-import Terminal from '../Page/Terminal'
 
 const Connection: React.FC<{
   connection: APP.Connection
@@ -155,25 +153,6 @@ const Connection: React.FC<{
                   ></ReloadOutlined>
                 </Tooltip>
                 <Menu connection={connection} />
-                <Tooltip title={t('Refresh')}>
-                  <CommentOutlined
-                    className="hover:text-blue-600"
-                    onClick={(e) => {
-                      store.page.addCreatePage(
-                        {
-                          name: 'terminal',
-                          type: 'terminal',
-                          connection
-                        },
-                        ({ key }) => {
-                          return (
-                            <Terminal connection={connection} pageKey={key} />
-                          )
-                        }
-                      )
-                    }}
-                  ></CommentOutlined>
-                </Tooltip>
               </>
             )}
             <CurlMenu

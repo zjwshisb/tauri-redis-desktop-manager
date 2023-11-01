@@ -57,20 +57,24 @@ const SlowLog: React.FC<{
   return (
     <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
       <div className="mb-2">
-        <Descriptions
-          size="middle"
-          column={2}
-          items={[
-            {
-              label: 'slowlog-log-slower-than',
-              children: data?.time
-            },
-            {
-              label: 'slowlog-max-len',
-              children: data?.count
-            }
-          ]}
-        ></Descriptions>
+        <div className="mb-2">
+          <Descriptions
+            bordered
+            size="small"
+            column={2}
+            items={[
+              {
+                label: 'slowlog-log-slower-than',
+                children: data?.time
+              },
+              {
+                label: 'slowlog-max-len',
+                children: data?.count
+              }
+            ]}
+          ></Descriptions>
+        </div>
+
         <Button
           danger
           type="primary"
