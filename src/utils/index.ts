@@ -4,6 +4,7 @@ import {
   type WindowLabel,
   type WindowOptions
 } from '@tauri-apps/api/window'
+import { store } from '@/store'
 
 export function versionCompare(v1: string, v2: string) {
   const sources = v1.split('.')
@@ -28,20 +29,25 @@ export function versionCompare(v1: string, v2: string) {
 
 export async function openWindow(
   label: WindowLabel,
-  options: WindowOptions
+  options: WindowOptions = {}
 ): Promise<WebviewWindow> {
+  const {
+    focus = true,
+    titleBarStyle = 'overlay',
+    width = 1000,
+    height = 1000,
+    ...other
+  } = options
+
   return await new Promise((resolve, reject) => {
-    if (options.titleBarStyle === undefined) {
-      options.titleBarStyle = 'transparent'
-    }
-    if (options.width === undefined) {
-      options.width = 1000
-    }
-    if (options.height === undefined) {
-      options.height = 800
-    }
-    options.tabbingIdentifier = 'test'
-    const webview = new WebviewWindow(label, options)
+    const webview = new WebviewWindow(label, {
+      focus,
+      titleBarStyle,
+      width,
+      height,
+      theme: store.setting.setting.dark_mode ? 'dark' : 'light',
+      ...other
+    })
     webview.once('tauri://created', function () {
       resolve(webview)
     })

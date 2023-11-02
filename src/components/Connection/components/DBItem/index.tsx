@@ -7,7 +7,7 @@ import {
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import ItemLayout from '../ItemLayout'
-import { Dropdown, Modal, message } from 'antd'
+import { Dropdown, App } from 'antd'
 import { t } from 'i18next'
 import { type ItemType } from 'antd/es/menu/hooks/useItems'
 
@@ -23,6 +23,8 @@ const Index: React.FC<{
   const [loading, setLoading] = React.useState(false)
 
   const store = useStore()
+
+  const { modal, message } = App.useApp()
 
   const getCount = React.useCallback(() => {
     setLoading(true)
@@ -95,7 +97,7 @@ const Index: React.FC<{
           onClick(e) {
             switch (e.key) {
               case 'flush': {
-                Modal.confirm({
+                modal.confirm({
                   title: t('Notice'),
                   content: t('Are you sure flush this database?'),
                   async onOk() {

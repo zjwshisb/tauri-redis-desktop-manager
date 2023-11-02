@@ -8,7 +8,7 @@ const Edit: React.FC<{
   connection: APP.Connection
   field: APP.Field
   trigger: React.ReactElement
-  onSuccess: (newField: APP.HashField) => void
+  onSuccess: (newField: APP.Field) => void
 }> = (props) => {
   const { t } = useTranslation()
 
@@ -20,7 +20,7 @@ const Edit: React.FC<{
       trigger={props.trigger}
       onSubmit={async (v) => {
         await request<number>('config/edit', props.connection.id, {
-          name: props.field.name,
+          name: props.field.field,
           value: v.value
         })
         props.onSuccess(v as APP.Field)

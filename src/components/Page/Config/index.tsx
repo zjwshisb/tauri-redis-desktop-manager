@@ -1,8 +1,7 @@
 import Editable from '@/components/Editable'
-import IconButton from '@/components/IconButton'
 import useRequest from '@/hooks/useRequest'
 import { EditOutlined } from '@ant-design/icons'
-import { Input } from 'antd'
+import { Button, Input } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Edit from './Components/Edit'
@@ -60,7 +59,7 @@ const Config: React.FC<{
               connection={connection}
               onSuccess={fetch}
               field={record}
-              trigger={<IconButton icon={<EditOutlined />}></IconButton>}
+              trigger={<Button icon={<EditOutlined />} type="link"></Button>}
             ></Edit>
           </Editable>
         )

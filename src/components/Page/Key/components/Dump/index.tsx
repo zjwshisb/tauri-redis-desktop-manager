@@ -1,4 +1,4 @@
-import { Button, Modal } from 'antd'
+import { App, Button } from 'antd'
 import React from 'react'
 import { ExportOutlined } from '@ant-design/icons'
 import request from '@/utils/request'
@@ -8,6 +8,8 @@ import Copy from '@/components/Copy'
 const Dump: React.FC<{
   keys: APP.Key
 }> = (props) => {
+  const { modal } = App.useApp()
+
   return (
     <Button
       icon={<ExportOutlined />}
@@ -16,7 +18,7 @@ const Dump: React.FC<{
           name: props.keys.name,
           db: props.keys.db
         }).then((res) => {
-          Modal.info({
+          modal.info({
             icon: false,
             title: 'DUMP',
             maskClosable: true,

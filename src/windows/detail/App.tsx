@@ -19,6 +19,7 @@ import Config from '@/components/Page/Config'
 import MemoryAnalysis from '@/components/Page/MemoryAnalysis'
 import { computed } from 'mobx'
 import Terminal from '@/components/Page/Terminal'
+import Container from '@/components/Container'
 
 const App: React.FC = () => {
   const store = useStore()
@@ -127,9 +128,11 @@ const App: React.FC = () => {
 
   return (
     <AppLayout>
-      <MacScrollbar className="w-full" id="container">
-        <div>{children}</div>
-      </MacScrollbar>
+      <Container className="flex-1 w-full" level={3}>
+        <MacScrollbar className="w-full" id="container">
+          <div>{children}</div>
+        </MacScrollbar>
+      </Container>
     </AppLayout>
   )
 }

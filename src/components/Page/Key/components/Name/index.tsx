@@ -1,10 +1,10 @@
 import React from 'react'
-import { Input, type InputProps } from 'antd'
+import { Button, Input } from 'antd'
 
 import { EditOutlined } from '@ant-design/icons'
 
 import Rename from '../Rename'
-import Editable from '@/components/Editable'
+import { isReadonly } from '@/components/Editable'
 import Context from '../../context'
 import Copy from '@/components/Copy'
 const Name: React.FC<{
@@ -13,40 +13,38 @@ const Name: React.FC<{
 }> = ({ keys, onChange }) => {
   const connection = React.useContext(Context)
 
-  const props: InputProps = React.useMemo(() => {
+  const types = React.useMemo(() => {
     let types = keys.types
     if (keys.sub_types !== keys.types) {
       types += `(${keys.sub_types})`
     }
-    return {
-      value: keys.name,
-      readOnly: true,
-      addonBefore: types
+    return types
+  }, [keys.sub_types, keys.types])
+
+  const edit = React.useMemo(() => {
+    if (isReadonly(connection)) {
+      return undefined
     }
-  }, [keys.name, keys.sub_types, keys.types])
+    return (
+      <Rename
+        trigger={
+          <Button icon={<EditOutlined />} type="text" size="small"></Button>
+        }
+        keys={keys}
+        onSuccess={onChange}
+      />
+    )
+  }, [connection, keys, onChange])
 
   return (
-    <Editable
-      connection={connection}
-      feedback={
-        <Copy content={keys.name}>
-          <Input {...props}></Input>
-        </Copy>
-      }
-    >
-      <Copy content={keys.name}>
-        <Input
-          {...props}
-          addonAfter={
-            <Rename
-              trigger={<EditOutlined />}
-              keys={keys}
-              onSuccess={onChange}
-            />
-          }
-        ></Input>
-      </Copy>
-    </Editable>
+    <Copy content={keys.name}>
+      <Input
+        value={keys.name}
+        readOnly
+        addonBefore={types}
+        addonAfter={edit}
+      ></Input>
+    </Copy>
   )
 }
 

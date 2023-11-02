@@ -1,4 +1,4 @@
-import { Modal, message, type ModalProps } from 'antd'
+import { Modal, type ModalProps, App } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -23,6 +23,8 @@ const CusModal: React.FC<
   } = props
 
   const { t } = useTranslation()
+
+  const { message } = App.useApp()
 
   const [open, setOpen] = React.useState(false)
 

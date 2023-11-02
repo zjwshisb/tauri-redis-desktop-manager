@@ -1,4 +1,4 @@
-import { Form, Select, InputNumber } from 'antd'
+import { Form, Select, InputNumber, Checkbox } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { observer } from 'mobx-react-lite'
@@ -58,6 +58,13 @@ const Index: React.FC = () => {
         tooltip={t('The COUNT option for command HSCAN,SSCAN,ZSCAN')}
       >
         <InputNumber min={1} />
+      </Form.Item>
+      <Form.Item
+        name="dark_mode"
+        label={t('Dark Mode')}
+        valuePropName="checked"
+      >
+        <Checkbox />
       </Form.Item>
     </ModalForm>
   )

@@ -16,7 +16,7 @@ import {
   Col,
   Row,
   Button,
-  Modal
+  App
 } from 'antd'
 import Action, { type ActionRef } from './Action'
 import { useSourceConnection, useTargetConnection } from '../../hooks'
@@ -24,6 +24,7 @@ import { getCurrent } from '@tauri-apps/api/window'
 import { confirm } from '@tauri-apps/api/dialog'
 import { type UnlistenFn } from '@tauri-apps/api/event'
 import { useLatest } from 'ahooks'
+import Container from '@/components/Container'
 
 interface ConfigForm {
   pattern: string
@@ -40,6 +41,8 @@ const StepTwo: React.FC = () => {
   const [migrateLoading, setMigrateLoading] = React.useState(false)
 
   const targetConnection = useTargetConnection()
+
+  const { modal } = App.useApp()
 
   const sourceConnection = useSourceConnection()
 
@@ -61,7 +64,7 @@ const StepTwo: React.FC = () => {
     if (!migrateLoading) {
       return {
         onClick() {
-          Modal.confirm({
+          modal.confirm({
             title: t('Notice'),
             content: t('Are you sure start migrate those keys?'),
             onOk() {
@@ -82,7 +85,7 @@ const StepTwo: React.FC = () => {
         children: t('Stop')
       }
     }
-  }, [migrateLoading, prevLoading, ref, t])
+  }, [migrateLoading, modal, prevLoading, t])
 
   const previewProps: ButtonProps = React.useMemo(() => {
     if (!prevLoading) {
@@ -136,7 +139,10 @@ const StepTwo: React.FC = () => {
   }
 
   return (
-    <div className={classNames(['w-full flex-col justify-between flex'])}>
+    <Container
+      className={classNames(['w-full flex-col justify-between flex'])}
+      level={4}
+    >
       <div>
         <Header
           source={{
@@ -148,7 +154,7 @@ const StepTwo: React.FC = () => {
             subTitle: state.value?.target.database?.toString()
           }}
         ></Header>
-        <div className="p-4">
+        <Container className="p-4 flex-1" level={4}>
           <div className="mb-4">
             <div className="text-lg font-medium">{t('Setting')}</div>
             <Form<ConfigForm>
@@ -248,7 +254,7 @@ const StepTwo: React.FC = () => {
               database: state.value?.source.database
             }}
           ></Action>
-        </div>
+        </Container>
       </div>
       <SubmitBar
         nextProps={previewProps}
@@ -267,7 +273,7 @@ const StepTwo: React.FC = () => {
           </Button>
         }
       ></SubmitBar>
-    </div>
+    </Container>
   )
 }
 

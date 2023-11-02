@@ -5,19 +5,23 @@ import ResizableDiv from '@/components/ResizableDiv'
 import useStore from '@/hooks/useStore'
 import { MacScrollbar } from 'mac-scrollbar'
 import ConnectionForm from '@/components/ConnectionForm'
+import Container from '@/components/Container'
 
 const Index: React.FC = () => {
   const store = useStore()
 
   return (
     <ResizableDiv
-      className={'border-r'}
+      className={
+        'border-r border-neutral-border dark:border-neutral-border-dark'
+      }
       minWidth={200}
       defaultWidth={300}
       maxWidth={500}
     >
-      <div
-        className="flex h-full  bg-[#E7E8E8] flex-col overflow-hidden"
+      <Container
+        className="flex h-full flex-col overflow-hidden"
+        level={2}
         id="connection"
       >
         <ConnectionForm />
@@ -28,7 +32,7 @@ const Index: React.FC = () => {
             })}
           </div>
         </MacScrollbar>
-      </div>
+      </Container>
     </ResizableDiv>
   )
 }

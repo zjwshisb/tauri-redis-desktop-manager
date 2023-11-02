@@ -9,7 +9,7 @@ import {
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
-import { Dropdown, Modal, message } from 'antd'
+import { Dropdown, App } from 'antd'
 import { useTranslation } from 'react-i18next'
 
 export interface DBType {
@@ -22,6 +22,8 @@ const Index: React.FC<{
   onOpen: (c: APP.Connection) => void
 }> = ({ connection, onOpen }) => {
   const store = useStore()
+
+  const { message, modal } = App.useApp()
 
   const { t } = useTranslation()
 
@@ -71,65 +73,67 @@ const Index: React.FC<{
   }, [t, connection.open])
 
   return (
-    <Dropdown
-      trigger={['hover']}
-      className="hover:text-blue-600"
-      menu={{
-        onClick(e) {
-          e.domEvent.stopPropagation()
-          switch (e.key) {
-            case 'delete': {
-              Modal.confirm({
-                title: t('Notice'),
-                content: t('Are you sure delete <{{name}}>?', {
-                  name: t('Connection')
-                }),
-                async onOk() {
-                  await request('connections/del', 0, {
-                    id: connection.id
-                  })
-                  store.connection.remove(connection.id)
-                  message.success(t('Success'))
-                }
-              })
-              break
-            }
-            case 'edit': {
-              if (connection.open === true) {
-                Modal.confirm({
+    <>
+      <Dropdown
+        trigger={['hover']}
+        className="hover:text-blue-600"
+        menu={{
+          onClick(e) {
+            e.domEvent.stopPropagation()
+            switch (e.key) {
+              case 'delete': {
+                modal.confirm({
                   title: t('Notice'),
-                  content: t('You must close the connection before editing'),
-                  onOk: () => {
-                    store.connection.close(connection.id)
-                    store.connection.openForm(connection)
+                  content: t('Are you sure delete <{{name}}>?', {
+                    name: t('Connection')
+                  }),
+                  async onOk() {
+                    await request('connections/del', 0, {
+                      id: connection.id
+                    })
+                    store.connection.remove(connection.id)
+                    message.success(t('Success'))
                   }
                 })
-              } else {
-                store.connection.openForm(connection)
+                break
               }
-              break
+              case 'edit': {
+                if (connection.open === true) {
+                  modal.confirm({
+                    title: t('Notice'),
+                    content: t('You must close the connection before editing'),
+                    onOk: () => {
+                      store.connection.close(connection.id)
+                      store.connection.openForm(connection)
+                    }
+                  })
+                } else {
+                  store.connection.openForm(connection)
+                }
+                break
+              }
+              case 'open': {
+                store.connection.open(connection.id).then(() => {
+                  onOpen(connection)
+                })
+                break
+              }
+              case 'close': {
+                store.connection.close(connection.id)
+                break
+              }
             }
-            case 'open': {
-              store.connection.open(connection.id).then(() => {
-                onOpen(connection)
-              })
-              break
-            }
-            case 'close': {
-              store.connection.close(connection.id)
-              break
-            }
-          }
-        },
-        items: connectionMenus
-      }}
-    >
-      <AppstoreOutlined
-        onClick={(e) => {
-          e.stopPropagation()
+          },
+          items: connectionMenus
         }}
-      />
-    </Dropdown>
+      >
+        <AppstoreOutlined
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+        />
+      </Dropdown>
+    </>
   )
 }
 export default observer(Index)

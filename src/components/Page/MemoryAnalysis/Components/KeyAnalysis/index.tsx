@@ -10,6 +10,7 @@ import { CaretDownFilled, CaretUpFilled } from '@ant-design/icons'
 import { useScanCursor } from '@/hooks/useKeyScan'
 import classNames from 'classnames'
 import useStore from '@/hooks/useStore'
+import Container from '@/components/Container'
 
 export interface KeyItem {
   name: string
@@ -217,7 +218,7 @@ const KeyAnalysis: React.FC<{
           </div>
         </div>
       </div>
-      <div className="border">
+      <Container className="border rounded">
         {keys.length === 0 && (
           <div className="h-[600px]">
             <Empty className="py-10"></Empty>
@@ -243,7 +244,7 @@ const KeyAnalysis: React.FC<{
             }}
           </VirtualList>
         )}
-      </div>
+      </Container>
     </div>
   )
 }

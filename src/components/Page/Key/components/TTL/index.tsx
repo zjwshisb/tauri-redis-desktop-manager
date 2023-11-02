@@ -1,9 +1,9 @@
 import React, { useContext } from 'react'
-import { Input, type InputProps } from 'antd'
+import { Button, Input } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import Expire from '../Expire'
 import context from '../../context'
-import Editable from '@/components/Editable'
+import { isReadonly } from '@/components/Editable'
 
 const TTL: React.FC<{
   keys: APP.Key
@@ -11,31 +11,28 @@ const TTL: React.FC<{
 }> = ({ keys, onChange }) => {
   const connection = useContext(context)
 
-  const props: InputProps = React.useMemo(() => {
-    return {
-      value: keys.ttl,
-      readOnly: true,
-      addonBefore: 'TTL'
+  const edit = React.useMemo(() => {
+    if (isReadonly(connection)) {
+      return undefined
     }
-  }, [keys.ttl])
-
-  const content = React.useMemo(() => {
     return (
-      <Editable connection={connection} feedback={<Input {...props}></Input>}>
-        <Input
-          {...props}
-          addonAfter={
-            <Expire
-              keys={keys}
-              onSuccess={onChange}
-              trigger={<EditOutlined />}
-            />
-          }
-        ></Input>
-      </Editable>
+      <Expire
+        keys={keys}
+        onSuccess={onChange}
+        trigger={
+          <Button icon={<EditOutlined />} size="small" type="text"></Button>
+        }
+      />
     )
-  }, [connection, keys, onChange, props])
+  }, [connection, keys, onChange])
 
-  return content
+  return (
+    <Input
+      value={keys.ttl}
+      readOnly
+      addonBefore={'TTL'}
+      addonAfter={edit}
+    ></Input>
+  )
 }
 export default TTL

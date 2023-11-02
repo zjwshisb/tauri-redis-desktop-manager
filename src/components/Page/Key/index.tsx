@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input, Modal, Result, Space, message } from 'antd'
+import { App, Button, Input, Result, Space } from 'antd'
 import StringValue from './components/StringValue'
 import HashValue from './components/HashValue'
 import ListValue from './components/ListValue'
@@ -53,6 +53,8 @@ const Key: React.FC<{
 
   const { t } = useTranslation()
 
+  const { modal, message } = App.useApp()
+
   const value = React.useMemo(() => {
     if (item !== undefined) {
       switch (item.types) {
@@ -100,7 +102,7 @@ const Key: React.FC<{
 
   const handleDelete = React.useCallback(() => {
     if (item !== undefined) {
-      Modal.confirm({
+      modal.confirm({
         title: t('Notice'),
         content: t('Are you sure delete <{{name}}>?', {
           name: item.name
@@ -116,7 +118,7 @@ const Key: React.FC<{
         }
       })
     }
-  }, [item, pageKey, store.page, t])
+  }, [item, message, modal, pageKey, store.page, t])
 
   if (error !== '') {
     return <Result status="warning" title={error}></Result>
@@ -152,10 +154,10 @@ const Key: React.FC<{
                 ></Name>
               </div>
               <Space wrap>
-                <div className="w-[200px]">
+                <div className="w-[300px]">
                   <TTL keys={item} onChange={fetch}></TTL>
                 </div>
-                <div className="w-[200px]">
+                <div className="w-[300px]">
                   <Input
                     addonBefore={'Memory Usage'}
                     value={item.memory}

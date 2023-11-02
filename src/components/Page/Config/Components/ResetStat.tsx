@@ -1,6 +1,6 @@
 import Editable from '@/components/Editable'
 
-import { Button, Modal, message } from 'antd'
+import { Button, App } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Link from '@/components/Link'
@@ -12,13 +12,15 @@ const ResetStat: React.FC<{
 }> = ({ connection, onSuccess }) => {
   const { t } = useTranslation()
 
+  const { modal, message } = App.useApp()
+
   return (
     <Editable connection={connection}>
       <div className="ml-2">
         <Button
           type="primary"
           onClick={() => {
-            Modal.confirm({
+            modal.confirm({
               title: t('Notice'),
               content: (
                 <div>

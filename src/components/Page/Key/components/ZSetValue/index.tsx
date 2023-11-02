@@ -1,12 +1,11 @@
 import React from 'react'
-import { Button, Space, Input } from 'antd'
+import { Button, Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import ZRem from './components/ZRem'
 import { observer } from 'mobx-react-lite'
 import FieldForm from './components/FieldForm'
 import { EditOutlined } from '@ant-design/icons'
 import CusTable from '@/components/CusTable'
-import IconButton from '@/components/IconButton'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
 import { isReadonly } from '@/components/Editable'
@@ -74,7 +73,7 @@ const Index: React.FC<{
       fixed: 'right',
       render(_, record) {
         return (
-          <Space>
+          <div>
             <ZRem
               keys={keys}
               value={record.field}
@@ -86,9 +85,9 @@ const Index: React.FC<{
               onSuccess={onRefresh}
               keys={keys}
               field={record}
-              trigger={<IconButton icon={<EditOutlined />} />}
+              trigger={<Button icon={<EditOutlined />} type="link" />}
             ></FieldForm>
-          </Space>
+          </div>
         )
       }
     },

@@ -1,9 +1,8 @@
 import React from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
-import { Modal, message } from 'antd'
+import { App, Button } from 'antd'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
-import IconButton from '@/components/IconButton'
 
 const HDel: React.FC<{
   keys: APP.Key
@@ -12,10 +11,13 @@ const HDel: React.FC<{
 }> = ({ field, keys, onSuccess }) => {
   const { t } = useTranslation()
 
+  const { modal, message } = App.useApp()
+
   return (
-    <IconButton
+    <Button
+      type="link"
       onClick={() => {
-        Modal.confirm({
+        modal.confirm({
           title: t('Notice'),
           content: t('Are you sure delete <{{name}}>?', {
             name: field.field
@@ -32,7 +34,7 @@ const HDel: React.FC<{
         })
       }}
       icon={<DeleteOutlined />}
-    ></IconButton>
+    ></Button>
   )
 }
 export default HDel

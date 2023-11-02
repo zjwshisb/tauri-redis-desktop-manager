@@ -2,12 +2,12 @@ import React from 'react'
 import { Button, Card, Form } from 'antd'
 
 import ValueLayout from '../ValueLayout'
-import ReactJson from 'react-json-view'
 import lodash from 'lodash'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
 import FieldInput from '@/components/FieldInput'
+import JsonView from '@/components/JsonView'
 
 const JsonValue: React.FC<{
   keys: APP.JsonKey
@@ -35,13 +35,7 @@ const JsonValue: React.FC<{
     if (!value.json) {
       return value.value
     }
-    return (
-      <ReactJson
-        src={value.value}
-        name={false}
-        displayDataTypes={false}
-      ></ReactJson>
-    )
+    return <JsonView src={value.value}></JsonView>
   }, [value.json, value.value])
 
   return (

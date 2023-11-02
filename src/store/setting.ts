@@ -10,13 +10,15 @@ export interface AppSetting {
   locale: string
   key_count: number
   field_count: number
+  dark_mode: boolean
 }
 
 class SettingStore {
   setting: AppSetting = {
     locale: i18n.language,
     key_count: 100,
-    field_count: 100
+    field_count: 100,
+    dark_mode: false
   }
 
   constructor() {
@@ -24,8 +26,7 @@ class SettingStore {
     if (cache !== null) {
       try {
         const setting: AppSetting = JSON.parse(cache)
-        this.setting = setting
-        i18n.changeLanguage(this.setting.locale)
+        this.update(setting)
       } catch {}
     }
     if (!isMainWindow()) {
@@ -41,6 +42,16 @@ class SettingStore {
       this.setting.locale = data.locale
       i18n.changeLanguage(this.setting.locale)
     }
+    const htmls = document.getElementsByTagName('html')
+    if (htmls.length >= 1) {
+      const html = htmls[0]
+      if (data.dark_mode === true) {
+        html.classList.add('dark')
+      } else {
+        html.classList.remove('dark')
+      }
+    }
+
     this.setting = {
       ...this.setting,
       ...data

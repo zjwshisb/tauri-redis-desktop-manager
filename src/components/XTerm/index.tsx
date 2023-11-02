@@ -2,6 +2,7 @@ import React from 'react'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import lodash from 'lodash'
+import Container from '../Container'
 
 interface XTermProps {
   className?: string
@@ -169,9 +170,12 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
   }, [term, props.welcome, prefix, onEnter, readonly])
 
   return (
-    <div ref={container} className="bg-black rounded overflow-hidden">
+    <Container
+      ref={container}
+      className="bg-black rounded overflow-hidden border "
+    >
       <div ref={div} className={props.className}></div>
-    </div>
+    </Container>
   )
 }
 export default React.forwardRef<Terminal, XTermProps>(XTerm)

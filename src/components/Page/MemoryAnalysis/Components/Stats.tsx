@@ -1,5 +1,5 @@
 import useRequest from '@/hooks/useRequest'
-import { Button, Card, Descriptions, Modal, message } from 'antd'
+import { App, Button, Card, Descriptions } from 'antd'
 import React from 'react'
 import { isArray } from 'lodash'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +12,8 @@ const Stats: React.FC<{
   const { data } = useRequest<APP.Field[][]>('memory/stats', connection.id)
 
   const { t } = useTranslation()
+
+  const { modal, message } = App.useApp()
 
   const renderItem = React.useCallback((i: APP.Field[]) => {
     return i.map((v) => {
@@ -29,8 +31,8 @@ const Stats: React.FC<{
         })
       }
       return {
-        label: v.name,
-        key: v.name,
+        label: v.field,
+        key: v.value,
         children
       }
     })
@@ -73,7 +75,7 @@ const Stats: React.FC<{
         <Button
           type="primary"
           onClick={() => {
-            Modal.confirm({
+            modal.confirm({
               title: t('Notice'),
               content: (
                 <div>

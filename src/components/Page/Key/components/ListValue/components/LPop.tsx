@@ -1,4 +1,4 @@
-import { Button, Modal, message } from 'antd'
+import { App, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
@@ -9,11 +9,13 @@ const LPop: React.FC<{
 }> = (props) => {
   const { t } = useTranslation()
 
+  const { modal, message } = App.useApp()
+
   return (
     <Button
       type="primary"
       onClick={() => {
-        Modal.confirm({
+        modal.confirm({
           title: t('Notice'),
           content: t('Are you sure pop a value from the left?'),
           async onOk() {

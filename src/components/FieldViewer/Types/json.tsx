@@ -1,8 +1,8 @@
 import { type TypeFormat } from '.'
 import React from 'react'
-import ReactJson from 'react-json-view'
 import lodash from 'lodash'
 import Error from '../Err'
+import JsonView from '@/components/JsonView'
 
 const item: TypeFormat = {
   key: 'json',
@@ -15,21 +15,15 @@ const item: TypeFormat = {
         const obj = JSON.parse(content)
         if (lodash.isPlainObject(obj)) {
           resolve(
-            <ReactJson
+            <JsonView
               validationMessage="error"
               displayDataTypes={false}
-              indentWidth={2}
-              sortKeys={true}
               style={{
-                wordBreak: 'break-all'
+                wordBreak: 'break-all',
+                color: '#FFFFFF'
               }}
-              collapseStringsAfterLength={200}
-              enableClipboard
               src={obj}
-              name={false}
-              quotesOnKeys={false}
-              collapsed={1}
-            ></ReactJson>
+            ></JsonView>
           )
           return
         } else {

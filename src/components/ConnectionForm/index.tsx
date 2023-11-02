@@ -5,11 +5,11 @@ import {
   Modal,
   InputNumber,
   Space,
-  message,
   Checkbox,
   Col,
   Row,
-  Divider
+  Divider,
+  App
 } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import React from 'react'
@@ -30,6 +30,8 @@ const ConnectionForm: React.FC = () => {
 
   const formItem = store.connection.getForm()
   const [isSsh, setIsSsh] = React.useState(false)
+
+  const { message } = App.useApp()
 
   React.useEffect(() => {
     if (formItem.open && formItem.item != null) {

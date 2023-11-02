@@ -9,6 +9,7 @@ import { type WebviewWindow, getAll } from '@tauri-apps/api/window'
 import { WindowsOutlined } from '@ant-design/icons'
 import { TauriEvent } from '@tauri-apps/api/event'
 import { useTauriEvent } from '@/hooks/useTauriEvent'
+import Container from '@/components/Container'
 
 const ActionBar: React.FC = () => {
   const [window, setWindow] = React.useState<WebviewWindow[]>(getAll())
@@ -23,8 +24,10 @@ const ActionBar: React.FC = () => {
   })
 
   return (
-    <div className="h-[85px] w-full flex-shrink-0 border-b  bg-[#F1F1F1] flex flex-col">
-      <div className="h-[30px]" data-tauri-drag-region="true"></div>
+    <Container
+      className="h-[55px] w-full flex-shrink-0 border-b flex flex-col"
+      level={1}
+    >
       <div className="flex justify-between items-center flex-1">
         <div className="flex px-4">
           <Space>
@@ -40,7 +43,7 @@ const ActionBar: React.FC = () => {
           <WindowsOutlined />
         </div>
       </div>
-    </div>
+    </Container>
   )
 }
 

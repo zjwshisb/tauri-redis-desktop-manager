@@ -1,9 +1,8 @@
-import { Form, InputNumber } from 'antd'
+import { Button, Form, InputNumber } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import { EditOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import IconButton from '@/components/IconButton'
 import FieldInput from '@/components/FieldInput'
 import ModalForm from '@/components/ModalForm'
 
@@ -17,7 +16,7 @@ const LSet: React.FC<{
 
   return (
     <ModalForm
-      trigger={<IconButton icon={<EditOutlined />} />}
+      trigger={<Button icon={<EditOutlined />} type="link" />}
       onSubmit={async (v) => {
         await request<number>('key/list/lset', props.keys.connection_id, {
           name: props.keys.name,

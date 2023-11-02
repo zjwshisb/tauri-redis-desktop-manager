@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite'
 import 'mac-scrollbar/dist/mac-scrollbar.css'
 
 import { DatabaseOutlined, DoubleRightOutlined } from '@ant-design/icons'
+import Container from '@/components/Container'
 
 const StepOne: React.FC<{
   title?: React.ReactNode
@@ -19,7 +20,10 @@ const StepOne: React.FC<{
 }> = ({ source, target, title }) => {
   return (
     <>
-      <div className="flex items-center justify-center h-[50px] bg-[#EEEFEE] text-[14px]">
+      <Container
+        className="flex items-center justify-center h-[50px] text-[14px]"
+        level={1}
+      >
         <div className="flex flex-1 items-center justify-end">
           <div className="px-4 flex flex-col items-center leading-4">
             <span>{source.title}</span>
@@ -44,9 +48,11 @@ const StepOne: React.FC<{
             )}
           </div>
         </div>
-      </div>
+      </Container>
       {title !== undefined && (
-        <div className="py-1 flex justify-center border-b">{title}</div>
+        <Container level={3} className="py-1 flex justify-center border-b">
+          {title}
+        </Container>
       )}
     </>
   )

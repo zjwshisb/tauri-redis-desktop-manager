@@ -7,7 +7,6 @@ import ValueLayout from '../ValueLayout'
 import request from '@/utils/request'
 import useTableColumn from '@/hooks/useTableColumn'
 import { PlusOutlined } from '@ant-design/icons'
-import IconButton from '@/components/IconButton'
 import ModalForm from '@/components/ModalForm'
 import { type Field } from 'ahooks/lib/useFusionTable/types'
 import { useTranslation } from 'react-i18next'
@@ -81,7 +80,10 @@ const TopKValue: React.FC<{
               }}
               title="TOPK.INCRBY"
               trigger={
-                <IconButton icon={<PlusOutlined></PlusOutlined>}></IconButton>
+                <Button
+                  icon={<PlusOutlined></PlusOutlined>}
+                  type="link"
+                ></Button>
               }
             >
               <Form.Item name={'field'} label={'name'}>

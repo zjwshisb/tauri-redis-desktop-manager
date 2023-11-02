@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { ceil, chunk } from 'lodash'
 import request from '@/utils/request'
 import classNames from 'classnames'
+import Container from '@/components/Container'
 
 type Status = 'before' | 'finished' | 'stop'
 
@@ -201,7 +202,7 @@ const Action: React.ForwardRefRenderFunction<ActionRef, ActionProps> = (
   return (
     <div className="mt-4">
       <div className="text-lg font-medium mb-2">{t('Key List')}</div>
-      <div className="border h-[300px]">
+      <Container className="border h-[300px]">
         {keys.length === 0 && (
           <div className={'h-full flex items-center justify-center'}>
             <Empty />
@@ -218,7 +219,7 @@ const Action: React.ForwardRefRenderFunction<ActionRef, ActionProps> = (
             >
               {(item, index) => {
                 return (
-                  <div className="h-[24px] border-b box-border flex items-center px-2">
+                  <Container className="h-[24px] border-b box-border flex items-center px-2">
                     <div className="w-[100px] flex-shrink-0">{index + 1}</div>
                     <div className="w-[300px] truncate break-all px-2 flex-1">
                       {item.name}
@@ -233,13 +234,13 @@ const Action: React.ForwardRefRenderFunction<ActionRef, ActionProps> = (
                     >
                       {item.message}
                     </div>
-                  </div>
+                  </Container>
                 )
               }}
             </VirtualList>
           </Spin>
         )}
-      </div>
+      </Container>
       <div className="mt-2">
         <Descriptions
           size="small"

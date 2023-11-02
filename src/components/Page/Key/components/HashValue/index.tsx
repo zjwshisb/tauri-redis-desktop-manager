@@ -1,12 +1,11 @@
 import React, { useContext, useState } from 'react'
-import { Button, Space, Input } from 'antd'
+import { Button, Input } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import HSet from './components/HSet'
 import HDel from './components/HDel'
 import { useTranslation } from 'react-i18next'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
-import IconButton from '@/components/IconButton'
 import context from '../../context'
 import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
@@ -67,10 +66,10 @@ const HashValue: React.FC<{
       fixed: 'right',
       render(_, record, index) {
         return (
-          <Space>
+          <div>
             <Editable connection={connection}>
               <HSet
-                trigger={<IconButton icon={<EditOutlined />} />}
+                trigger={<Button icon={<EditOutlined />} type="link"></Button>}
                 keys={keys}
                 field={record}
                 onSuccess={onRefresh}
@@ -79,7 +78,7 @@ const HashValue: React.FC<{
             <Editable connection={connection}>
               <HDel keys={keys} field={record} onSuccess={onRefresh} />
             </Editable>
-          </Space>
+          </div>
         )
       }
     },

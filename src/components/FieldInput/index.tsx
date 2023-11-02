@@ -1,8 +1,9 @@
 import React from 'react'
 import { Card, Input, Radio } from 'antd'
 import lodash from 'lodash'
-import ReactJson, { type InteractionProps } from 'react-json-view'
+import { type InteractionProps } from 'react-json-view'
 import { useTranslation } from 'react-i18next'
+import JsonView from '../JsonView'
 
 const FieldInput: React.FC<{
   value?: string
@@ -62,17 +63,15 @@ const FieldInput: React.FC<{
       const onChange = readOnly ? undefined : onJsonChange
       return (
         <Card bodyStyle={{ padding: 8 }}>
-          <ReactJson
-            displayDataTypes={false}
+          <JsonView
             style={{
               wordBreak: 'break-all'
             }}
-            name={false}
             src={jsonValue}
             onDelete={onChange}
             onEdit={onChange}
             onAdd={onChange}
-          ></ReactJson>
+          ></JsonView>
         </Card>
       )
     }

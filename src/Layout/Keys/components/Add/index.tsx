@@ -1,7 +1,7 @@
 import { type KeyInfo } from '@/store/key'
 import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
-import { Form, Input, InputNumber, Select, Tooltip } from 'antd'
+import { Button, Form, Input, InputNumber, Select, Tooltip } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import useKeyTypes from '@/hooks/useKeyTypes'
@@ -153,7 +153,11 @@ const Plus: React.FC<{
       onValueChange={onValueChange}
       trigger={
         <Tooltip title={t('New Key')} placement="bottom">
-          <PlusOutlined className="hover:cursor-pointer text-lg"></PlusOutlined>
+          <Button
+            type="text"
+            size="small"
+            icon={<PlusOutlined className="text-lg"></PlusOutlined>}
+          ></Button>
         </Tooltip>
       }
       title={t('New Key')}

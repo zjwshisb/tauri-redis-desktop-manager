@@ -1,87 +1,49 @@
 import React from 'react'
 
-import { Tooltip } from 'antd'
 import { observer } from 'mobx-react-lite'
 import request from '@/utils/request'
-import { event } from '@tauri-apps/api'
-import Terminal, { type TerminalRow } from '@/components/Terminal'
-import { useLatest, useMount, useUnmount } from 'ahooks'
-import { InfoCircleOutlined } from '@ant-design/icons'
-import useArrayState from '@/hooks/useArrayState'
-import SearchText from '@/components/SearchText'
 
 import AppLayout from '@/components/AppLayout'
 import Page from '@/components/Page'
+import Container from '@/components/Container'
+import { useEventListener } from '@/hooks/useEventListener'
+import XTerm from '@/components/XTerm'
+import { type Terminal } from 'xterm'
+import { Button } from 'antd'
 
 const App: React.FC = () => {
-  const { items, append, clear } = useArrayState<TerminalRow>(100)
+  const searchRef = React.useRef('')
 
-  const unListenFn = React.useRef<() => void>()
+  const term = React.useRef<Terminal>(null)
 
-  const [search, setSearch] = React.useState('')
-
-  const searchRef = useLatest(search)
-
-  const init = React.useRef(false)
-  useMount(() => {
-    if (!init.current) {
+  const { listen, cancel } = useEventListener<string>((e) => {
+    const cmd: APP.RedisCmd = JSON.parse(e.payload)
+    if (
+      searchRef.current === '' ||
+      cmd.cmd
+        .toLocaleLowerCase()
+        .includes(searchRef.current.toLocaleLowerCase())
+    ) {
+      term.current?.writeln(` ${cmd.host}> ${cmd.cmd}`)
       console.log('test')
-      init.current = true
-      request('debug/log').then(() => {
-        event
-          .listen<string>('debug', (e) => {
-            const cmd: APP.RedisCmd = JSON.parse(e.payload)
-            if (
-              searchRef.current === '' ||
-              cmd.cmd
-                .toLocaleLowerCase()
-                .includes(searchRef.current.toLocaleLowerCase())
-            ) {
-              const row: TerminalRow = {
-                time: cmd.created_at,
-                tags: [cmd.host, `${cmd.duration}us`],
-                message: (
-                  <div className="flex">
-                    <div>
-                      <SearchText text={cmd.cmd} search={searchRef.current} />
-                    </div>
-                    <Tooltip
-                      title={cmd.response}
-                      className="ml-1"
-                      placement="right"
-                    >
-                      <InfoCircleOutlined className="text-amber-600" />
-                    </Tooltip>
-                  </div>
-                ),
-                id: cmd.id
-              }
-              append(row)
-            }
-          })
-          .then((r) => {
-            unListenFn.current = r
-          })
-      })
     }
   })
 
-  useUnmount(() => {
-    if (unListenFn.current != null) {
-      unListenFn.current()
-    }
-  })
+  const handleListen = React.useCallback(() => {
+    cancel()
+    request('debug/log').then(() => {
+      listen('debug')
+    })
+  }, [cancel, listen])
+
   return (
     <AppLayout>
-      <Page pageKey="log" wFull>
-        <Terminal
-          className="h-[500px]"
-          rows={items}
-          onClear={clear}
-          search={search}
-          onSearchChange={setSearch}
-        ></Terminal>
-      </Page>
+      <Container level={3}>
+        <Page pageKey="log" wFull>
+          <XTerm ref={term} readonly welcome="Pause button to start"></XTerm>
+          <Button onClick={handleListen}>Start</Button>
+        </Page>
+      </Container>
     </AppLayout>
   )
 }

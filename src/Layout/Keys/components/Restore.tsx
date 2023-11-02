@@ -1,14 +1,14 @@
 import { type KeyInfo } from '@/store/key'
 import request from '@/utils/request'
 import { ImportOutlined } from '@ant-design/icons'
-import { Checkbox, Form, Input, InputNumber, Tooltip } from 'antd'
+import { Button, Checkbox, Form, Input, InputNumber, Tooltip } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import TextArea from 'antd/es/input/TextArea'
 import VersionAccess from '@/components/VersionAccess'
 import ModalForm from '@/components/ModalForm'
 
-const Import: React.FC<{
+const Restore: React.FC<{
   onSuccess: (name: string) => void
   info: KeyInfo
 }> = ({ info, onSuccess }) => {
@@ -21,7 +21,11 @@ const Import: React.FC<{
         }}
         trigger={
           <Tooltip title={t('Restore Key')} placement="bottom">
-            <ImportOutlined className="hover:cursor-pointer text-lg"></ImportOutlined>
+            <Button
+              type="text"
+              size="small"
+              icon={<ImportOutlined className="text-lg"></ImportOutlined>}
+            ></Button>
           </Tooltip>
         }
         title={t('Restore Key')}
@@ -85,4 +89,4 @@ const Import: React.FC<{
     </VersionAccess>
   )
 }
-export default Import
+export default Restore

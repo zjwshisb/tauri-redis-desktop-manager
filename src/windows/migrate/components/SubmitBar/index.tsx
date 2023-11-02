@@ -2,6 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, type ButtonProps, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
+import Container from '@/components/Container'
 
 const SubmitBar: React.FC<{
   prevProps?: ButtonProps
@@ -13,7 +14,7 @@ const SubmitBar: React.FC<{
   const { prevProps, nextProps } = props
 
   return (
-    <div className="flex items-end justify-end p-4 bg-[#EEEEEF]">
+    <Container className="flex items-end justify-end p-4 " level={2}>
       <Space>
         {prevProps != null && (
           <Button {...prevProps}>
@@ -28,7 +29,7 @@ const SubmitBar: React.FC<{
         </Button>
         {props.extra}
       </Space>
-    </div>
+    </Container>
   )
 }
 

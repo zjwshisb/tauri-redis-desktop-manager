@@ -1,7 +1,7 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { type ListRef } from 'rc-virtual-list'
-import { Spin, Space, Tooltip, Statistic, ConfigProvider } from 'antd'
+import { Spin, Tooltip, Statistic, ConfigProvider, Button } from 'antd'
 import { useDebounceFn } from 'ahooks'
 import useStore from '@/hooks/useStore'
 import ResizableDiv from '@/components/ResizableDiv'
@@ -20,6 +20,7 @@ import useKeyScan from '@/hooks/useKeyScan'
 import { type KeyInfo } from '@/store/key'
 import Context from './context'
 import reducer from './reducer'
+import Container from '@/components/Container'
 
 const isMain = isMainWindow()
 
@@ -92,17 +93,26 @@ const Index: React.FC<{
 
   return (
     <ResizableDiv
-      className={'border-r'}
+      className={
+        'border-r  border-neutral-border dark:border-neutral-border-dark'
+      }
       minWidth={200}
       defaultWidth={300}
       maxWidth={800}
     >
       <Context.Provider value={[state, dispatch]}>
-        <div className="flex flex-col h-full overflow-hidden bg-white" id={id}>
+        <Container
+          className="flex flex-col h-full overflow-hidden"
+          id={id}
+          level={3}
+        >
           <Spin spinning={loading}>
-            <div className="border-b">
-              <div className="bg-[#ECECEC] p-2 flex justify-between items-center">
-                <Space className="flex">
+            <Container className="border-b" level={5}>
+              <Container
+                className="p-2 flex justify-between items-center border-b"
+                level={5}
+              >
+                <div className="flex">
                   <Editable connection={info.connection}>
                     <Add
                       onSuccess={(name: string) => {
@@ -151,23 +161,29 @@ const Index: React.FC<{
                   </Editable>
                   {isMain && (
                     <Tooltip title={t('Open In New Window')} placement="bottom">
-                      <WindowsOutlined
-                        className="hover:cursor-pointer text-lg"
+                      <Button
+                        size="small"
                         onClick={() => {
                           store.keyInfo.newWindow(info.connection, info.db)
                         }}
-                      ></WindowsOutlined>
+                        type="text"
+                        icon={
+                          <WindowsOutlined className="text-lg"></WindowsOutlined>
+                        }
+                      ></Button>
                     </Tooltip>
                   )}
                   <Tooltip title={t('Refresh')} placement="bottom">
-                    <ReloadOutlined
-                      className="hover:cursor-pointer text-lg"
+                    <Button
+                      size="small"
+                      type="text"
                       onClick={() => {
                         getKeys(true)
                       }}
-                    />
+                      icon={<ReloadOutlined className="text-lg" />}
+                    ></Button>
                   </Tooltip>
-                </Space>
+                </div>
                 <div>
                   <ConfigProvider
                     theme={{
@@ -184,16 +200,16 @@ const Index: React.FC<{
                     ></Statistic>
                   </ConfigProvider>
                 </div>
-              </div>
+              </Container>
               <Filter connection={info.connection} />
-            </div>
+            </Container>
             <VirtualKeyList
               info={info}
               keys={keys}
               height={listHeight}
               listRef={listRef}
             />
-            <div className="p-2 border-t">
+            <Container className="p-2 border-t">
               <LoadMore
                 disabled={!more}
                 loading={loading}
@@ -202,9 +218,9 @@ const Index: React.FC<{
                   getKeys()
                 }}
               />
-            </div>
+            </Container>
           </Spin>
-        </div>
+        </Container>
       </Context.Provider>
     </ResizableDiv>
   )

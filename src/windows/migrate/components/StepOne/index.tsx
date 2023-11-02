@@ -13,6 +13,7 @@ import classNames from 'classnames'
 import Header from '../Header'
 import Context from '../../context'
 import { type MigrateItem } from '../../reducer'
+import Container from '@/components/Container'
 
 const StepOne: React.FC = () => {
   const { t } = useTranslation()
@@ -23,7 +24,8 @@ const StepOne: React.FC = () => {
   const [state, dispatch] = React.useContext(Context)
 
   return (
-    <div
+    <Container
+      level={4}
       className={classNames([
         'w-full flex-col justify-between',
         state.step === 0 ? 'flex' : 'hidden'
@@ -80,7 +82,7 @@ const StepOne: React.FC = () => {
           }
         }}
       />
-    </div>
+    </Container>
   )
 }
 

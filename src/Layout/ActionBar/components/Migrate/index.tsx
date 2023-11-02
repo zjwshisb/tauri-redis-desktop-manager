@@ -10,7 +10,6 @@ const Sync: React.FC = () => {
   const { open, active } = useOpenWindow('migrate', {
     url: 'src/windows/migrate/index.html',
     title: t('Data Migrate').toString(),
-    focus: true,
     minHeight: 700,
     minWidth: 600
   })

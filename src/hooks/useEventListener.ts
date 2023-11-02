@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import request from '@/utils/request'
 import { appWindow } from '@tauri-apps/api/window'
 import { isMainWindow } from '@/utils'
-import { Modal } from 'antd'
+import { App } from 'antd'
 import { useLatest } from 'ahooks'
 
 export function useEventListener<T = string>(handle: (e: Event<T>) => void) {
@@ -15,6 +15,8 @@ export function useEventListener<T = string>(handle: (e: Event<T>) => void) {
   const handleFn = useLatest(handle)
 
   const eventName = React.useRef('')
+
+  const { modal } = App.useApp()
 
   const listen = React.useCallback(
     async (name: string) => {
@@ -48,15 +50,20 @@ export function useEventListener<T = string>(handle: (e: Event<T>) => void) {
     if (!isMainWindow()) {
       let unListen: UnlistenFn
       appWindow
-        .listen(TauriEvent.WINDOW_CLOSE_REQUESTED, () => {
-          Modal.confirm({
-            title: t('Notice'),
-            content: 'Are you sure close this window?',
-            onOk: async () => {
-              await cancel()
-              await appWindow.close()
-            }
-          })
+        .listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+          try {
+            modal.confirm({
+              title: t('Notice'),
+              content: 'Are you sure close this window?',
+              onOk: async () => {
+                await cancel()
+                await appWindow.close()
+              }
+            })
+          } catch (e) {
+            await cancel()
+            await appWindow.close()
+          }
         })
         .then((r) => {
           unListen = r
@@ -67,7 +74,7 @@ export function useEventListener<T = string>(handle: (e: Event<T>) => void) {
         }
       }
     }
-  }, [cancel, t])
+  }, [cancel, modal, t])
 
   React.useEffect(() => {
     return () => {

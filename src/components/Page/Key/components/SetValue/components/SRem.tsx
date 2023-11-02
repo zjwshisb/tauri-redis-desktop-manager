@@ -1,8 +1,7 @@
 import React from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
-import { Modal, message } from 'antd'
+import { App, Button } from 'antd'
 import request from '@/utils/request'
-import IconButton from '@/components/IconButton'
 import { useTranslation } from 'react-i18next'
 
 const SRem: React.FC<{
@@ -12,11 +11,14 @@ const SRem: React.FC<{
 }> = ({ value, keys, onSuccess }) => {
   const { t } = useTranslation()
 
+  const { modal, message } = App.useApp()
+
   return (
-    <IconButton
+    <Button
+      type="link"
       icon={<DeleteOutlined />}
       onClick={() => {
-        Modal.confirm({
+        modal.confirm({
           title: t('Notice'),
           content: t('Are you sure delete <{{name}}>?', {
             name: value
@@ -32,7 +34,7 @@ const SRem: React.FC<{
           }
         })
       }}
-    ></IconButton>
+    ></Button>
   )
 }
 export default SRem

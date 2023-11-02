@@ -1,10 +1,9 @@
 import useRequest from '@/hooks/useRequest'
-import { Modal, Space, Tooltip, message } from 'antd'
+import { Space, Tooltip, App, Button } from 'antd'
 import React from 'react'
 import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { type ColumnType } from 'antd/es/table'
 import request from '@/utils/request'
-import IconButton from '@/components/IconButton'
 import Page from '..'
 import useTableColumn from '@/hooks/useTableColumn'
 import Editable from '@/components/Editable'
@@ -61,6 +60,8 @@ const Client: React.FC<{
     fetch
   } = useRequest<string>('client/list', connection.id)
 
+  const { modal, message } = App.useApp()
+
   const clients = React.useMemo(() => {
     if (clientStr !== undefined) {
       return clientStr
@@ -82,7 +83,7 @@ const Client: React.FC<{
 
   const handleKill = React.useCallback(
     (id: string) => {
-      Modal.confirm({
+      modal.confirm({
         title: 'notice',
         content: `are you sure kill the client<${id}>`,
         async onOk() {
@@ -95,7 +96,7 @@ const Client: React.FC<{
         }
       })
     },
-    [connection.id, fetch]
+    [connection.id, fetch, message, modal]
   )
 
   const columns = useTableColumn(
@@ -150,12 +151,13 @@ const Client: React.FC<{
         return (
           <Space>
             <Editable connection={connection}>
-              <IconButton
+              <Button
+                type="link"
                 onClick={() => {
                   handleKill(record.id)
                 }}
                 icon={<DeleteOutlined />}
-              ></IconButton>
+              ></Button>
             </Editable>
           </Space>
         )

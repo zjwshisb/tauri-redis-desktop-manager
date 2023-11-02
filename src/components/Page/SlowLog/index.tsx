@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import Page from '..'
 import CusTable from '@/components/CusTable'
 import useTableColumn from '@/hooks/useTableColumn'
-import { Button, Descriptions, Modal, message } from 'antd'
+import { App, Button, Descriptions } from 'antd'
 import { useTranslation } from 'react-i18next'
 import request from '@/utils/request'
 
@@ -17,6 +17,8 @@ const SlowLog: React.FC<{
     time: number
     count: number
   }>('server/slow-log', connection.id)
+
+  const { modal, message } = App.useApp()
 
   const { t } = useTranslation()
 
@@ -79,7 +81,7 @@ const SlowLog: React.FC<{
           danger
           type="primary"
           onClick={() => {
-            Modal.confirm({
+            modal.confirm({
               title: t('Notice'),
               content: t(
                 'Are you sure resets the slow log, clearing all entries in it?'

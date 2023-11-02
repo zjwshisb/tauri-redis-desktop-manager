@@ -8,6 +8,7 @@ import StickyBox from 'react-sticky-box'
 import { computed } from 'mobx'
 import { KeyOutlined } from '@ant-design/icons'
 import Welcome from './components/Welcome'
+import Container from '@/components/Container'
 
 const Index: React.FC = () => {
   const store = useStore()
@@ -45,7 +46,7 @@ const Index: React.FC = () => {
 
   const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
     <StickyBox offsetTop={0} offsetBottom={20} style={{ zIndex: 1 }}>
-      <DefaultTabBar {...props} className="bg-gray-100 m-0" />
+      <DefaultTabBar {...props} className="m-0 bg-gray-1 dark:bg-gray-13" />
     </StickyBox>
   )
 
@@ -102,18 +103,13 @@ const Index: React.FC = () => {
   )
 
   return (
-    <div className={'flex flex-1  bg-white box-border overflow-hidden'}>
-      <MacScrollbar
-        className="w-full  bg-white"
-        style={{ zIndex: 9 }}
-        id={'container'}
-      >
+    <Container className={'flex flex-1  box-border overflow-hidden'} level={4}>
+      <MacScrollbar className="w-full" style={{ zIndex: 9 }} id={'container'}>
         <ConfigProvider
           theme={{
             components: {
               Tabs: {
-                cardGutter: 0,
-                cardBg: '#ECECEC'
+                cardGutter: 0
               }
             }
           }}
@@ -144,7 +140,7 @@ const Index: React.FC = () => {
           </div>
         </ConfigProvider>
       </MacScrollbar>
-    </div>
+    </Container>
   )
 }
 
