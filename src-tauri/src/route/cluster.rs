@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    conn::{ConnectionManager, ConnectionWrapper},
+    connection::{ConnectionWrapper, Manager, Node},
     err::CusError,
-    model::Node,
     request::{self, IdArgs},
     response::{KeyWithMemory, ScanLikeResult},
 };
@@ -12,7 +11,7 @@ use redis::{FromRedisValue, Value};
 pub async fn scan<'r>(
     cid: u32,
     payload: String,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<ScanLikeResult<String, Vec<HashMap<String, String>>>, CusError> {
     let args: request::ScanLikeArgs<Vec<HashMap<String, String>>> =
         serde_json::from_str(payload.as_str())?;
@@ -59,7 +58,7 @@ pub async fn scan<'r>(
 pub async fn node_size<'r>(
     cid: u32,
     payload: String,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: IdArgs<String> = serde_json::from_str(&payload.as_str())?;
     let nodes: Vec<Node> = manager.get_nodes(cid).await?;
@@ -75,17 +74,14 @@ pub async fn node_size<'r>(
     return Ok(0);
 }
 
-pub async fn node<'r>(
-    cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
-) -> Result<Vec<Node>, CusError> {
+pub async fn node<'r>(cid: u32, manager: tauri::State<'r, Manager>) -> Result<Vec<Node>, CusError> {
     manager.get_nodes(cid).await
 }
 
 pub async fn analysis<'r>(
     cid: u32,
     payload: String,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<ScanLikeResult<KeyWithMemory, Vec<HashMap<String, String>>>, CusError> {
     let args: request::ScanLikeArgs<Vec<HashMap<String, String>>> =
         serde_json::from_str(payload.as_str())?;

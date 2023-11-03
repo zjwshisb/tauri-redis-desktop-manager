@@ -1,4 +1,4 @@
-use crate::conn::ConnectionManager;
+use crate::connection::Manager;
 use crate::err::CusError;
 
 use crate::request::NameArgs;
@@ -11,7 +11,7 @@ use redis::Value;
 pub async fn memory_usage<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     manager
@@ -29,7 +29,7 @@ pub async fn memory_usage<'r>(
 pub async fn analysis<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<ScanLikeResult<KeyWithMemory, String>, CusError> {
     let args: request::ScanLikeArgs<String> = serde_json::from_str(&payload)?;
 
@@ -78,7 +78,7 @@ pub async fn analysis<'r>(
 
 pub async fn memory_stats<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<Vec<response::Field>>, CusError> {
     let value: Vec<Value> = manager
         .execute(cid, redis::cmd("memory").arg("stats"), None)
@@ -98,7 +98,7 @@ pub async fn memory_stats<'r>(
 
 pub async fn memory_doctor<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let values = manager
         .execute(cid, redis::cmd("Memory").arg("doctor"), None)
@@ -120,7 +120,7 @@ pub async fn memory_doctor<'r>(
 
 pub async fn memory_purge<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     manager
         .execute(cid, redis::cmd("Memory").arg("PURGE"), None)

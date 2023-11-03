@@ -2,7 +2,7 @@ use redis::Value;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    conn::{self, ConnectionManager},
+    connection::{self, Manager},
     err::CusError,
     sqlite,
 };
@@ -27,12 +27,12 @@ pub struct ItemResult {
 pub async fn migrate<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<ItemResult>, CusError> {
     let args: MigrateArgs = serde_json::from_str(&payload)?;
     let mut result = vec![];
     let source_model = sqlite::Connection::first(cid)?;
-    let mut source_connection = conn::ConnectionWrapper::build(source_model).await?;
+    let mut source_connection = connection::ConnectionWrapper::build(source_model).await?;
     if !source_connection.is_cluster() {
         if let Some(db) = args.source_db {
             manager
@@ -43,7 +43,7 @@ pub async fn migrate<'r>(
         }
     }
     let target_model = sqlite::Connection::first(args.target_id)?;
-    let mut target_connection = conn::ConnectionWrapper::build(target_model).await?;
+    let mut target_connection = connection::ConnectionWrapper::build(target_model).await?;
     if !target_connection.is_cluster() {
         if let Some(db) = args.target_db {
             manager

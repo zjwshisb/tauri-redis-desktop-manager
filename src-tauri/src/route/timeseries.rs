@@ -1,5 +1,5 @@
 use crate::{
-    conn::ConnectionManager,
+    connection::Manager,
     err::CusError,
     request::{FieldValueArgs, FieldValueItem, NameArgs, RangeArgs},
     response::Field,
@@ -10,7 +10,7 @@ use serde::Deserialize;
 pub async fn info<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let value: Vec<redis::Value> = manager
@@ -27,7 +27,7 @@ pub async fn info<'r>(
 pub async fn range<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let value: Vec<redis::Value> = manager
@@ -43,7 +43,7 @@ pub async fn range<'r>(
 pub async fn add<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: FieldValueArgs<i64> = serde_json::from_str(&payload)?;
     let value: i64 = manager
@@ -59,7 +59,7 @@ pub async fn add<'r>(
 pub async fn del<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: RangeArgs = serde_json::from_str(&payload)?;
     let value: i64 = manager
@@ -75,7 +75,7 @@ pub async fn del<'r>(
 pub async fn incrby<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: FieldValueArgs<Option<i64>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("TS.INCRBY");
@@ -90,7 +90,7 @@ pub async fn incrby<'r>(
 pub async fn decrby<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: FieldValueArgs<Option<i64>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("TS.DECRBY");
@@ -116,7 +116,7 @@ struct AlterArgs {
 pub async fn alter<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: AlterArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TS.ALTER");
@@ -146,7 +146,7 @@ pub async fn alter<'r>(
 pub async fn create<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: AlterArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TS.CREATE");
@@ -188,7 +188,7 @@ struct CreateRuleArgs {
 pub async fn create_rule<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: CreateRuleArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TS.CREATERULE");
@@ -213,7 +213,7 @@ struct DeleteRuleArgs {
 pub async fn delete_rule<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: DeleteRuleArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TS.DELETERULE");

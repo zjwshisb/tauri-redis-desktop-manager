@@ -1,4 +1,4 @@
-use crate::conn::ConnectionManager;
+use crate::connection::Manager;
 use crate::err::CusError;
 
 use crate::request::{CommonValueArgs, NameArgs};
@@ -16,7 +16,7 @@ use serde::Deserialize;
 pub async fn scan<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<ScanLikeResult<String, String>, CusError> {
     let args: request::ScanLikeArgs<String> = serde_json::from_str(&payload)?;
 
@@ -45,7 +45,7 @@ pub async fn scan<'r>(
 pub async fn get<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Key, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let mut key: Key = Key::build(args.name, args.db, cid, &manager).await?;
@@ -72,7 +72,7 @@ struct DelArgs {
 pub async fn del<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: DelArgs = serde_json::from_str(&payload)?;
     manager
@@ -88,7 +88,7 @@ struct ExpireArgs {
 pub async fn expire<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: ExpireArgs = serde_json::from_str(&payload)?;
     if args.ttl == -1 {
@@ -128,7 +128,7 @@ struct RenameArgs {
 pub async fn rename<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: RenameArgs = serde_json::from_str(&payload)?;
     manager
@@ -143,7 +143,7 @@ pub async fn rename<'r>(
 pub async fn set<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -166,7 +166,7 @@ struct AddArgs {
 pub async fn add<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: AddArgs = serde_json::from_str(&payload)?;
     match args.types.as_str() {
@@ -201,7 +201,7 @@ pub async fn add<'r>(
 pub async fn dump<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let v: Vec<u8> = manager
@@ -222,7 +222,7 @@ struct RestoreArgs {
 pub async fn restore<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: RestoreArgs = serde_json::from_str(&payload)?;
     let v = utils::redis_str_to_binary(args.value);

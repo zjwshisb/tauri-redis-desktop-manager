@@ -1,7 +1,7 @@
 use redis::{cmd, Value};
 
 use crate::{
-    conn::ConnectionManager,
+    connection::Manager,
     err::CusError,
     request::{CommonValueArgs, NameArgs},
     response::Field,
@@ -17,7 +17,7 @@ struct CreateArgs {
 pub async fn create<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: CreateArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TDIGEST.CREATE");
@@ -32,7 +32,7 @@ pub async fn create<'r>(
 pub async fn info<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
 
@@ -45,7 +45,7 @@ pub async fn info<'r>(
 pub async fn add<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: String = manager
@@ -61,7 +61,7 @@ pub async fn add<'r>(
 pub async fn rank<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: Vec<i64> = manager
@@ -77,7 +77,7 @@ pub async fn rank<'r>(
 pub async fn by_rank<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: Vec<String> = manager
@@ -93,7 +93,7 @@ pub async fn by_rank<'r>(
 pub async fn rev_rank<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: Vec<i64> = manager
@@ -109,7 +109,7 @@ pub async fn rev_rank<'r>(
 pub async fn by_rev_rank<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: Vec<String> = manager
@@ -125,7 +125,7 @@ pub async fn by_rev_rank<'r>(
 pub async fn cdf<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: Vec<String> = manager
@@ -141,7 +141,7 @@ pub async fn cdf<'r>(
 pub async fn quantile<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: Vec<String> = manager
@@ -157,7 +157,7 @@ pub async fn quantile<'r>(
 pub async fn reset<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
 
@@ -170,7 +170,7 @@ pub async fn reset<'r>(
 pub async fn min<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
 
@@ -183,7 +183,7 @@ pub async fn min<'r>(
 pub async fn max<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let value: String = manager
@@ -203,7 +203,7 @@ struct TrimmedMeanArgs {
 pub async fn trimmed_mean<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: TrimmedMeanArgs = serde_json::from_str(&payload)?;
     let value: String = manager

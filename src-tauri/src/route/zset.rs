@@ -1,12 +1,12 @@
 use crate::request::{CommonValueArgs, FieldValueItem, ItemScanArgs};
 use crate::response::{Field, ScanLikeResult};
-use crate::{err::CusError, ConnectionManager};
+use crate::{connection::Manager, err::CusError};
 use redis::Value;
 
 pub async fn zscan<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<ScanLikeResult<Field, String>, CusError> {
     let args: ItemScanArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("zscan");
@@ -23,7 +23,7 @@ pub async fn zscan<'r>(
 pub async fn zrem<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -38,7 +38,7 @@ pub async fn zrem<'r>(
 pub async fn zadd<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<FieldValueItem<String>>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("zadd");

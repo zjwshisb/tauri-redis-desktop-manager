@@ -1,11 +1,11 @@
-use crate::conn::{Connectable, ConnectionManager, RedisConnection};
+use crate::connection::{Connectable, Connection, Manager};
 use crate::err::CusError;
 use crate::pubsub::{PubsubItem, PubsubManager};
 use crate::response::EventResp;
 use crate::sqlite::Connection as ConnectionModel;
 use crate::utils;
 use futures::stream::StreamExt;
-use redis::aio::Connection;
+use redis::aio::Connection as RedisConnection;
 use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
 
@@ -31,8 +31,8 @@ pub async fn subscribe<'r>(
 ) -> Result<String, CusError> {
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
     let model = ConnectionModel::first(cid)?;
-    let mut connection = RedisConnection::new(model.get_params());
-    let conn: Connection = connection.get_normal().await?;
+    let mut connection = Connection::new(model.get_params());
+    let conn: RedisConnection = connection.get_normal().await?;
     let mut pubsub = conn.into_pubsub();
     for x in args.channels {
         pubsub.subscribe(&x).await?;
@@ -96,7 +96,7 @@ struct PublishArgs {
 pub async fn publish<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: PublishArgs = serde_json::from_str(&payload)?;
     manager
@@ -114,8 +114,8 @@ pub async fn monitor<'r>(
     cid: u32,
 ) -> Result<String, CusError> {
     let model = ConnectionModel::first(cid)?;
-    let mut connection = RedisConnection::new(model.get_params());
-    let mut conn: Connection = connection.get_normal().await?;
+    let mut connection = Connection::new(model.get_params());
+    let mut conn = connection.get_normal().await?;
 
     let event_name = utils::random_str(32);
     let event_name_resp = event_name.clone();

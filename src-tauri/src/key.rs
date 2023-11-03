@@ -1,6 +1,6 @@
+use crate::connection::Manager;
 use crate::err::CusError;
 use crate::response::FieldValue;
-use crate::ConnectionManager;
 use redis::FromRedisValue;
 use redis::{cmd, Value};
 use serde::Serialize;
@@ -22,7 +22,7 @@ impl Key {
         name: String,
         db: u8,
         cid: u32,
-        manager: &tauri::State<'r, ConnectionManager>,
+        manager: &tauri::State<'r, Manager>,
     ) -> Result<Key, CusError> {
         let mut key: Key = Key {
             name: name,
@@ -47,7 +47,7 @@ impl Key {
         Ok(key)
     }
 
-    pub async fn get_sub_types<'r>(&mut self, manager: &tauri::State<'r, ConnectionManager>) {
+    pub async fn get_sub_types<'r>(&mut self, manager: &tauri::State<'r, Manager>) {
         if self.types == "string" {
             if let Ok(_) = manager
                 .execute::<Value>(
@@ -67,7 +67,7 @@ impl Key {
 
     pub async fn get_memory<'r>(
         &mut self,
-        manager: &tauri::State<'r, ConnectionManager>,
+        manager: &tauri::State<'r, Manager>,
     ) -> Result<(), CusError> {
         if self.types == "ReJSON-RL" {
             self.memory = manager
@@ -94,7 +94,7 @@ impl Key {
 
     pub async fn get_ttl<'r>(
         &mut self,
-        manager: &tauri::State<'r, ConnectionManager>,
+        manager: &tauri::State<'r, Manager>,
     ) -> Result<(), CusError> {
         self.ttl = manager
             .execute(
@@ -108,7 +108,7 @@ impl Key {
 
     pub async fn get_json_value<'r>(
         &mut self,
-        manager: &tauri::State<'r, ConnectionManager>,
+        manager: &tauri::State<'r, Manager>,
     ) -> Result<(), CusError> {
         self.data = FieldValue::Str(
             manager
@@ -124,7 +124,7 @@ impl Key {
 
     pub async fn get_string_value<'r>(
         &mut self,
-        manager: &tauri::State<'r, ConnectionManager>,
+        manager: &tauri::State<'r, Manager>,
     ) -> Result<(), CusError> {
         let value: Value = manager
             .execute(
@@ -150,7 +150,7 @@ impl Key {
     }
     pub async fn get_length<'r>(
         &mut self,
-        manager: &tauri::State<'r, ConnectionManager>,
+        manager: &tauri::State<'r, Manager>,
     ) -> Result<(), CusError> {
         let cmd = match self.sub_types.as_str() {
             "string" => "STRLEN",

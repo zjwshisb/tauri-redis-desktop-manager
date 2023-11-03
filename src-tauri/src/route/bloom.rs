@@ -1,8 +1,8 @@
 use crate::{
+    connection::Manager,
     err::CusError,
     request::{CommonValueArgs, NameArgs},
     response::Field,
-    ConnectionManager,
 };
 use redis::{cmd, Value};
 use serde::Deserialize;
@@ -10,7 +10,7 @@ use serde::Deserialize;
 pub async fn info<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let values: Vec<Value> = manager
@@ -32,7 +32,7 @@ struct ReserveArgs {
 pub async fn reserve<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: ReserveArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("BF.RESERVE");
@@ -52,7 +52,7 @@ pub async fn reserve<'r>(
 pub async fn madd<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
 
@@ -69,7 +69,7 @@ pub async fn madd<'r>(
 pub async fn exists<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
 

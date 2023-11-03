@@ -1,12 +1,12 @@
 use crate::err::CusError;
 use crate::request::{CommonValueArgs, ItemScanArgs};
-use crate::{conn::ConnectionManager, response::ScanLikeResult};
+use crate::{connection::Manager, response::ScanLikeResult};
 use redis::Value;
 
 pub async fn sscan<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<ScanLikeResult<String, String>, CusError> {
     let args: ItemScanArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("sscan");
@@ -23,7 +23,7 @@ pub async fn sscan<'r>(
 pub async fn sadd<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
@@ -46,7 +46,7 @@ pub async fn sadd<'r>(
 pub async fn srem<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs = serde_json::from_str(payload.as_str())?;
     let value: i64 = manager

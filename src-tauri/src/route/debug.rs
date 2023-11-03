@@ -1,9 +1,7 @@
-use crate::{
-    conn::ConnectionManager, err::CusError, model::Command, pubsub::PubsubManager, response,
-};
+use crate::{connection::Manager, err::CusError, model::Command, pubsub::PubsubManager, response};
 
 pub async fn log<'r>(
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
     window: tauri::Window,
 ) -> Result<(), CusError> {
     let (tx, mut rx) = tokio::sync::mpsc::channel::<Command>(32);
@@ -16,13 +14,13 @@ pub async fn log<'r>(
     Ok(())
 }
 
-pub async fn cancel<'r>(manager: tauri::State<'r, ConnectionManager>) -> Result<(), CusError> {
+pub async fn cancel<'r>(manager: tauri::State<'r, Manager>) -> Result<(), CusError> {
     manager.remove_tx().await;
     Ok(())
 }
 
 pub async fn clients<'r>(
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
     pubsub: tauri::State<'r, PubsubManager>,
 ) -> Result<Vec<response::Conn>, CusError> {
     let mut r = vec![];

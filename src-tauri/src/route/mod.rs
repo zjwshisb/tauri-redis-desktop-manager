@@ -1,6 +1,6 @@
 use tauri::Window;
 
-use crate::conn::ConnectionManager;
+use crate::connection::Manager;
 use crate::err::CusError;
 use crate::pubsub::PubsubManager;
 use crate::response::Response;
@@ -32,7 +32,7 @@ pub mod zset;
 #[tauri::command]
 pub async fn dispatch<'r>(
     pubsub: tauri::State<'r, PubsubManager>,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
     window: Window,
     path: String,
     cid: u32,

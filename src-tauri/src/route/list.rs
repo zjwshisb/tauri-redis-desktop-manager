@@ -2,15 +2,15 @@ use redis::Value;
 use serde::Deserialize;
 
 use crate::{
+    connection::Manager,
     err::CusError,
     request::{self, RangeArgs},
-    ConnectionManager,
 };
 
 pub async fn lrange<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let args: RangeArgs = serde_json::from_str(&payload)?;
     manager
@@ -35,7 +35,7 @@ struct LSetArgs {
 pub async fn lset<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: LSetArgs = serde_json::from_str(&payload)?;
     manager
@@ -53,7 +53,7 @@ pub async fn lset<'r>(
 pub async fn ltrim<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: RangeArgs = serde_json::from_str(&payload)?;
     manager
@@ -79,7 +79,7 @@ struct InsertArgs {
 pub async fn linsert<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: InsertArgs = serde_json::from_str(&payload)?;
     let value: i64 = manager
@@ -103,7 +103,7 @@ pub async fn linsert<'r>(
 pub async fn lpush<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
@@ -122,7 +122,7 @@ pub async fn lpush<'r>(
 pub async fn lpop<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: request::NameArgs = serde_json::from_str(&payload)?;
     let value = manager
@@ -137,7 +137,7 @@ pub async fn lpop<'r>(
 pub async fn rpush<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
@@ -156,7 +156,7 @@ pub async fn rpush<'r>(
 pub async fn rpop<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: request::NameArgs = serde_json::from_str(&payload)?;
     let value = manager

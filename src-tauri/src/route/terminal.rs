@@ -4,12 +4,16 @@ use encoding::all::UTF_16BE;
 use encoding::{EncoderTrap, Encoding};
 use tauri::Window;
 
-use crate::{conn::ConnectionWrapper, err::CusError, sqlite::Connection, ConnectionManager};
+use crate::{
+    connection::{ConnectionWrapper, Manager},
+    err::CusError,
+    sqlite::Connection,
+};
 
 pub async fn open<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
     window: Window,
 ) -> Result<(), CusError> {
     let connection = Connection::first(cid)?;

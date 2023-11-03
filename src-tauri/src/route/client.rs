@@ -1,10 +1,10 @@
-use crate::{err::CusError, request, ConnectionManager};
+use crate::{connection::Manager, err::CusError, request};
 use redis::{self};
 
 pub async fn list<'r>(
     _payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     manager
         .execute(cid, redis::cmd("client").arg("list"), None)
@@ -14,7 +14,7 @@ pub async fn list<'r>(
 pub async fn kill<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: request::IdArgs<String> = serde_json::from_str(&payload)?;
     let count: i64 = manager

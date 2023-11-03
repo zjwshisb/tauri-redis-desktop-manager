@@ -1,5 +1,5 @@
+use crate::connection::Manager;
 use crate::err::CusError;
-use crate::ConnectionManager;
 use redis::{FromRedisValue, Value};
 use serde::Deserialize;
 
@@ -14,7 +14,7 @@ pub struct SetArgs {
 pub async fn set<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: SetArgs = serde_json::from_str(&payload)?;
     let v: Value = manager

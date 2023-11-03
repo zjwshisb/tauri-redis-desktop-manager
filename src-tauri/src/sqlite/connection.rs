@@ -1,62 +1,6 @@
-use crate::{conn, err::CusError, ssh};
-use dirs_next;
-use rusqlite::{self, params, Connection as SqliteConnection, Row};
+use crate::{connection, err::CusError, sqlite, ssh};
+use rusqlite::{self, params, Row};
 use serde::{Deserialize, Serialize};
-use std::fs;
-const DATA_DIR: &str = "redis";
-const DATA_NAME: &str = "data3.db";
-
-pub fn get_sqlite_client() -> Result<SqliteConnection, CusError> {
-    let path = get_data_path();
-    let conn = SqliteConnection::open(path)?;
-    Ok(conn)
-}
-
-pub fn init_sqlite() {
-    let client = get_sqlite_client().unwrap();
-    client
-        .execute(
-            "CREATE TABLE IF NOT EXISTS connections (
-            id    INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            host  TEXT NOT NULL,
-            port  INTEGER NOT NULL,
-            username TEXT,
-            password  TEXT,
-            is_cluster INTEGER NOT NULL DEFAULT 0,
-            readonly INTEGER NOT NULL DEFAULT 0,
-            ssh_host  TEXT,
-            ssh_port  INTEGER,
-            ssh_password  TEXT,
-            ssh_username  TEXT,
-            ssh_private_key  TEXT,
-            ssh_timeout  INTEGER,
-            ssh_passphrase  TEXT
-        )",
-            (), // empty list of parameters.
-        )
-        .unwrap();
-}
-
-fn get_data_path() -> String {
-    if let Some(data_dir) = dirs_next::data_dir() {
-        let mut full_dir: String = String::from(data_dir.to_str().unwrap());
-        full_dir.push_str("/");
-        full_dir.push_str(DATA_DIR);
-        let full_dir_meta = fs::metadata(&full_dir);
-        match full_dir_meta {
-            Err(_) => {
-                fs::create_dir(&full_dir).unwrap();
-            }
-            _ => {}
-        }
-        full_dir.push_str("/");
-        full_dir.push_str(DATA_NAME);
-        return full_dir;
-    } else {
-        panic!("sqlite error: data dir not exists")
-    }
-}
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Connection {
@@ -77,9 +21,9 @@ pub struct Connection {
     pub ssh_passphrase: Option<String>,
 }
 
-impl conn::Connectable for Connection {
-    fn get_params(&self) -> conn::RedisConnectionParams {
-        let redis_params = conn::RedisParam {
+impl connection::Connectable for Connection {
+    fn get_params(&self) -> connection::ConnectionParams {
+        let redis_params = connection::ConnectedParam {
             tcp_host: self.host.clone(),
             tcp_port: self.port,
             username: self.username.clone(),
@@ -92,7 +36,7 @@ impl conn::Connectable for Connection {
             if let Some(p) = self.ssh_port {
                 port = p
             }
-            let mut username = String::from("root");
+            let mut username = String::new();
             if let Some(u) = &self.username {
                 username = u.clone();
             }
@@ -108,7 +52,7 @@ impl conn::Connectable for Connection {
             };
             ssh_params = Some(ssh_p);
         }
-        conn::RedisConnectionParams {
+        connection::ConnectionParams {
             redis_params,
             ssh_params,
             model_name: String::from("connection"),
@@ -151,7 +95,7 @@ impl Connection {
     }
 
     pub fn first(id: u32) -> Result<Connection, CusError> {
-        let conn = get_sqlite_client()?;
+        let conn = sqlite::get_client()?;
         let mut stmt = conn.prepare(
             "select id, 
             name,
@@ -175,7 +119,7 @@ impl Connection {
     }
 
     pub fn save(&mut self) -> Result<(), CusError> {
-        let conn = get_sqlite_client()?;
+        let conn = sqlite::get_client()?;
         let mut is_cluster = 0;
         if self.is_cluster {
             is_cluster = 1;
@@ -264,13 +208,13 @@ impl Connection {
     }
 
     pub fn del(self) -> Result<(), CusError> {
-        let conn = get_sqlite_client()?;
+        let conn = sqlite::get_client()?;
         conn.execute("delete from connections where id = ?1", [self.id])?;
         Ok(())
     }
 
     pub fn all() -> Result<Vec<Connection>, CusError> {
-        let conn = crate::sqlite::get_sqlite_client()?;
+        let conn = crate::sqlite::get_client()?;
         let mut stmt_result = conn.prepare(
             "select id,
                 name,

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    conn::{ConnectionManager, ConnectionWrapper},
+    connection::{ConnectionWrapper, Manager},
     err::CusError,
     model::SlowLog,
     response::{self, Field},
@@ -11,14 +11,14 @@ use redis::{FromRedisValue, Value};
 
 pub async fn info<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<HashMap<String, HashMap<String, String>>, CusError> {
     manager.get_info(cid).await
 }
 
 pub async fn ping<'r>(
     payload: String,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let params: Connection = serde_json::from_str(payload.as_str())?;
     let mut conn = ConnectionWrapper::build(params).await?;
@@ -28,10 +28,7 @@ pub async fn ping<'r>(
     Ok(String::from("PONG"))
 }
 // get redis server version
-pub async fn version<'r>(
-    cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
-) -> Result<String, CusError> {
+pub async fn version<'r>(cid: u32, manager: tauri::State<'r, Manager>) -> Result<String, CusError> {
     manager.get_version(cid).await
 }
 
@@ -44,7 +41,7 @@ pub struct SlowLogResp {
 // get slow logs
 pub async fn slow_log<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<SlowLogResp, CusError> {
     let config = manager.get_config(cid, "slowlog*").await?;
     let conn = sqlite::Connection::first(cid)?;
@@ -84,7 +81,7 @@ pub async fn slow_log<'r>(
 // reset slow log
 pub async fn reset_slow_log<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     manager
         .execute(cid, &mut redis::cmd("SLOWLOG").arg("RESET"), None)
@@ -93,7 +90,7 @@ pub async fn reset_slow_log<'r>(
 // get redis server module
 pub async fn module<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<HashMap<String, String>>, CusError> {
     let arr: Vec<redis::Value> = manager
         .execute(cid, redis::cmd("MODULE").arg("LIST"), None)

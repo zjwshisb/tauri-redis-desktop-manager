@@ -1,5 +1,5 @@
 use crate::{
-    conn::ConnectionManager,
+    connection::Manager,
     err::CusError,
     response::{Field, FieldValue},
 };
@@ -7,7 +7,7 @@ use serde::Deserialize;
 
 pub async fn get_database<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<FieldValue, CusError> {
     let configs = manager.get_config(cid, "databases").await?;
     let databases = Field::first("databases", &configs);
@@ -19,7 +19,7 @@ pub async fn get_database<'r>(
 
 pub async fn get_all<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let value = manager.get_config(cid, "*").await?;
     Ok(value)
@@ -33,7 +33,7 @@ struct EditArgs {
 pub async fn edit<'r>(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     let args: EditArgs = serde_json::from_str(&payload)?;
     manager
@@ -48,10 +48,7 @@ pub async fn edit<'r>(
         .await
 }
 
-pub async fn rewrite<'r>(
-    cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
-) -> Result<String, CusError> {
+pub async fn rewrite<'r>(cid: u32, manager: tauri::State<'r, Manager>) -> Result<String, CusError> {
     manager
         .execute(cid, redis::cmd("config").arg("rewrite"), None)
         .await
@@ -59,7 +56,7 @@ pub async fn rewrite<'r>(
 
 pub async fn reset_stat<'r>(
     cid: u32,
-    manager: tauri::State<'r, ConnectionManager>,
+    manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
     manager
         .execute(cid, redis::cmd("config").arg("resetstat"), None)
