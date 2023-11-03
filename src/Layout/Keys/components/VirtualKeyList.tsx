@@ -1,5 +1,4 @@
 import React from 'react'
-import { observer } from 'mobx-react-lite'
 import VirtualList, { type ListRef } from 'rc-virtual-list'
 import { Empty, List } from 'antd'
 import { type KeyInfo } from '@/store/key'
@@ -9,7 +8,7 @@ const VirtualKeyList: React.FC<{
   info: KeyInfo
   keys: string[]
   height: number
-  listRef: React.RefObject<ListRef>
+  listRef?: React.RefObject<ListRef>
 }> = ({ info, keys, height, listRef }) => {
   if (keys.length <= 0) {
     return (
@@ -43,4 +42,4 @@ const VirtualKeyList: React.FC<{
   )
 }
 
-export default observer(VirtualKeyList)
+export default VirtualKeyList

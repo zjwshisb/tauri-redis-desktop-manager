@@ -1,12 +1,12 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, List, Popover, Button } from 'antd'
+import { Typography, Popover, Button } from 'antd'
 import useStore from '@/hooks/useStore'
-import classNames from 'classnames'
 import Key from '@/components/Page/Key'
 import { SearchOutlined } from '@ant-design/icons'
 import context from '../context'
 import Container from '@/components/Container'
+import InteractiveContainer from '@/components/InteractiveContainer'
 
 const KeyItem: React.FC<{
   name: string
@@ -57,7 +57,8 @@ const KeyItem: React.FC<{
         }
       }}
     >
-      <List.Item
+      <InteractiveContainer
+        className="h-[37px] box-border p-2 border-b-[0.5px]"
         key={name}
         onClick={(e) => {
           store.page.addCreatePage(
@@ -78,12 +79,9 @@ const KeyItem: React.FC<{
           )
           e.stopPropagation()
         }}
-        className={classNames(['border-none h-[37px] active-able'])}
       >
-        <Typography.Text ellipsis={true} className="w-full h-full">
-          {name}
-        </Typography.Text>
-      </List.Item>
+        <Typography.Text ellipsis={true}>{name}</Typography.Text>
+      </InteractiveContainer>
     </Popover>
   )
 }

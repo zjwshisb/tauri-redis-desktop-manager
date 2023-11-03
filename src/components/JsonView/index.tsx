@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactJson, { type ReactJsonViewProps } from 'react-json-view'
 import useStore from '@/hooks/useStore'
+import { observer } from 'mobx-react-lite'
 
 const JsonView: React.FC<Omit<ReactJsonViewProps, 'theme'>> = (p) => {
   const store = useStore()
@@ -26,4 +27,4 @@ const JsonView: React.FC<Omit<ReactJsonViewProps, 'theme'>> = (p) => {
     ></ReactJson>
   )
 }
-export default JsonView
+export default observer(JsonView)

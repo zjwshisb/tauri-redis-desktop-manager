@@ -9,7 +9,7 @@ import {
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
-import { Dropdown, App } from 'antd'
+import { Dropdown, App, Button } from 'antd'
 import { useTranslation } from 'react-i18next'
 
 export interface DBType {
@@ -127,11 +127,7 @@ const Index: React.FC<{
           items: connectionMenus
         }}
       >
-        <AppstoreOutlined
-          onClick={(e) => {
-            e.stopPropagation()
-          }}
-        />
+        <Button size="small" type="text" icon={<AppstoreOutlined />}></Button>
       </Dropdown>
     </>
   )

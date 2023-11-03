@@ -23,8 +23,8 @@ const Stats: React.FC<{
       } else {
         children = v.value.map((vv) => {
           return (
-            <div key={vv.name}>
-              <span>{vv.name}:</span>
+            <div key={vv.field}>
+              <span>{vv.field}:</span>
               <span>{vv.value as string}</span>
             </div>
           )

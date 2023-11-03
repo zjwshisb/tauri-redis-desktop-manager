@@ -35,7 +35,7 @@ export async function openWindow(
     focus = true,
     titleBarStyle = 'overlay',
     width = 1000,
-    height = 1000,
+    height = 800,
     ...other
   } = options
 

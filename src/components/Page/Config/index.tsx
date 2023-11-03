@@ -85,7 +85,7 @@ const Config: React.FC<{
         <ResetStat connection={connection}></ResetStat>
       </div>
       <CusTable
-        rowKey={'name'}
+        rowKey={'field'}
         dataSource={item}
         columns={columns}
         virtual={false}

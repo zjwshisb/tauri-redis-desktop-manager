@@ -218,7 +218,7 @@ const KeyAnalysis: React.FC<{
           </div>
         </div>
       </div>
-      <Container className="border rounded">
+      <Container className="border rounded overflow-hidden">
         {keys.length === 0 && (
           <div className="h-[600px]">
             <Empty className="py-10"></Empty>

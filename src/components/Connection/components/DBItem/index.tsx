@@ -59,7 +59,7 @@ const Index: React.FC<{
     const m: ItemType[] = []
     if (!connection.readonly) {
       m.push({
-        label: 'Flush Database',
+        label: t('Flush Database'),
         key: 'flush'
       })
     }

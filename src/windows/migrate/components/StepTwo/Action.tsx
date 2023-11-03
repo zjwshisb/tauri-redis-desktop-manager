@@ -10,6 +10,9 @@ import { ceil, chunk } from 'lodash'
 import request from '@/utils/request'
 import classNames from 'classnames'
 import Container from '@/components/Container'
+import InteractiveContainer from '@/components/InteractiveContainer'
+import useStore from '@/hooks/useStore'
+import Key from '@/components/Page/Key'
 
 type Status = 'before' | 'finished' | 'stop'
 
@@ -56,6 +59,8 @@ const Action: React.ForwardRefRenderFunction<ActionRef, ActionProps> = (
   ref
 ) => {
   const { t } = useTranslation()
+
+  const store = useStore()
 
   const [keys, setKeys] = React.useState<KeyItem[]>([])
 
@@ -219,7 +224,32 @@ const Action: React.ForwardRefRenderFunction<ActionRef, ActionProps> = (
             >
               {(item, index) => {
                 return (
-                  <Container className="h-[24px] border-b box-border flex items-center px-2">
+                  <InteractiveContainer
+                    className="h-[24px] border-b-[0.5px] box-border flex items-center px-2"
+                    onClick={() => {
+                      const page = store.page.createPage(
+                        {
+                          connection: source.connection,
+                          name: item.name,
+                          db: source.database,
+                          type: 'key'
+                        },
+                        ({ key }) => (
+                          <Key
+                            name={item.name}
+                            db={
+                              source.database === undefined
+                                ? 0
+                                : source.database
+                            }
+                            connection={source.connection}
+                            pageKey={key}
+                          ></Key>
+                        )
+                      )
+                      store.page.openPage(page)
+                    }}
+                  >
                     <div className="w-[100px] flex-shrink-0">{index + 1}</div>
                     <div className="w-[300px] truncate break-all px-2 flex-1">
                       {item.name}
@@ -234,7 +264,7 @@ const Action: React.ForwardRefRenderFunction<ActionRef, ActionProps> = (
                     >
                       {item.message}
                     </div>
-                  </Container>
+                  </InteractiveContainer>
                 )
               }}
             </VirtualList>

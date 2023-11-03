@@ -9,7 +9,7 @@ import {
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { useThrottleFn } from 'ahooks'
-import { Space, Tooltip } from 'antd'
+import { Button, Tooltip } from 'antd'
 import DBItem from './components/DBItem'
 import NodeItem from './components/NodeItem'
 import CurlMenu from './components/CurlMenu'
@@ -17,6 +17,7 @@ import Menu from './components/Menu'
 import { useTranslation } from 'react-i18next'
 import Info from '@/components/Page/Info'
 import { computed } from 'mobx'
+import InteractiveContainer from '../InteractiveContainer'
 
 const Connection: React.FC<{
   connection: APP.Connection
@@ -122,7 +123,9 @@ const Connection: React.FC<{
 
   return (
     <div className={'box-border'}>
-      <div className={'flex justify-between text-lg px-2  py-1 active-able'}>
+      <InteractiveContainer
+        className={'flex justify-between text-lg px-2  py-1'}
+      >
         <div className={'flex overflow-hidden flex-1 items-center'}>
           <span className="text-sm mr-1 ">{icon}</span>
           <div
@@ -130,40 +133,40 @@ const Connection: React.FC<{
             onDoubleClick={onItemClickTh.run}
             onClick={onTrigger}
           >
-            <span className="pr-2 text-gray-600">#{connection.id}</span>
+            <span className="pr-2 ">#{connection.id}</span>
             {connection.name}
           </div>
         </div>
         <div className={'flex-shrink-0 pl-2'}>
-          <Space>
-            {connection.err !== undefined && (
-              <Tooltip title={connection.err} color="volcano">
-                <WarningOutlined className="text-orange-600"></WarningOutlined>
+          {connection.err !== undefined && (
+            <Tooltip title={connection.err} color="volcano">
+              <WarningOutlined className="text-orange-600"></WarningOutlined>
+            </Tooltip>
+          )}
+          {connection.open === true && (
+            <>
+              <Tooltip title={t('Refresh')}>
+                <Button
+                  size="small"
+                  type="text"
+                  icon={<ReloadOutlined></ReloadOutlined>}
+                  onClick={(e) => {
+                    store.connection.getInfo(connection)
+                    e.stopPropagation()
+                  }}
+                ></Button>
               </Tooltip>
-            )}
-            {connection.open === true && (
-              <>
-                <Tooltip title={t('Refresh')}>
-                  <ReloadOutlined
-                    className="hover:text-blue-600"
-                    onClick={(e) => {
-                      store.connection.getInfo(connection)
-                      e.stopPropagation()
-                    }}
-                  ></ReloadOutlined>
-                </Tooltip>
-                <Menu connection={connection} />
-              </>
-            )}
-            <CurlMenu
-              connection={connection}
-              onOpen={() => {
-                setCollapse(true)
-              }}
-            />
-          </Space>
+              <Menu connection={connection} />
+            </>
+          )}
+          <CurlMenu
+            connection={connection}
+            onOpen={() => {
+              setCollapse(true)
+            }}
+          />
         </div>
-      </div>
+      </InteractiveContainer>
       <div
         className="overflow-hidden transition-all"
         style={{

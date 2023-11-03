@@ -4,23 +4,35 @@
 
 ## Preview
 
-![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/8.png?raw=true)
+##### Ui
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/preview-1.png?raw=true)
+
+##### Dark Mode
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/preview-2.png?raw=true)
+
+##### Memory Analysis
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/memory.png?raw=true)
+
+##### Migrate
+![image](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/screen/migrate.png?raw=true)
 
 ## Feature
 
-+ Keys Operate
 + Cluster Mode Support
++ SSH Proxy Support
 + Readonly Mode
-+ Publish/Subscribe
-+ Monitor
 + Use Scan、Sscan、Hscan、Zscan For Key、Field Iterate
++ Publish/Subscribe command Support
++ Monitor command Support
 + Key Memory Analysis  
 + Multiwindow Support
 + Debug Log
 + Data Migrate
 + JSON Type Support
-+ Time Series Type Support
-+ TopK Type Support
++ Probabilistic data structures(TopK,HyperLogLog,Bloom filter,Count-min sketch,t-digest) Support
++ Time series Support
++ Dark Mode
+
 
 ## Devlopment
 

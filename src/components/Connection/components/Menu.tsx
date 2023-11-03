@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import { Dropdown } from 'antd'
+import { Button, Dropdown } from 'antd'
 import { useTranslation } from 'react-i18next'
 import Client from '@/components/Page/Client'
 import Info from '@/components/Page/Info'
@@ -225,11 +225,7 @@ const Menu: React.FC<{
         items: connectionMenus
       }}
     >
-      <MenuOutlined
-        onClick={(e) => {
-          e.stopPropagation()
-        }}
-      />
+      <Button type="text" size="small" icon={<MenuOutlined />}></Button>
     </Dropdown>
   )
 }

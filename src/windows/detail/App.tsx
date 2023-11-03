@@ -128,8 +128,8 @@ const App: React.FC = () => {
 
   return (
     <AppLayout>
-      <Container className="flex-1 w-full" level={3}>
-        <MacScrollbar className="w-full" id="container">
+      <Container className="flex-1 w-full flex" level={3}>
+        <MacScrollbar className="w-full overflow-scroll" id="container">
           <div>{children}</div>
         </MacScrollbar>
       </Container>

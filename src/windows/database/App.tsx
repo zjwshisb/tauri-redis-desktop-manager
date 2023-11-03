@@ -38,7 +38,7 @@ const App: React.FC = () => {
   }, [connection, params.db, store.keyInfo])
 
   return (
-    <AppLayout className="border-t">
+    <AppLayout>
       {store.keyInfo.info != null && <Keys info={store.keyInfo.info}></Keys>}
       <Pages />
     </AppLayout>

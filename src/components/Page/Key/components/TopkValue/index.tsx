@@ -148,7 +148,7 @@ const TopKValue: React.FC<{
     >
       <CusTable
         virtual={false}
-        rowKey={'name'}
+        rowKey={'field'}
         dataSource={items}
         columns={columns}
       ></CusTable>

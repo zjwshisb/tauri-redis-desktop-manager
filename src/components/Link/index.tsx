@@ -1,5 +1,6 @@
 import React from 'react'
 import { open } from '@tauri-apps/api/shell'
+import classNames from 'classnames'
 const Link: React.FC<
   React.PropsWithChildren<{
     href: string
@@ -8,7 +9,7 @@ const Link: React.FC<
 > = ({ href, children, className }) => {
   return (
     <a
-      className={className}
+      className={classNames([className, 'text-blue-600'])}
       href="#"
       onClick={() => {
         open(href)

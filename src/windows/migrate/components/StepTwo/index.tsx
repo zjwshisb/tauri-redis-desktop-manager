@@ -67,6 +67,9 @@ const StepTwo: React.FC = () => {
           modal.confirm({
             title: t('Notice'),
             content: t('Are you sure start migrate those keys?'),
+            okButtonProps: {
+              type: 'primary'
+            },
             onOk() {
               ref.current?.migrate()
             }

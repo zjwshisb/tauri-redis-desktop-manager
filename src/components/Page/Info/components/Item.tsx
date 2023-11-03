@@ -21,7 +21,7 @@ const Item: React.FC<{
     Object.keys(data).forEach((vv) => {
       if (vv.includes(search.toLocaleLowerCase())) {
         fields.push({
-          name: vv,
+          field: vv,
           value: data[vv]
         })
       }
@@ -77,16 +77,17 @@ const Item: React.FC<{
               />
             </div>
             <CusTable
-              rowKey={'name'}
+              rowKey={'field'}
               virtual={false}
               dataSource={items}
               columns={[
                 {
                   title: t('Key'),
-                  dataIndex: 'name',
+                  dataIndex: 'field',
                   defaultSortOrder: 'ascend',
+
                   sorter(a, b) {
-                    return a.name > b.name ? 1 : -1
+                    return a.field > b.field ? 1 : -1
                   }
                 },
                 {

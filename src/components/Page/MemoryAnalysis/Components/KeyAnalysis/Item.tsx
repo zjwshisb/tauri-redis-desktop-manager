@@ -3,6 +3,7 @@ import { type KeyItem } from './index'
 import { memoryFormat } from '@/utils'
 import Key from '@/components/Page/Key'
 import useStore from '@/hooks/useStore'
+import InteractiveContainer from '@/components/InteractiveContainer'
 
 interface ItemProps {
   item: KeyItem
@@ -13,7 +14,7 @@ interface ItemProps {
 const Item: React.FC<ItemProps> = (props) => {
   const store = useStore()
   return (
-    <div
+    <InteractiveContainer
       onClick={() => {
         const page = store.page.createPage(
           {
@@ -33,7 +34,7 @@ const Item: React.FC<ItemProps> = (props) => {
         )
         store.page.openPage(page)
       }}
-      className="flex px-2 h-[25px] justify-between items-center border-b last:border-b-0 active-able"
+      className="flex px-2 h-[25px] justify-between items-center border-b-[0.5px] last:border-b-0"
     >
       <div className="w-40 flex-shrink-0">{props.index}.</div>
       <div className="flex flex-1 overflow-hidden">
@@ -43,7 +44,7 @@ const Item: React.FC<ItemProps> = (props) => {
       <div className="ml-4 w-[100px] flex-shrink-0 text-right">
         {memoryFormat(props.item.memory)}
       </div>
-    </div>
+    </InteractiveContainer>
   )
 }
 export default Item

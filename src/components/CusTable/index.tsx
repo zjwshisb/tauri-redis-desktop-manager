@@ -22,9 +22,10 @@ export default function CusTable<T extends object>(
   const db = useDebounceFn(
     () => {
       if (container.current !== null) {
+        console.log('test')
         let containerWith = container.current?.clientWidth - 1
-        if (containerWith <= 1000) {
-          containerWith = 1000
+        if (containerWith <= 800) {
+          containerWith = 800
         }
         setScrollX(containerWith)
       }
@@ -40,12 +41,15 @@ export default function CusTable<T extends object>(
   React.useLayoutEffect(() => {
     const div = container.current
     if (div !== null) {
-      div.addEventListener('resize', db.run)
+      const observer = new ResizeObserver((entries) => {
+        db.run()
+      })
+      observer.observe(div)
       return () => {
-        div.removeEventListener('resize', db.run)
+        observer.unobserve(div)
       }
     }
-  }, [db.run])
+  }, [db])
 
   const scroll = React.useMemo(() => {
     if (virtual) {
