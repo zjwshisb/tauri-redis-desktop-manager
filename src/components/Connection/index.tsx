@@ -9,13 +9,12 @@ import {
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { useThrottleFn } from 'ahooks'
-import { Button, Tooltip } from 'antd'
+import { Button, Spin, Tooltip } from 'antd'
 import DBItem from './components/DBItem'
 import NodeItem from './components/NodeItem'
 import CurlMenu from './components/CurlMenu'
 import Menu from './components/Menu'
 import { useTranslation } from 'react-i18next'
-import Info from '@/components/Page/Info'
 import { computed } from 'mobx'
 import InteractiveContainer from '../InteractiveContainer'
 
@@ -52,14 +51,11 @@ const Connection: React.FC<{
       if (connection.open !== true) {
         try {
           await store.connection.open(connection.id)
-          store.page.addCreatePage(
-            {
-              type: 'info',
-              name: 'info',
-              connection
-            },
-            ({ key }) => <Info connection={connection} pageKey={key}></Info>
-          )
+          store.page.addPage({
+            type: 'info',
+            name: 'info',
+            connection
+          })
 
           setCollapse(true)
         } catch {}
@@ -173,7 +169,7 @@ const Connection: React.FC<{
           height
         }}
       >
-        {children}
+        <Spin spinning={connection.loading}>{children}</Spin>
       </div>
     </div>
   )

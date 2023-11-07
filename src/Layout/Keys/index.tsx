@@ -9,7 +9,6 @@ import { ReloadOutlined, KeyOutlined, WindowsOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import VirtualKeyList from './components/VirtualKeyList'
 import LoadMore from '@/components/LoadMore'
-import Key from '@/components/Page/Key'
 import { isMainWindow } from '@/utils'
 import Add from './components/Add'
 import Restore from './components/Restore'
@@ -116,22 +115,12 @@ const Index: React.FC<{
                   <Editable connection={info.connection}>
                     <Add
                       onSuccess={(name: string) => {
-                        store.page.addCreatePage(
-                          {
-                            type: 'key',
-                            connection: info.connection,
-                            name,
-                            db: info.db
-                          },
-                          ({ key }) => (
-                            <Key
-                              name={name}
-                              db={info.db}
-                              connection={info.connection}
-                              pageKey={key}
-                            ></Key>
-                          )
-                        )
+                        store.page.addPage({
+                          type: 'key',
+                          connection: info.connection,
+                          name,
+                          db: info.db
+                        })
                       }}
                       info={info}
                     />
@@ -140,22 +129,12 @@ const Index: React.FC<{
                     <Restore
                       info={info}
                       onSuccess={(name: string) => {
-                        store.page.addCreatePage(
-                          {
-                            type: 'key',
-                            connection: info.connection,
-                            name,
-                            db: info.db
-                          },
-                          ({ key }) => (
-                            <Key
-                              name={name}
-                              db={info.db}
-                              connection={info.connection}
-                              pageKey={key}
-                            ></Key>
-                          )
-                        )
+                        store.page.addPage({
+                          type: 'key',
+                          connection: info.connection,
+                          name,
+                          db: info.db
+                        })
                       }}
                     />
                   </Editable>

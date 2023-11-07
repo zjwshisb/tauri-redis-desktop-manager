@@ -14,14 +14,6 @@ import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { Button, Dropdown } from 'antd'
 import { useTranslation } from 'react-i18next'
-import Client from '@/components/Page/Client'
-import Info from '@/components/Page/Info'
-import Node from '@/components/Page/Node'
-import SlowLog from '@/components/Page/SlowLog'
-import Config from '@/components/Page/Config'
-import MemoryAnalysis from '@/components/Page/MemoryAnalysis'
-import Pubsub from '@/components/Page/Pubsub'
-import Monitor from '@/components/Page/Monitor'
 
 interface MenuItem {
   key: string
@@ -118,106 +110,69 @@ const Menu: React.FC<{
         onClick(e) {
           switch (e.key) {
             case 'client': {
-              store.page.addCreatePage(
-                {
-                  connection,
-                  type: 'client',
-                  name: 'client'
-                },
-                ({ key }) => (
-                  <Client connection={connection} pageKey={key}></Client>
-                )
-              )
+              store.page.addPage({
+                connection,
+                type: 'client',
+                name: 'client'
+              })
               break
             }
             case 'info': {
-              store.page.addCreatePage(
-                {
-                  type: 'info',
-                  name: 'info',
-                  connection
-                },
-                ({ key }) => <Info connection={connection} pageKey={key}></Info>
-              )
+              store.page.addPage({
+                type: 'info',
+                name: 'info',
+                connection
+              })
               break
             }
             case 'node': {
-              store.page.addCreatePage(
-                {
-                  type: 'node',
-                  name: 'node',
-                  connection
-                },
-                ({ key }) => <Node connection={connection} pageKey={key}></Node>
-              )
+              store.page.addPage({
+                type: 'node',
+                name: 'node',
+                connection
+              })
               break
             }
             case 'slow-log': {
-              store.page.addCreatePage(
-                {
-                  type: 'slow-log',
-                  name: 'slow-log',
-                  connection
-                },
-                ({ key }) => (
-                  <SlowLog connection={connection} pageKey={key}></SlowLog>
-                )
-              )
+              store.page.addPage({
+                type: 'slow-log',
+                name: 'slow-log',
+                connection
+              })
               break
             }
             case 'config': {
-              store.page.addCreatePage(
-                {
-                  type: 'config',
-                  name: 'config',
-                  connection
-                },
-                ({ key }) => (
-                  <Config connection={connection} pageKey={key}></Config>
-                )
-              )
+              store.page.addPage({
+                type: 'config',
+                name: 'config',
+                connection
+              })
               break
             }
             case 'memory': {
-              store.page.addCreatePage(
-                {
-                  type: 'memory-analysis',
-                  name: 'memory-analysis',
+              store.page.addPage({
+                type: 'memory-analysis',
+                name: 'mmory-analysis',
 
-                  connection
-                },
-                ({ key }) => (
-                  <MemoryAnalysis
-                    connection={connection}
-                    pageKey={key}
-                  ></MemoryAnalysis>
-                )
-              )
+                connection
+              })
               break
             }
             case 'pubsub': {
-              store.page.addCreatePage(
-                {
-                  type: 'pubsub',
-                  name: 'pubsub',
+              store.page.addPage({
+                type: 'pubsub',
+                name: 'pubsub',
 
-                  connection
-                },
-                ({ key }) => (
-                  <Pubsub connection={connection} pageKey={key}></Pubsub>
-                )
-              )
+                connection
+              })
               break
             }
             case 'monitor': {
-              store.page.addCreatePage(
-                {
-                  type: 'monitor',
-                  name: 'monitor',
-                  connection
-                },
-                ({ key }) => <Monitor connection={connection} pageKey={key} />
-              )
+              store.page.addPage({
+                type: 'monitor',
+                name: 'monitor',
+                connection
+              })
               break
             }
           }

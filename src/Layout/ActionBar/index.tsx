@@ -5,6 +5,7 @@ import React from 'react'
 import NewConnection from './components/NewConnection'
 import Session from './components/Session'
 import Migrate from './components/Migrate'
+import Collection from './components/Collection'
 import { type WebviewWindow, getAll } from '@tauri-apps/api/window'
 import { WindowsOutlined } from '@ant-design/icons'
 import { TauriEvent } from '@tauri-apps/api/event'
@@ -36,6 +37,7 @@ const ActionBar: React.FC = () => {
             <Log />
             <Session />
             <Migrate />
+            <Collection />
           </Space>
         </div>
         <div className="flex px-4">

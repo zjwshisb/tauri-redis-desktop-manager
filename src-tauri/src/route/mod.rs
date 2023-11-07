@@ -8,6 +8,7 @@ use crate::response::Response;
 pub mod bloom;
 pub mod client;
 pub mod cluster;
+pub mod collection;
 pub mod config;
 pub mod connection;
 pub mod db;
@@ -155,6 +156,11 @@ pub async fn dispatch<'r>(
 
         "terminal/open" => Response::new(terminal::open(payload, cid, manager, window).await?),
         "terminal/transfer" => Response::new(terminal::transfer(payload).await?),
+
+        "collections" => Response::new(collection::all().await?),
+        "collections/add" => Response::new(collection::add(payload).await?),
+        "collections/del" => Response::new(collection::del(payload).await?),
+
         _ => Err(CusError::App(format!("{} Not Found", path))),
     };
     r

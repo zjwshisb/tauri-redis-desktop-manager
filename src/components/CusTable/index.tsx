@@ -22,7 +22,6 @@ export default function CusTable<T extends object>(
   const db = useDebounceFn(
     () => {
       if (container.current !== null) {
-        console.log('test')
         let containerWith = container.current?.clientWidth - 1
         if (containerWith <= 800) {
           containerWith = 800

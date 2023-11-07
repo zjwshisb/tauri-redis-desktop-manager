@@ -44,7 +44,7 @@ const App: React.FC = () => {
 
   return (
     <AppLayout>
-      <Container level={3}>
+      <Container level={4}>
         <Page pageKey="log" wFull>
           <XTerm ref={term} readonly welcome="Pause button to start"></XTerm>
           <div className="mt-2 flex">

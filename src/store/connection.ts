@@ -3,6 +3,7 @@ import request from '../utils/request'
 import { getAll } from '@tauri-apps/api/window'
 import pageStore from './page'
 import keysStore from './key'
+import collectionStore from './collection'
 
 interface Form {
   open: boolean
@@ -39,6 +40,7 @@ class ConnectionStore {
   }
 
   async getInfo(connection: APP.Connection) {
+    connection.loading = true
     if (connection.is_cluster) {
       const nodes = await request<APP.Node[]>('cluster/nodes', connection.id)
       runInAction(() => {
@@ -51,10 +53,15 @@ class ConnectionStore {
       const count = parseInt(db.data)
       const dbs: APP.Database[] = []
       for (let i = 0; i < count; i++) {
-        dbs.push({
+        const db = {
           database: i,
           count: 0
+        }
+        const res = await request<number>('db/dbsize', connection.id, {
+          db: db.database
         })
+        db.count = res.data
+        dbs.push(db)
       }
       runInAction(() => {
         connection.dbs = dbs
@@ -64,6 +71,7 @@ class ConnectionStore {
     runInAction(() => {
       connection.version = version.data
       connection.open = true
+      connection.loading = false
     })
   }
 
@@ -134,11 +142,17 @@ class ConnectionStore {
     this.connections.push(connection)
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     const index = this.connections.findIndex((v) => v.id === id)
     if (index > -1) {
-      this.close(this.connections[index].id)
-      this.connections.splice(index, 1)
+      await request('connections/del', 0, {
+        id
+      })
+      runInAction(() => {
+        this.close(this.connections[index].id)
+        this.connections.splice(index, 1)
+        collectionStore.getAll()
+      })
     }
   }
 

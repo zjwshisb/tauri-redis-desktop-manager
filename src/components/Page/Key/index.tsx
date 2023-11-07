@@ -134,21 +134,12 @@ const Key: React.FC<{
                 <Name
                   keys={item}
                   onChange={(newName) => {
-                    const newPage = store.page.createPage(
-                      {
-                        type: 'key',
-                        connection,
-                        name: newName
-                      },
-                      ({ key }) => (
-                        <Key
-                          name={newName}
-                          connection={connection}
-                          db={db}
-                          pageKey={key}
-                        ></Key>
-                      )
-                    )
+                    const newPage = store.page.createPage({
+                      type: 'key',
+                      connection,
+                      name: newName,
+                      db: item.db
+                    })
                     store.page.updatePage(pageKey, newPage)
                   }}
                 ></Name>

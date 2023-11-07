@@ -8,6 +8,7 @@ import useStore from '@/hooks/useStore'
 import { computed } from 'mobx'
 import { type FormInstance } from 'antd/es/form/Form'
 import { type MigrateItem } from '../../reducer'
+import useDatabaseOption from '@/hooks/useDatabaseOption'
 
 const ConnectionSelect: React.FC<{
   title: string
@@ -54,23 +55,7 @@ const ConnectionSelect: React.FC<{
     form.resetFields(['database'])
   }, [connection, form])
 
-  const databasesOption = computed(() => {
-    if (connection === undefined) {
-      return []
-    }
-    if (connection.is_cluster) {
-      return []
-    }
-    if (connection.dbs === undefined) {
-      return []
-    }
-    return connection.dbs.map((v) => {
-      return {
-        label: v.database,
-        value: v.database
-      }
-    })
-  })
+  const databasesOption = useDatabaseOption(connection)
 
   return (
     <div className="flex-1 px-10 py-2 flex-shrink-0 overflow-hidden">
@@ -128,8 +113,8 @@ const ConnectionSelect: React.FC<{
                 name: t('Database')
               })}
               size="small"
-              options={databasesOption.get()}
-              disabled={databasesOption.get().length === 0}
+              options={databasesOption}
+              disabled={databasesOption.length === 0}
             ></Select>
           </Form.Item>
         </Form>

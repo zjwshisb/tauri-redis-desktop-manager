@@ -3,13 +3,16 @@ import { FloatButton } from 'antd'
 import { ReloadOutlined, WindowsOutlined } from '@ant-design/icons'
 import { isMainWindow } from '@/utils'
 import useStore from '@/hooks/useStore'
+import { observer } from 'mobx-react-lite'
+import Collect from './collect'
 
 const isMain = isMainWindow()
 
 const PageFloatButton: React.FC<{
   onRefresh?: () => void
   pageKey?: string
-}> = ({ onRefresh, pageKey }) => {
+  collected?: boolean
+}> = ({ onRefresh, pageKey, collected = true }) => {
   const store = useStore()
 
   if (onRefresh === undefined && !isMain) {
@@ -32,12 +35,15 @@ const PageFloatButton: React.FC<{
       shape="square"
       style={{ top: '40%', bottom: 'auto', right: 10 }}
     >
+      {pageKey !== undefined && collected && (
+        <Collect pageKey={pageKey}></Collect>
+      )}
       {isMain && pageKey !== undefined && (
         <FloatButton
           icon={<WindowsOutlined />}
           onClick={() => {
             if (pageKey !== undefined) {
-              store.page.openNewWindowPageKey(pageKey)
+              store.page.openPageInNewWindowByKey(pageKey)
             }
           }}
         ></FloatButton>
@@ -49,6 +55,7 @@ const PageFloatButton: React.FC<{
           icon={<ReloadOutlined></ReloadOutlined>}
         ></FloatButton>
       )}
+
       <FloatButton.BackTop
         target={() => {
           const target = document.getElementById('container')
@@ -58,4 +65,4 @@ const PageFloatButton: React.FC<{
     </FloatButton.Group>
   )
 }
-export default PageFloatButton
+export default observer(PageFloatButton)

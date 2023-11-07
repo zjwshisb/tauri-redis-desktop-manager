@@ -8,7 +8,6 @@ import {
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import request from '@/utils/request'
 import { Dropdown, App, Button } from 'antd'
 import { useTranslation } from 'react-i18next'
 
@@ -88,9 +87,6 @@ const Index: React.FC<{
                     name: t('Connection')
                   }),
                   async onOk() {
-                    await request('connections/del', 0, {
-                      id: connection.id
-                    })
                     store.connection.remove(connection.id)
                     message.success(t('Success'))
                   }

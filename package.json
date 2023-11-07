@@ -15,7 +15,7 @@
     "@tauri-apps/api": "^1.5.1",
     "Buffer": "^0.0.0",
     "ahooks": "^3.7.8",
-    "antd": "^5.10.1",
+    "antd": "^5.11.0",
     "autoprefixer": "^10.4.14",
     "buffer": "^6.0.3",
     "classnames": "^2.3.2",
@@ -32,6 +32,7 @@
     "react": "^18.2.0",
     "react-countup": "^6.4.2",
     "react-dom": "^18.2.0",
+    "react-highlight-words": "^0.20.0",
     "react-i18next": "^12.2.2",
     "react-json-view": "^1.21.3",
     "react-sticky-box": "^2.0.4",
@@ -42,6 +43,7 @@
     "xterm-addon-fit": "^0.8.0"
   },
   "devDependencies": {
+    "@types/react-highlight-words": "^0.16.6",
     "@tauri-apps/cli": "^1.5.2",
     "@types/lodash": "^4.14.194",
     "@types/node": "^18.7.10",

@@ -9,6 +9,7 @@ import { computed } from 'mobx'
 import { KeyOutlined } from '@ant-design/icons'
 import Welcome from './components/Welcome'
 import Container from '@/components/Container'
+import DetailPage from '@/components/Page/DetailPage'
 
 const Index: React.FC = () => {
   const store = useStore()
@@ -46,7 +47,7 @@ const Index: React.FC = () => {
 
   const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
     <StickyBox offsetTop={0} offsetBottom={20} style={{ zIndex: 1 }}>
-      <DefaultTabBar {...props} className="m-0 bg-gray-1 dark:bg-gray-13" />
+      <DefaultTabBar {...props} className="!mb-0 bg-gray-1 dark:bg-gray-13" />
     </StickyBox>
   )
 
@@ -60,13 +61,13 @@ const Index: React.FC = () => {
               onClick(e) {
                 switch (e.key) {
                   case 'window': {
-                    store.page.openNewWindowPage(v).then(() => {
-                      store.page.removePage(v.key)
+                    store.page.openPageInNewWindow(v).then(() => {
+                      store.page.removePage(v.pageKey)
                     })
                     break
                   }
                   case 'close': {
-                    store.page.removePage(v.key)
+                    store.page.removePage(v.pageKey)
                     break
                   }
                   case 'all': {
@@ -96,8 +97,8 @@ const Index: React.FC = () => {
             </div>
           </Dropdown>
         ),
-        key: v.key,
-        children: v.children
+        key: v.pageKey,
+        children: <DetailPage {...v} />
       }
     })
   )

@@ -3,6 +3,7 @@ import React from 'react'
 import { Input, Select } from 'antd'
 import TypeSelect from '@/components/TypeSelect'
 import { useTranslation } from 'react-i18next'
+import useDatabaseOption from '@/hooks/useDatabaseOption'
 
 export interface FilterForm {
   search: string
@@ -29,6 +30,8 @@ const Filter: React.FC<{
     [onValueChange, value]
   )
 
+  const options = useDatabaseOption(connection)
+
   return (
     <>
       <div className="mb-2 w-[200px] mr-2">
@@ -49,12 +52,7 @@ const Filter: React.FC<{
             onChange={(v) => {
               update('db', v)
             }}
-            options={connection.dbs?.map((v) => {
-              return {
-                label: v.database,
-                value: v.database
-              }
-            })}
+            options={options}
           ></Select>
         </div>
       )}

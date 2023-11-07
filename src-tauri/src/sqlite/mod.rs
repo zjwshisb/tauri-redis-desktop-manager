@@ -5,8 +5,10 @@ use std::fs;
 const DATA_DIR: &str = "redis";
 const DATA_NAME: &str = "data3.db";
 
+mod collection;
 mod connection;
 
+pub use collection::Collection;
 pub use connection::Connection;
 
 pub fn get_client() -> Result<SqliteConnection, CusError> {
@@ -41,12 +43,13 @@ pub fn init() {
         .unwrap();
     client
         .execute(
-            "CREATE TABLE IF NOT EXISTS Collections (
+            "CREATE TABLE IF NOT EXISTS collections (
         id    INTEGER PRIMARY KEY,
         connection_id INTEGER NOT NULL,
         name  TEXT NOT NULL,
-        db  INTEGER NOT NULL DEFAULT 0,
-        type TEXT NOT NULL,
+        db  INTEGER,
+        types TEXT NOT NULL,
+        key TEXT NOT NULL,
         created_at TEXT NOT NULL
     )",
             (), // empty list of parameters.

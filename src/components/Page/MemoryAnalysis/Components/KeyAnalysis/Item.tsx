@@ -1,7 +1,6 @@
 import React from 'react'
 import { type KeyItem } from './index'
 import { memoryFormat } from '@/utils'
-import Key from '@/components/Page/Key'
 import useStore from '@/hooks/useStore'
 import InteractiveContainer from '@/components/InteractiveContainer'
 
@@ -16,23 +15,12 @@ const Item: React.FC<ItemProps> = (props) => {
   return (
     <InteractiveContainer
       onClick={() => {
-        const page = store.page.createPage(
-          {
-            connection: props.connection,
-            name: props.item.name,
-            db: props.db,
-            type: 'key'
-          },
-          ({ key }) => (
-            <Key
-              name={props.item.name}
-              db={props.db}
-              connection={props.connection}
-              pageKey={key}
-            ></Key>
-          )
-        )
-        store.page.openPage(page)
+        store.page.addPageOrInNewWindow({
+          connection: props.connection,
+          name: props.item.name,
+          db: props.db,
+          type: 'key'
+        })
       }}
       className="flex px-2 h-[25px] justify-between items-center border-b-[0.5px] last:border-b-0"
     >

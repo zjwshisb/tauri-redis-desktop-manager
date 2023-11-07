@@ -146,4 +146,14 @@ declare namespace APP {
   }
 
   type ScanLikeResp<T = string> = SingleScanLikeResp<T> | ClusterScanLikeResp<T>
+
+  interface Collection {
+    id?: number
+    connection_id: number
+    db?: number
+    types: string
+    name: string
+    key: string
+    created_at: string
+  }
 }

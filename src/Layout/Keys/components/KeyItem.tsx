@@ -2,11 +2,11 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { Typography, Popover, Button } from 'antd'
 import useStore from '@/hooks/useStore'
-import Key from '@/components/Page/Key'
 import { SearchOutlined } from '@ant-design/icons'
 import context from '../context'
 import Container from '@/components/Container'
 import InteractiveContainer from '@/components/InteractiveContainer'
+import Highlighter from 'react-highlight-words'
 
 const KeyItem: React.FC<{
   name: string
@@ -17,7 +17,7 @@ const KeyItem: React.FC<{
 
   const [prefix, setPrefix] = React.useState<string[]>([])
 
-  const [, dispatch] = React.useContext(context)
+  const [state, dispatch] = React.useContext(context)
 
   return (
     <Popover
@@ -61,26 +61,21 @@ const KeyItem: React.FC<{
         className="h-[37px] box-border p-2 border-b-[0.5px]"
         key={name}
         onClick={(e) => {
-          store.page.addCreatePage(
-            {
-              connection,
-              name,
-              db,
-              type: 'key'
-            },
-            ({ key }) => (
-              <Key
-                name={name}
-                db={db}
-                connection={connection}
-                pageKey={key}
-              ></Key>
-            )
-          )
+          store.page.addPage({
+            connection,
+            name,
+            db,
+            type: 'key'
+          })
           e.stopPropagation()
         }}
       >
-        <Typography.Text ellipsis={true}>{name}</Typography.Text>
+        <Typography.Text ellipsis={true}>
+          <Highlighter
+            textToHighlight={name}
+            searchWords={[state.filter.search]}
+          ></Highlighter>
+        </Typography.Text>
       </InteractiveContainer>
     </Popover>
   )

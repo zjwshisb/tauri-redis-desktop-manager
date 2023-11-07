@@ -14,12 +14,12 @@ export type Page =
   | ConfigPage
   | MemoryAnalysisPage
   | TerminalPage
+  | CollectionPage
 
 interface BasePage<T> {
   label: React.ReactNode
-  key: string
-  children: React.ReactNode
-  connection: APP.Connection
+  pageKey: string
+  connection?: APP.Connection
   type: T
   name: string
   db?: number
@@ -36,9 +36,9 @@ type SlowLogPage = BasePage<'slow-log'>
 type ConfigPage = BasePage<'config'>
 type MemoryAnalysisPage = BasePage<'memory-analysis'>
 type TerminalPage = BasePage<'terminal'>
+type CollectionPage = BasePage<'collection'>
 
-type CreatePageProps = Omit<Page, 'key' | 'children' | 'label'>
-type RenderChildrenFn = (props: Omit<Page, 'children'>) => React.ReactNode
+type CreatePageProps = Omit<Page, 'pageKey' | 'label'>
 
 class PageStore {
   pages: Page[] = []
@@ -77,38 +77,42 @@ class PageStore {
   }
 
   removePage(key: string) {
-    const index = this.pages.findIndex((v) => v.key === key)
+    const index = this.pages.findIndex((v) => v.pageKey === key)
     if (index > -1) {
       this.pages.splice(index, 1)
       if (key === this.active) {
         if (this.pages.length >= index + 1) {
-          this.active = this.pages[index].key
+          this.active = this.pages[index].pageKey
         } else if (this.pages.length > 0) {
-          this.active = this.pages[this.pages.length - 1].key
+          this.active = this.pages[this.pages.length - 1].pageKey
         }
       }
     }
   }
 
-  async openNewWindowPageKey(key: string) {
-    const page = this.pages.find((v) => v.key === key)
+  getPageByKey(p: string) {
+    return this.pages.find((v) => v.pageKey === p)
+  }
+
+  async openPageInNewWindowByKey(key: string) {
+    const page = this.getPageByKey(key)
     if (page != null) {
-      await this.openNewWindowPage(page)
+      await this.openPageInNewWindow(page)
       this.removePage(key)
     } else {
       return await Promise.reject(new Error('Page Not Found'))
     }
   }
 
-  async openNewWindowPage(p: Page) {
+  async openPageInNewWindow(p: Page) {
     let url = ''
     if (p.connection !== undefined) {
       url = `/src/windows/detail/index.html?type=${p.type}&cid=${
         p.connection?.id
-      }&key=${encodeURI(p.key)}`
+      }&key=${encodeURI(p.pageKey)}`
     } else {
       url = `/src/windows/detail/index.html?type=${p.type}&key=${encodeURI(
-        p.key
+        p.pageKey
       )}`
     }
 
@@ -144,16 +148,22 @@ class PageStore {
       case 'terminal': {
         break
       }
+      case 'collection': {
+        break
+      }
       default: {
         url = ''
         break
       }
     }
     if (url !== '') {
-      const label = `${p.connection.id}-${spark.hash(p.key)}`
+      let label = `${spark.hash(p.pageKey)}`
+      if (p.connection != null) {
+        label = `${p.connection.id}-${label}`
+      }
       await openWindow(label, {
         url,
-        title: p.key,
+        title: p.pageKey,
         focus: true
       })
     } else {
@@ -161,57 +171,78 @@ class PageStore {
     }
   }
 
-  getPageKey(name: string, conn: APP.Connection, db?: number) {
-    let key = `${conn.id}|${name}`
-    if (db !== undefined) {
+  getPageKey(
+    name: string,
+    type: Page['type'],
+    conn?: APP.Connection,
+    db?: number
+  ) {
+    let key = `${name}|${type}`
+    if (conn != null) {
+      key = `${conn.id}|` + key
+    }
+    if (db !== undefined && type === 'key') {
       key += `@${db}`
     }
     return key
   }
 
-  openPage(page: Page) {
+  getPageLabel(page: Omit<Page, 'label'>) {
+    let label = `${page.name}`
+    if (page.connection !== undefined) {
+      label = `${page.connection.id}|${label}`
+    }
+    if (page.db !== undefined) {
+      label += `@${page.db}`
+    }
+    return label
+  }
+
+  addPageOrInNewWindow(props: CreatePageProps) {
+    const page = this.createPage(props)
     if (isMainWindow()) {
       this.addPage(page)
     } else {
-      this.openNewWindowPage(page)
+      this.openPageInNewWindow(page)
     }
   }
 
   updatePage(key: string, page: Page) {
-    const index = this.pages.findIndex((v) => v.key === key)
+    const index = this.pages.findIndex((v) => v.pageKey === key)
     if (index > -1) {
       this.pages[index] = page
       if (this.active === key) {
-        this.active = page.key
+        this.active = page.pageKey
       }
     }
   }
 
-  createPage(p: CreatePageProps, renderChildren: RenderChildrenFn): Page {
-    const key = this.getPageKey(p.name, p.connection, p.db)
-    const props = {
-      key,
-      label: key,
-      ...p
+  createPage(props: CreatePageProps): Page {
+    const pageKey = this.getPageKey(
+      props.name,
+      props.type,
+      props.connection,
+      props.db
+    )
+    const p = {
+      ...props,
+      pageKey
     }
     return {
-      children: renderChildren(props),
-      ...props
+      ...p,
+      pageKey,
+      label: this.getPageLabel(p)
     }
   }
 
-  addCreatePage(p: CreatePageProps, render: RenderChildrenFn) {
-    const page = this.createPage(p, render)
-    this.addPage(page)
-  }
-
-  addPage(page: Page) {
-    const exist = this.pages.find((v) => v.key === page.key)
+  addPage(props: CreatePageProps) {
+    const page = this.createPage(props)
+    const exist = this.getPageByKey(page.pageKey)
     if (exist != null) {
-      this.active = exist.key
+      this.active = exist.pageKey
     } else {
       this.pages.push(page)
-      this.active = page.key
+      this.active = page.pageKey
     }
   }
 }

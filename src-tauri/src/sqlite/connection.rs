@@ -210,6 +210,10 @@ impl Connection {
     pub fn del(self) -> Result<(), CusError> {
         let conn = sqlite::get_client()?;
         conn.execute("delete from connections where id = ?1", [self.id])?;
+        conn.execute(
+            "delete from collections where connection_id = ?1",
+            [self.id],
+        )?;
         Ok(())
     }
 

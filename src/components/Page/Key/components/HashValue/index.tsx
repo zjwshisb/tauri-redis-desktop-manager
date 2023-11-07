@@ -12,6 +12,7 @@ import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
+import Highlighter from 'react-highlight-words'
 
 const HashValue: React.FC<{
   keys: APP.HashKey
@@ -30,7 +31,7 @@ const HashValue: React.FC<{
     [
       {
         dataIndex: 'field',
-        width: 200,
+        width: 300,
         title: (
           <div className="flex items-center justify-center">
             <div>{t('Field Name')}</div>
@@ -51,7 +52,15 @@ const HashValue: React.FC<{
               />
             </div>
           </div>
-        )
+        ),
+        render(value) {
+          return (
+            <Highlighter
+              textToHighlight={value}
+              searchWords={[params.search]}
+            />
+          )
+        }
       },
       {
         dataIndex: 'value',

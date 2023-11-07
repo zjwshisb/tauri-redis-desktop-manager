@@ -7,6 +7,7 @@ import DbInfo from './DbInfo'
 import Module from './Module'
 import CusTable from '@/components/CusTable'
 import VersionAccess from '@/components/VersionAccess'
+import Highlighter from 'react-highlight-words'
 
 const Item: React.FC<{
   data: Record<string, string>
@@ -85,7 +86,14 @@ const Item: React.FC<{
                   title: t('Key'),
                   dataIndex: 'field',
                   defaultSortOrder: 'ascend',
-
+                  render(value) {
+                    return (
+                      <Highlighter
+                        textToHighlight={value}
+                        searchWords={[search]}
+                      />
+                    )
+                  },
                   sorter(a, b) {
                     return a.field > b.field ? 1 : -1
                   }

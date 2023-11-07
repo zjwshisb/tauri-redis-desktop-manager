@@ -1,59 +1,32 @@
 import React from 'react'
-import {
-  DatabaseOutlined,
-  ReloadOutlined,
-  KeyOutlined
-} from '@ant-design/icons'
+import { DatabaseOutlined, KeyOutlined } from '@ant-design/icons'
 import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import ItemLayout from '../ItemLayout'
 import { Dropdown, App } from 'antd'
 import { t } from 'i18next'
 import { type ItemType } from 'antd/es/menu/hooks/useItems'
+import { observer } from 'mobx-react-lite'
 
-const Index: React.FC<{
+const DBItem: React.FC<{
   active: boolean
   connection: APP.Connection
   item: APP.Database
 }> = (props) => {
   const { connection, item } = props
 
-  const [keyCount, setKeyCount] = React.useState(0)
-
-  const [loading, setLoading] = React.useState(false)
-
   const store = useStore()
 
   const { modal, message } = App.useApp()
 
-  const getCount = React.useCallback(() => {
-    setLoading(true)
-    request<number>('db/dbsize', connection.id, {
-      db: item.database
-    })
-      .then((res) => {
-        setKeyCount(res.data)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [connection.id, item])
-
-  React.useEffect(() => {
-    getCount()
-  }, [getCount])
-
   const child = React.useMemo(() => {
-    if (loading) {
-      return <ReloadOutlined spin />
-    }
     return (
       <div className="flex items-center  italic">
-        <span>{keyCount}</span>
+        <span>{item.count}</span>
         <KeyOutlined className="text-sm" />
       </div>
     )
-  }, [keyCount, loading])
+  }, [item.count])
 
   const menuItems = React.useMemo(() => {
     const m: ItemType[] = []
@@ -104,7 +77,7 @@ const Index: React.FC<{
                     await request('db/flush', connection.id, {
                       db: item.database
                     })
-                    getCount()
+                    store.connection.getInfo(connection)
                     message.success(t('Success'))
                   }
                 })
@@ -123,4 +96,4 @@ const Index: React.FC<{
     </ItemLayout>
   )
 }
-export default Index
+export default observer(DBItem)
