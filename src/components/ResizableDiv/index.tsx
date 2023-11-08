@@ -1,7 +1,7 @@
 import React from 'react'
 import { Resizable } from 're-resizable'
 
-const Index: React.FC<
+const ResizableDiv: React.FC<
   React.PropsWithChildren<{
     minWidth: number
     maxWidth: number
@@ -32,4 +32,4 @@ const Index: React.FC<
   )
 }
 
-export default Index
+export default ResizableDiv

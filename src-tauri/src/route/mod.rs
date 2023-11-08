@@ -154,8 +154,7 @@ pub async fn dispatch<'r>(
         "hyperloglog/pfcount" => Response::new(hyperloglog::pfcount(payload, cid, manager).await?),
         "hyperloglog/pfadd" => Response::new(hyperloglog::pfadd(payload, cid, manager).await?),
 
-        "terminal/open" => Response::new(terminal::open(payload, cid, manager, window).await?),
-        "terminal/transfer" => Response::new(terminal::transfer(payload).await?),
+        "terminal/open" => Response::new(terminal::open(cid, window, pubsub, manager).await?),
 
         "collections" => Response::new(collection::all().await?),
         "collections/add" => Response::new(collection::add(payload).await?),

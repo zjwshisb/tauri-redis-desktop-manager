@@ -2,6 +2,7 @@ use crate::err::CusError;
 use chrono::prelude::*;
 use redis::FromRedisValue;
 use redis::Value;
+use serde::Deserialize;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -21,7 +22,7 @@ where
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Deserialize)]
 pub struct EventResp<T> {
     pub data: T,
     pub success: bool,

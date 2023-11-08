@@ -10,6 +10,7 @@ use redis::aio::{Connection as RedisConnection, ConnectionLike};
 use redis::cluster::ClusterClient;
 use redis::cluster_async::ClusterConnection;
 use redis::Client;
+use redis::Connection as RedisSyncConnection;
 use redis::FromRedisValue;
 use redis::{Arg, Value};
 use ssh_jumper::model::SshForwarderEnd;
@@ -121,6 +122,20 @@ impl Connection {
         params
     }
 
+    pub async fn get_sync_one(&self) -> Result<RedisSyncConnection, CusError> {
+        let params = self.get_connected_params();
+        let client = Client::open(params)?;
+        let result = client.get_connection();
+        match result {
+            Ok(c) => {
+                return Ok(c);
+            }
+            Err(e) => {
+                return Err(CusError::App(e.to_string()));
+            }
+        }
+    }
+
     pub async fn get_normal(&mut self) -> Result<RedisConnection, CusError> {
         ssh::create_tunnel(self).await?;
         let params = self.get_connected_params();
@@ -190,6 +205,10 @@ impl ConnectionWrapper {
             conn: b,
         };
         Ok(r)
+    }
+
+    pub fn get_proxy(&self) -> Option<String> {
+        self.model.get_proxy()
     }
 
     pub fn get_host(&self) -> String {

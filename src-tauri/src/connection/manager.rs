@@ -4,7 +4,7 @@ use crate::{
     model::Command,
     response::{self, Field},
 };
-use redis::Cmd;
+use redis::{Cmd, Connection as RedisSyncConnection};
 use redis::{FromRedisValue, Value};
 use std::collections::HashMap;
 use tokio::sync::{mpsc::Sender, Mutex};

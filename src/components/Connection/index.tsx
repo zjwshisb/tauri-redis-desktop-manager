@@ -4,7 +4,8 @@ import {
   DisconnectOutlined,
   ReloadOutlined,
   WarningOutlined,
-  LoadingOutlined
+  LoadingOutlined,
+  MacCommandFilled
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
@@ -141,6 +142,19 @@ const Connection: React.FC<{
           )}
           {connection.open === true && (
             <>
+              <Button
+                type="text"
+                size="small"
+                onClick={() => {
+                  store.page.addPage({
+                    type: 'terminal',
+                    name: 'terminal',
+                    connection
+                  })
+                }}
+                icon={<MacCommandFilled />}
+              ></Button>
+
               <Tooltip title={t('Refresh')}>
                 <Button
                   size="small"

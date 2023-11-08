@@ -3,7 +3,8 @@ import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import lodash from 'lodash'
 import Container from '../Container'
-
+import { type Child, Command } from '@tauri-apps/api/shell'
+import classNames from 'classnames'
 interface XTermProps {
   className?: string
   welcome?: string
@@ -33,7 +34,6 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
       disableStdin: readonly,
       convertEol: true,
       cursorInactiveStyle: readonly ? 'none' : 'block'
-
       // 终端中的回滚量
       // 光标闪烁
     })
@@ -74,25 +74,53 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
         if (!readonly) {
           term.write(prefix)
         }
-
+        const command = new Command('bash')
+        command.on('error', (error) => {
+          console.log(error)
+          // console.error(`command error: "${error}"`)
+        })
+        command.stdout.on('data', (line) => {
+          // console.log(`command stdout: "${line}"`)
+          console.log(line)
+        })
+        command.stderr.on('data', (line) => {
+          console.log(line)
+          // console.log(`command stderr: "${line}"`)
+        })
+        let child: Child | undefined
+        command.spawn().then((res) => {
+          child = res
+        })
         term.onData((s) => {
+          child
+            ?.write(s)
+            .then(() => {
+              console.log(child)
+            })
+            .catch((e) => {
+              console.log(e)
+            })
+          console.log(child)
+          // term.write('\x9bA')
+          // term.write('\x07')
           // const f = iconv.encode(s, 'utf8')
           // const r = iconv.decode(f, 'utf8')
-          // console.log(r)
-          // term.write(f)
+          // console.log()
+          // term.write(s)
           // const b = decodeURIComponent(encodeURIComponent(s))
           // console.log(s)
           // console.log(b)
           // term.write(b)
-          // term.paste(s)
+          // term.paste(s)a
           // term.write(b)
           // if (readonly) {
           //   return
           // }
-          // if (s.length > 1) {
-          //   currentLine.current += s
-          //   term.write(s)
-          // }
+          // console.log(s)
+          if (s.length > 1) {
+            currentLine.current += s
+            term.write(s)
+          }
         })
         term.onKey((e) => {
           if (readonly) {
@@ -135,6 +163,7 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
                 historyIndex.current = 0
               }
               if (history.current[historyIndex.current] !== undefined) {
+                term.write('\x9B1P')
                 term.write(history.current[historyIndex.current])
               }
 
@@ -152,13 +181,14 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
                   0,
                   currentLine.current.length - 1
                 )
-                term.write('\b \b')
+                console.log('test')
+                term.write('\x9b1P')
               }
               break
             }
             default: {
               currentLine.current += e.key
-              // term.write(e.key)
+              term.write(e.key)
             }
           }
         })
@@ -172,7 +202,10 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
   return (
     <Container
       ref={container}
-      className="bg-black rounded overflow-hidden border "
+      className={classNames([
+        'bg-black rounded overflow-hidden border',
+        props.className
+      ])}
     >
       <div ref={div} className={props.className}></div>
     </Container>

@@ -17,8 +17,14 @@
         "all": true
       },
       "shell": {
-        "all": false,
-        "open": true
+        "scope": [{
+          "name": "bash",
+          "cmd": "/bin/bash"
+        }],
+        "all": true,
+        "open": true,
+        "execute": true,
+        "sidecar": true 
       },
       "dialog": {
         "all": true,
