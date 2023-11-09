@@ -23,6 +23,7 @@ fn main() {
         .menu(menu)
         .manage(PubsubManager::new())
         .manage(connection::Manager::new())
+        .manage(connection::EventManager::new())
         .invoke_handler(tauri::generate_handler![route::dispatch])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

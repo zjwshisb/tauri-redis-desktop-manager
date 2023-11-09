@@ -7,7 +7,7 @@ use crate::{
 };
 use chrono::prelude::*;
 use redis::aio::{Connection as RedisConnection, ConnectionLike};
-use redis::cluster::ClusterClient;
+use redis::cluster::{ClusterClient, ClusterConnection as RedisSyncClusterConnection};
 use redis::cluster_async::ClusterConnection;
 use redis::Client;
 use redis::Connection as RedisSyncConnection;
@@ -125,6 +125,20 @@ impl Connection {
     pub async fn get_sync_one(&self) -> Result<RedisSyncConnection, CusError> {
         let params = self.get_connected_params();
         let client = Client::open(params)?;
+        let result = client.get_connection();
+        match result {
+            Ok(c) => {
+                return Ok(c);
+            }
+            Err(e) => {
+                return Err(CusError::App(e.to_string()));
+            }
+        }
+    }
+
+    pub async fn get_sync_cluster_one(&self) -> Result<RedisSyncClusterConnection, CusError> {
+        let params: ConnectedParam = self.get_connected_params();
+        let client = ClusterClient::new(vec![params])?;
         let result = client.get_connection();
         match result {
             Ok(c) => {

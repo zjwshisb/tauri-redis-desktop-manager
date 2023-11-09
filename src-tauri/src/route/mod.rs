@@ -1,6 +1,6 @@
 use tauri::Window;
 
-use crate::connection::Manager;
+use crate::connection::{EventManager, Manager};
 use crate::err::CusError;
 use crate::pubsub::PubsubManager;
 use crate::response::Response;
@@ -34,6 +34,7 @@ pub mod zset;
 pub async fn dispatch<'r>(
     pubsub: tauri::State<'r, PubsubManager>,
     manager: tauri::State<'r, Manager>,
+    event_manage: tauri::State<'r, EventManager>,
     window: Window,
     path: String,
     cid: u32,
@@ -154,7 +155,8 @@ pub async fn dispatch<'r>(
         "hyperloglog/pfcount" => Response::new(hyperloglog::pfcount(payload, cid, manager).await?),
         "hyperloglog/pfadd" => Response::new(hyperloglog::pfadd(payload, cid, manager).await?),
 
-        "terminal/open" => Response::new(terminal::open(cid, window, pubsub, manager).await?),
+        "terminal/open" => Response::new(terminal::open(cid, window, manager, event_manage).await?),
+        "terminal/cancel" => Response::new(terminal::cancel(payload, window, event_manage).await?),
 
         "collections" => Response::new(collection::all().await?),
         "collections/add" => Response::new(collection::add(payload).await?),

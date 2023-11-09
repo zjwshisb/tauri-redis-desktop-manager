@@ -4,6 +4,7 @@ use crate::{
     model::Command,
     response::{self, Field},
 };
+use redis::cluster::ClusterConnection as RedisSyncClusterConnection;
 use redis::{Cmd, Connection as RedisSyncConnection};
 use redis::{FromRedisValue, Value};
 use std::collections::HashMap;
@@ -224,6 +225,30 @@ impl Manager {
             return Ok(v);
         }
         return Err(CusError::reopen());
+    }
+
+    pub async fn get_is_cluster(&self, cid: u32) -> bool {
+        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
+            return conn.is_cluster();
+        }
+        return false;
+    }
+
+    pub async fn get_sync_conn(&self, cid: u32) -> Result<RedisSyncConnection, CusError> {
+        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
+            return Ok(conn.model.get_sync_one().await?);
+        }
+        return Err(CusError::build("not found"));
+    }
+
+    pub async fn get_sync_cluster_conn(
+        &self,
+        cid: u32,
+    ) -> Result<RedisSyncClusterConnection, CusError> {
+        if let Some(conn) = self.map.lock().await.get_mut(&cid) {
+            return Ok(conn.model.get_sync_cluster_one().await?);
+        }
+        return Err(CusError::build("not found"));
     }
 
     // get connected connections info

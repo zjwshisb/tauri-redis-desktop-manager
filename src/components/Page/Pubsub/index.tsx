@@ -73,12 +73,7 @@ const Pubsub: React.FC<{
           subscribe(v)
         }}
       ></Form>
-      <XTerm
-        welcome="Enter channel to subscribe"
-        ref={term}
-        readonly
-        className="h-[396px]"
-      />
+      <XTerm ref={term} className="h-[396px]" />
 
       <div className="py-2">
         <Divider orientation="left" plain>

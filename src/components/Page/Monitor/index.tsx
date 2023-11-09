@@ -49,12 +49,7 @@ const Monitor: React.FC<{
 
   return (
     <Page pageKey={props.pageKey}>
-      <XTerm
-        readonly={true}
-        ref={term}
-        className="h-[396px] w-full overflow-hidden rounded"
-        welcome="click start button to start monitor"
-      />
+      <XTerm ref={term} className="h-[396px] w-full overflow-hidden rounded" />
       <div className="mt-2">
         <Space>
           {status === 0 && (
