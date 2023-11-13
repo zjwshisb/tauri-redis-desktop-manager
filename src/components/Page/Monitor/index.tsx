@@ -1,80 +1,59 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import request from '@/utils/request'
-import { Button, Input, Space } from 'antd'
+import { Input, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import Page from '..'
-import XTerm from '@/components/XTerm'
-import { type Terminal } from 'xterm'
+import XTerm, { type XTermAction } from '@/components/XTerm'
 
-import { useEventListener } from '@/hooks/useEventListener'
+import { useEventListen } from '@/hooks/useEventListen'
 
 const Monitor: React.FC<{
   connection: APP.Connection
   pageKey: string
 }> = (props) => {
-  const [status, setStatus] = React.useState<0 | 1>(0)
-
   const search = React.useRef('')
 
   const { t } = useTranslation()
 
-  const term = React.useRef<Terminal>(null)
+  const term = React.useRef<XTermAction>(null)
 
-  const { listen, cancel } = useEventListener((r) => {
-    try {
-      const message: APP.EventPayload<string> = JSON.parse(r.payload)
-      if (search.current !== '') {
-        if (
-          message.data
-            .toLocaleLowerCase()
-            .includes(search.current.toLocaleLowerCase())
-        ) {
+  useEventListen<string>(
+    async () => {
+      return (await request<string>('pubsub/monitor', props.connection.id)).data
+    },
+    (r) => {
+      try {
+        const message: APP.EventPayload<string> = JSON.parse(r.payload)
+        if (search.current !== '') {
+          if (
+            message.data
+              .toLocaleLowerCase()
+              .includes(search.current.toLocaleLowerCase())
+          ) {
+            term.current?.writeln(message.data)
+          }
+        } else {
           term.current?.writeln(message.data)
         }
-      } else {
-        term.current?.writeln(message.data)
-      }
-    } catch (e) {}
-  })
-
-  const listenFn = useCallback(
-    async (cid: number) => {
-      const res = await request<string>('pubsub/monitor', cid)
-      await listen(res.data).then((r) => {
-        setStatus(1)
-      })
+      } catch (e) {}
     },
-    [listen]
+    async (name) => {
+      return await request('pubsub/cancel', 0, {
+        name
+      })
+    }
   )
 
   return (
     <Page pageKey={props.pageKey}>
-      <XTerm ref={term} className="h-[396px] w-full overflow-hidden rounded" />
+      <XTerm
+        ref={term}
+        onReady={(term) => {
+          term.writeln('waiting for logs...')
+        }}
+      />
       <div className="mt-2">
         <Space>
-          {status === 0 && (
-            <Button
-              type="primary"
-              onClick={async () => {
-                listenFn(props.connection.id)
-              }}
-            >
-              {t('Start')}
-            </Button>
-          )}
-          {status === 1 && (
-            <Button
-              type="primary"
-              danger
-              onClick={() => {
-                cancel().then(() => {
-                  setStatus(0)
-                })
-              }}
-            >
-              {t('Stop')}
-            </Button>
-          )}
           <Input
             className="!w-[200px]"
             placeholder={t('Filter').toString()}

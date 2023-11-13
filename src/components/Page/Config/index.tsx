@@ -1,6 +1,6 @@
 import Editable from '@/components/Editable'
 import useRequest from '@/hooks/useRequest'
-import { EditOutlined } from '@ant-design/icons'
+import { EditOutlined, SearchOutlined } from '@ant-design/icons'
 import { Button, Input } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -11,6 +11,7 @@ import ResetStat from './Components/ResetStat'
 import Page from '..'
 import CusTable from '@/components/CusTable'
 import useTableColumn from '@/hooks/useTableColumn'
+import Highlighter from 'react-highlight-words'
 
 const Config: React.FC<{
   connection: APP.Connection
@@ -41,6 +42,9 @@ const Config: React.FC<{
         dataIndex: 'field',
         width: 300,
         defaultSortOrder: 'ascend',
+        render(value) {
+          return <Highlighter searchWords={[search]} textToHighlight={value} />
+        },
         sorter(a, b) {
           return a.field > b.field ? 1 : -1
         }
@@ -74,6 +78,7 @@ const Config: React.FC<{
       <div className="flex mb-2">
         <div className="w-[300px]">
           <Input
+            prefix={<SearchOutlined />}
             placeholder={t('Filter').toString()}
             value={search}
             onChange={(e) => {

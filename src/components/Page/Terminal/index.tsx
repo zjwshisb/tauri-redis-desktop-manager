@@ -1,11 +1,9 @@
 import React from 'react'
-import XTerm from '@/components/XTerm'
+import XTerm, { type XTermAction } from '@/components/XTerm'
 import Page from '..'
 import request from '@/utils/request'
-import { Input, AutoComplete } from 'antd'
-import { type Terminal as TerminalI } from 'xterm'
+import { Input, AutoComplete, Button, Space } from 'antd'
 import { emit } from '@tauri-apps/api/event'
-import { isArray, isNumber, isString } from 'lodash'
 import { useEventListen } from '@/hooks/useEventListen'
 
 interface EventName {
@@ -27,27 +25,6 @@ const Terminal: React.FC<{
     }
   }, [event])
 
-  const printData = React.useCallback((data: any, prefix = '') => {
-    if (isString(data)) {
-      term.current?.writeln(`${prefix} "${data}"`)
-    }
-    if (isNumber(data)) {
-      term.current?.writeln(`${prefix} ${data}`)
-    }
-    if (isArray(data)) {
-      if (data.length === 0) {
-        printData('(empty array)', prefix)
-      }
-      data.forEach((v, index) => {
-        if (index === 0) {
-          printData(v, prefix + ` ${index})`)
-        } else {
-          printData(v, ' '.repeat(prefix.length) + ` ${index})`)
-        }
-      })
-    }
-  }, [])
-
   useEventListen<APP.EventPayload<any>>(
     async () => {
       return await request<EventName>('terminal/open', connection.id).then(
@@ -63,7 +40,7 @@ const Terminal: React.FC<{
     (v) => {
       const data = v.payload.data
       if (v.payload.success) {
-        printData(data)
+        term.current?.writeRedisResult(data)
       } else {
         term.current?.writeln(`(error) Err ${data as string}`)
       }
@@ -76,7 +53,7 @@ const Terminal: React.FC<{
     return `${connection.host}:${connection.port}>`
   }, [connection.host, connection.port])
 
-  const term = React.useRef<TerminalI>(null)
+  const term = React.useRef<XTermAction>(null)
 
   const [cmd, setCmd] = React.useState('')
 
@@ -87,7 +64,6 @@ const Terminal: React.FC<{
     <Page pageKey={pageKey}>
       <XTerm className="rounded-b-none" ref={term} />
       <AutoComplete
-        size="large"
         value={cmd}
         bordered={false}
         className="w-full"
@@ -121,20 +97,25 @@ const Terminal: React.FC<{
               break
             }
             case 'Enter': {
-              term.current?.writeln(`> ${cmd}`)
-              history.current.push(cmd)
-              historyIndex.current = history.current.length
-              if (event !== undefined) {
-                const payload: APP.EventPayload<string[]> = {
-                  data: cmd.split(' ').filter((v) => {
-                    return v.trim() !== ''
-                  }),
-                  id: 1,
-                  time: '13232',
-                  success: true,
-                  event: event.send
+              const parseCmd = cmd
+                .split(' ')
+                .map((v) => v.trim())
+                .filter((v) => v !== '')
+              if (parseCmd.length > 0) {
+                const cmdStr = parseCmd.join(' ')
+                term.current?.writeln(`> ${cmdStr}`)
+                history.current.push(cmdStr)
+                historyIndex.current = history.current.length
+                if (event !== undefined) {
+                  const payload: APP.EventPayload<string[]> = {
+                    data: parseCmd,
+                    id: 1,
+                    time: '13232',
+                    success: true,
+                    event: event.send
+                  }
+                  emit(event.send, payload)
                 }
-                emit(event.send, payload)
               }
               setCmd('')
             }
@@ -150,6 +131,22 @@ const Terminal: React.FC<{
           }}
         />
       </AutoComplete>
+      <div className="pt-2">
+        <Space>
+          <span>
+            <Button
+              onClick={() => {
+                term.current?.clear()
+              }}
+            >
+              Clear
+            </Button>
+          </span>
+          <span>
+            Enter to execute command, Arrow Down/Arrow Up to switch history
+          </span>
+        </Space>
+      </div>
     </Page>
   )
 }

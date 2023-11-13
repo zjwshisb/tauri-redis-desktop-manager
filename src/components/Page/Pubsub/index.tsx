@@ -4,9 +4,8 @@ import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import Form, { type SubscribeForm } from './components/Form'
 import Page from '..'
-import { useEventListener } from '@/hooks/useEventListener'
-import XTerm from '@/components/XTerm'
-import { type Terminal } from 'xterm'
+import XTerm, { type XTermAction } from '@/components/XTerm'
+import { useEventListen } from '@/hooks/useEventListen'
 
 const Pubsub: React.FC<{
   connection: APP.Connection
@@ -14,32 +13,45 @@ const Pubsub: React.FC<{
 }> = (props) => {
   const [form, setForm] = React.useState<SubscribeForm>()
 
-  const term = React.useRef<Terminal>(null)
+  const term = React.useRef<XTermAction>(null)
 
   const { t } = useTranslation()
 
-  const { listen, cancel } = useEventListener<string>((r) => {
-    try {
-      const message: APP.EventPayload<APP.PubsubMessage> = JSON.parse(r.payload)
-      term.current?.writeln('1) "message"')
-      term.current?.writeln(`2) "${message.data.channel}"`)
-      term.current?.writeln(`3) "${message.data.payload}"`)
-    } catch (e) {}
-  })
-
-  const subscribe = React.useCallback(
-    async (f: SubscribeForm) => {
-      await cancel()
+  const { listen, clear } = useEventListen<string>(
+    async () => {
       const res = await request<string>(
         'pubsub/subscribe',
         props.connection.id,
-        f
+        form
       )
-      term.current?.writeln('"OK"')
-      listen(res.data)
+      return res.data
     },
-    [cancel, listen, props.connection.id]
+    (r) => {
+      try {
+        const message: APP.EventPayload<APP.PubsubMessage> = JSON.parse(
+          r.payload
+        )
+        term.current?.writeln('1) "message"')
+        term.current?.writeln(`2) "${message.data.channel}"`)
+        term.current?.writeln(`3) "${message.data.payload}"`)
+      } catch (e) {}
+    },
+    async (name) => {
+      return await request('pubsub/cancel', 0, {
+        name
+      })
+    },
+    false
   )
+
+  React.useEffect(() => {
+    if (form != null) {
+      listen()
+      return () => {
+        clear()
+      }
+    }
+  }, [clear, form, listen])
 
   const publish = React.useMemo(() => {
     if (form != null) {
@@ -70,10 +82,14 @@ const Pubsub: React.FC<{
         connection={props.connection}
         onChange={(v) => {
           setForm(v)
-          subscribe(v)
         }}
       ></Form>
-      <XTerm ref={term} className="h-[396px]" />
+      <XTerm
+        ref={term}
+        onReady={(term) => {
+          term.writeln('Enter channels to subscribe...')
+        }}
+      />
 
       <div className="py-2">
         <Divider orientation="left" plain>

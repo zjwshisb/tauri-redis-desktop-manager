@@ -7,9 +7,10 @@ import { isMainWindow } from '@/utils'
 import { appWindow } from '@tauri-apps/api/window'
 
 export function useEventListen<T = string>(
-  eventName: string | (() => Promise<string>),
+  getNameFn: string | (() => Promise<string>),
   eventHandle: (e: Event<T>) => void,
-  onUnListenCallback: (name: string) => Promise<any>
+  onUnListenCallback?: (name: string) => Promise<any>,
+  immediately = true
 ) {
   const cancelFn = React.useRef<UnlistenFn>()
 
@@ -21,11 +22,11 @@ export function useEventListen<T = string>(
 
   const callback = useLatest(onUnListenCallback)
 
-  const eventNameRef = React.useRef(async () => {
-    if (isString(eventName)) {
-      return await Promise.resolve(eventName)
+  const eventNameRef = useLatest(async () => {
+    if (isString(getNameFn)) {
+      return await Promise.resolve(getNameFn)
     } else {
-      return await eventName()
+      return await getNameFn()
     }
   })
 
@@ -33,33 +34,42 @@ export function useEventListen<T = string>(
     if (cancelFn.current != null) {
       cancelFn.current()
     }
-    if (name.current !== '') {
+    if (name.current !== '' && callback.current != null) {
       return await callback.current(name.current)
     }
     await Promise.resolve()
   }, [callback])
 
-  React.useEffect(() => {
-    if (!init.current) {
-      init.current = true
-      if (!isMainWindow()) {
-        appWindow.once(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-          await clearFn()
-          appWindow.close()
-        })
-      }
-      eventNameRef.current().then((r) => {
-        name.current = r
-        appWindow.listen(r, handleFn.current).then((f) => {
-          cancelFn.current = f
-        })
+  const listen = React.useCallback(() => {
+    if (!isMainWindow()) {
+      appWindow.once(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+        await clearFn()
+        appWindow.close()
       })
     }
-  }, [clearFn, handleFn])
+    eventNameRef.current().then((r) => {
+      name.current = r
+      appWindow.listen(r, handleFn.current).then((f) => {
+        cancelFn.current = f
+      })
+    })
+  }, [clearFn, eventNameRef, handleFn])
+
+  React.useEffect(() => {
+    if (!init.current && immediately) {
+      init.current = true
+      listen()
+    }
+  }, [immediately, listen])
 
   React.useEffect(() => {
     return () => {
       clearFn()
     }
   }, [clearFn])
+
+  return {
+    listen,
+    clear: clearFn
+  }
 }

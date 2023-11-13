@@ -22,7 +22,7 @@ where
     }
 }
 
-#[derive(Serialize, Debug, Deserialize)]
+#[derive(Serialize, Debug, Deserialize, Clone)]
 pub struct EventResp<T> {
     pub data: T,
     pub success: bool,

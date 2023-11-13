@@ -7,6 +7,7 @@ import useSearchParam from '@/hooks/useSearchParam'
 import useStore from '@/hooks/useStore'
 import Keys from '@/Layout/Keys'
 import Pages from '@/Layout/Pages'
+import { computed } from 'mobx'
 
 const App: React.FC = () => {
   const params = useSearchParam<{
@@ -37,9 +38,22 @@ const App: React.FC = () => {
     }
   }, [connection, params.db, store.keyInfo])
 
+  const children = computed(() => {
+    if (store.keyInfo.info == null) {
+      return <></>
+    }
+    if (connection === undefined) {
+      return <></>
+    }
+    if (connection.nodes === undefined) {
+      return <></>
+    }
+    return <Keys info={store.keyInfo.info}></Keys>
+  })
+
   return (
     <AppLayout>
-      {store.keyInfo.info != null && <Keys info={store.keyInfo.info}></Keys>}
+      {children.get()}
       <Pages />
     </AppLayout>
   )

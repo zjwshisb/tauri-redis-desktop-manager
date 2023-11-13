@@ -1,5 +1,5 @@
 use crate::{
-    connection::Node,
+    connection::{Node, Value},
     err::CusError,
     model::Command,
     ssh::{self, SshProxy},
@@ -9,10 +9,11 @@ use chrono::prelude::*;
 use redis::aio::{Connection as RedisConnection, ConnectionLike};
 use redis::cluster::{ClusterClient, ClusterConnection as RedisSyncClusterConnection};
 use redis::cluster_async::ClusterConnection;
+use redis::Arg;
 use redis::Client;
 use redis::Connection as RedisSyncConnection;
 use redis::FromRedisValue;
-use redis::{Arg, Value};
+
 use ssh_jumper::model::SshForwarderEnd;
 use std::net::SocketAddr;
 use std::time::Duration;
@@ -262,69 +263,22 @@ impl ConnectionWrapper {
         let mut cus_cmd = Command {
             id: utils::random_str(32),
             cmd: cmd_vec.join(" "),
-            response: String::new(),
+            response: Value::Nil,
             created_at: Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
             host: self.model.get_host(),
             duration: end.timestamp_micros() - start.timestamp_micros(),
         };
         match value_r {
-            Ok(value) => {
-                match &value {
-                    Value::Bulk(v) => {
-                        for vv in v {
-                            match vv {
-                                Value::Data(vvv) => {
-                                    let s = String::from_utf8(vvv.to_vec()).unwrap();
-                                    rep.push(s);
-                                }
-                                Value::Bulk(vvv) => {
-                                    for vvvv in vvv {
-                                        match vvvv {
-                                            Value::Data(vvvvv) => {
-                                                let s = String::from_utf8(vvvvv.to_vec()).unwrap();
-                                                rep.push(s);
-                                            }
-                                            _ => {}
-                                        }
-                                    }
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-                    Value::Int(v) => rep.push(v.to_string()),
-                    Value::Nil => rep.push(String::from("nil")),
-                    Value::Data(v) => {
-                        // maybe value is bitmap
-                        let s = String::from_utf8(v.to_vec());
-                        match s {
-                            Ok(s) => rep.push(s),
-                            Err(_) => {
-                                let i: Vec<u8> = Vec::from_redis_value(&value).unwrap();
-                                let binary = i
-                                    .iter()
-                                    .map(|u| format!("{:b}", u))
-                                    .collect::<Vec<String>>()
-                                    .join("");
-
-                                rep.push(binary)
-                            }
-                        }
-                    }
-                    Value::Status(v) => rep.push(v.to_string()),
-                    Value::Okay => {
-                        rep.push(String::from("OK"));
-                    }
+            Ok(value) => match T::from_redis_value(&value) {
+                Ok(v) => {
+                    cus_cmd.response = Value::build(value);
+                    Ok((v, cus_cmd))
                 }
-                cus_cmd.response = rep.join(" ");
-                match T::from_redis_value(&value) {
-                    Ok(v) => Ok((v, cus_cmd)),
-                    Err(err) => Err((CusError::App(err.to_string()), cus_cmd)),
-                }
-            }
+                Err(err) => Err((CusError::App(err.to_string()), cus_cmd)),
+            },
             Err(err) => {
                 rep.push(err.to_string());
-                cus_cmd.response = rep.join(" ");
+                cus_cmd.response = Value::Str(err.to_string());
                 Err((CusError::App(err.to_string()), cus_cmd))
             }
         }

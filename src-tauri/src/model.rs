@@ -1,6 +1,7 @@
 use crate::utils::random_str;
 
-use redis::{FromRedisValue, Value};
+use crate::connection::Value;
+use redis::{FromRedisValue, Value as RedisValue};
 use serde::Serialize;
 use std::fmt::Debug;
 
@@ -8,7 +9,7 @@ use std::fmt::Debug;
 pub struct Command {
     pub id: String,
     pub cmd: String,
-    pub response: String,
+    pub response: Value,
     pub host: String,
     pub created_at: String,
     pub duration: i64,
@@ -26,7 +27,7 @@ pub struct SlowLog {
 }
 
 impl SlowLog {
-    pub fn build(s: &Vec<Value>) -> Self {
+    pub fn build(s: &Vec<RedisValue>) -> Self {
         let mut log = Self::default();
         if let Some(v) = s.get(0) {
             log.id = i64::from_redis_value(v).unwrap();

@@ -163,7 +163,7 @@ class PageStore {
       }
       await openWindow(label, {
         url,
-        title: p.pageKey,
+        title: p.label as string,
         focus: true
       })
     } else {
@@ -192,7 +192,7 @@ class PageStore {
     if (page.connection !== undefined) {
       label = `${page.connection.id}|${label}`
     }
-    if (page.db !== undefined) {
+    if (page.db != null) {
       label += `@${page.db}`
     }
     return label

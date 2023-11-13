@@ -1,23 +1,80 @@
 import React from 'react'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
-import lodash from 'lodash'
+import lodash, { isArray, isNull, isNumber, isString } from 'lodash'
 import Container from '../Container'
 import classNames from 'classnames'
 interface XTermProps {
   className?: string
+  onReady?: (term: Terminal) => void
 }
 
-const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
+export interface XTermAction {
+  write: (data: string) => void
+  writeln: (data: string) => void
+  writeRedisResult: (data: any, prefix?: string) => void
+  scrollToBottom: () => void
+  clear: () => void
+}
+
+const XTerm: React.ForwardRefRenderFunction<XTermAction, XTermProps> = (
   props: XTermProps,
-  ref: React.ForwardedRef<Terminal>
+  ref: React.ForwardedRef<XTermAction>
 ) => {
   const div = React.useRef<HTMLDivElement>(null)
   const container = React.useRef<HTMLDivElement>(null)
 
   const [term, setTerm] = React.useState<Terminal | null>(null)
 
-  const currentLine = React.useRef('')
+  React.useImperativeHandle(ref, () => {
+    return {
+      clear() {
+        term?.clear()
+      },
+      scrollToBottom() {
+        term?.scrollToBottom()
+      },
+      write(data) {
+        term?.write(data)
+      },
+      writeln(data) {
+        term?.writeln(data)
+      },
+
+      writeRedisResult(data: any, prefix = '', quota = true) {
+        if (isNull(data)) {
+          term?.writeln(`${prefix}(nil)`)
+        }
+        if (isString(data)) {
+          if (quota) {
+            term?.writeln(`${prefix}"${data}"`)
+          } else {
+            term?.writeln(`${prefix}${data}`)
+          }
+        }
+        if (isNumber(data)) {
+          term?.writeln(`${prefix}${data}`)
+        }
+        if (isArray(data)) {
+          if (data.length === 0) {
+            this.writeRedisResult('(empty array)', prefix, false)
+          }
+          data.forEach((v, index) => {
+            if (index === 0) {
+              this.writeRedisResult(v, prefix + `${index + 1})`)
+            } else {
+              this.writeRedisResult(
+                v,
+                ' '.repeat(prefix.length) + `${index + 1})`
+              )
+            }
+          })
+        }
+      }
+    }
+  })
+
+  const onReadyFn = React.useRef(props.onReady)
 
   React.useEffect(() => {
     const item = new Terminal({
@@ -30,33 +87,27 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
     if (div.current != null) {
       item.open(div.current)
       const fit = new FitAddon()
-      fit.fit()
 
       item.loadAddon(fit)
       if (container.current != null) {
         const fn = lodash.debounce(() => {
           fit.fit()
         })
-        const observer = new ResizeObserver((entries) => {
+        const observer = new ResizeObserver(() => {
           fn()
         })
         observer.observe(container.current)
       }
-      item.onData((s) => {
-        if (s.length > 1) {
-          currentLine.current += s
-          item.write(s)
-        }
-      })
       fit.fit()
       setTerm(item)
+      if (onReadyFn.current != null) {
+        onReadyFn.current(item)
+      }
     }
     return () => {
       item.dispose()
     }
   }, [])
-
-  React.useImperativeHandle(ref, () => term as Terminal)
 
   return (
     <Container
@@ -71,4 +122,4 @@ const XTerm: React.ForwardRefRenderFunction<Terminal, XTermProps> = (
     </Container>
   )
 }
-export default React.forwardRef<Terminal, XTermProps>(XTerm)
+export default React.forwardRef<XTermAction, XTermProps>(XTerm)

@@ -161,5 +161,7 @@
   "Copy Success": "复制成功",
   "Reset": "重置",
   "Bloom Filter": "布隆过滤器",
-  "Dark Mode": "深色模式"
+  "Dark Mode": "深色模式",
+  "Terminal": "终端",
+  "Show Result": "显示结果"
 } 

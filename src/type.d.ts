@@ -127,7 +127,7 @@ declare namespace APP {
   interface RedisCmd {
     id: string
     cmd: string
-    response: string
+    response: any
     host: string
     created_at: string
     duration: number

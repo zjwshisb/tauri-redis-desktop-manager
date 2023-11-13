@@ -6,66 +6,58 @@ import request from '@/utils/request'
 import AppLayout from '@/components/AppLayout'
 import Page from '@/components/Page'
 import Container from '@/components/Container'
-import { useEventListener } from '@/hooks/useEventListener'
-import XTerm from '@/components/XTerm'
-import { type Terminal } from 'xterm'
-import { Button, Input, Space } from 'antd'
+import XTerm, { type XTermAction } from '@/components/XTerm'
+import { Checkbox, Input, Space } from 'antd'
+import { useEventListen } from '@/hooks/useEventListen'
 import { useTranslation } from 'react-i18next'
 
 const App: React.FC = () => {
   const searchRef = React.useRef('')
 
-  const term = React.useRef<Terminal>(null)
+  const showResultRef = React.useRef(true)
+
+  const term = React.useRef<XTermAction>(null)
 
   const { t } = useTranslation()
 
-  const [status, setStatus] = React.useState<0 | 1>(0)
-
-  const { listen, cancel } = useEventListener<string>((e) => {
-    const cmd: APP.RedisCmd = JSON.parse(e.payload)
-    if (
-      searchRef.current === '' ||
-      cmd.cmd
-        .toLocaleLowerCase()
-        .includes(searchRef.current.toLocaleLowerCase())
-    ) {
-      term.current?.writeln(` ${cmd.host}> ${cmd.cmd}`)
-      console.log('test')
+  useEventListen<string>(
+    async () => {
+      return await request('debug/log').then(() => {
+        return 'debug'
+      })
+    },
+    (e) => {
+      const cmd: APP.RedisCmd = JSON.parse(e.payload)
+      console.log(e.payload)
+      if (
+        searchRef.current === '' ||
+        cmd.cmd
+          .toLocaleLowerCase()
+          .includes(searchRef.current.toLocaleLowerCase())
+      ) {
+        term.current?.writeln(`${cmd.host}> ${cmd.cmd}`)
+        if (showResultRef.current) {
+          term.current?.writeRedisResult(cmd.response)
+        }
+      }
+    },
+    async () => {
+      return await request('debug/cancel')
     }
-  })
-
-  const handleListen = React.useCallback(() => {
-    cancel()
-    request('debug/log').then(() => {
-      listen('debug')
-      setStatus(1)
-    })
-  }, [cancel, listen])
+  )
 
   return (
     <AppLayout>
       <Container level={4}>
         <Page pageKey="log" wFull>
-          <XTerm ref={term} readonly welcome="Pause button to start"></XTerm>
+          <XTerm
+            ref={term}
+            onReady={(term) => {
+              term.writeln('waiting for logs...')
+            }}
+          ></XTerm>
           <div className="mt-2 flex">
             <Space>
-              {status === 0 && (
-                <Button onClick={handleListen} type="primary">
-                  {t('Start')}
-                </Button>
-              )}
-              {status === 1 && (
-                <Button
-                  type="primary"
-                  danger
-                  onClick={() => {
-                    cancel()
-                    setStatus(0)
-                  }}
-                >
-                  {t('Stop')}
-                </Button>
-              )}
               <div className="w-[200px]">
                 <Input
                   placeholder="filter"
@@ -73,6 +65,17 @@ const App: React.FC = () => {
                     searchRef.current = e.target.value
                   }}
                 ></Input>
+              </div>
+              <div>
+                <Space>
+                  <span>{t('Show Result')}</span>
+                  <Checkbox
+                    defaultChecked={true}
+                    onChange={(e) => {
+                      showResultRef.current = e.target.checked
+                    }}
+                  ></Checkbox>
+                </Space>
               </div>
             </Space>
           </div>
