@@ -205,8 +205,7 @@ impl ConnectionWrapper {
         let b: Box<dyn ConnectionLike + Send>;
         let params: ConnectionParams = model.get_params();
         let mut connection = Connection::new(params);
-        let cluster = connection.params.is_cluster;
-        if cluster {
+        if connection.params.is_cluster {
             b = Box::new(connection.get_cluster().await?)
         } else {
             b = Box::new(connection.get_normal().await?);
@@ -220,10 +219,6 @@ impl ConnectionWrapper {
             conn: b,
         };
         Ok(r)
-    }
-
-    pub fn get_proxy(&self) -> Option<String> {
-        self.model.get_proxy()
     }
 
     pub fn get_host(&self) -> String {

@@ -8,9 +8,9 @@ const JsonView: React.FC<Omit<ReactJsonViewProps, 'theme'>> = (p) => {
 
   const theme = React.useMemo(() => {
     if (store.setting.setting.dark_mode) {
-      return 'summerfruit'
+      return 'shapeshifter'
     }
-    return 'summerfruit:inverted'
+    return 'shapeshifter:inverted'
   }, [store.setting.setting.dark_mode])
 
   return (

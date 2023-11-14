@@ -45,7 +45,7 @@ const App: React.FC = () => {
     if (connection === undefined) {
       return <></>
     }
-    if (connection.nodes === undefined) {
+    if (connection.is_cluster && connection.nodes === undefined) {
       return <></>
     }
     return <Keys info={store.keyInfo.info}></Keys>
