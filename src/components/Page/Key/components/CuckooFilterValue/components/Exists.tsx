@@ -5,17 +5,17 @@ import { Button, Form } from 'antd'
 import FieldInput from '@/components/FieldInput'
 
 const Exists: React.FC<{
-  keys: APP.BloomFilterKey
+  keys: APP.CuckooFilterKey
 }> = ({ keys }) => {
   return (
     <ModalQueryForm
-      title="BF.EXISTS"
+      title="CF.EXISTS"
       width={500}
-      documentUrl="https://redis.io/commands/bf.exists/"
+      documentUrl="https://redis.io/commands/cf.exists/"
       trigger={<Button type="primary">EXISTS</Button>}
       onQuery={async (v) => {
         const res = await request<number>(
-          'bloom-filter/exists',
+          'cuckoo-filter/exists',
           keys.connection_id,
           {
             name: keys.name,
@@ -30,7 +30,7 @@ const Exists: React.FC<{
         rules={[{ required: true }]}
         name={'value'}
         label="Item"
-        tooltip="is an item to check."
+        tooltip="Is an item to check."
       >
         <FieldInput />
       </Form.Item>

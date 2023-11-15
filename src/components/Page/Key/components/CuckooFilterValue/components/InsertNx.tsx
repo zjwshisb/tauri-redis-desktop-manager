@@ -5,22 +5,25 @@ import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
 import FormListItem from '@/components/FormListItem'
 import FieldInput from '@/components/FieldInput'
+import { useTranslation } from 'react-i18next'
 
-const Add: React.FC<{
-  keys: APP.BloomFilterKey
+const InsertNx: React.FC<{
+  keys: APP.CuckooFilterKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
+  const { t } = useTranslation()
+
   return (
     <ModalForm
       defaultValue={{
         value: [undefined]
       }}
-      title={'BF.MADD'}
-      documentUrl="https://redis.io/commands/bf.madd/"
+      title={'CF.INSERTNX'}
+      documentUrl="https://redis.io/commands/cf.insertnx/"
       width={400}
-      trigger={<Button type="primary">MADD</Button>}
+      trigger={<Button type="primary">INSERTNX</Button>}
       onSubmit={async (v) => {
-        await request('bloom-filter/madd', keys.connection_id, {
+        await request('cuckoo-filter/insertnx', keys.connection_id, {
           db: keys.db,
           name: keys.name,
           ...v
@@ -31,7 +34,10 @@ const Add: React.FC<{
     >
       <FormListItem
         itemProps={{
-          tooltip: 'is an item to add.'
+          tooltip: 'is an item to add.',
+          label: t('Item').toString(),
+          required: true,
+          rules: [{ required: true }]
         }}
         name="value"
         renderItem={({ key, name, ...restField }) => {
@@ -50,4 +56,4 @@ const Add: React.FC<{
     </ModalForm>
   )
 }
-export default Add
+export default InsertNx

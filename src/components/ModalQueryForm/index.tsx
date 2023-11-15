@@ -5,7 +5,7 @@ import CusModal from '@/components/CusModal'
 import { type FormInstance, type FormProps } from 'antd/lib'
 import Link from '../Link'
 import { LinkOutlined } from '@ant-design/icons'
-import { isNumber, isString } from 'lodash'
+import { isArray, isNumber, isString } from 'lodash'
 import { useTranslation } from 'react-i18next'
 
 interface ModalQueryFormProps<T> {
@@ -43,6 +43,12 @@ function ModalQueryForm<T>(
           return (
             <Form.Item label="Result">
               <Card bodyStyle={{ padding: 8 }}>{result}</Card>
+            </Form.Item>
+          )
+        } else if (isArray(result)) {
+          return (
+            <Form.Item label="Result">
+              <Card bodyStyle={{ padding: 8 }}>{result.join(',')}</Card>
             </Form.Item>
           )
         }

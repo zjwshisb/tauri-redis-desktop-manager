@@ -57,11 +57,7 @@ pub async fn madd<'r>(
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
 
     let value: Vec<i64> = manager
-        .execute(
-            cid,
-            cmd("BF.MADD").arg(args.name).arg(args.value),
-            Some(args.db),
-        )
+        .execute(cid, cmd("BF.MADD").arg(args.name).arg(args.value), args.db)
         .await?;
     Ok(value)
 }
@@ -77,7 +73,7 @@ pub async fn exists<'r>(
         .execute(
             cid,
             cmd("BF.EXISTS").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)

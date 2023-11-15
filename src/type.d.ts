@@ -77,6 +77,7 @@ declare namespace APP {
     | TimeSeriesKey
     | TDigestKey
     | BloomFilterKey
+    | CuckooFilterKey
     | HyperLogLogKey
 
   type StringKey = BaseKey<'string', string>
@@ -99,7 +100,9 @@ declare namespace APP {
 
   type BloomFilterKey = BaseKey<'MBbloom--', string[]>
 
-  type HyperLogLogKey = BaseKey<'string', 'string', 'HyperLogLog'>
+  type CuckooFilterKey = BaseKey<'MBbloomCF', string>
+
+  type HyperLogLogKey = BaseKey<'string', string, 'HyperLogLog'>
 
   interface IndexValue {
     index: number

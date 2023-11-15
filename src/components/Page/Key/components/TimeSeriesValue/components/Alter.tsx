@@ -29,10 +29,6 @@ const Alter: React.FC<{
     }
   }, [info])
 
-  React.useEffect(() => {
-    console.log(defaultValue)
-  }, [defaultValue])
-
   return (
     <ModalForm
       defaultValue={defaultValue}

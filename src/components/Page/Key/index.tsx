@@ -11,6 +11,7 @@ import TimeSeriesValue from './components/TimeSeriesValue'
 import TDigestValue from './components/TDigestValue'
 import BloomFilterValue from './components/BloomFilterValue'
 import HyperLogLogValue from './components/HyperLogLogValue'
+import CuckooFilterKey from './components/CuckooFilterValue'
 import Name from './components/Name'
 import Dump from './components/Dump'
 import { DeleteOutlined } from '@ant-design/icons'
@@ -94,6 +95,11 @@ const Key: React.FC<{
         }
         case 'MBbloom--': {
           return <BloomFilterValue keys={item} onRefresh={fetch} />
+        }
+        case 'MBbloomCF': {
+          return (
+            <CuckooFilterKey keys={item} onRefresh={fetch}></CuckooFilterKey>
+          )
         }
       }
     }

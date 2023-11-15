@@ -89,7 +89,7 @@ pub async fn add<'r>(
         .execute(
             cid,
             redis::cmd("TOPK.ADD").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     match v {

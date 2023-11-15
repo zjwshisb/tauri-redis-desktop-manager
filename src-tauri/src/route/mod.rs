@@ -11,6 +11,7 @@ pub mod cluster;
 pub mod collection;
 pub mod config;
 pub mod connection;
+pub mod cuckoo;
 pub mod db;
 pub mod debug;
 pub mod hash;
@@ -151,6 +152,17 @@ pub async fn dispatch<'r>(
         "bloom-filter/reserve" => Response::new(bloom::reserve(payload, cid, manager).await?),
         "bloom-filter/madd" => Response::new(bloom::madd(payload, cid, manager).await?),
         "bloom-filter/exists" => Response::new(bloom::exists(payload, cid, manager).await?),
+
+        "cuckoo-filter/info" => Response::new(cuckoo::info(payload, cid, manager).await?),
+        "cuckoo-filter/add" => Response::new(cuckoo::add(payload, cid, manager).await?),
+        "cuckoo-filter/addnx" => Response::new(cuckoo::addnx(payload, cid, manager).await?),
+        "cuckoo-filter/exists" => Response::new(cuckoo::exists(payload, cid, manager).await?),
+        "cuckoo-filter/mexists" => Response::new(cuckoo::mexists(payload, cid, manager).await?),
+        "cuckoo-filter/del" => Response::new(cuckoo::del(payload, cid, manager).await?),
+        "cuckoo-filter/insert" => Response::new(cuckoo::insert(payload, cid, manager).await?),
+        "cuckoo-filter/insertnx" => Response::new(cuckoo::insertnx(payload, cid, manager).await?),
+        "cuckoo-filter/reserve" => Response::new(cuckoo::reserve(payload, cid, manager).await?),
+        "cuckoo-filter/count" => Response::new(cuckoo::count(payload, cid, manager).await?),
 
         "hyperloglog/pfcount" => Response::new(hyperloglog::pfcount(payload, cid, manager).await?),
         "hyperloglog/pfadd" => Response::new(hyperloglog::pfadd(payload, cid, manager).await?),

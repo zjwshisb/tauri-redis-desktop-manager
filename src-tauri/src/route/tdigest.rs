@@ -52,7 +52,7 @@ pub async fn add<'r>(
         .execute(
             cid,
             cmd("TDIGEST.ADD").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)
@@ -68,7 +68,7 @@ pub async fn rank<'r>(
         .execute(
             cid,
             cmd("TDIGEST.RANK").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)
@@ -84,7 +84,7 @@ pub async fn by_rank<'r>(
         .execute(
             cid,
             cmd("TDIGEST.BYRANK").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)
@@ -100,7 +100,7 @@ pub async fn rev_rank<'r>(
         .execute(
             cid,
             cmd("TDIGEST.REVRANK").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)
@@ -116,7 +116,7 @@ pub async fn by_rev_rank<'r>(
         .execute(
             cid,
             cmd("TDIGEST.BYREVRANK").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)
@@ -132,7 +132,7 @@ pub async fn cdf<'r>(
         .execute(
             cid,
             cmd("TDIGEST.CDF").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)
@@ -148,7 +148,7 @@ pub async fn quantile<'r>(
         .execute(
             cid,
             cmd("TDIGEST.QUANTILE").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)

@@ -150,7 +150,7 @@ pub async fn set<'r>(
         .execute(
             cid,
             redis::cmd("set").arg(&args.name).arg(&args.value),
-            Some(args.db),
+            args.db,
         )
         .await
 }

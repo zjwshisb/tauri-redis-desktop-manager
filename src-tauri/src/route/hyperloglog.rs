@@ -24,7 +24,7 @@ pub async fn pfadd<'r>(
         .execute(
             cid,
             redis::cmd("PFADD").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)

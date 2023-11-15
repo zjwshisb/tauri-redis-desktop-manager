@@ -110,7 +110,7 @@ pub async fn lpush<'r>(
         .execute(
             cid,
             redis::cmd("lpush").arg(&args.name).arg(&args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     match value {
@@ -144,7 +144,7 @@ pub async fn rpush<'r>(
         .execute(
             cid,
             redis::cmd("rpush").arg(&args.name).arg(&args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     match value {

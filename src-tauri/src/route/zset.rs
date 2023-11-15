@@ -30,7 +30,7 @@ pub async fn zrem<'r>(
         .execute(
             cid,
             redis::cmd("zrem").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await
 }
@@ -46,5 +46,5 @@ pub async fn zadd<'r>(
     for x in args.value {
         cmd.arg(x.value).arg(x.field);
     }
-    manager.execute(cid, &mut cmd, Some(args.db)).await
+    manager.execute(cid, &mut cmd, args.db).await
 }

@@ -30,7 +30,7 @@ pub async fn sadd<'r>(
         .execute(
             cid,
             redis::cmd("sadd").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     match value {
@@ -53,7 +53,7 @@ pub async fn srem<'r>(
         .execute(
             cid,
             redis::cmd("srem").arg(args.name).arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
     match value {

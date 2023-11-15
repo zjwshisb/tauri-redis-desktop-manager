@@ -34,7 +34,7 @@ pub async fn hset<'r>(
     for x in args.value {
         cmd.arg(&[x.field, x.value]);
     }
-    manager.execute(cid, &mut cmd, Some(args.db)).await
+    manager.execute(cid, &mut cmd, args.db).await
 }
 #[derive(Deserialize)]
 struct HDelArgs {

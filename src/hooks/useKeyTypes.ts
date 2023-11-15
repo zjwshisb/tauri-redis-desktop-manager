@@ -64,6 +64,11 @@ export default function useKeyTypes(
         searchable: true
       },
       {
+        label: t('Cuckoo Filter'),
+        value: 'MBbloomCF',
+        searchable: true
+      },
+      {
         label: t('HyperLogLog'),
         value: 'HyperLogLog',
         searchable: false

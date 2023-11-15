@@ -4,18 +4,18 @@ import request from '@/utils/request'
 import { Button, Form } from 'antd'
 import FieldInput from '@/components/FieldInput'
 
-const Exists: React.FC<{
-  keys: APP.BloomFilterKey
+const Count: React.FC<{
+  keys: APP.CuckooFilterKey
 }> = ({ keys }) => {
   return (
     <ModalQueryForm
-      title="BF.EXISTS"
+      title="CF.COUNT"
       width={500}
-      documentUrl="https://redis.io/commands/bf.exists/"
-      trigger={<Button type="primary">EXISTS</Button>}
+      documentUrl="https://redis.io/commands/cf.count/"
+      trigger={<Button type="primary">COUNT</Button>}
       onQuery={async (v) => {
         const res = await request<number>(
-          'bloom-filter/exists',
+          'cuckoo-filter/count',
           keys.connection_id,
           {
             name: keys.name,
@@ -30,11 +30,11 @@ const Exists: React.FC<{
         rules={[{ required: true }]}
         name={'value'}
         label="Item"
-        tooltip="is an item to check."
+        tooltip="Is an item to check."
       >
         <FieldInput />
       </Form.Item>
     </ModalQueryForm>
   )
 }
-export default Exists
+export default Count

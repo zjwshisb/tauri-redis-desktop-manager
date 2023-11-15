@@ -13,6 +13,7 @@ import ScoreItem from './components/ScoreItem'
 import TimeSeriesItem from './components/TimeSeriesItem'
 import BloomFilterItem from './components/BloomFilterItem'
 import SimpleArrayItem from './components/SimpleArrayItem'
+import CuckooFilterItem from './components/CuckooFilterItem'
 
 import { type FormInstance } from 'antd/lib'
 import FieldInput from '@/components/FieldInput'
@@ -88,6 +89,9 @@ const Plus: React.FC<{
       case 'MBbloom--': {
         return <BloomFilterItem />
       }
+      case 'MBbloomCF': {
+        return <CuckooFilterItem />
+      }
       case 'HyperLogLog': {
         form.current?.setFieldValue('value', [undefined])
         return <SimpleArrayItem />
@@ -124,6 +128,9 @@ const Plus: React.FC<{
       }
       case 'HyperLogLog': {
         return 'hyperloglog/pfadd'
+      }
+      case 'MBbloomCF': {
+        return 'cuckoo-filter/reserve'
       }
       default: {
         return 'key/add'
