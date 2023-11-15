@@ -38,6 +38,7 @@ const App: React.FC = () => {
         term.current?.writeln(`${cmd.host}> ${cmd.cmd}`)
         if (showResultRef.current) {
           term.current?.writeRedisResult(cmd.response)
+          term.current?.scrollToBottom()
         }
       }
     },

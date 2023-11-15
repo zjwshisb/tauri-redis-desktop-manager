@@ -1,30 +1,48 @@
 import React from 'react'
-import { Resizable } from 're-resizable'
+import { type Enable, Resizable } from 're-resizable'
 
 const ResizableDiv: React.FC<
   React.PropsWithChildren<{
-    minWidth: number
-    maxWidth: number
+    minWidth?: number
+    maxWidth?: number
     className?: string
-    defaultWidth: number
+    defaultWidth?: number
+    defaultHeight?: number
+    minHeight?: number
+    maxHeight?: number
+    enable?: Enable
   }>
 > = (props) => {
   const [width, setWidth] = React.useState(props.defaultWidth)
+  const [height, setHeight] = React.useState(props.defaultHeight)
+
+  const { enable = { right: true } } = props
 
   return (
     <Resizable
       className={props.className}
       minWidth={props.minWidth}
       maxWidth={props.maxWidth}
+      minHeight={props.minHeight}
+      maxHeight={props.maxHeight}
       onResizeStop={(e, direction, ref, d) => {
-        setWidth((p) => p + d.width)
+        setWidth((p) => {
+          if (p !== undefined) {
+            return p + d.width
+          }
+          return undefined
+        })
+        setHeight((p) => {
+          if (p !== undefined) {
+            return p + d.height
+          }
+          return undefined
+        })
       }}
-      enable={{
-        right: true
-      }}
+      enable={enable}
       size={{
-        width,
-        height: '100%'
+        width: width === undefined ? '100%' : width,
+        height: height === undefined ? '100%' : height
       }}
     >
       {props.children}

@@ -31,7 +31,7 @@ const Terminal: React.FC<{
         (res) => {
           setEvent(res.data)
           setTimeout(() => {
-            term.current?.writeln('connected')
+            term.current?.writeln('connected...')
           }, 200)
           return res.data.receive
         }

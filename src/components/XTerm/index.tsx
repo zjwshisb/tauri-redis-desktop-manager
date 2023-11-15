@@ -2,8 +2,8 @@ import React from 'react'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import lodash, { isArray, isNull, isNumber, isString } from 'lodash'
-import Container from '../Container'
 import classNames from 'classnames'
+import ResizableDiv from '../ResizableDiv'
 interface XTermProps {
   className?: string
   onReady?: (term: Terminal) => void
@@ -22,7 +22,6 @@ const XTerm: React.ForwardRefRenderFunction<XTermAction, XTermProps> = (
   ref: React.ForwardedRef<XTermAction>
 ) => {
   const div = React.useRef<HTMLDivElement>(null)
-  const container = React.useRef<HTMLDivElement>(null)
 
   const [term, setTerm] = React.useState<Terminal | null>(null)
 
@@ -89,15 +88,14 @@ const XTerm: React.ForwardRefRenderFunction<XTermAction, XTermProps> = (
       const fit = new FitAddon()
 
       item.loadAddon(fit)
-      if (container.current != null) {
-        const fn = lodash.debounce(() => {
-          fit.fit()
-        })
-        const observer = new ResizeObserver(() => {
-          fn()
-        })
-        observer.observe(container.current)
-      }
+      const fn = lodash.debounce(() => {
+        fit.fit()
+      })
+      const observer = new ResizeObserver(() => {
+        console.log('test')
+        fn()
+      })
+      observer.observe(div.current)
       fit.fit()
       setTerm(item)
       if (onReadyFn.current != null) {
@@ -110,16 +108,21 @@ const XTerm: React.ForwardRefRenderFunction<XTermAction, XTermProps> = (
   }, [])
 
   return (
-    <Container
-      className={classNames([
-        'bg-black rounded-md overflow-hidden border',
-        props.className
-      ])}
+    <ResizableDiv
+      defaultHeight={396}
+      minHeight={300}
+      enable={{
+        bottom: true
+      }}
     >
-      <div ref={container}>
-        <div ref={div}></div>
-      </div>
-    </Container>
+      <div
+        ref={div}
+        className={classNames([
+          'bg-black rounded-md overflow-hidden border h-full',
+          props.className
+        ])}
+      ></div>
+    </ResizableDiv>
   )
 }
 export default React.forwardRef<XTermAction, XTermProps>(XTerm)
