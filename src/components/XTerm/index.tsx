@@ -7,6 +7,9 @@ import ResizableDiv from '../ResizableDiv'
 interface XTermProps {
   className?: string
   onReady?: (term: Terminal) => void
+  defaultHeight?: number
+  minHeight?: number
+  resize?: boolean
 }
 
 export interface XTermAction {
@@ -24,6 +27,8 @@ const XTerm: React.ForwardRefRenderFunction<XTermAction, XTermProps> = (
   const div = React.useRef<HTMLDivElement>(null)
 
   const [term, setTerm] = React.useState<Terminal | null>(null)
+
+  const { defaultHeight = 396, minHeight = 300, resize = true } = props
 
   React.useImperativeHandle(ref, () => {
     return {
@@ -86,13 +91,11 @@ const XTerm: React.ForwardRefRenderFunction<XTermAction, XTermProps> = (
     if (div.current != null) {
       item.open(div.current)
       const fit = new FitAddon()
-
       item.loadAddon(fit)
       const fn = lodash.debounce(() => {
         fit.fit()
       })
       const observer = new ResizeObserver(() => {
-        console.log('test')
         fn()
       })
       observer.observe(div.current)
@@ -109,11 +112,15 @@ const XTerm: React.ForwardRefRenderFunction<XTermAction, XTermProps> = (
 
   return (
     <ResizableDiv
-      defaultHeight={396}
-      minHeight={300}
-      enable={{
-        bottom: true
-      }}
+      defaultHeight={defaultHeight}
+      minHeight={minHeight}
+      enable={
+        resize
+          ? {
+              bottom: true
+            }
+          : undefined
+      }
     >
       <div
         ref={div}

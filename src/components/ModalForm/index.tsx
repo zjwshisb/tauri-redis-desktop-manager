@@ -29,9 +29,10 @@ const ModalForm: React.ForwardRefRenderFunction<
 
   return (
     <CusModal
+      forceRender={false}
+      destroyOnClose
       onCancel={props.onCancel}
       showOkNotice={showOkNotice}
-      destroyOnClose
       width={width}
       onClear={() => {
         setTimeout(() => {

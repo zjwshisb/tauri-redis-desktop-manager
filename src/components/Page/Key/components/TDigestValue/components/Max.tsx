@@ -17,6 +17,9 @@ const Max: React.FC<{
           {
             name: props.keys.name,
             db: props.keys.db
+          },
+          {
+            showNotice: false
           }
         )
         return res.data

@@ -31,8 +31,8 @@ const LTrim: React.FC<{
         <InputNumber min={0} precision={0} className="!w-full"></InputNumber>
       </Form.Item>
       <Form.Item
-        name={'stop'}
-        label={'Stop'}
+        name={'end'}
+        label={'End'}
         required
         rules={[{ required: true }]}
       >

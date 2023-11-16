@@ -3,6 +3,7 @@ import React from 'react'
 import request from '@/utils/request'
 import { Button, Form } from 'antd'
 import FieldInput from '@/components/FieldInput'
+import { m } from '@tauri-apps/api/dialog-20ff401c'
 
 const Count: React.FC<{
   keys: APP.CuckooFilterKey
@@ -21,6 +22,9 @@ const Count: React.FC<{
             name: keys.name,
             db: keys.db,
             ...v
+          },
+          {
+            showNotice: false
           }
         )
         return res.data

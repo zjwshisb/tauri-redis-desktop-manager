@@ -13,7 +13,8 @@ const ValueItem: React.FC<{
     <FormListItem
       name="value"
       itemProps={{
-        label
+        label,
+        required: true
       }}
       renderItem={({ name, ...restField }) => {
         return (

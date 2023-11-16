@@ -19,7 +19,7 @@ pub async fn hscan<'r>(
         cmd.arg(&["MATCH", format!("*{}*", search).as_str()]);
     }
 
-    let value: Vec<Value> = manager.execute(cid, &mut cmd, Some(args.db)).await?;
+    let value: Vec<Value> = manager.execute(cid, &mut cmd, args.db).await?;
     ScanLikeResult::<Field, String>::build(value)
 }
 

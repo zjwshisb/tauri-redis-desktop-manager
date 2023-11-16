@@ -38,7 +38,7 @@ const Del: React.FC<{
           placeholder={t('Please Enter').toString()}
         />
       </Form.Item>
-      <Form.Item name="stop" label="To Timestamp" rules={[{ required: true }]}>
+      <Form.Item name="end" label="To Timestamp" rules={[{ required: true }]}>
         <InputNumber
           min={0}
           className="!w-full"

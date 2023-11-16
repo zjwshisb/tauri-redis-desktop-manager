@@ -60,7 +60,7 @@ declare namespace APP {
     ttl: number
     memory: number
     data: V
-    db: number
+    db?: number
     connection_id: number
     length: number
     sub_types: ST

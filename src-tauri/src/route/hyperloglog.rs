@@ -9,7 +9,7 @@ pub async fn pfcount<'r>(
 ) -> Result<i64, CusError> {
     let args: NameArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
-        .execute(cid, redis::cmd("PFCOUNT").arg(args.name), Some(args.db))
+        .execute(cid, redis::cmd("PFCOUNT").arg(args.name), args.db)
         .await?;
     Ok(value)
 }

@@ -28,7 +28,7 @@ const DetailPage: React.FC<
     if (connection !== undefined) {
       switch (type) {
         case 'key': {
-          if (db !== undefined && name !== undefined) {
+          if (name !== undefined) {
             node = (
               <Key
                 connection={connection}

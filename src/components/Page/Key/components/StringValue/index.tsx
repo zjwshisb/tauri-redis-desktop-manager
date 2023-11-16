@@ -1,50 +1,50 @@
 import React from 'react'
-import { Button, Card, Form } from 'antd'
+import { Card } from 'antd'
 import FieldViewer from '@/components/FieldViewer'
-import request from '@/utils/request'
 import ValueLayout from '../ValueLayout'
-import { useTranslation } from 'react-i18next'
-import ModalForm from '@/components/ModalForm'
-import FieldInput from '@/components/FieldInput'
+
+import Set from './components/Set'
+import DecrBy from './components/DecrBy'
+import Decr from './components/Decr'
+import GetRange from './components/GetRange'
+import Incr from './components/Incr'
+import IncrBy from './components/IncrBy'
+import IncrByFloat from './components/IncrByFloat'
+import SetRange from './components/SetRange'
+import Append from './components/Append'
+import Lcs from './components/Lcs'
+import MGet from './components/MGet'
+import GetDel from './components/GetDel'
 
 const StringValue: React.FC<{
   keys: APP.StringKey
   onRefresh: () => void
 }> = ({ keys, onRefresh }) => {
-  const [value, setValue] = React.useState(keys.data)
-
-  const { t } = useTranslation()
-
-  React.useEffect(() => {
-    setValue(keys.data)
-  }, [keys.data])
-
   return (
     <ValueLayout
+      readonlyAction={
+        <>
+          <MGet keys={keys} />
+          <GetRange keys={keys} />
+          <Lcs keys={keys} />
+        </>
+      }
       actions={
-        <ModalForm
-          title={t('Edit')}
-          trigger={<Button type="primary">{t('Edit')}</Button>}
-          onSubmit={async (v) => {
-            await request('key/set', keys.connection_id, {
-              db: keys.db,
-              name: keys.name,
-              value: v.value
-            })
-            onRefresh()
-          }}
-          defaultValue={{
-            value
-          }}
-        >
-          <Form.Item name={'value'} rules={[{ required: true }]} required>
-            <FieldInput />
-          </Form.Item>
-        </ModalForm>
+        <>
+          <GetDel keys={keys} onRefresh={onRefresh}></GetDel>
+          <Set keys={keys} onRefresh={onRefresh} />
+          <SetRange keys={keys} onRefresh={onRefresh} />
+          <Append keys={keys} onRefresh={onRefresh} />
+          <Incr keys={keys} onRefresh={onRefresh} />
+          <IncrBy keys={keys} onRefresh={onRefresh} />
+          <IncrByFloat keys={keys} onRefresh={onRefresh} />
+          <Decr keys={keys} onRefresh={onRefresh} />
+          <DecrBy keys={keys} onRefresh={onRefresh} />
+        </>
       }
     >
       <Card bodyStyle={{ padding: 8 }}>
-        <FieldViewer content={value}></FieldViewer>
+        <FieldViewer content={keys.data}></FieldViewer>
       </Card>
     </ValueLayout>
   )

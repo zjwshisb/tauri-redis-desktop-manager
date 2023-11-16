@@ -42,16 +42,17 @@ class SettingStore {
       this.setting.locale = data.locale
       i18n.changeLanguage(this.setting.locale)
     }
-    const htmls = document.getElementsByTagName('html')
-    if (htmls.length >= 1) {
-      const html = htmls[0]
-      if (data.dark_mode === true) {
-        html.classList.add('dark')
-      } else {
-        html.classList.remove('dark')
+    if (data.dark_mode !== undefined) {
+      const htmls = document.getElementsByTagName('html')
+      if (htmls.length >= 1) {
+        const html = htmls[0]
+        if (data.dark_mode) {
+          html.classList.add('dark')
+        } else {
+          html.classList.remove('dark')
+        }
       }
     }
-
     this.setting = {
       ...this.setting,
       ...data

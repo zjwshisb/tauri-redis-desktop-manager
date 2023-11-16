@@ -14,11 +14,7 @@ pub async fn info<'r>(
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let value: Vec<redis::Value> = manager
-        .execute(
-            cid,
-            cmd("TS.INFO").arg(args.name).arg("DEBUG"),
-            Some(args.db),
-        )
+        .execute(cid, cmd("TS.INFO").arg(args.name).arg("DEBUG"), args.db)
         .await?;
     let resp = Field::build_vec(&value)?;
     Ok(resp)
@@ -34,7 +30,7 @@ pub async fn range<'r>(
         .execute(
             cid,
             cmd("TS.RANGE").arg(args.name).arg("-").arg("+"),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(Field::build_by_bulk_vec(&value)?)
@@ -50,7 +46,7 @@ pub async fn add<'r>(
         .execute(
             cid,
             cmd("TS.ADD").arg(args.name).arg(args.value).arg(args.field),
-            Some(args.db),
+            args.db,
         )
         .await?;
     Ok(value)
@@ -65,8 +61,8 @@ pub async fn del<'r>(
     let value: i64 = manager
         .execute(
             cid,
-            cmd("TS.DEL").arg(args.name).arg(args.start).arg(args.stop),
-            Some(args.db),
+            cmd("TS.DEL").arg(args.name).arg(args.start).arg(args.end),
+            args.db,
         )
         .await?;
     Ok(value)
@@ -83,7 +79,7 @@ pub async fn incrby<'r>(
     if let Some(i) = args.value {
         cmd.arg(("TIMESTAMP", i));
     }
-    let value: i64 = manager.execute(cid, &mut cmd, Some(args.db)).await?;
+    let value: i64 = manager.execute(cid, &mut cmd, args.db).await?;
     Ok(value)
 }
 
@@ -98,7 +94,7 @@ pub async fn decrby<'r>(
     if let Some(i) = args.value {
         cmd.arg(("TIMESTAMP", i));
     }
-    let value: i64 = manager.execute(cid, &mut cmd, Some(args.db)).await?;
+    let value: i64 = manager.execute(cid, &mut cmd, args.db).await?;
     Ok(value)
 }
 

@@ -20,6 +20,9 @@ const TrimmedMean: React.FC<{
             name: keys.name,
             db: keys.db,
             ...v
+          },
+          {
+            showNotice: false
           }
         )
         return res.data

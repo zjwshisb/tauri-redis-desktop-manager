@@ -45,7 +45,7 @@ pub async fn list<'r>(
         .execute(
             cid,
             redis::cmd("TOPK.LIST").arg(args.name).arg("WITHCOUNT"),
-            Some(args.db),
+            args.db,
         )
         .await?;
     let mut resp: Vec<Field> = vec![];
@@ -74,7 +74,7 @@ pub async fn info<'r>(
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let v: Vec<Value> = manager
-        .execute(cid, redis::cmd("TOPK.INFO").arg(args.name), Some(args.db))
+        .execute(cid, redis::cmd("TOPK.INFO").arg(args.name), args.db)
         .await?;
     Ok(Field::build_vec(&v)?)
 }
@@ -115,7 +115,7 @@ pub async fn incrby<'r>(
                 .arg(args.name)
                 .arg(args.field)
                 .arg(args.value),
-            Some(args.db),
+            args.db,
         )
         .await?;
 

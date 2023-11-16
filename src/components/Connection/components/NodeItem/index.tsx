@@ -49,7 +49,7 @@ const NodeItem: React.FC<{
       <div
         className="flex flex-1 justify-between"
         onClick={() => {
-          store.keyInfo.set(props.connection, 0)
+          store.keyInfo.set(props.connection, undefined)
         }}
       >
         <div className="flex">

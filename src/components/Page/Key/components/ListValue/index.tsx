@@ -40,17 +40,17 @@ const ListValue: React.FC<{
   const getFields = React.useCallback(
     async (reset = false) => {
       const start = index.current
-      const stop = index.current + store.setting.setting.field_count - 1
+      const end = index.current + store.setting.setting.field_count - 1
       setLoading(true)
       return await request<string[]>('key/list/lrange', keys.connection_id, {
         name: keys.name,
         db: keys.db,
         start,
-        stop
+        end
       })
         .then((res) => {
-          index.current = stop
-          const more = stop >= keys.length
+          index.current = end
+          const more = end >= keys.length
           if (reset) {
             setItems(res.data)
           } else {
@@ -124,7 +124,6 @@ const ListValue: React.FC<{
     ],
     {
       title: t('Action'),
-      width: 100,
       fixed: 'right',
       render(_, record, index) {
         return (

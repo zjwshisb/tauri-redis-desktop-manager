@@ -21,7 +21,7 @@ pub async fn memory_usage<'r>(
                 .arg("usage")
                 .arg(&args.name)
                 .arg(&["SAMPLES", "0"]),
-            Some(args.db),
+            args.db,
         )
         .await
 }

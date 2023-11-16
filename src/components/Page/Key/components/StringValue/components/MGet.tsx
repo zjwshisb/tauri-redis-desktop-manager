@@ -1,28 +1,24 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form } from 'antd'
+import { Button, Form, Input } from 'antd'
 import FormListItem from '@/components/FormListItem'
-import FieldInput from '@/components/FieldInput'
-import { useTranslation } from 'react-i18next'
 
-const MExists: React.FC<{
-  keys: APP.CuckooFilterKey
+const MGet: React.FC<{
+  keys: APP.StringKey
 }> = ({ keys }) => {
-  const { t } = useTranslation()
-
   return (
     <ModalQueryForm
-      title="CF.MEXISTS"
+      title="MGET"
+      width={400}
       defaultValue={{
-        value: [undefined]
+        name: [keys.name]
       }}
-      width={500}
-      documentUrl="https://redis.io/commands/cf.mexists/"
-      trigger={<Button type="primary">MEXISTS</Button>}
+      documentUrl="https://redis.io/commands/mget/"
+      trigger={<Button type="primary">MGET</Button>}
       onQuery={async (v) => {
-        const res = await request<number>(
-          'cuckoo-filter/mexists',
+        const res = await request<string>(
+          'string/mget',
           keys.connection_id,
           {
             name: keys.name,
@@ -37,22 +33,19 @@ const MExists: React.FC<{
       }}
     >
       <FormListItem
+        name="name"
         itemProps={{
-          tooltip: 'Is an item to check.',
-          label: t('Item').toString(),
-          required: true,
-          rules: [{ required: true }]
+          label: 'Keys',
+          required: true
         }}
-        name="value"
-        renderItem={({ key, name, ...restField }) => {
+        renderItem={({ name, ...restField }) => {
           return (
             <Form.Item
               {...restField}
               name={[name]}
-              required={true}
               rules={[{ required: true }]}
             >
-              <FieldInput />
+              <Input />
             </Form.Item>
           )
         }}
@@ -60,4 +53,4 @@ const MExists: React.FC<{
     </ModalQueryForm>
   )
 }
-export default MExists
+export default MGet

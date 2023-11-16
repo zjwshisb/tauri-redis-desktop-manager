@@ -21,10 +21,17 @@ const Add: React.FC<{
       width={400}
       trigger={<Button type="primary">PFCOUNT</Button>}
       onQuery={async (v) => {
-        const res = await request('hyperloglog/pfcount', keys.connection_id, {
-          db: keys.db,
-          ...v
-        })
+        const res = await request(
+          'hyperloglog/pfcount',
+          keys.connection_id,
+          {
+            db: keys.db,
+            ...v
+          },
+          {
+            showNotice: false
+          }
+        )
         return res.data
       }}
     >

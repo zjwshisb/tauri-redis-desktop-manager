@@ -1,27 +1,31 @@
-import { Button, Card, Form } from 'antd'
+import { Button, Form } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import CusModal from '@/components/CusModal'
 import { type FormInstance, type FormProps } from 'antd/lib'
 import Link from '../Link'
 import { LinkOutlined } from '@ant-design/icons'
-import { isArray, isNumber, isString } from 'lodash'
 import { useTranslation } from 'react-i18next'
+import XTerm, { type XTermAction } from '../XTerm'
+import { useLatest } from 'ahooks'
 
 interface ModalQueryFormProps<T> {
   defaultValue?: Record<string, any>
   trigger: React.ReactElement
   onQuery: (value: Record<string, any>) => Promise<T>
+  onSuccess?: () => void
   width?: string | number
   title?: React.ReactNode
   onFieldsChange?: FormProps['onFieldsChange']
   onValueChange?: FormProps['onValuesChange']
   onCancel?: () => void
   documentUrl?: string
-  resultRender?: (v: T) => React.ReactNode
   ref?: React.ForwardedRef<FormInstance>
   queryWithOpen?: boolean
 }
+
+const welcome = 'Waiting for result...'
+
 function ModalQueryForm<T>(
   props: React.PropsWithChildren<ModalQueryFormProps<T>>,
   ref: React.ForwardedRef<FormInstance>
@@ -30,55 +34,49 @@ function ModalQueryForm<T>(
 
   React.useImperativeHandle(ref, () => form)
 
-  const { width = 800, queryWithOpen = false, onQuery } = props
+  const { width = 800, queryWithOpen = false, onQuery, onSuccess } = props
+
+  const term = React.useRef<XTermAction>(null)
 
   const { t } = useTranslation()
 
-  const [result, setResult] = React.useState<T>()
+  const onQueryRef = useLatest(onQuery)
 
-  const resultNode = React.useMemo(() => {
-    if (result !== undefined) {
-      if (props.resultRender === undefined) {
-        if (isString(result) || isNumber(result)) {
-          return (
-            <Form.Item label="Result">
-              <Card bodyStyle={{ padding: 8 }}>{result}</Card>
-            </Form.Item>
-          )
-        } else if (isArray(result)) {
-          return (
-            <Form.Item label="Result">
-              <Card bodyStyle={{ padding: 8 }}>{result.join(',')}</Card>
-            </Form.Item>
-          )
-        }
-      } else {
-        return props.resultRender(result)
-      }
-    }
-    return <></>
-  }, [props, result])
+  const onSuccessRef = useLatest(onSuccess)
 
   const query = React.useCallback(async () => {
     const v = await form.validateFields()
-    onQuery(v).then((res) => {
-      setResult(res)
-    })
-  }, [form, onQuery])
+    onQueryRef
+      .current(v)
+      .then((result) => {
+        if (onSuccessRef.current != null) {
+          onSuccessRef.current()
+        }
+        if (result !== undefined) {
+          term.current?.clear()
+          term.current?.writeRedisResult(result)
+        }
+      })
+      .catch((e) => {
+        term.current?.clear()
+        term.current?.writeln(`(error) ${e as string} `)
+      })
+  }, [form, onQueryRef, onSuccessRef])
 
   return (
     <CusModal
+      forceRender={false}
       autoClose={false}
       onCancel={props.onCancel}
       showOkNotice={false}
-      destroyOnClose
       width={width}
       footer={(_, { OkBtn, CancelBtn }) => (
         <div>
           <CancelBtn />
           <Button
             onClick={() => {
-              setResult(undefined)
+              term.current?.clear()
+              term.current?.writeln(welcome)
               form.resetFields()
             }}
           >
@@ -88,7 +86,8 @@ function ModalQueryForm<T>(
         </div>
       )}
       onClear={() => {
-        setResult(undefined)
+        term.current?.clear()
+        term.current?.writeln(welcome)
         setTimeout(() => {
           form.resetFields()
         }, 100)
@@ -122,7 +121,14 @@ function ModalQueryForm<T>(
         }}
       >
         {props.children}
-        {resultNode}
+        <XTerm
+          defaultHeight={200}
+          minHeight={200}
+          ref={term}
+          onReady={(term) => {
+            term.writeln(welcome)
+          }}
+        ></XTerm>
       </Form>
     </CusModal>
   )

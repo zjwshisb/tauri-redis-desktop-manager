@@ -1,7 +1,6 @@
 use crate::connection::Manager;
 use crate::err::CusError;
 use crate::response::FieldValue;
-use redis::FromRedisValue;
 use redis::{cmd, Value};
 use serde::Serialize;
 
@@ -13,14 +12,14 @@ pub struct Key {
     ttl: i64,
     data: FieldValue,
     connection_id: u32,
-    db: u8,
+    db: Option<u8>,
     memory: i64,
     length: i64,
 }
 impl Key {
     pub async fn build<'r>(
         name: String,
-        db: u8,
+        db: Option<u8>,
         cid: u32,
         manager: &tauri::State<'r, Manager>,
     ) -> Result<Key, CusError> {
@@ -35,9 +34,7 @@ impl Key {
             memory: 0,
             length: 0,
         };
-        key.types = manager
-            .execute(cid, cmd("type").arg(&key.name), Some(db))
-            .await?;
+        key.types = manager.execute(cid, cmd("type").arg(&key.name), db).await?;
         key.get_sub_types(manager).await;
         if !key.is_none() {
             key.get_ttl(&manager).await?;
@@ -50,11 +47,7 @@ impl Key {
     pub async fn get_sub_types<'r>(&mut self, manager: &tauri::State<'r, Manager>) {
         if self.types == "string" {
             if let Ok(_) = manager
-                .execute::<Value>(
-                    self.connection_id,
-                    cmd("PFCOUNT").arg(&self.name),
-                    Some(self.db),
-                )
+                .execute::<Value>(self.connection_id, cmd("PFCOUNT").arg(&self.name), self.db)
                 .await
             {
                 self.sub_types = String::from("HyperLogLog");
@@ -74,7 +67,7 @@ impl Key {
                 .execute(
                     self.connection_id,
                     cmd("JSON.DEBUG").arg("MEMORY").arg(&self.name),
-                    Some(self.db),
+                    self.db,
                 )
                 .await?
         } else {
@@ -85,7 +78,7 @@ impl Key {
                         .arg("usage")
                         .arg(&self.name)
                         .arg(&["SAMPLES", "0"]),
-                    Some(self.db),
+                    self.db,
                 )
                 .await?
         }
@@ -97,11 +90,7 @@ impl Key {
         manager: &tauri::State<'r, Manager>,
     ) -> Result<(), CusError> {
         self.ttl = manager
-            .execute(
-                self.connection_id,
-                cmd("ttl").arg(&self.name),
-                Some(self.db),
-            )
+            .execute(self.connection_id, cmd("ttl").arg(&self.name), self.db)
             .await?;
         Ok(())
     }
@@ -115,7 +104,7 @@ impl Key {
                 .execute(
                     self.connection_id,
                     cmd("JSON.GET").arg(&self.name).arg("$"),
-                    Some(self.db),
+                    self.db,
                 )
                 .await?,
         );
@@ -126,26 +115,14 @@ impl Key {
         &mut self,
         manager: &tauri::State<'r, Manager>,
     ) -> Result<(), CusError> {
-        let value: Value = manager
+        let value: Vec<u8> = manager
             .execute(
                 self.connection_id,
                 redis::cmd("get").arg(&self.name),
-                Some(self.db),
+                self.db,
             )
             .await?;
-        let v: Result<String, redis::RedisError> = String::from_redis_value(&value);
-        match v {
-            Ok(s) => self.data = FieldValue::Str(s),
-            Err(_) => {
-                let i: Vec<u8> = Vec::from_redis_value(&value).unwrap();
-                self.data = FieldValue::Str(
-                    i.iter()
-                        .map(|u| format!("{:b}", u))
-                        .collect::<Vec<String>>()
-                        .join(""),
-                );
-            }
-        }
+        self.data = FieldValue::Str(String::from_utf8_lossy(&value).to_string());
         Ok(())
     }
     pub async fn get_length<'r>(
@@ -164,11 +141,7 @@ impl Key {
         };
         if cmd != "" {
             self.length = manager
-                .execute(
-                    self.connection_id,
-                    redis::cmd(cmd).arg(&self.name),
-                    Some(self.db),
-                )
+                .execute(self.connection_id, redis::cmd(cmd).arg(&self.name), self.db)
                 .await?;
         }
         Ok(())

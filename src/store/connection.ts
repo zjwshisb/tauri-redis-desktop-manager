@@ -76,7 +76,7 @@ class ConnectionStore {
   }
 
   async open(id: number) {
-    const connection = this.connections.find((v) => v.id === id)
+    const connection = this.getById(id)
     if (connection !== undefined) {
       try {
         runInAction(() => {
@@ -126,6 +126,10 @@ class ConnectionStore {
         }
       })
     }
+  }
+
+  getById(id: number) {
+    return this.connections.find((v) => v.id === id)
   }
 
   update(id: number, data: Partial<APP.Connection>) {

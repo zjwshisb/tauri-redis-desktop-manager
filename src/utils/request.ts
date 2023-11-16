@@ -6,11 +6,10 @@ import { isObject, isString } from 'lodash'
 export interface Response<T> {
   data: T
 }
-
 export interface RequestOptions {
   showNotice: boolean
 }
-export default async function request<T>(
+export default async function request<T = any>(
   path: string,
   cid: number = 0,
   args: Record<string, any> | string = {},
@@ -26,7 +25,6 @@ export default async function request<T>(
         }
       }
     })
-
     const params = {
       path,
       cid,

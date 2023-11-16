@@ -37,7 +37,7 @@ pub async fn info<'r>(
     let args: NameArgs = serde_json::from_str(&payload)?;
 
     let value: Vec<Value> = manager
-        .execute(cid, cmd("TDIGEST.INFO").arg(args.name), Some(args.db))
+        .execute(cid, cmd("TDIGEST.INFO").arg(args.name), args.db)
         .await?;
     Ok(Field::build_vec(&value)?)
 }
@@ -162,7 +162,7 @@ pub async fn reset<'r>(
     let args: NameArgs = serde_json::from_str(&payload)?;
 
     let value: String = manager
-        .execute(cid, cmd("TDIGEST.RESET").arg(args.name), Some(args.db))
+        .execute(cid, cmd("TDIGEST.RESET").arg(args.name), args.db)
         .await?;
     Ok(value)
 }
@@ -175,7 +175,7 @@ pub async fn min<'r>(
     let args: NameArgs = serde_json::from_str(&payload)?;
 
     let value: String = manager
-        .execute(cid, cmd("TDIGEST.MIN").arg(args.name), Some(args.db))
+        .execute(cid, cmd("TDIGEST.MIN").arg(args.name), args.db)
         .await?;
     Ok(value)
 }
@@ -187,7 +187,7 @@ pub async fn max<'r>(
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let value: String = manager
-        .execute(cid, cmd("TDIGEST.MAX").arg(args.name), Some(args.db))
+        .execute(cid, cmd("TDIGEST.MAX").arg(args.name), args.db)
         .await?;
     Ok(value)
 }

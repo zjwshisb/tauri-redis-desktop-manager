@@ -30,14 +30,15 @@ function isShowLength(types: APP.Key['types']) {
     types !== 'ReJSON-RL' &&
     types !== 'TopK-TYPE' &&
     types !== 'TSDB-TYPE' &&
-    types !== 'TDIS-TYPE'
+    types !== 'TDIS-TYPE' &&
+    types !== 'MBbloomCF'
   )
 }
 
 const Key: React.FC<{
   name: string
   connection: APP.Connection
-  db: number
+  db?: number
   pageKey: string
 }> = ({ name, connection, db, pageKey }) => {
   const {

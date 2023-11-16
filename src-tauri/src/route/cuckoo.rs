@@ -14,7 +14,7 @@ pub async fn info<'r>(
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let values: Vec<Value> = manager
-        .execute(cid, cmd("CF.INFO").arg(args.name), Some(args.db))
+        .execute(cid, cmd("CF.INFO").arg(args.name), args.db)
         .await?;
     Ok(Field::build_vec(&values)?)
 }

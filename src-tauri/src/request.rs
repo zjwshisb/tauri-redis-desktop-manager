@@ -19,7 +19,7 @@ pub struct IdArgs<T> {
 pub struct ItemScanArgs {
     pub name: String,
     pub cursor: String,
-    pub db: u8,
+    pub db: Option<u8>,
     pub count: i64,
     pub search: Option<String>,
 }
@@ -40,21 +40,21 @@ pub struct FieldValueItem<T = String> {
 #[derive(Deserialize)]
 pub struct NameArgs<T = String> {
     pub name: T,
-    pub db: u8,
+    pub db: Option<u8>,
 }
 
 #[derive(Deserialize)]
-pub struct FieldValueArgs<T> {
+pub struct FieldValueArgs<T = String> {
     pub name: String,
     pub field: String,
     pub value: T,
-    pub db: u8,
+    pub db: Option<u8>,
 }
 
 #[derive(Deserialize)]
-pub struct RangeArgs {
+pub struct RangeArgs<T = i64> {
     pub name: String,
-    pub start: i64,
-    pub stop: i64,
-    pub db: u8,
+    pub start: T,
+    pub end: T,
+    pub db: Option<u8>,
 }

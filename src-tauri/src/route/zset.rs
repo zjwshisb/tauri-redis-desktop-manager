@@ -16,7 +16,7 @@ pub async fn zscan<'r>(
     if let Some(search) = args.search {
         cmd.arg(&["MATCH", &format!("*{}*", search)]);
     }
-    let values: Vec<Value> = manager.execute(cid, &mut cmd, Some(args.db)).await?;
+    let values: Vec<Value> = manager.execute(cid, &mut cmd, args.db).await?;
     ScanLikeResult::<Field, String>::build(values)
 }
 

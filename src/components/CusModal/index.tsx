@@ -52,7 +52,6 @@ const CusModal: React.FC<
     <>
       {trigger}
       <Modal
-        destroyOnClose
         afterOpenChange={(v) => {
           if (otherProps.onOpenChange != null) {
             otherProps.onOpenChange(v)

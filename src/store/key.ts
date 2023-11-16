@@ -2,7 +2,7 @@ import { openWindow } from '@/utils'
 import { makeAutoObservable } from 'mobx'
 
 export interface KeyInfo {
-  db: number
+  db?: number
   connection: APP.Connection
 }
 
@@ -18,7 +18,7 @@ class KeysStore {
     }
   }
 
-  set(conn: APP.Connection, db: number = 0) {
+  set(conn: APP.Connection, db?: number) {
     this.info = {
       db,
       connection: conn

@@ -24,6 +24,7 @@ pub mod migrate;
 pub mod pubsub;
 pub mod server;
 pub mod set;
+pub mod string;
 pub mod tdigest;
 pub mod terminal;
 pub mod timeseries;
@@ -81,10 +82,24 @@ pub async fn dispatch<'r>(
         "key/add" => Response::new(key::add(payload, cid, manager).await?),
         "key/del" => Response::new(key::del(payload, cid, manager).await?),
         "key/get" => Response::new(key::get(payload, cid, manager).await?),
-        "key/set" => Response::new(key::set(payload, cid, manager).await?),
+
         "key/dump" => Response::new(key::dump(payload, cid, manager).await?),
         "key/restore" => Response::new(key::restore(payload, cid, manager).await?),
         "key/expire" => Response::new(key::expire(payload, cid, manager).await?),
+
+        "string/set" => Response::new(string::set(payload, cid, manager).await?),
+        "string/decrby" => Response::new(string::decrby(payload, cid, manager).await?),
+        "string/decr" => Response::new(string::decr(payload, cid, manager).await?),
+        "string/incr" => Response::new(string::incr(payload, cid, manager).await?),
+        "string/incrby" => Response::new(string::incrby(payload, cid, manager).await?),
+        "string/incrbyfloat" => Response::new(string::incrby_float(payload, cid, manager).await?),
+        "string/getrange" => Response::new(string::get_range(payload, cid, manager).await?),
+        "string/setrange" => Response::new(string::set_range(payload, cid, manager).await?),
+        "string/append" => Response::new(string::append(payload, cid, manager).await?),
+        "string/lcs" => Response::new(string::lcs(payload, cid, manager).await?),
+        "string/mget" => Response::new(string::mget(payload, cid, manager).await?),
+        "string/getdel" => Response::new(string::getdel(payload, cid, manager).await?),
+
         "memory/analysis" => Response::new(memory::analysis(payload, cid, manager).await?),
         "memory/usage" => Response::new(memory::memory_usage(payload, cid, manager).await?),
         "memory/doctor" => Response::new(memory::memory_doctor(cid, manager).await?),

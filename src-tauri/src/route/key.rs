@@ -1,7 +1,7 @@
 use crate::connection::Manager;
 use crate::err::CusError;
 
-use crate::request::{CommonValueArgs, NameArgs};
+use crate::request::NameArgs;
 use crate::{
     err::{self},
     key::Key,
@@ -140,21 +140,6 @@ pub async fn rename<'r>(
         .await
 }
 
-pub async fn set<'r>(
-    payload: String,
-    cid: u32,
-    manager: tauri::State<'r, Manager>,
-) -> Result<String, CusError> {
-    let args: CommonValueArgs = serde_json::from_str(&payload)?;
-    manager
-        .execute(
-            cid,
-            redis::cmd("set").arg(&args.name).arg(&args.value),
-            args.db,
-        )
-        .await
-}
-
 #[derive(Deserialize)]
 struct AddArgs {
     name: String,
@@ -205,7 +190,7 @@ pub async fn dump<'r>(
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let v: Vec<u8> = manager
-        .execute(cid, redis::cmd("dump").arg(&args.name), Some(args.db))
+        .execute(cid, redis::cmd("dump").arg(&args.name), args.db)
         .await?;
     Ok(utils::binary_to_redis_str(&v))
 }

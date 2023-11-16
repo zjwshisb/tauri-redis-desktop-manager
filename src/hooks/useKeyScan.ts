@@ -73,7 +73,7 @@ export function useScanCursor<T = string>(connection: APP.Connection) {
 
 export default function useKeyScan(
   connection: APP.Connection,
-  db: number,
+  db: number | undefined,
   params: UseKeyScanFilter,
   options?: UseKeyScanOptions
 ) {

@@ -19,8 +19,8 @@ pub async fn lrange<'r>(
             redis::cmd("lrange")
                 .arg(&args.name)
                 .arg(&args.start)
-                .arg(&args.stop),
-            Some(args.db),
+                .arg(&args.end),
+            args.db,
         )
         .await
 }
@@ -62,8 +62,8 @@ pub async fn ltrim<'r>(
             redis::cmd("ltrim")
                 .arg(&args.name)
                 .arg(args.start)
-                .arg(args.stop),
-            Some(args.db),
+                .arg(args.end),
+            args.db,
         )
         .await
 }
@@ -126,7 +126,7 @@ pub async fn lpop<'r>(
 ) -> Result<String, CusError> {
     let args: request::NameArgs = serde_json::from_str(&payload)?;
     let value = manager
-        .execute(cid, redis::cmd("lpop").arg(&args.name), Some(args.db))
+        .execute(cid, redis::cmd("lpop").arg(&args.name), args.db)
         .await?;
     match value {
         Value::Nil => return Err(CusError::key_not_exists()),
@@ -160,7 +160,7 @@ pub async fn rpop<'r>(
 ) -> Result<String, CusError> {
     let args: request::NameArgs = serde_json::from_str(&payload)?;
     let value = manager
-        .execute(cid, redis::cmd("rpop").arg(&args.name), Some(args.db))
+        .execute(cid, redis::cmd("rpop").arg(&args.name), args.db)
         .await?;
     match value {
         Value::Nil => return Err(CusError::key_not_exists()),
