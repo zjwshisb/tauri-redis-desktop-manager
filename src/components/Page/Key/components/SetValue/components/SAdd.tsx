@@ -4,11 +4,14 @@ import request from '@/utils/request'
 import FieldInput from '@/components/FieldInput'
 import ModalForm from '@/components/ModalForm'
 import FormListItem from '@/components/FormListItem'
+import { useTranslation } from 'react-i18next'
 
 const SAdd: React.FC<{
   keys: APP.SetKey
   onSuccess: () => void
 }> = (props) => {
+  const { t } = useTranslation()
+
   return (
     <ModalForm
       defaultValue={{
@@ -27,7 +30,8 @@ const SAdd: React.FC<{
     >
       <FormListItem
         itemProps={{
-          label: 'Items'
+          label: t('Item'),
+          required: true
         }}
         name="value"
         renderItem={(field) => {
