@@ -19,6 +19,10 @@
 + Time Series structures
 + Dark Mode
 + Terminal
+  
+## Command Support (At GUI)
+
+[Detail](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/COMMAND.md)
 
 ## Preview
 

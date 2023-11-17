@@ -7,8 +7,8 @@ import FieldInput from '@/components/FieldInput'
 
 const Append: React.FC<{
   keys: APP.StringKey
-  onRefresh: () => void
-}> = ({ keys, onRefresh }) => {
+  onSuccess: () => void
+}> = ({ keys, onSuccess }) => {
   const { t } = useTranslation()
 
   return (
@@ -27,7 +27,7 @@ const Append: React.FC<{
           },
           { showNotice: false }
         )
-        onRefresh()
+        onSuccess()
       }}
     >
       <Form.Item

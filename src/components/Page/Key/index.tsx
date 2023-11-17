@@ -46,10 +46,18 @@ const Key: React.FC<{
     fetch,
     loading,
     error
-  } = useRequest<APP.Key>('key/get', connection.id, {
-    name,
-    db
-  })
+  } = useRequest<APP.Key>(
+    'key/get',
+    connection.id,
+    {
+      name,
+      db
+    },
+    true,
+    {
+      showNotice: false
+    }
+  )
 
   const store = useStore()
 
@@ -174,7 +182,6 @@ const Key: React.FC<{
                 )}
                 <Copy content={item.name} isButton />
                 <Dump keys={item}></Dump>
-
                 <Editable connection={connection}>
                   <Button
                     onClick={handleDelete}

@@ -3,7 +3,9 @@ use serde::Deserialize;
 use crate::connection::{Manager, Value};
 use crate::err::CusError;
 
-use crate::request::{CommonValueArgs, FieldValueArgs, NameArgs, RangeArgs};
+use crate::request::{
+    CommonValueArgs, FieldValueArgs, FieldValueItem, NameArgs, RangeArgs, SingleValueArgs,
+};
 
 pub async fn set<'r>(
     payload: String,
@@ -18,6 +20,19 @@ pub async fn set<'r>(
             args.db,
         )
         .await
+}
+
+pub async fn mset<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<String, CusError> {
+    let args: SingleValueArgs<Vec<FieldValueItem>> = serde_json::from_str(&payload)?;
+    let mut cmd = redis::cmd("mset");
+    for x in args.value {
+        cmd.arg((&x.field, &x.value));
+    }
+    manager.execute(cid, &mut cmd, args.db).await
 }
 
 pub async fn append<'r>(
@@ -200,6 +215,22 @@ pub async fn getdel<'r>(
     let args: NameArgs = serde_json::from_str(&payload)?;
     let v: Vec<u8> = manager
         .execute(cid, redis::cmd("GETDEL").arg(&args.name), args.db)
+        .await?;
+    Ok(String::from_utf8_lossy(&v).to_string())
+}
+
+pub async fn getset<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<String, CusError> {
+    let args: CommonValueArgs = serde_json::from_str(&payload)?;
+    let v: Vec<u8> = manager
+        .execute(
+            cid,
+            redis::cmd("GETSET").arg(&args.name).arg(args.value),
+            args.db,
+        )
         .await?;
     Ok(String::from_utf8_lossy(&v).to_string())
 }

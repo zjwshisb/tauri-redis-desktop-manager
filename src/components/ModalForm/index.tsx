@@ -34,12 +34,11 @@ const ModalForm: React.ForwardRefRenderFunction<
       onCancel={props.onCancel}
       showOkNotice={showOkNotice}
       width={width}
-      onClear={() => {
-        setTimeout(() => {
-          form.resetFields()
-        }, 100)
+      afterClose={() => {
+        console.log('close')
+        form.resetFields()
       }}
-      onOpen={() => {
+      beforeOpen={() => {
         form.setFieldsValue(props.defaultValue)
       }}
       trigger={props.trigger}

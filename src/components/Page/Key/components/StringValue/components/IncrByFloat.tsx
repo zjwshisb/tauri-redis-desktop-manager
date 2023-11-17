@@ -7,8 +7,8 @@ import VersionAccess from '@/components/VersionAccess'
 import context from '../../../context'
 const IncrByFloat: React.FC<{
   keys: APP.StringKey
-  onRefresh: () => void
-}> = ({ keys, onRefresh }) => {
+  onSuccess: () => void
+}> = ({ keys, onSuccess }) => {
   const { t } = useTranslation()
 
   const connection = React.useContext(context)
@@ -26,7 +26,7 @@ const IncrByFloat: React.FC<{
             name: keys.name,
             value: v.value
           })
-          onRefresh()
+          onSuccess()
         }}
       >
         <Form.Item name={'value'} rules={[{ required: true }]} required>

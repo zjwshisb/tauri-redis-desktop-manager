@@ -7,8 +7,8 @@ import FieldInput from '@/components/FieldInput'
 
 const Set: React.FC<{
   keys: APP.StringKey
-  onRefresh: () => void
-}> = ({ keys, onRefresh }) => {
+  onSuccess: () => void
+}> = ({ keys, onSuccess }) => {
   const [value, setValue] = React.useState(keys.data)
 
   const { t } = useTranslation()
@@ -28,7 +28,7 @@ const Set: React.FC<{
           name: keys.name,
           value: v.value
         })
-        onRefresh()
+        onSuccess()
       }}
       defaultValue={{
         value

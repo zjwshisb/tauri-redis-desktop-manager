@@ -5,8 +5,8 @@ import ButtonAction from '@/components/ButtonAction'
 
 const Decr: React.FC<{
   keys: APP.StringKey
-  onRefresh: () => void
-}> = ({ keys, onRefresh }) => {
+  onSuccess: () => void
+}> = ({ keys, onSuccess }) => {
   const { t } = useTranslation()
 
   return (
@@ -18,7 +18,7 @@ const Decr: React.FC<{
           db: keys.db,
           name: keys.name
         })
-        onRefresh()
+        onSuccess()
       }}
     >
       {t('DECR')}

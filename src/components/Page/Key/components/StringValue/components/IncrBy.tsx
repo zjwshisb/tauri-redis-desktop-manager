@@ -6,8 +6,8 @@ import ModalForm from '@/components/ModalForm'
 
 const IncrBy: React.FC<{
   keys: APP.StringKey
-  onRefresh: () => void
-}> = ({ keys, onRefresh }) => {
+  onSuccess: () => void
+}> = ({ keys, onSuccess }) => {
   const { t } = useTranslation()
 
   return (
@@ -22,7 +22,7 @@ const IncrBy: React.FC<{
           name: keys.name,
           value: v.value
         })
-        onRefresh()
+        onSuccess()
       }}
       defaultValue={{}}
     >

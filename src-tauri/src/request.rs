@@ -32,6 +32,12 @@ pub struct CommonValueArgs<T = String> {
 }
 
 #[derive(Deserialize)]
+pub struct SingleValueArgs<T = String> {
+    pub db: Option<u8>,
+    pub value: T,
+}
+
+#[derive(Deserialize)]
 pub struct FieldValueItem<T = String> {
     pub field: String,
     pub value: T,

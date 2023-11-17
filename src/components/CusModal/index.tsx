@@ -8,17 +8,20 @@ const CusModal: React.FC<
     showOkNotice?: boolean
     onOk: () => Promise<any>
     onOpenChange?: (v: boolean) => void
-    onOpen?: () => void
-    onClear?: () => void
+    afterOpen?: () => void
+    beforeOpen?: () => void
+    beforeClose?: () => void
     autoClose?: boolean
-  } & Omit<ModalProps, 'onOk'>
+  } & Omit<ModalProps, 'onOk' | 'open'>
 > = (props) => {
   const {
     onOk,
     onCancel,
-    onOpen,
+    afterOpen,
+    beforeClose,
     showOkNotice = true,
     autoClose = true,
+    beforeOpen,
     ...otherProps
   } = props
 
@@ -30,23 +33,31 @@ const CusModal: React.FC<
 
   const [confirmLoading, setConfirmLoading] = React.useState(false)
 
+  const changeOpen = React.useCallback(
+    (v: boolean) => {
+      setOpen((p) => {
+        if (!p && v && beforeOpen !== undefined) {
+          beforeOpen()
+        }
+        if (p && !v && beforeClose !== undefined) {
+          beforeClose()
+        }
+        return v
+      })
+    },
+    [beforeClose, beforeOpen]
+  )
+
   const trigger = React.useMemo(() => {
     if (otherProps.trigger !== undefined) {
       return React.cloneElement(props.trigger as React.ReactElement, {
         onClick() {
-          setOpen(true)
+          changeOpen(true)
         }
       })
     }
     return <></>
-  }, [otherProps.trigger, props.trigger])
-
-  const isOpen = React.useMemo(() => {
-    if (otherProps.open !== undefined) {
-      return otherProps.open
-    }
-    return open
-  }, [open, otherProps.open])
+  }, [changeOpen, otherProps.trigger, props.trigger])
 
   return (
     <>
@@ -56,13 +67,9 @@ const CusModal: React.FC<
           if (otherProps.onOpenChange != null) {
             otherProps.onOpenChange(v)
           }
-          if (!v) {
-            if (otherProps.onClear !== undefined) {
-              otherProps.onClear()
-            }
-          } else {
-            if (onOpen != null) {
-              onOpen()
+          if (v) {
+            if (afterOpen != null) {
+              afterOpen()
             }
           }
         }}
@@ -75,7 +82,7 @@ const CusModal: React.FC<
                 message.success(t('Success'))
               }
               if (autoClose) {
-                setOpen(false)
+                changeOpen(false)
               }
             })
             .catch(() => {})
@@ -83,9 +90,9 @@ const CusModal: React.FC<
               setConfirmLoading(false)
             })
         }}
-        open={isOpen}
+        open={open}
         onCancel={(e) => {
-          setOpen(false)
+          changeOpen(false)
           if (onCancel != null) {
             onCancel(e)
           }

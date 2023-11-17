@@ -13,11 +13,11 @@ interface ModalQueryFormProps<T> {
   defaultValue?: Record<string, any>
   trigger: React.ReactElement
   onQuery: (value: Record<string, any>) => Promise<T>
-  onSuccess?: () => void
   width?: string | number
   title?: React.ReactNode
   onFieldsChange?: FormProps['onFieldsChange']
   onValueChange?: FormProps['onValuesChange']
+  afterQueryClose?: () => void
   onCancel?: () => void
   documentUrl?: string
   ref?: React.ForwardedRef<FormInstance>
@@ -34,7 +34,7 @@ function ModalQueryForm<T>(
 
   React.useImperativeHandle(ref, () => form)
 
-  const { width = 800, queryWithOpen = false, onQuery, onSuccess } = props
+  const { width = 800, queryWithOpen = false, onQuery, afterQueryClose } = props
 
   const term = React.useRef<XTermAction>(null)
 
@@ -42,16 +42,14 @@ function ModalQueryForm<T>(
 
   const onQueryRef = useLatest(onQuery)
 
-  const onSuccessRef = useLatest(onSuccess)
+  const [isQuerySuccess, setIsQuerySuccess] = React.useState(false)
 
   const query = React.useCallback(async () => {
     const v = await form.validateFields()
     onQueryRef
       .current(v)
       .then((result) => {
-        if (onSuccessRef.current != null) {
-          onSuccessRef.current()
-        }
+        setIsQuerySuccess(true)
         if (result !== undefined) {
           term.current?.clear()
           term.current?.writeRedisResult(result)
@@ -61,42 +59,43 @@ function ModalQueryForm<T>(
         term.current?.clear()
         term.current?.writeln(`(error) ${e as string} `)
       })
-  }, [form, onQueryRef, onSuccessRef])
+  }, [form, onQueryRef])
+
+  const clear = React.useCallback(() => {
+    term.current?.clear()
+    term.current?.writeln(welcome)
+    form.resetFields()
+  }, [form])
 
   return (
     <CusModal
       forceRender={false}
+      destroyOnClose
       autoClose={false}
       onCancel={props.onCancel}
       showOkNotice={false}
+      cancelText={t('Close')}
       width={width}
       footer={(_, { OkBtn, CancelBtn }) => (
         <div>
           <CancelBtn />
-          <Button
-            onClick={() => {
-              term.current?.clear()
-              term.current?.writeln(welcome)
-              form.resetFields()
-            }}
-          >
-            {t('Reset')}
-          </Button>
+          <Button onClick={clear}>{t('Reset')}</Button>
           <OkBtn />
         </div>
       )}
-      onClear={() => {
-        term.current?.clear()
-        term.current?.writeln(welcome)
-        setTimeout(() => {
-          form.resetFields()
-        }, 100)
+      afterClose={() => {
+        clear()
+        if (isQuerySuccess && afterQueryClose !== undefined) {
+          afterQueryClose()
+        }
       }}
-      onOpen={() => {
-        form.setFieldsValue(props.defaultValue)
+      afterOpen={() => {
         if (queryWithOpen) {
           query()
         }
+      }}
+      beforeOpen={() => {
+        form.setFieldsValue(props.defaultValue)
       }}
       trigger={props.trigger}
       onOk={query}

@@ -99,6 +99,8 @@ pub async fn dispatch<'r>(
         "string/lcs" => Response::new(string::lcs(payload, cid, manager).await?),
         "string/mget" => Response::new(string::mget(payload, cid, manager).await?),
         "string/getdel" => Response::new(string::getdel(payload, cid, manager).await?),
+        "string/getset" => Response::new(string::getset(payload, cid, manager).await?),
+        "string/mset" => Response::new(string::mset(payload, cid, manager).await?),
 
         "memory/analysis" => Response::new(memory::analysis(payload, cid, manager).await?),
         "memory/usage" => Response::new(memory::memory_usage(payload, cid, manager).await?),

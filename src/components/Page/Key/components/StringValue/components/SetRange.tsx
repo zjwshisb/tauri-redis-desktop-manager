@@ -7,8 +7,8 @@ import FieldInput from '@/components/FieldInput'
 
 const SetRange: React.FC<{
   keys: APP.StringKey
-  onRefresh: () => void
-}> = ({ keys, onRefresh }) => {
+  onSuccess: () => void
+}> = ({ keys, onSuccess }) => {
   const { t } = useTranslation()
 
   return (
@@ -22,7 +22,7 @@ const SetRange: React.FC<{
           name: keys.name,
           ...v
         })
-        onRefresh()
+        onSuccess()
       }}
     >
       <Form.Item name={'field'} label={t('Offset')}>

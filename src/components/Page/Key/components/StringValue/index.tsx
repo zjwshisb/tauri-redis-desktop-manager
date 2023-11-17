@@ -15,6 +15,8 @@ import Append from './components/Append'
 import Lcs from './components/Lcs'
 import MGet from './components/MGet'
 import GetDel from './components/GetDel'
+import GetSet from './components/GetSet'
+import MSet from './components/MSet'
 
 const StringValue: React.FC<{
   keys: APP.StringKey
@@ -31,15 +33,17 @@ const StringValue: React.FC<{
       }
       actions={
         <>
-          <GetDel keys={keys} onRefresh={onRefresh}></GetDel>
-          <Set keys={keys} onRefresh={onRefresh} />
-          <SetRange keys={keys} onRefresh={onRefresh} />
-          <Append keys={keys} onRefresh={onRefresh} />
-          <Incr keys={keys} onRefresh={onRefresh} />
-          <IncrBy keys={keys} onRefresh={onRefresh} />
-          <IncrByFloat keys={keys} onRefresh={onRefresh} />
-          <Decr keys={keys} onRefresh={onRefresh} />
-          <DecrBy keys={keys} onRefresh={onRefresh} />
+          <GetSet keys={keys} onSuccess={onRefresh} />
+          <GetDel keys={keys} onSuccess={onRefresh}></GetDel>
+          <MSet keys={keys} onSuccess={onRefresh}></MSet>
+          <Set keys={keys} onSuccess={onRefresh} />
+          <SetRange keys={keys} onSuccess={onRefresh} />
+          <Append keys={keys} onSuccess={onRefresh} />
+          <Incr keys={keys} onSuccess={onRefresh} />
+          <IncrBy keys={keys} onSuccess={onRefresh} />
+          <IncrByFloat keys={keys} onSuccess={onRefresh} />
+          <Decr keys={keys} onSuccess={onRefresh} />
+          <DecrBy keys={keys} onSuccess={onRefresh} />
         </>
       }
     >
