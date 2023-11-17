@@ -1,37 +1,40 @@
-import { Form, Button } from 'antd'
+import { Form, Button, Input } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import FieldInput from '@/components/FieldInput'
 import ModalForm from '@/components/ModalForm'
 import FormListItem from '@/components/FormListItem'
 import { useTranslation } from 'react-i18next'
 
-const SAdd: React.FC<{
+const SDiffStore: React.FC<{
   keys: APP.SetKey
-  onSuccess: () => void
-}> = (props) => {
+}> = ({ keys }) => {
   const { t } = useTranslation()
 
   return (
     <ModalForm
-      documentUrl="https://redis.io/commands/sadd/"
+      documentUrl="https://redis.io/commands/sdiffstore/"
       defaultValue={{
-        value: [undefined]
+        value: [keys.name, undefined]
       }}
-      trigger={<Button type="primary">SADD</Button>}
+      trigger={<Button type="primary">SDIFFSTORE</Button>}
       onSubmit={async (v) => {
-        await request<number>('set/sadd', props.keys.connection_id, {
-          name: props.keys.name,
-          db: props.keys.db,
+        await request<number>('set/sdiffstore', keys.connection_id, {
+          db: keys.db,
           ...v
         })
-        props.onSuccess()
       }}
-      title={'SADD'}
+      title={'SDIFFSTORE'}
     >
+      <Form.Item
+        label={t('Destination key')}
+        name={'name'}
+        rules={[{ required: true }]}
+      >
+        <Input />
+      </Form.Item>
       <FormListItem
         itemProps={{
-          label: t('Item'),
+          label: t('Keys'),
           required: true
         }}
         name="value"
@@ -42,7 +45,7 @@ const SAdd: React.FC<{
               required
               rules={[{ required: true }]}
             >
-              <FieldInput />
+              <Input />
             </Form.Item>
           )
         }}
@@ -50,4 +53,4 @@ const SAdd: React.FC<{
     </ModalForm>
   )
 }
-export default SAdd
+export default SDiffStore

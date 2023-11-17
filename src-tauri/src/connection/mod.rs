@@ -1,5 +1,5 @@
 use crate::utils;
-use redis::Value as RedisValue;
+use redis::{FromRedisValue, RedisResult, Value as RedisValue};
 mod conn;
 mod event;
 mod manager;
@@ -10,31 +10,36 @@ pub use event::EventManager;
 pub use manager::Manager;
 pub use node::Node;
 
-pub enum Value {
+pub enum CValue {
     Str(String),
-    Vec(Vec<Value>),
+    Vec(Vec<CValue>),
     Int(i64),
     Nil,
 }
+impl FromRedisValue for CValue {
+    fn from_redis_value(v: &RedisValue) -> RedisResult<Self> {
+        return Ok(CValue::build(v.clone()));
+    }
+}
 
-impl serde::Serialize for Value {
+impl serde::Serialize for CValue {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
         match &self {
-            Value::Str(s) => {
+            CValue::Str(s) => {
                 return serializer.serialize_str(s);
             }
-            Value::Vec(v) => v.serialize(serializer),
-            Value::Int(v) => v.serialize(serializer),
-            Value::Nil => serializer.serialize_none(),
+            CValue::Vec(v) => v.serialize(serializer),
+            CValue::Int(v) => v.serialize(serializer),
+            CValue::Nil => serializer.serialize_none(),
         }
     }
 }
 
-impl Value {
-    pub fn build(v: RedisValue) -> Value {
+impl CValue {
+    pub fn build(v: RedisValue) -> CValue {
         match v {
             RedisValue::Okay => return Self::Str("Ok".to_string()),
             RedisValue::Data(s) => {

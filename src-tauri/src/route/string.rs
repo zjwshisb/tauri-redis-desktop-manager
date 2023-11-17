@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::connection::{Manager, Value};
+use crate::connection::{CValue, Manager};
 use crate::err::CusError;
 
 use crate::request::{
@@ -169,7 +169,7 @@ pub async fn lcs<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<Value, CusError> {
+) -> Result<CValue, CusError> {
     let args: LcsArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("lcs");
     cmd.arg(args.key1).arg(args.key2);
@@ -191,20 +191,18 @@ pub async fn lcs<'r>(
             cmd.arg("WITHMATCHLEN");
         }
     }
-    let v: redis::Value = manager.execute(cid, &mut cmd, args.db).await?;
-    Ok(Value::build(v))
+    manager.execute(cid, &mut cmd, args.db).await
 }
 
 pub async fn mget<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<Value, CusError> {
+) -> Result<CValue, CusError> {
     let args: NameArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let v: redis::Value = manager
+    manager
         .execute(cid, redis::cmd("MGET").arg(&args.name), args.db)
-        .await?;
-    Ok(Value::build(v))
+        .await
 }
 
 pub async fn getdel<'r>(

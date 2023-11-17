@@ -25,7 +25,6 @@ const Lcs: React.FC<{
             'string/lcs',
             keys.connection_id,
             {
-              name: keys.name,
               db: keys.db,
               ...v
             },

@@ -75,10 +75,8 @@ pub async fn dispatch<'r>(
         "key/zset/zscan" => Response::new(zset::zscan(payload, cid, manager).await?),
         "key/zset/zrem" => Response::new(zset::zrem(payload, cid, manager).await?),
         "key/zset/zadd" => Response::new(zset::zadd(payload, cid, manager).await?),
-        "key/set/sscan" => Response::new(set::sscan(payload, cid, manager).await?),
-        "key/set/sadd" => Response::new(set::sadd(payload, cid, manager).await?),
-        "key/set/srem" => Response::new(set::srem(payload, cid, manager).await?),
         "key/rename" => Response::new(key::rename(payload, cid, manager).await?),
+
         "key/add" => Response::new(key::add(payload, cid, manager).await?),
         "key/del" => Response::new(key::del(payload, cid, manager).await?),
         "key/get" => Response::new(key::get(payload, cid, manager).await?),
@@ -86,6 +84,16 @@ pub async fn dispatch<'r>(
         "key/dump" => Response::new(key::dump(payload, cid, manager).await?),
         "key/restore" => Response::new(key::restore(payload, cid, manager).await?),
         "key/expire" => Response::new(key::expire(payload, cid, manager).await?),
+
+        "set/sscan" => Response::new(set::sscan(payload, cid, manager).await?),
+        "set/sadd" => Response::new(set::sadd(payload, cid, manager).await?),
+        "set/srem" => Response::new(set::srem(payload, cid, manager).await?),
+        "set/sdiff" => Response::new(set::sdiff(payload, cid, manager).await?),
+        "set/sdiffstore" => Response::new(set::sdiff_store(payload, cid, manager).await?),
+        "set/sinter" => Response::new(set::sinter(payload, cid, manager).await?),
+        "set/sintercard" => Response::new(set::sinter_card(payload, cid, manager).await?),
+        "set/sinterstore" => Response::new(set::sinter_store(payload, cid, manager).await?),
+        "set/sismember" => Response::new(set::sis_member(payload, cid, manager).await?),
 
         "string/set" => Response::new(string::set(payload, cid, manager).await?),
         "string/decrby" => Response::new(string::decrby(payload, cid, manager).await?),

@@ -4,21 +4,21 @@ import request from '@/utils/request'
 import { Button, Form, Input } from 'antd'
 import FormListItem from '@/components/FormListItem'
 
-const MGet: React.FC<{
-  keys: APP.StringKey
+const SInter: React.FC<{
+  keys: APP.SetKey
 }> = ({ keys }) => {
   return (
     <ModalQueryForm
-      title="MGET"
+      title="SINTER"
       width={400}
       defaultValue={{
-        name: [keys.name]
+        value: [keys.name, undefined]
       }}
-      documentUrl="https://redis.io/commands/mget/"
-      trigger={<Button type="primary">MGET</Button>}
+      documentUrl="https://redis.io/commands/sinter/"
+      trigger={<Button type="primary">SINTER</Button>}
       onQuery={async (v) => {
-        const res = await request<string>(
-          'string/mget',
+        const res = await request(
+          'set/sinter',
           keys.connection_id,
           {
             db: keys.db,
@@ -32,7 +32,7 @@ const MGet: React.FC<{
       }}
     >
       <FormListItem
-        name="name"
+        name="value"
         itemProps={{
           label: 'Keys',
           required: true
@@ -52,4 +52,4 @@ const MGet: React.FC<{
     </ModalQueryForm>
   )
 }
-export default MGet
+export default SInter

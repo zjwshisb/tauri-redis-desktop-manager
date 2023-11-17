@@ -57,7 +57,7 @@ const XTerm: React.ForwardRefRenderFunction<XTermAction, XTermProps> = (
           }
         }
         if (isNumber(data)) {
-          term?.writeln(`${prefix}${data}`)
+          term?.writeln(`${prefix}(integer)${data}`)
         }
         if (isArray(data)) {
           if (data.length === 0) {

@@ -2,7 +2,7 @@
 
 Those command which be checked are supported  at  GUI
 
-## String
+## STRING
 
 - [x] APPEND
 - [X] DECR
@@ -25,3 +25,23 @@ Those command which be checked are supported  at  GUI
 - [X] SETRANGE
 - [X] STRLEN
 - [ ] ~~SUBSTR~~(deprecated)
+
+## SET
+
+- [x] SADD
+- [X] SCARD
+- [X] SDIFF
+- [X] SDIFFSTORE
+- [X] SINTER
+- [X] SINTERCARD
+- [X] SINTERSTORE
+- [X] SISMEMBER
+- [ ] SMEMBERS
+- [ ] SMISMEMBER
+- [ ] SMOVE
+- [ ] SPOP
+- [ ] SRANDMEMBER
+- [ ] SREM
+- [ ] SSCAN
+- [ ] SUNION
+- [ ] SUNIONSTORE

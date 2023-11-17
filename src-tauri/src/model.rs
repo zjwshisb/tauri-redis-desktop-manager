@@ -1,6 +1,6 @@
 use crate::utils::random_str;
 
-use crate::connection::Value;
+use crate::connection::CValue;
 use redis::{FromRedisValue, Value as RedisValue};
 use serde::Serialize;
 use std::fmt::Debug;
@@ -9,7 +9,7 @@ use std::fmt::Debug;
 pub struct Command {
     pub id: String,
     pub cmd: String,
-    pub response: Value,
+    pub response: CValue,
     pub host: String,
     pub created_at: String,
     pub duration: i64,

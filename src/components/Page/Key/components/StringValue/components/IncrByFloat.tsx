@@ -24,7 +24,7 @@ const IncrByFloat: React.FC<{
           await request('string/incrbyfloat', keys.connection_id, {
             db: keys.db,
             name: keys.name,
-            value: v.value
+            ...v
           })
           onSuccess()
         }}

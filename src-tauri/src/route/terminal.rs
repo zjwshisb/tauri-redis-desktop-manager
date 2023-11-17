@@ -1,6 +1,6 @@
 use tauri::Window;
 
-use crate::connection::{EventManager, Manager, Value};
+use crate::connection::{CValue, EventManager, Manager};
 use crate::err::CusError;
 use crate::request::IdArgs;
 use crate::{response::EventResp, utils};
@@ -24,17 +24,17 @@ pub async fn open<'r>(
     let inner_receive_event_name = receive_event_name.clone();
     let inner_send_event_name = send_event_name.clone();
     let window_copy = window.clone();
-    fn cmd_handle<F>(s: &str, func: F) -> EventResp<Value>
+    fn cmd_handle<F>(s: &str, func: F) -> EventResp<CValue>
     where
         F: Fn(Cmd) -> RedisResult<RedisValue>,
     {
         let item: EventResp<Vec<String>> = serde_json::from_str(s).unwrap();
         let cmd_vec = item.data;
-        let mut resp_item: EventResp<Value> = EventResp::new(Value::Nil, String::new());
+        let mut resp_item: EventResp<CValue> = EventResp::new(CValue::Nil, String::new());
         if let Some(first) = cmd_vec.get(0) {
             if first.to_lowercase() == "monitor" || first.to_lowercase() == "subscribe" {
                 resp_item.success = false;
-                resp_item.data = Value::Str("not support this command".to_string());
+                resp_item.data = CValue::Str("not support this command".to_string());
             } else {
                 let mut cmd = redis::cmd(first);
                 let mut i = 1;
@@ -45,19 +45,19 @@ pub async fn open<'r>(
                 let result = func(cmd);
                 match result {
                     Ok(vv) => {
-                        resp_item.data = Value::build(vv);
+                        resp_item.data = CValue::build(vv);
                     }
                     Err(e) => {
                         if let Some(s) = e.detail() {
                             resp_item.success = false;
-                            resp_item.data = Value::Str(s.to_string())
+                            resp_item.data = CValue::Str(s.to_string())
                         }
                     }
                 }
             }
         } else {
             resp_item.success = false;
-            resp_item.data = Value::Str("invalid args".to_string());
+            resp_item.data = CValue::Str("invalid args".to_string());
         }
         resp_item
     }

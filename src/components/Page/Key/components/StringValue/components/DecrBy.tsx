@@ -20,11 +20,10 @@ const DecrBy: React.FC<{
         await request('string/decrby', keys.connection_id, {
           db: keys.db,
           name: keys.name,
-          value: v.value
+          ...v
         })
         onSuccess()
       }}
-      defaultValue={{}}
     >
       <Form.Item name={'value'} rules={[{ required: true }]} required>
         <InputNumber className="!w-full" precision={0} />

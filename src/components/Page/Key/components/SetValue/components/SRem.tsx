@@ -1,40 +1,27 @@
 import React from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
-import { App, Button } from 'antd'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
+import ButtonAction from '@/components/ButtonAction'
 
 const SRem: React.FC<{
   keys: APP.Key
   value: string
   onSuccess: (f: string) => void
 }> = ({ value, keys, onSuccess }) => {
-  const { t } = useTranslation()
-
-  const { modal, message } = App.useApp()
-
   return (
-    <Button
+    <ButtonAction
+      documentUrl="https://redis.io/commands/srem/"
       type="link"
       icon={<DeleteOutlined />}
-      onClick={() => {
-        modal.confirm({
-          title: t('Notice'),
-          content: t('Are you sure delete <{{name}}>?', {
-            name: value
-          }),
-          async onOk() {
-            await request('key/set/srem', keys.connection_id, {
-              name: keys.name,
-              value,
-              db: keys.db
-            })
-            message.success(t('Success'))
-            onSuccess(value)
-          }
+      onSubmit={async () => {
+        await request('set/srem', keys.connection_id, {
+          name: keys.name,
+          value,
+          db: keys.db
         })
+        onSuccess(value)
       }}
-    ></Button>
+    ></ButtonAction>
   )
 }
 export default SRem

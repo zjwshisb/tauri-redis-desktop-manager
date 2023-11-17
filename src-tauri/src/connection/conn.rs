@@ -1,5 +1,5 @@
 use crate::{
-    connection::{Node, Value},
+    connection::{CValue, Node},
     err::CusError,
     model::Command,
     ssh::{self, SshProxy},
@@ -258,7 +258,7 @@ impl ConnectionWrapper {
         let mut cus_cmd = Command {
             id: utils::random_str(32),
             cmd: cmd_vec.join(" "),
-            response: Value::Nil,
+            response: CValue::Nil,
             created_at: Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
             host: self.model.get_host(),
             duration: end.timestamp_micros() - start.timestamp_micros(),
@@ -266,14 +266,14 @@ impl ConnectionWrapper {
         match value_r {
             Ok(value) => match T::from_redis_value(&value) {
                 Ok(v) => {
-                    cus_cmd.response = Value::build(value);
+                    cus_cmd.response = CValue::build(value);
                     Ok((v, cus_cmd))
                 }
                 Err(err) => Err((CusError::App(err.to_string()), cus_cmd)),
             },
             Err(err) => {
                 rep.push(err.to_string());
-                cus_cmd.response = Value::Str(err.to_string());
+                cus_cmd.response = CValue::Str(err.to_string());
                 Err((CusError::App(err.to_string()), cus_cmd))
             }
         }

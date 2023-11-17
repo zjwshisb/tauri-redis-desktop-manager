@@ -12,6 +12,12 @@ import { useFieldScan } from '@/hooks/useFieldScan'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
+import SDiff from './components/SDiff'
+import SDiffStore from './components/SDiffStore'
+import SInter from './components/SInter'
+import SInterCard from './components/SInterCard'
+import SInterStore from './components/SInterStore'
+import SIsMember from './components/SIsmember'
 
 const SetValue: React.FC<{
   keys: APP.SetKey
@@ -26,7 +32,7 @@ const SetValue: React.FC<{
   })
 
   const { fields, loading, more, getFields, getAllFields } =
-    useFieldScan<string>('key/set/sscan', keys, params)
+    useFieldScan<string>('set/sscan', keys, params)
 
   const data = React.useMemo(() => {
     return fields.map((v, index) => {
@@ -90,13 +96,20 @@ const SetValue: React.FC<{
 
   return (
     <ValueLayout
+      readonlyAction={
+        <>
+          <SDiff keys={keys} />
+          <SInter keys={keys} />
+          <SInterCard keys={keys} />
+          <SIsMember keys={keys} />
+        </>
+      }
       actions={
-        <SAdd
-          keys={keys}
-          onSuccess={() => {
-            onRefresh()
-          }}
-        ></SAdd>
+        <>
+          <SAdd keys={keys} onSuccess={onRefresh}></SAdd>
+          <SDiffStore keys={keys} />
+          <SInterStore keys={keys} />
+        </>
       }
     >
       <CusTable
