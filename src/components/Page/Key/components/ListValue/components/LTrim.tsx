@@ -13,7 +13,7 @@ const LTrim: React.FC<{
       documentUrl="https://redis.io/commands/ltrim/"
       trigger={<Button type="primary">LTRIM</Button>}
       onSubmit={async (v) => {
-        await request<number>('key/list/ltrim', props.keys.connection_id, {
+        await request<number>('list/ltrim', props.keys.connection_id, {
           name: props.keys.name,
           db: props.keys.db,
           ...v

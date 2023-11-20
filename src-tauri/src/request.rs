@@ -25,8 +25,8 @@ pub struct ItemScanArgs {
 }
 
 #[derive(Deserialize)]
-pub struct CommonValueArgs<T = String> {
-    pub name: String,
+pub struct CommonValueArgs<T = String, K = String> {
+    pub name: K,
     pub db: Option<u8>,
     pub value: T,
 }
@@ -50,9 +50,9 @@ pub struct NameArgs<T = String> {
 }
 
 #[derive(Deserialize)]
-pub struct FieldValueArgs<T = String> {
+pub struct FieldValueArgs<T = String, F = String> {
     pub name: String,
-    pub field: String,
+    pub field: F,
     pub value: T,
     pub db: Option<u8>,
 }

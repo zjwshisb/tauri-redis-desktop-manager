@@ -19,7 +19,7 @@ const RPop: React.FC<{
           title: t('Notice'),
           content: t('Are you sure pop a value from the right?'),
           async onOk() {
-            await request<number>('key/list/rpop', props.keys.connection_id, {
+            await request<number>('list/rpop', props.keys.connection_id, {
               name: props.keys.name,
               db: props.keys.db
             })

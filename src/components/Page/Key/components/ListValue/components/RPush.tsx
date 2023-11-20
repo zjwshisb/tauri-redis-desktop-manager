@@ -12,7 +12,7 @@ const RPush: React.FC<{
     <ModalForm
       trigger={<Button type="primary">RPUSH</Button>}
       onSubmit={async (v) => {
-        await request<number>('key/list/rpush', props.keys.connection_id, {
+        await request<number>('list/rpush', props.keys.connection_id, {
           name: props.keys.name,
           db: props.keys.db,
           value: [v.value]

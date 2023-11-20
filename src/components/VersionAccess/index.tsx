@@ -8,13 +8,14 @@ const VersionAccess: React.FC<
     version: string
     connection?: APP.Connection
     feedback?: React.ReactNode
+    type?: 'more' | 'less'
   }>
-> = ({ version, connection, feedback = <></>, children }) => {
+> = ({ version, connection, feedback = <></>, type = 'more', children }) => {
   const isShow = computed(() => {
     if (connection?.version !== undefined) {
-      return versionCompare(connection.version, version) > -1
+      const compare = versionCompare(connection.version, version)
+      return type === 'more' ? compare > -1 : compare < 1
     }
-
     return false
   })
 

@@ -1,17 +1,327 @@
-use redis::Value;
+use redis::{FromRedisValue, Value};
 use serde::Deserialize;
 
 use crate::{
-    connection::Manager,
+    connection::{CValue, Manager},
     err::CusError,
-    request::{self, RangeArgs},
+    request::{self, CommonValueArgs, FieldValueArgs, NameArgs, RangeArgs},
 };
+
+#[derive(Deserialize)]
+struct MoveArgs<T = f64> {
+    source: String,
+    destination: String,
+    timeout: Option<T>,
+    wherefrom: Option<String>,
+    whereto: Option<String>,
+    db: Option<u8>,
+}
+
+pub async fn bl_move<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: MoveArgs = serde_json::from_str(&payload)?;
+    let v: Value = manager
+        .execute(
+            cid,
+            redis::cmd("BLMOVE")
+                .arg(args.source)
+                .arg(args.destination)
+                .arg(args.wherefrom)
+                .arg(args.whereto)
+                .arg(args.timeout),
+            args.db,
+        )
+        .await?;
+    match v {
+        Value::Nil => {
+            return Err(CusError::build("Timeout is reached."));
+        }
+        _ => return Ok(CValue::from_redis_value(&v)?),
+    }
+}
+
+#[derive(Deserialize)]
+struct LMPopArgs {
+    numkeys: i64,
+    keys: Vec<String>,
+    wherefrom: String,
+    count: Option<i64>,
+    timeout: Option<f64>,
+    db: Option<u8>,
+}
+pub async fn blm_pop<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: LMPopArgs = serde_json::from_str(&payload)?;
+    let mut cmd = redis::cmd("BLMPOP");
+    cmd.arg(args.timeout)
+        .arg(args.numkeys)
+        .arg(args.keys)
+        .arg(args.wherefrom);
+    if let Some(v) = args.count {
+        cmd.arg(("COUNT", v));
+    }
+    let v: Value = manager.execute(cid, &mut cmd, args.db).await?;
+    match v {
+        Value::Nil => {
+            return Err(CusError::build("No element could be popped."));
+        }
+        _ => return Ok(CValue::from_redis_value(&v)?),
+    }
+}
+
+pub async fn bl_pop<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<f64, Vec<String>> = serde_json::from_str(&payload)?;
+    let v: Value = manager
+        .execute(
+            cid,
+            redis::cmd("BLPOP").arg(args.name).arg(args.value),
+            args.db,
+        )
+        .await?;
+    match v {
+        Value::Nil => {
+            return Err(CusError::build(
+                "No element could be popped and the timeout expired",
+            ));
+        }
+        _ => return Ok(CValue::from_redis_value(&v)?),
+    }
+}
+
+pub async fn br_pop<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<f64, Vec<String>> = serde_json::from_str(&payload)?;
+    let v: Value = manager
+        .execute(
+            cid,
+            redis::cmd("BRPOP").arg(args.name).arg(args.value),
+            args.db,
+        )
+        .await?;
+    match v {
+        Value::Nil => {
+            return Err(CusError::build(
+                "No element could be popped and the timeout expired",
+            ));
+        }
+        _ => return Ok(CValue::from_redis_value(&v)?),
+    }
+}
+
+pub async fn br_pop_lpush<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: MoveArgs<i64> = serde_json::from_str(&payload)?;
+    let v: Value = manager
+        .execute(
+            cid,
+            redis::cmd("BRPOPLPUSH")
+                .arg(args.source)
+                .arg(args.destination)
+                .arg(args.timeout),
+            args.db,
+        )
+        .await?;
+    match v {
+        Value::Nil => {
+            return Err(CusError::build("Timeout is reached."));
+        }
+        _ => return Ok(CValue::from_redis_value(&v)?),
+    }
+}
+
+pub async fn lindex<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<i64> = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("LINDEX").arg(args.name).arg(args.value),
+            args.db,
+        )
+        .await
+}
+
+pub async fn llen<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<i64, CusError> {
+    let args: NameArgs = serde_json::from_str(&payload)?;
+    manager
+        .execute(cid, redis::cmd("LLEN").arg(args.name), args.db)
+        .await
+}
+
+pub async fn lm_pop<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: LMPopArgs = serde_json::from_str(&payload)?;
+    let mut cmd = redis::cmd("LMPOP");
+    cmd.arg(args.numkeys).arg(args.keys).arg(args.wherefrom);
+    if let Some(v) = args.count {
+        cmd.arg(("COUNT", v));
+    }
+    let v: Value = manager.execute(cid, &mut cmd, args.db).await?;
+    match v {
+        Value::Nil => {
+            return Err(CusError::build("No element could be popped."));
+        }
+        _ => return Ok(CValue::from_redis_value(&v)?),
+    }
+}
+
+pub async fn lmove<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<String, CusError> {
+    let args: MoveArgs = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("LMOVE")
+                .arg(args.source)
+                .arg(args.destination)
+                .arg(args.wherefrom)
+                .arg(args.whereto),
+            args.db,
+        )
+        .await
+}
+
+#[derive(Deserialize)]
+struct InsertArgs {
+    name: String,
+    db: Option<u8>,
+    whereto: String,
+    value: String,
+    pivot: String,
+}
+pub async fn linsert<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<i64, CusError> {
+    let args: InsertArgs = serde_json::from_str(&payload)?;
+    let value: i64 = manager
+        .execute(
+            cid,
+            redis::cmd("linsert")
+                .arg(&args.name)
+                .arg(&args.whereto)
+                .arg(&args.pivot)
+                .arg(&args.value),
+            args.db,
+        )
+        .await?;
+    match value {
+        0 => return Err(CusError::key_not_exists()),
+        -1 => return Err(CusError::App(String::from("the pivot wasn't found."))),
+        _ => return Ok(value),
+    }
+}
+
+pub async fn lpop<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<Option<i64>> = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("LPOP").arg(&args.name).arg(args.value),
+            args.db,
+        )
+        .await
+}
+
+#[derive(Deserialize)]
+struct LPosArgs {
+    name: String,
+    db: Option<u8>,
+    element: String,
+    rank: Option<i64>,
+    count: Option<i64>,
+    len: Option<i64>,
+}
+
+pub async fn lpos<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: LPosArgs = serde_json::from_str(&payload)?;
+    let mut cmd = redis::cmd("LPOS");
+    cmd.arg(args.name).arg(args.element);
+    if let Some(v) = args.rank {
+        cmd.arg(("RANK", v));
+    }
+    if let Some(v) = args.count {
+        cmd.arg(("COUNT", v));
+    }
+    if let Some(v) = args.len {
+        cmd.arg(("MAXLEN", v));
+    }
+    manager.execute(cid, &mut cmd, args.db).await
+}
+
+pub async fn lpush<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<i64, CusError> {
+    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("LPUSH").arg(&args.name).arg(&args.value),
+            args.db,
+        )
+        .await
+}
+
+pub async fn lpush_x<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<i64, CusError> {
+    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("LPUSHX").arg(&args.name).arg(&args.value),
+            args.db,
+        )
+        .await
+}
 
 pub async fn lrange<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<Vec<String>, CusError> {
+) -> Result<CValue, CusError> {
     let args: RangeArgs = serde_json::from_str(&payload)?;
     manager
         .execute(
@@ -25,27 +335,38 @@ pub async fn lrange<'r>(
         .await
 }
 
-#[derive(Deserialize)]
-struct LSetArgs {
-    name: String,
-    index: i64,
-    value: String,
-    db: u8,
+pub async fn lrem<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: FieldValueArgs<i64> = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("lrem")
+                .arg(&args.name)
+                .arg(&args.value)
+                .arg(&args.field),
+            args.db,
+        )
+        .await
 }
+
 pub async fn lset<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
 ) -> Result<String, CusError> {
-    let args: LSetArgs = serde_json::from_str(&payload)?;
+    let args: FieldValueArgs<String, i64> = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
-            redis::cmd("lset")
+            redis::cmd("LSET")
                 .arg(&args.name)
-                .arg(args.index)
+                .arg(args.field)
                 .arg(&args.value),
-            Some(args.db),
+            args.db,
         )
         .await
 }
@@ -66,72 +387,6 @@ pub async fn ltrim<'r>(
             args.db,
         )
         .await
-}
-
-#[derive(Deserialize)]
-struct InsertArgs {
-    name: String,
-    db: u8,
-    types: String,
-    value: String,
-    pivot: String,
-}
-pub async fn linsert<'r>(
-    payload: String,
-    cid: u32,
-    manager: tauri::State<'r, Manager>,
-) -> Result<i64, CusError> {
-    let args: InsertArgs = serde_json::from_str(&payload)?;
-    let value: i64 = manager
-        .execute(
-            cid,
-            redis::cmd("linsert")
-                .arg(&args.name)
-                .arg(&args.types)
-                .arg(&args.pivot)
-                .arg(&args.value),
-            Some(args.db),
-        )
-        .await?;
-    match value {
-        0 => return Err(CusError::key_not_exists()),
-        -1 => return Err(CusError::App(String::from("the pivot wasn't found."))),
-        _ => return Ok(value),
-    }
-}
-
-pub async fn lpush<'r>(
-    payload: String,
-    cid: u32,
-    manager: tauri::State<'r, Manager>,
-) -> Result<i64, CusError> {
-    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: i64 = manager
-        .execute(
-            cid,
-            redis::cmd("lpush").arg(&args.name).arg(&args.value),
-            args.db,
-        )
-        .await?;
-    match value {
-        0 => return Err(CusError::key_not_exists()),
-        _ => return Ok(value),
-    }
-}
-
-pub async fn lpop<'r>(
-    payload: String,
-    cid: u32,
-    manager: tauri::State<'r, Manager>,
-) -> Result<String, CusError> {
-    let args: request::NameArgs = serde_json::from_str(&payload)?;
-    let value = manager
-        .execute(cid, redis::cmd("lpop").arg(&args.name), args.db)
-        .await?;
-    match value {
-        Value::Nil => return Err(CusError::key_not_exists()),
-        _ => return Ok(String::from("OK")),
-    }
 }
 
 pub async fn rpush<'r>(

@@ -1,40 +1,36 @@
-import { Button, Form, InputNumber } from 'antd'
+import { Form, Input, InputNumber } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import { EditOutlined } from '@ant-design/icons'
-import { useTranslation } from 'react-i18next'
 import FieldInput from '@/components/FieldInput'
 import ModalForm from '@/components/ModalForm'
 
 const LSet: React.FC<{
   keys: APP.ListKey
-  index: number
-  value: string
+  defaultValue: Record<string, any>
   onSuccess: (value: string, index: number) => void
+  trigger: React.ReactElement
 }> = (props) => {
-  const { t } = useTranslation()
-
   return (
     <ModalForm
-      trigger={<Button icon={<EditOutlined />} type="link" />}
+      documentUrl="https://redis.io/commands/lset/"
+      trigger={props.trigger}
       onSubmit={async (v) => {
-        await request<number>('key/list/lset', props.keys.connection_id, {
-          name: props.keys.name,
+        await request<number>('list/lset', props.keys.connection_id, {
           db: props.keys.db,
           ...v
         })
         props.onSuccess(v.value, v.index)
       }}
       title={'LSET'}
-      defaultValue={{
-        index: props.index,
-        value: props.value
-      }}
+      defaultValue={props.defaultValue}
     >
-      <Form.Item name={'index'} label={t('Index')}>
-        <InputNumber readOnly></InputNumber>
+      <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
+        <Input></Input>
       </Form.Item>
-      <Form.Item name={'value'} label={t('Value')} rules={[{ required: true }]}>
+      <Form.Item name={'field'} label={'Index'} rules={[{ required: true }]}>
+        <InputNumber></InputNumber>
+      </Form.Item>
+      <Form.Item name={'value'} label={'Value'} rules={[{ required: true }]}>
         <FieldInput></FieldInput>
       </Form.Item>
     </ModalForm>

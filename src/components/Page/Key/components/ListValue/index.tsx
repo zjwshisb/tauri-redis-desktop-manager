@@ -1,6 +1,6 @@
 import React from 'react'
 import request from '@/utils/request'
-import { Space } from 'antd'
+import { Button, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import LTrim from './components/LTrim'
 import LSet from './components/LSet'
@@ -18,6 +18,20 @@ import { isReadonly } from '@/components/Editable'
 import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
+import BLMove from './components/BLMove'
+import BLMPop from './components/BLMPop'
+import BLPop from './components/BLPop'
+import BRPop from './components/BRPop'
+import BRPopLPush from './components/BRPopLPush'
+import LIndex from './components/LIndex'
+import LLen from './components/LLen'
+import LMove from './components/LMove'
+import LMPop from './components/LMPop'
+import LPos from './components/LPos'
+import LPushX from './components/LPushx'
+import LRange from './components/LRange'
+import LRem from './components/LRem'
+import { EditOutlined } from '@ant-design/icons'
 
 const ListValue: React.FC<{
   keys: APP.ListKey
@@ -42,7 +56,7 @@ const ListValue: React.FC<{
       const start = index.current
       const end = index.current + store.setting.setting.field_count - 1
       setLoading(true)
-      return await request<string[]>('key/list/lrange', keys.connection_id, {
+      return await request<string[]>('list/lrange', keys.connection_id, {
         name: keys.name,
         db: keys.db,
         start,
@@ -66,13 +80,7 @@ const ListValue: React.FC<{
           setLoading(false)
         })
     },
-    [
-      keys.connection_id,
-      keys.db,
-      keys.length,
-      keys.name,
-      store.setting.setting.field_count
-    ]
+    [keys, store.setting.setting.field_count]
   )
 
   const getAllFields = React.useCallback(() => {
@@ -130,16 +138,14 @@ const ListValue: React.FC<{
           <Space>
             <LSet
               keys={keys}
-              index={index}
-              value={record.value}
-              onSuccess={(value, index) => {
-                setItems((prev) => {
-                  const newState = [...prev]
-                  if (newState.length >= index + 1) {
-                    newState[index] = value
-                  }
-                  return newState
-                })
+              trigger={<Button type="link" icon={<EditOutlined />} />}
+              defaultValue={{
+                field: index,
+                value: record.value,
+                name: keys.name
+              }}
+              onSuccess={() => {
+                onRefresh()
               }}
             />
           </Space>
@@ -151,44 +157,31 @@ const ListValue: React.FC<{
   )
   return (
     <ValueLayout
+      readonlyAction={
+        <>
+          <LIndex keys={keys} />
+          <LLen keys={keys} />
+          <LPos keys={keys} />
+          <LRange keys={keys} />
+        </>
+      }
       actions={
         <>
-          <LInsert
-            keys={keys}
-            onSuccess={() => {
-              onRefresh()
-            }}
-          />
-          <LTrim
-            keys={keys}
-            onSuccess={() => {
-              onRefresh()
-            }}
-          />
-          <LPush
-            keys={keys}
-            onSuccess={() => {
-              onRefresh()
-            }}
-          />
-          <LPop
-            keys={keys}
-            onSuccess={() => {
-              onRefresh()
-            }}
-          />
-          <RPush
-            keys={keys}
-            onSuccess={() => {
-              onRefresh()
-            }}
-          />
-          <RPop
-            keys={keys}
-            onSuccess={() => {
-              onRefresh()
-            }}
-          ></RPop>
+          <BLMove keys={keys} onSuccess={onRefresh} />
+          <BLMPop keys={keys} onSuccess={onRefresh} />
+          <BLPop keys={keys} onSuccess={onRefresh} />
+          <BRPop keys={keys} onSuccess={onRefresh} />
+          <BRPopLPush keys={keys} onSuccess={onRefresh} />
+          <LInsert keys={keys} onSuccess={onRefresh} />
+          <LMove keys={keys} onSuccess={onRefresh} />
+          <LMPop keys={keys} onSuccess={onRefresh} />
+          <LPop keys={keys} onSuccess={onRefresh} />
+          <LPush keys={keys} onSuccess={onRefresh} />
+          <LPushX keys={keys} onSuccess={onRefresh} />
+          <LRem keys={keys} onSuccess={onRefresh} />
+          <LTrim keys={keys} onSuccess={onRefresh} />
+          <RPush keys={keys} onSuccess={onRefresh} />
+          <RPop keys={keys} onSuccess={onRefresh} />
         </>
       }
     >

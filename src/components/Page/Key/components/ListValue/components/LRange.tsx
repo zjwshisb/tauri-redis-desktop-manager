@@ -3,23 +3,21 @@ import React from 'react'
 import request from '@/utils/request'
 import { Button, Form, Input, InputNumber } from 'antd'
 
-const LPop: React.FC<{
+const LRange: React.FC<{
   keys: APP.ListKey
-  onSuccess: () => void
-}> = ({ keys, onSuccess }) => {
+}> = ({ keys }) => {
   return (
     <ModalQueryForm
-      title="LPOP"
+      title="LRANGE"
       width={400}
-      afterQueryClose={onSuccess}
       defaultValue={{
         name: keys.name
       }}
-      documentUrl="https://redis.io/commands/lpop/"
-      trigger={<Button type="primary">LPOP</Button>}
+      documentUrl="https://redis.io/commands/lrange/"
+      trigger={<Button type="primary">LRANGE</Button>}
       onQuery={async (v) => {
         const res = await request(
-          'list/lpop',
+          'list/lrange',
           keys.connection_id,
           {
             db: keys.db,
@@ -32,13 +30,16 @@ const LPop: React.FC<{
         return res.data
       }}
     >
-      <Form.Item label={'Key'} name={'name'} rules={[{ required: true }]}>
+      <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
         <Input />
       </Form.Item>
-      <Form.Item label={'Count'} name={'value'}>
-        <InputNumber min={0} className="!w-full" />
+      <Form.Item name={'start'} label={'Start'} rules={[{ required: true }]}>
+        <InputNumber />
+      </Form.Item>
+      <Form.Item name={'end'} label={'Stop'} rules={[{ required: true }]}>
+        <InputNumber />
       </Form.Item>
     </ModalQueryForm>
   )
 }
-export default LPop
+export default LRange

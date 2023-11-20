@@ -1,25 +1,24 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, Input, InputNumber } from 'antd'
+import { Button, Form, Input } from 'antd'
 
-const LPop: React.FC<{
+const LLen: React.FC<{
   keys: APP.ListKey
-  onSuccess: () => void
-}> = ({ keys, onSuccess }) => {
+}> = ({ keys }) => {
   return (
     <ModalQueryForm
-      title="LPOP"
+      title="LLEN"
       width={400}
-      afterQueryClose={onSuccess}
+      queryWithOpen
       defaultValue={{
         name: keys.name
       }}
-      documentUrl="https://redis.io/commands/lpop/"
-      trigger={<Button type="primary">LPOP</Button>}
+      documentUrl="https://redis.io/commands/llen/"
+      trigger={<Button type="primary">LLEN</Button>}
       onQuery={async (v) => {
         const res = await request(
-          'list/lpop',
+          'list/llen',
           keys.connection_id,
           {
             db: keys.db,
@@ -32,13 +31,10 @@ const LPop: React.FC<{
         return res.data
       }}
     >
-      <Form.Item label={'Key'} name={'name'} rules={[{ required: true }]}>
+      <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
         <Input />
-      </Form.Item>
-      <Form.Item label={'Count'} name={'value'}>
-        <InputNumber min={0} className="!w-full" />
       </Form.Item>
     </ModalQueryForm>
   )
 }
-export default LPop
+export default LLen

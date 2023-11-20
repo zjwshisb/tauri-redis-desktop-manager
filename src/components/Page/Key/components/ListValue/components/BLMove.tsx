@@ -1,49 +1,62 @@
-import { Form, Input, Button, Radio } from 'antd'
+import { Form, Input, Button, Radio, InputNumber } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import FieldInput from '@/components/FieldInput'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
 
-const LInsert: React.FC<{
+const BLMove: React.FC<{
   keys: APP.ListKey
   onSuccess: () => void
 }> = (props) => {
   const connection = React.useContext(connectionContext)
+
   return (
-    <VersionAccess connection={connection} version="2.2.0">
+    <VersionAccess version="6.2.0" connection={connection}>
       <ModalForm
-        width={400}
-        documentUrl="https://redis.io/commands/linsert/"
+        width={500}
+        documentUrl="https://redis.io/commands/blmove/"
         defaultValue={{
-          name: props.keys.name
+          source: props.keys.name
         }}
-        trigger={<Button type="primary">LINSERT</Button>}
+        trigger={<Button type="primary">BLMOVE</Button>}
         onSubmit={async (v) => {
-          await request<number>('list/linsert', props.keys.connection_id, {
+          await request<number>('list/blmove', props.keys.connection_id, {
             db: props.keys.db,
             ...v
           })
           props.onSuccess()
         }}
-        title={'LINSERT'}
+        title={'BLMOVE'}
       >
         <Form.Item
-          name={'name'}
-          label={'Key'}
+          name={'source'}
+          label={'Source'}
           required
           rules={[{ required: true }]}
         >
           <Input></Input>
         </Form.Item>
         <Form.Item
-          name={'pivot'}
-          label={'Pivot'}
+          name={'destination'}
+          label={'Destination'}
           required
           rules={[{ required: true }]}
         >
           <Input></Input>
+        </Form.Item>
+        <Form.Item
+          name={'wherefrom'}
+          label={'Wherefrom'}
+          rules={[{ required: true }]}
+        >
+          <Radio.Group
+            optionType="button"
+            options={[
+              { label: 'LEFT', value: 'LEFT' },
+              { label: 'RIGHT', value: 'RIGHT' }
+            ]}
+          ></Radio.Group>
         </Form.Item>
         <Form.Item
           name={'whereto'}
@@ -53,21 +66,20 @@ const LInsert: React.FC<{
           <Radio.Group
             optionType="button"
             options={[
-              { label: 'BEFORE', value: 'BEFORE' },
-              { label: 'AFTER', value: 'AFTER' }
+              { label: 'LEFT', value: 'LEFT' },
+              { label: 'RIGHT', value: 'RIGHT' }
             ]}
           ></Radio.Group>
         </Form.Item>
         <Form.Item
-          name={'value'}
-          label={'Value'}
-          required
+          name={'timeout'}
+          label="Timeout"
           rules={[{ required: true }]}
         >
-          <FieldInput />
+          <InputNumber min={0} />
         </Form.Item>
       </ModalForm>
     </VersionAccess>
   )
 }
-export default LInsert
+export default BLMove

@@ -45,3 +45,28 @@ Those command which be checked are supported  at  GUI
 - [X] SSCAN
 - [X] SUNION
 - [X] SUNIONSTORE
+
+## LIST
+
+- [X] BLMOVE
+- [X] BLMPOP
+- [X] BLPOP
+- [X] BRPOP
+- [X] BRPOPLPUSH
+- [X] LINDEX
+- [X] LINSERT
+- [X] LLEN
+- [X] LMOVE
+- [X] LMPOP
+- [X] LOP
+- [X] LPOS
+- [X] LPUSH
+- [ ] LPUSHX
+- [ ] LRANGE
+- [ ] LREM
+- [ ] LSET
+- [ ] LTRIM
+- [ ] RPOP
+- [ ] RPOPLPUSH
+- [ ] RPUSH
+- [ ] RPUSHX
