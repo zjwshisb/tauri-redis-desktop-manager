@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::connection::CValue;
 use crate::err::CusError;
-use crate::request::{CommonValueArgs, ItemScanArgs, SingleValueArgs};
+use crate::request::{CommonValueArgs, FieldValueArgs, ItemScanArgs, NameArgs, SingleValueArgs};
 use crate::{connection::Manager, response::ScanLikeResult};
 
 pub async fn sscan<'r>(
@@ -51,7 +51,7 @@ pub async fn srem<'r>(
     cid: u32,
     manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
-    let args: CommonValueArgs = serde_json::from_str(payload.as_str())?;
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
     let value: i64 = manager
         .execute(
             cid,
@@ -61,7 +61,7 @@ pub async fn srem<'r>(
         .await?;
     match value {
         0 => {
-            return Err(CusError::build("Value not exists in Set"));
+            return Err(CusError::build("Member not exists in Set"));
         }
         _ => {
             return Ok(value);
@@ -153,6 +153,107 @@ pub async fn sis_member<'r>(
         .execute(
             cid,
             cmd("SISMEMBER").arg(args.name).arg(args.value),
+            args.db,
+        )
+        .await
+}
+
+pub async fn sm_is_member<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
+    manager
+        .execute(
+            cid,
+            cmd("SMISMEMBER").arg(args.name).arg(args.value),
+            args.db,
+        )
+        .await
+}
+
+pub async fn smembers<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: NameArgs = serde_json::from_str(payload.as_str())?;
+    manager
+        .execute(cid, cmd("SMEMBERS").arg(args.name), args.db)
+        .await
+}
+
+pub async fn smove<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<i64, CusError> {
+    let args: FieldValueArgs = serde_json::from_str(payload.as_str())?;
+    let v: i64 = manager
+        .execute(
+            cid,
+            cmd("SMOVE").arg(args.name).arg(args.field).arg(args.value),
+            args.db,
+        )
+        .await?;
+    match v {
+        0 => {
+            return Err(CusError::build(
+                "element is not a member of source and no operation was performed",
+            ))
+        }
+        i => Ok(i),
+    }
+}
+
+pub async fn spop<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<Option<i64>> = serde_json::from_str(payload.as_str())?;
+    manager
+        .execute(cid, cmd("SPOP").arg(args.name).arg(args.value), args.db)
+        .await
+}
+
+pub async fn srand_member<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<Option<i64>> = serde_json::from_str(payload.as_str())?;
+    manager
+        .execute(
+            cid,
+            cmd("SRANDMEMBER").arg(args.name).arg(args.value),
+            args.db,
+        )
+        .await
+}
+
+pub async fn sunion<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: SingleValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
+    manager
+        .execute(cid, cmd("SUNION").arg(args.value), args.db)
+        .await
+}
+
+pub async fn sunion_store<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<i64, CusError> {
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
+    manager
+        .execute(
+            cid,
+            cmd("SUNIONSTORE").arg(args.name).arg(args.value),
             args.db,
         )
         .await

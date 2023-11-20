@@ -10,6 +10,7 @@ const ButtonAction: React.FC<
     onSubmit: () => Promise<any>
     showConfirm?: boolean
     documentUrl?: string
+    title?: string
   }
 > = (props) => {
   const [loading, setLoading] = React.useState(false)
@@ -42,7 +43,7 @@ const ButtonAction: React.FC<
       onClick={() => {
         if (showConfirm) {
           modal.confirm({
-            title: t('Notice'),
+            title: props.title,
             content: (
               <div>
                 <span>{t('Are you sure do this action?')}</span>

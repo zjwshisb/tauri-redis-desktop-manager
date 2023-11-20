@@ -36,12 +36,12 @@ Those command which be checked are supported  at  GUI
 - [X] SINTERCARD
 - [X] SINTERSTORE
 - [X] SISMEMBER
-- [ ] SMEMBERS
-- [ ] SMISMEMBER
-- [ ] SMOVE
-- [ ] SPOP
-- [ ] SRANDMEMBER
-- [ ] SREM
-- [ ] SSCAN
-- [ ] SUNION
-- [ ] SUNIONSTORE
+- [X] SMEMBERS
+- [X] SMISMEMBER
+- [X] SMOVE
+- [X] SPOP
+- [X] SRANDMEMBER
+- [X] SREM
+- [X] SSCAN
+- [X] SUNION
+- [X] SUNIONSTORE

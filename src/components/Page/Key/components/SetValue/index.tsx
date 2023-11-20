@@ -1,5 +1,5 @@
 import React from 'react'
-import { Input, Space } from 'antd'
+import { Button, Input, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import SAdd from './components/SAdd'
 import SRem from './components/SRem'
@@ -18,6 +18,14 @@ import SInter from './components/SInter'
 import SInterCard from './components/SInterCard'
 import SInterStore from './components/SInterStore'
 import SIsMember from './components/SIsmember'
+import SMembers from './components/SMembers'
+import SMIsMember from './components/SMIsMember'
+import SMove from './components/SMove'
+import { DeleteOutlined, ScissorOutlined } from '@ant-design/icons'
+import SPop from './components/SPop'
+import SRandMember from './components/SRandMember'
+import SUnion from './components/SUnion'
+import SUnionStore from './components/SUnionStore'
 
 const SetValue: React.FC<{
   keys: APP.SetKey
@@ -81,12 +89,25 @@ const SetValue: React.FC<{
         return (
           <Space>
             <SRem
+              trigger={<Button type="link" icon={<DeleteOutlined />}></Button>}
               keys={keys}
-              value={record.value}
+              defaultValue={{
+                value: [record.value]
+              }}
               onSuccess={() => {
                 onRefresh()
               }}
             ></SRem>
+
+            <SMove
+              onSuccess={onRefresh}
+              defaultValue={{
+                name: keys.name,
+                value: record.value
+              }}
+              keys={keys}
+              trigger={<Button type="link" icon={<ScissorOutlined />}></Button>}
+            ></SMove>
           </Space>
         )
       }
@@ -102,6 +123,10 @@ const SetValue: React.FC<{
           <SInter keys={keys} />
           <SInterCard keys={keys} />
           <SIsMember keys={keys} />
+          <SMIsMember keys={keys} />
+          <SMembers keys={keys} />
+          <SRandMember keys={keys} />
+          <SUnion keys={keys} />
         </>
       }
       actions={
@@ -109,6 +134,22 @@ const SetValue: React.FC<{
           <SAdd keys={keys} onSuccess={onRefresh}></SAdd>
           <SDiffStore keys={keys} />
           <SInterStore keys={keys} />
+          <SMove
+            onSuccess={onRefresh}
+            defaultValue={{
+              name: keys.name
+            }}
+            keys={keys}
+            trigger={<Button type="primary">SMOVE</Button>}
+          ></SMove>
+          <SPop keys={keys} onSuccess={onRefresh}></SPop>
+          <SRem
+            trigger={<Button type="primary">SREM</Button>}
+            keys={keys}
+            onSuccess={onRefresh}
+            defaultValue={{ value: [undefined] }}
+          />
+          <SUnionStore keys={keys} />
         </>
       }
     >

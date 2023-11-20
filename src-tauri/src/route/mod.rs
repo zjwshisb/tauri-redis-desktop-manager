@@ -94,6 +94,13 @@ pub async fn dispatch<'r>(
         "set/sintercard" => Response::new(set::sinter_card(payload, cid, manager).await?),
         "set/sinterstore" => Response::new(set::sinter_store(payload, cid, manager).await?),
         "set/sismember" => Response::new(set::sis_member(payload, cid, manager).await?),
+        "set/smismember" => Response::new(set::sm_is_member(payload, cid, manager).await?),
+        "set/smembers" => Response::new(set::smembers(payload, cid, manager).await?),
+        "set/smove" => Response::new(set::smove(payload, cid, manager).await?),
+        "set/spop" => Response::new(set::spop(payload, cid, manager).await?),
+        "set/srandmember" => Response::new(set::srand_member(payload, cid, manager).await?),
+        "set/sunion" => Response::new(set::sunion(payload, cid, manager).await?),
+        "set/sunionstore" => Response::new(set::sunion_store(payload, cid, manager).await?),
 
         "string/set" => Response::new(string::set(payload, cid, manager).await?),
         "string/decrby" => Response::new(string::decrby(payload, cid, manager).await?),
