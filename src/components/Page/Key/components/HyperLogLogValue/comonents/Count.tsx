@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Button, Form, Input } from 'antd'
 import request from '@/utils/request'
-import FormListItem from '@/components/FormListItem'
+import FormListItem from '@/components/Form/FormListItem'
 import { useTranslation } from 'react-i18next'
 import ModalQueryForm from '@/components/ModalQueryForm'
 

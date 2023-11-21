@@ -147,7 +147,7 @@ const SetValue: React.FC<{
             trigger={<Button type="primary">SREM</Button>}
             keys={keys}
             onSuccess={onRefresh}
-            defaultValue={{ value: [undefined] }}
+            defaultValue={{ value: [undefined], name: keys.name }}
           />
           <SUnionStore keys={keys} />
         </>

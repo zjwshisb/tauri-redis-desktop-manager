@@ -1,7 +1,9 @@
-import { Form, InputNumber, Button } from 'antd'
+import { Form, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
+import CusInput from '@/components/CusInput'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const LTrim: React.FC<{
   keys: APP.ListKey
@@ -11,10 +13,12 @@ const LTrim: React.FC<{
     <ModalForm
       width={400}
       documentUrl="https://redis.io/commands/ltrim/"
+      defaultValue={{
+        name: props.keys.name
+      }}
       trigger={<Button type="primary">LTRIM</Button>}
       onSubmit={async (v) => {
         await request<number>('list/ltrim', props.keys.connection_id, {
-          name: props.keys.name,
           db: props.keys.db,
           ...v
         })
@@ -22,26 +26,28 @@ const LTrim: React.FC<{
       }}
       title={'LTRIM'}
     >
+      <Form.Item name={'name'} label="Key" rules={[{ required: true }]}>
+        <CusInput />
+      </Form.Item>
       <Form.Item
         name={'start'}
         label={'Start'}
         required
         rules={[{ required: true }]}
       >
-        <InputNumber min={0} precision={0} className="!w-full"></InputNumber>
+        <CusInputNumber min={0} precision={0} />
       </Form.Item>
       <Form.Item
         name={'end'}
-        label={'End'}
+        label={'Stop'}
         required
         rules={[{ required: true }]}
       >
-        <InputNumber
+        <CusInputNumber
           min={0}
-          className="!w-full"
           max={props.keys.length - 1}
           precision={0}
-        ></InputNumber>
+        ></CusInputNumber>
       </Form.Item>
     </ModalForm>
   )

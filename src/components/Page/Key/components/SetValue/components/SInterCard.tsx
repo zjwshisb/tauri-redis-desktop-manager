@@ -1,10 +1,12 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, Input, InputNumber } from 'antd'
-import FormListItem from '@/components/FormListItem'
+import { Button } from 'antd'
+import FormListItem from '@/components/Form/FormListItem'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 const SInterCard: React.FC<{
   keys: APP.SetKey
 }> = ({ keys }) => {
@@ -35,34 +37,16 @@ const SInterCard: React.FC<{
           return res.data
         }}
       >
-        <Form.Item
-          name={'numkeys'}
-          label={'numkeys'}
-          rules={[{ required: true }]}
-        >
-          <InputNumber min={1} />
-        </Form.Item>
+        <FormInputNumberItem name={'numkeys'} label={'numkeys'} required />
         <FormListItem
           name="keys"
-          itemProps={{
-            label: 'Keys',
-            required: true
-          }}
-          renderItem={({ name, ...restField }) => {
-            return (
-              <Form.Item
-                {...restField}
-                name={[name]}
-                rules={[{ required: true }]}
-              >
-                <Input />
-              </Form.Item>
-            )
+          label="Keys"
+          required
+          renderItem={(f) => {
+            return <FormInputItem {...f} required />
           }}
         ></FormListItem>
-        <Form.Item name={'limit'} label={'limit'}>
-          <InputNumber />
-        </Form.Item>
+        <FormInputNumberItem name={'limit'} label={'limit'} />
       </ModalQueryForm>
     </VersionAccess>
   )

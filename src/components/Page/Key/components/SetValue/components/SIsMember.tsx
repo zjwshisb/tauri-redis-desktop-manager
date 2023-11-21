@@ -1,8 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form } from 'antd'
-import FieldInput from '@/components/FieldInput'
+import { Button } from 'antd'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
 
 const SIsMember: React.FC<{
   keys: APP.SetKey
@@ -12,13 +13,15 @@ const SIsMember: React.FC<{
       title="SISMEMBER"
       width={400}
       documentUrl="https://redis.io/commands/sismember/"
+      defaultValue={{
+        name: keys.name
+      }}
       trigger={<Button type="primary">SISMEMBER</Button>}
       onQuery={async (v) => {
         const res = await request(
           'set/sismember',
           keys.connection_id,
           {
-            name: keys.name,
             db: keys.db,
             ...v
           },
@@ -29,9 +32,8 @@ const SIsMember: React.FC<{
         return res.data
       }}
     >
-      <Form.Item name={'value'} label={'item'} rules={[{ required: true }]}>
-        <FieldInput />
-      </Form.Item>
+      <FormInputItem name={'name'} label={'Key'} required></FormInputItem>
+      <FormInputJsonItem name={'value'} label={'Item'} required />
     </ModalQueryForm>
   )
 }

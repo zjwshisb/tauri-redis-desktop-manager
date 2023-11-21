@@ -1,15 +1,14 @@
-import { Form, Button, Input } from 'antd'
+import { Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
-import FormListItem from '@/components/FormListItem'
-import { useTranslation } from 'react-i18next'
+import FormListItem from '@/components/Form/FormListItem'
+
+import FormInputItem from '@/components/Form/FormInputItem'
 
 const SDiffStore: React.FC<{
   keys: APP.SetKey
 }> = ({ keys }) => {
-  const { t } = useTranslation()
-
   return (
     <ModalForm
       documentUrl="https://redis.io/commands/sdiffstore/"
@@ -25,29 +24,13 @@ const SDiffStore: React.FC<{
       }}
       title={'SDIFFSTORE'}
     >
-      <Form.Item
-        label={t('Destination')}
-        name={'name'}
-        rules={[{ required: true }]}
-      >
-        <Input />
-      </Form.Item>
+      <FormInputItem label={'Destination'} name={'name'} required />
       <FormListItem
-        itemProps={{
-          label: t('Keys'),
-          required: true
-        }}
+        label={'Keys'}
+        required
         name="value"
         renderItem={(field) => {
-          return (
-            <Form.Item
-              name={[field.name]}
-              required
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          )
+          return <FormInputItem {...field} required />
         }}
       ></FormListItem>
     </ModalForm>

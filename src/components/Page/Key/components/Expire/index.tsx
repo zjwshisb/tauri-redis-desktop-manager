@@ -1,8 +1,9 @@
-import { Form, InputNumber } from 'antd'
+import { Form } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const Expire: React.FC<{
   keys: APP.Key
@@ -34,7 +35,7 @@ const Expire: React.FC<{
         label={'TTL'}
         tooltip={t('-1 mean PERSIST the key')}
       >
-        <InputNumber min={-1} className="!w-full"></InputNumber>
+        <CusInputNumber min={-1}></CusInputNumber>
       </Form.Item>
     </ModalForm>
   )

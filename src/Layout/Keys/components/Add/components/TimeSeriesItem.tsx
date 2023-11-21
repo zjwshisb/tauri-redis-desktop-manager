@@ -1,8 +1,10 @@
 import React from 'react'
 
-import { Form, InputNumber, Row, Col, Input, Select } from 'antd'
+import { Form, Row, Col, Select } from 'antd'
 import { useTranslation } from 'react-i18next'
-import FormListItem from '@/components/FormListItem'
+import FormListItem from '@/components/Form/FormListItem'
+import CusInputNumber from '@/components/CusInputNumber'
+import CusInput from '@/components/CusInput'
 
 const TimeSeriesItem: React.FC<{
   type: 'alter' | 'create'
@@ -19,11 +21,7 @@ const TimeSeriesItem: React.FC<{
         TS.DECRBY calls with this key.When set to 0, samples never expire. When not specified, the option is set to the global
         RETENTION_POLICY configuration of the database, which by default is 0."
       >
-        <InputNumber
-          min={0}
-          className="!w-full"
-          placeholder={t('Please Select').toString()}
-        ></InputNumber>
+        <CusInputNumber min={0} />
       </Form.Item>
       {type === 'create' && (
         <Form.Item
@@ -46,11 +44,7 @@ const TimeSeriesItem: React.FC<{
         label="CHUNK_SIZE(size)"
         tooltip="is initial allocation size, in bytes, for the data part of each new chunk. Actual chunks may consume more memory. Changing chunkSize (using TS.ALTER) does not affect existing chunks."
       >
-        <InputNumber
-          min={0}
-          className="!w-full"
-          placeholder={t('Please Enter').toString()}
-        />
+        <CusInputNumber min={0} />
       </Form.Item>
       <Form.Item
         name="policy"
@@ -86,7 +80,7 @@ const TimeSeriesItem: React.FC<{
                   name={[name, 'field']}
                   rules={[{ required: true }]}
                 >
-                  <Input placeholder={t('Please Enter').toString()} />
+                  <CusInput />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -95,7 +89,7 @@ const TimeSeriesItem: React.FC<{
                   name={[name, 'value']}
                   rules={[{ required: true }]}
                 >
-                  <Input placeholder={t('Please Enter').toString()} />
+                  <CusInput />
                 </Form.Item>
               </Col>
             </Row>

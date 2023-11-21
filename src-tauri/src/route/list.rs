@@ -389,6 +389,44 @@ pub async fn ltrim<'r>(
         .await
 }
 
+pub async fn rpop<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<String, CusError> {
+    let args: CommonValueArgs<Option<i64>> = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("RPOP").arg(&args.name).arg(args.value),
+            args.db,
+        )
+        .await
+}
+
+pub async fn rpop_lpush<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: MoveArgs<i64> = serde_json::from_str(&payload)?;
+    let v: Value = manager
+        .execute(
+            cid,
+            redis::cmd("RPOPLPUSH")
+                .arg(args.source)
+                .arg(args.destination),
+            args.db,
+        )
+        .await?;
+    match v {
+        Value::Nil => {
+            return Err(CusError::build("The source list is empty."));
+        }
+        _ => return Ok(CValue::from_redis_value(&v)?),
+    }
+}
+
 pub async fn rpush<'r>(
     payload: String,
     cid: u32,
@@ -408,17 +446,17 @@ pub async fn rpush<'r>(
     }
 }
 
-pub async fn rpop<'r>(
+pub async fn rpushx<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<String, CusError> {
-    let args: request::NameArgs = serde_json::from_str(&payload)?;
-    let value = manager
-        .execute(cid, redis::cmd("rpop").arg(&args.name), args.db)
-        .await?;
-    match value {
-        Value::Nil => return Err(CusError::key_not_exists()),
-        _ => return Ok(String::from("OK")),
-    }
+) -> Result<i64, CusError> {
+    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("RPUSHX").arg(&args.name).arg(&args.value),
+            args.db,
+        )
+        .await
 }

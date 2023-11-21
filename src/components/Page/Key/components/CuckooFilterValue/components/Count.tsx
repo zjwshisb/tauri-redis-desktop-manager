@@ -2,8 +2,7 @@ import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
 import { Button, Form } from 'antd'
-import FieldInput from '@/components/FieldInput'
-import { m } from '@tauri-apps/api/dialog-20ff401c'
+import FieldInput from '@/components/InputJson'
 
 const Count: React.FC<{
   keys: APP.CuckooFilterKey

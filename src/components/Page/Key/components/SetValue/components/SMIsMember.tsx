@@ -1,9 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form } from 'antd'
-import FieldInput from '@/components/FieldInput'
-import FormListItem from '@/components/FormListItem'
+import { Button } from 'antd'
+import FormListItem from '@/components/Form/FormListItem'
+import FormInputItem from '@/components/Form/FormInputItem'
 
 const SMIsMember: React.FC<{
   keys: APP.SetKey
@@ -13,7 +13,8 @@ const SMIsMember: React.FC<{
       title="SMISMEMBER"
       width={400}
       defaultValue={{
-        value: [undefined]
+        value: [undefined],
+        name: keys.name
       }}
       documentUrl="https://redis.io/commands/smismember/"
       trigger={<Button type="primary">SMISMEMBER</Button>}
@@ -22,7 +23,6 @@ const SMIsMember: React.FC<{
           'set/smismember',
           keys.connection_id,
           {
-            name: keys.name,
             db: keys.db,
             ...v
           },
@@ -33,22 +33,13 @@ const SMIsMember: React.FC<{
         return res.data
       }}
     >
+      <FormInputItem name={'name'} label={'Key'} required />
       <FormListItem
-        itemProps={{
-          label: 'Member',
-          required: true
-        }}
+        required
+        label="Members"
         name="value"
         renderItem={(field) => {
-          return (
-            <Form.Item
-              name={[field.name]}
-              required
-              rules={[{ required: true }]}
-            >
-              <FieldInput />
-            </Form.Item>
-          )
+          return <FormInputItem required {...field} />
         }}
       ></FormListItem>
     </ModalQueryForm>

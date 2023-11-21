@@ -1,9 +1,9 @@
-import { Form } from 'antd'
+import { Form, Input } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
-import FieldInput from '@/components/FieldInput'
-import FormListItem from '@/components/FormListItem'
+import FormListItem from '@/components/Form/FormListItem'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
 
 const SRem: React.FC<{
   keys: APP.SetKey
@@ -27,22 +27,15 @@ const SRem: React.FC<{
       }}
       title={'SREM'}
     >
+      <Form.Item name={'name'} label="Key" rules={[{ required: true }]}>
+        <Input />
+      </Form.Item>
       <FormListItem
-        itemProps={{
-          label: 'Members',
-          required: true
-        }}
+        label="Members"
+        required
         name="value"
         renderItem={(field) => {
-          return (
-            <Form.Item
-              name={[field.name]}
-              required
-              rules={[{ required: true }]}
-            >
-              <FieldInput />
-            </Form.Item>
-          )
+          return <FormInputJsonItem {...field} required />
         }}
       ></FormListItem>
     </ModalForm>

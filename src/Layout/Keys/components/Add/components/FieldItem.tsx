@@ -1,8 +1,9 @@
-import { Form, Input, Row, Col } from 'antd'
+import { Form, Row, Col } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import FieldInput from '@/components/FieldInput'
-import FormListItem from '@/components/FormListItem'
+import FieldInput from '@/components/InputJson'
+import FormListItem from '@/components/Form/FormListItem'
+import CusInput from '@/components/CusInput'
 
 const FieldItem: React.FC = () => {
   const { t } = useTranslation()
@@ -20,7 +21,7 @@ const FieldItem: React.FC = () => {
                 label={t('Field Name')}
                 rules={[{ required: true }]}
               >
-                <Input placeholder={t('Field Name').toString()} />
+                <CusInput />
               </Form.Item>
             </Col>
             <Col span={12}>

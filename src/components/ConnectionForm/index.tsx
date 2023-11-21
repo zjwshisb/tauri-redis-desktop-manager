@@ -3,7 +3,6 @@ import {
   Form,
   Input,
   Modal,
-  InputNumber,
   Space,
   Checkbox,
   Col,
@@ -18,6 +17,22 @@ import { useTranslation } from 'react-i18next'
 import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
 import { open } from '@tauri-apps/api/dialog'
+import CusInput from '../CusInput'
+import CusInputNumber from '../CusInputNumber'
+import { type PasswordProps } from 'antd/es/input'
+
+const CusPasswordInput = (p: PasswordProps) => {
+  const { t } = useTranslation()
+  return (
+    <Input.Password
+      {...p}
+      allowClear
+      placeholder={t('Please Enter {{name}}', {
+        name: ''
+      }).toString()}
+    ></Input.Password>
+  )
+}
 
 const ConnectionForm: React.FC = () => {
   const [testLoading, setTestLoading] = React.useState(false)
@@ -176,24 +191,16 @@ const ConnectionForm: React.FC = () => {
               label={t('Host')}
               rules={[{ required: true, max: 512 }]}
             >
-              <Input
-                placeholder={t('Please Enter {{name}}', {
-                  name: 'Host'
-                }).toString()}
-              ></Input>
+              <CusInput />
             </Form.Item>
           </Col>
-          <Col>
+          <Col span={12}>
             <Form.Item
               name="port"
               label={t('Port')}
               rules={[{ required: true }]}
             >
-              <InputNumber
-                min={0}
-                max={65536}
-                className="!w-full"
-              ></InputNumber>
+              <CusInputNumber min={0} max={65536} />
             </Form.Item>
           </Col>
         </Row>
@@ -209,37 +216,19 @@ const ConnectionForm: React.FC = () => {
               label={t('Name')}
               tooltip={t('The name for Connection')}
             >
-              <Input
-                placeholder={t('Please Enter {{name}}', {
-                  name: t('Name')
-                }).toString()}
-              ></Input>
+              <CusInput />
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={20}>
           <Col span={12}>
             <Form.Item name="password" label={t('Password')}>
-              <Input.Password
-                onClick={(e) => {
-                  e.stopPropagation()
-                }}
-                placeholder={t('Please Enter {{name}}', {
-                  name: t('Password')
-                }).toString()}
-              ></Input.Password>
+              <CusPasswordInput />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item name="username" label={t('Username')}>
-              <Input
-                onClick={(e) => {
-                  e.stopPropagation()
-                }}
-                placeholder={t('Please Enter {{name}}', {
-                  name: t('Username')
-                }).toString()}
-              ></Input>
+              <CusInput />
             </Form.Item>
           </Col>
         </Row>
@@ -289,11 +278,7 @@ const ConnectionForm: React.FC = () => {
                     }
                   ]}
                 >
-                  <Input
-                    placeholder={t('Please Enter {{name}}', {
-                      name: t('Host')
-                    }).toString()}
-                  ></Input>
+                  <CusInput />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -307,13 +292,7 @@ const ConnectionForm: React.FC = () => {
                     }
                   ]}
                 >
-                  <InputNumber
-                    className="!w-full"
-                    max={99999}
-                    placeholder={t('Please Enter {{name}}', {
-                      name: t('Port')
-                    }).toString()}
-                  ></InputNumber>
+                  <CusInputNumber max={99999} />
                 </Form.Item>
               </Col>
             </Row>
@@ -329,11 +308,7 @@ const ConnectionForm: React.FC = () => {
                     }
                   ]}
                 >
-                  <Input
-                    placeholder={t('Please Enter {{name}}', {
-                      name: t('Username')
-                    }).toString()}
-                  ></Input>
+                  <CusInput />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -359,18 +334,14 @@ const ConnectionForm: React.FC = () => {
                     })
                   ]}
                 >
-                  <Input
-                    placeholder={t('Please Enter {{name}}', {
-                      name: t('Password')
-                    }).toString()}
-                  ></Input>
+                  <CusPasswordInput />
                 </Form.Item>
               </Col>
             </Row>
             <Row gutter={20}>
               <Col span={12}>
                 <Form.Item name="ssh_private_key" label={t('Private Key')}>
-                  <Input
+                  <CusInput
                     onClick={() => {
                       open({ multiple: false }).then((r) => {
                         form.setFieldValue('ssh_private_key', r)
@@ -378,18 +349,14 @@ const ConnectionForm: React.FC = () => {
                     }}
                     readOnly
                     placeholder={t('Please Select {{name}}', {
-                      name: t('Private Key')
+                      name: t(' ')
                     }).toString()}
-                  ></Input>
+                  ></CusInput>
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item name="ssh_passphrase" label={t('Passphrase')}>
-                  <Input
-                    placeholder={t('Please Enter {{name}}', {
-                      name: t('Passphrase')
-                    }).toString()}
-                  ></Input>
+                  <CusPasswordInput />
                 </Form.Item>
               </Col>
             </Row>

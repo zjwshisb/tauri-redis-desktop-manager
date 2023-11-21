@@ -4,7 +4,7 @@ import { Button, Form } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
-import FieldInput from '@/components/FieldInput'
+import FieldInput from '@/components/InputJson'
 
 const Add: React.FC<{
   keys: APP.CuckooFilterKey

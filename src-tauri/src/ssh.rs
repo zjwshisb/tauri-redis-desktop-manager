@@ -32,7 +32,6 @@ pub async fn create_tunnel<T: SshProxy>(t: &mut T) -> Result<Option<()>, CusErro
         if let Ok(ip_addr) = utils::string_to_ip(&config.host) {
             jump_host = HostAddress::IpAddr(ip_addr);
         }
-
         let mut auth: JumpHostAuthParams;
         let mut password = String::new();
         if let Some(p) = config.password {
@@ -62,7 +61,6 @@ pub async fn create_tunnel<T: SshProxy>(t: &mut T) -> Result<Option<()>, CusErro
                 passphrase,
             );
         }
-
         let mut target_host = HostAddress::HostName(Cow::Borrowed(&config.target_host));
         if let Ok(ip_addr) = utils::string_to_ip(&config.target_host) {
             target_host = HostAddress::IpAddr(ip_addr);

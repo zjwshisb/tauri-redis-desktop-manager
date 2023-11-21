@@ -1,10 +1,8 @@
-import { Checkbox, Col, Form, InputNumber, Row } from 'antd'
+import CusInputNumber from '@/components/CusInputNumber'
+import { Checkbox, Col, Form, Row } from 'antd'
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 
 const BloomFilterItem: React.FC = () => {
-  const { t } = useTranslation()
-
   return (
     <>
       <Row>
@@ -17,12 +15,7 @@ const BloomFilterItem: React.FC = () => {
             }
             rules={[{ required: true }]}
           >
-            <InputNumber
-              min={0}
-              max={1}
-              stringMode
-              placeholder={t('Please Enter').toString()}
-            />
+            <CusInputNumber min={0} max={1} stringMode />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -32,11 +25,7 @@ const BloomFilterItem: React.FC = () => {
             rules={[{ required: true }]}
             tooltip="The number of entries intended to be added to the filter. If your filter allows scaling, performance will begin to degrade after adding more items than this number. The actual degradation depends on how far the limit has been exceeded. Performance degrades linearly with the number of sub-filters."
           >
-            <InputNumber
-              min={1}
-              max={99999999}
-              placeholder={t('Please Enter').toString()}
-            />
+            <CusInputNumber min={1} max={99999999} />
           </Form.Item>
         </Col>
       </Row>
@@ -48,11 +37,7 @@ const BloomFilterItem: React.FC = () => {
             label={'Expansion'}
             tooltip="When capacity is reached, an additional sub-filter is created. The size of the new sub-filter is the size of the last sub-filter multiplied by expansion, specified as a positive integer."
           >
-            <InputNumber
-              min={1}
-              max={99999999}
-              placeholder={t('Please Enter').toString()}
-            />
+            <CusInputNumber min={1} max={99999999} />
           </Form.Item>
         </Col>
         <Col span={8}>

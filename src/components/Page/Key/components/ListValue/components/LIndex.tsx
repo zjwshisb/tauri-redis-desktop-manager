@@ -1,7 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, Input, InputNumber } from 'antd'
+import { Button, Form } from 'antd'
+import CusInput from '@/components/CusInput'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const LIndex: React.FC<{
   keys: APP.ListKey
@@ -31,10 +33,10 @@ const LIndex: React.FC<{
       }}
     >
       <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
-        <Input />
+        <CusInput />
       </Form.Item>
       <Form.Item name={'value'} label={'Index'} rules={[{ required: true }]}>
-        <InputNumber />
+        <CusInputNumber />
       </Form.Item>
     </ModalQueryForm>
   )

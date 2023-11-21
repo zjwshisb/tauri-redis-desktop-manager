@@ -78,12 +78,13 @@ pub async fn dispatch<'r>(
         "list/lpushx" => Response::new(list::lpush_x(payload, cid, manager).await?),
         "list/lrange" => Response::new(list::lrange(payload, cid, manager).await?),
         "list/lrem" => Response::new(list::lrem(payload, cid, manager).await?),
-
         "list/lset" => Response::new(list::lset(payload, cid, manager).await?),
         "list/ltrim" => Response::new(list::ltrim(payload, cid, manager).await?),
         "list/lpop" => Response::new(list::lpop(payload, cid, manager).await?),
-        "list/rpush" => Response::new(list::rpush(payload, cid, manager).await?),
         "list/rpop" => Response::new(list::rpop(payload, cid, manager).await?),
+        "list/rpoplpush" => Response::new(list::rpop_lpush(payload, cid, manager).await?),
+        "list/rpush" => Response::new(list::rpush(payload, cid, manager).await?),
+        "list/rpushx" => Response::new(list::rpushx(payload, cid, manager).await?),
 
         "key/zset/zscan" => Response::new(zset::zscan(payload, cid, manager).await?),
         "key/zset/zrem" => Response::new(zset::zrem(payload, cid, manager).await?),

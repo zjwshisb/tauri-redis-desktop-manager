@@ -1,11 +1,12 @@
-import { Form, Button, Input } from 'antd'
+import { Form, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import FieldInput from '@/components/FieldInput'
+import FieldInput from '@/components/InputJson'
 import ModalForm from '@/components/ModalForm'
-import FormListItem from '@/components/FormListItem'
+import FormListItem from '@/components/Form/FormListItem'
 import connectionContext from '../../../context'
 import VersionAccess from '@/components/VersionAccess'
+import CusInput from '@/components/CusInput'
 
 const LPushX: React.FC<{
   keys: APP.ListKey
@@ -33,7 +34,7 @@ const LPushX: React.FC<{
         title={'LPUSHX'}
       >
         <Form.Item rules={[{ required: true }]} name={'name'} label={'Key'}>
-          <Input />
+          <CusInput />
         </Form.Item>
         <FormListItem
           name="value"

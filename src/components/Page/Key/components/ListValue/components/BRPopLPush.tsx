@@ -1,9 +1,11 @@
-import { Form, Input, Button, InputNumber } from 'antd'
+import { Form, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
+import CusInput from '@/components/CusInput'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const BRPopLPush: React.FC<{
   keys: APP.ListKey
@@ -35,7 +37,7 @@ const BRPopLPush: React.FC<{
           required
           rules={[{ required: true }]}
         >
-          <Input></Input>
+          <CusInput />
         </Form.Item>
         <Form.Item
           name={'destination'}
@@ -43,14 +45,14 @@ const BRPopLPush: React.FC<{
           required
           rules={[{ required: true }]}
         >
-          <Input></Input>
+          <CusInput />
         </Form.Item>
         <Form.Item
           name={'timeout'}
           label="Timeout"
           rules={[{ required: true }]}
         >
-          <InputNumber min={0} precision={0} />
+          <CusInputNumber min={0} precision={0} />
         </Form.Item>
       </ModalForm>
     </VersionAccess>

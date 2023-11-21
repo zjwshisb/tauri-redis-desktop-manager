@@ -1,9 +1,10 @@
-import { Form, Input, Button, Radio } from 'antd'
+import { Form, Button, Radio } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
+import CusInput from '@/components/CusInput'
 
 const LMove: React.FC<{
   keys: APP.ListKey
@@ -35,7 +36,7 @@ const LMove: React.FC<{
           required
           rules={[{ required: true }]}
         >
-          <Input></Input>
+          <CusInput />
         </Form.Item>
         <Form.Item
           name={'destination'}
@@ -43,7 +44,7 @@ const LMove: React.FC<{
           required
           rules={[{ required: true }]}
         >
-          <Input></Input>
+          <CusInput />
         </Form.Item>
         <Form.Item
           name={'wherefrom'}

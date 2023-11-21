@@ -1,8 +1,9 @@
-import { Form, Row, Col, InputNumber } from 'antd'
+import { Form, Row, Col } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import FieldInput from '@/components/FieldInput'
-import FormListItem from '@/components/FormListItem'
+import FieldInput from '@/components/InputJson'
+import FormListItem from '@/components/Form/FormListItem'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const ScoreItem: React.FC = () => {
   const { t } = useTranslation()
@@ -33,11 +34,7 @@ const ScoreItem: React.FC = () => {
                 name={[name, 'value']}
                 rules={[{ required: true }]}
               >
-                <InputNumber
-                  placeholder={t('Please Enter').toString()}
-                  className="!w-full"
-                  stringMode
-                />
+                <CusInputNumber stringMode />
               </Form.Item>
             </Col>
           </Row>

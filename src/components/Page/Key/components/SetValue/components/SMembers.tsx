@@ -2,6 +2,7 @@ import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
 import { Button } from 'antd'
+import FormInputItem from '@/components/Form/FormInputItem'
 
 const SMembers: React.FC<{
   keys: APP.SetKey
@@ -11,6 +12,9 @@ const SMembers: React.FC<{
       title="SMEMBERS"
       width={400}
       documentUrl="https://redis.io/commands/smembers/"
+      defaultValue={{
+        name: keys.name
+      }}
       queryWithOpen
       trigger={<Button type="primary">SMEMBERS</Button>}
       onQuery={async (v) => {
@@ -18,8 +22,8 @@ const SMembers: React.FC<{
           'set/smembers',
           keys.connection_id,
           {
-            name: keys.name,
-            db: keys.db
+            db: keys.db,
+            ...v
           },
           {
             showNotice: false
@@ -27,7 +31,9 @@ const SMembers: React.FC<{
         )
         return res.data
       }}
-    ></ModalQueryForm>
+    >
+      <FormInputItem name={'name'} label="Key" />
+    </ModalQueryForm>
   )
 }
 export default SMembers

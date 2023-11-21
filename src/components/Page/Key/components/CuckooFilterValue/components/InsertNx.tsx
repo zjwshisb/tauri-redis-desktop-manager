@@ -3,8 +3,8 @@ import React from 'react'
 import { Button, Form } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
-import FormListItem from '@/components/FormListItem'
-import FieldInput from '@/components/FieldInput'
+import FormListItem from '@/components/Form/FormListItem'
+import FieldInput from '@/components/InputJson'
 import { useTranslation } from 'react-i18next'
 
 const InsertNx: React.FC<{

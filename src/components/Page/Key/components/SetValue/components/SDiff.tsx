@@ -1,8 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, Input } from 'antd'
-import FormListItem from '@/components/FormListItem'
+import { Button } from 'antd'
+import FormListItem from '@/components/Form/FormListItem'
+import FormInputItem from '@/components/Form/FormInputItem'
 
 const SDiff: React.FC<{
   keys: APP.SetKey
@@ -33,20 +34,10 @@ const SDiff: React.FC<{
     >
       <FormListItem
         name="value"
-        itemProps={{
-          label: 'Keys',
-          required: true
-        }}
-        renderItem={({ name, ...restField }) => {
-          return (
-            <Form.Item
-              {...restField}
-              name={[name]}
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          )
+        label="Keys"
+        required
+        renderItem={(p) => {
+          return <FormInputItem {...p} required />
         }}
       ></FormListItem>
     </ModalQueryForm>

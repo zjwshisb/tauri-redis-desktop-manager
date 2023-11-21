@@ -1,7 +1,9 @@
-import { Form, InputNumber, Button, Input } from 'antd'
+import { Form, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
+import CusInput from '@/components/CusInput'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const LRem: React.FC<{
   keys: APP.ListKey
@@ -25,13 +27,13 @@ const LRem: React.FC<{
       title={'LREM'}
     >
       <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
-        <Input />
+        <CusInput />
       </Form.Item>
       <Form.Item name={'value'} label={'Count'} rules={[{ required: true }]}>
-        <InputNumber className="!w-full" precision={0}></InputNumber>
+        <CusInputNumber precision={0} />
       </Form.Item>
       <Form.Item name={'field'} label={'Element'} rules={[{ required: true }]}>
-        <Input />
+        <CusInput />
       </Form.Item>
     </ModalForm>
   )

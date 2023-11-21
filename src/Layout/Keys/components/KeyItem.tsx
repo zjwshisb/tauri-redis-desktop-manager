@@ -11,7 +11,7 @@ import Highlighter from 'react-highlight-words'
 const KeyItem: React.FC<{
   name: string
   connection: APP.Connection
-  db: number
+  db?: number
 }> = ({ name, connection, db }) => {
   const store = useStore()
 

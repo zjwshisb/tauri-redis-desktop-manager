@@ -1,7 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, InputNumber } from 'antd'
+import { Button } from 'antd'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const SPop: React.FC<{
   keys: APP.SetKey
@@ -12,6 +14,9 @@ const SPop: React.FC<{
       title="SPOP"
       width={400}
       afterQueryClose={onSuccess}
+      defaultValue={{
+        name: keys.name
+      }}
       documentUrl="https://redis.io/commands/spop/"
       trigger={<Button type="primary">SPOP</Button>}
       onQuery={async (v) => {
@@ -19,7 +24,6 @@ const SPop: React.FC<{
           'set/spop',
           keys.connection_id,
           {
-            name: keys.name,
             db: keys.db,
             ...v
           },
@@ -30,9 +34,14 @@ const SPop: React.FC<{
         return res.data
       }}
     >
-      <Form.Item name={'value'} label={'Count'}>
-        <InputNumber min={1} className="!w-full" />
-      </Form.Item>
+      <FormInputItem name={'name'} label="Key" required />
+      <FormInputNumberItem
+        name={'value'}
+        label={'Count'}
+        inputProps={{
+          min: 1
+        }}
+      ></FormInputNumberItem>
     </ModalQueryForm>
   )
 }

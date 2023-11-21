@@ -3,7 +3,7 @@ import { Button, Form, InputNumber } from 'antd'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
-import FieldInput from '@/components/FieldInput'
+import FieldInput from '@/components/InputJson'
 
 const SetRange: React.FC<{
   keys: APP.StringKey

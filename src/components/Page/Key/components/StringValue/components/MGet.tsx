@@ -2,7 +2,7 @@ import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
 import { Button, Form, Input } from 'antd'
-import FormListItem from '@/components/FormListItem'
+import FormListItem from '@/components/Form/FormListItem'
 
 const MGet: React.FC<{
   keys: APP.StringKey

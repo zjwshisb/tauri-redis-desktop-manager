@@ -1,8 +1,10 @@
-import { Form, Input, InputNumber } from 'antd'
+import { Form } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import FieldInput from '@/components/FieldInput'
+import FieldInput from '@/components/InputJson'
 import ModalForm from '@/components/ModalForm'
+import CusInput from '@/components/CusInput'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const LSet: React.FC<{
   keys: APP.ListKey
@@ -25,10 +27,10 @@ const LSet: React.FC<{
       defaultValue={props.defaultValue}
     >
       <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
-        <Input></Input>
+        <CusInput />
       </Form.Item>
       <Form.Item name={'field'} label={'Index'} rules={[{ required: true }]}>
-        <InputNumber></InputNumber>
+        <CusInputNumber />
       </Form.Item>
       <Form.Item name={'value'} label={'Value'} rules={[{ required: true }]}>
         <FieldInput></FieldInput>

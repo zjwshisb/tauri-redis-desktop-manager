@@ -1,10 +1,13 @@
-import { Form, Input, Button, InputNumber } from 'antd'
+import { Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
-import FormListItem from '@/components/FormListItem'
+import FormListItem from '@/components/Form/FormListItem'
+
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const BRPop: React.FC<{
   keys: APP.ListKey
@@ -31,26 +34,19 @@ const BRPop: React.FC<{
         title={'BRPOP'}
       >
         <FormListItem
-          itemProps={{
-            label: 'keys',
-            required: true
-          }}
+          label="Keys"
           name="name"
+          required
           renderItem={(field) => {
-            return (
-              <Form.Item
-                name={[field.name]}
-                required
-                rules={[{ required: true }]}
-              >
-                <Input />
-              </Form.Item>
-            )
+            return <FormInputItem {...field} required />
           }}
         ></FormListItem>
-        <Form.Item name={'value'} label="Timeout" rules={[{ required: true }]}>
-          <InputNumber min={0} />
-        </Form.Item>
+        <FormInputNumberItem
+          name={'value'}
+          label="Timeout"
+          required
+          inputProps={{ min: 0 }}
+        />
       </ModalForm>
     </VersionAccess>
   )

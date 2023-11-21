@@ -1,9 +1,12 @@
-import { Form, Input, Button, Radio, InputNumber } from 'antd'
+import { Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormRadioItem from '@/components/Form/FormRadioItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const BLMove: React.FC<{
   keys: APP.ListKey
@@ -29,55 +32,37 @@ const BLMove: React.FC<{
         }}
         title={'BLMOVE'}
       >
-        <Form.Item
-          name={'source'}
-          label={'Source'}
-          required
-          rules={[{ required: true }]}
-        >
-          <Input></Input>
-        </Form.Item>
-        <Form.Item
-          name={'destination'}
-          label={'Destination'}
-          required
-          rules={[{ required: true }]}
-        >
-          <Input></Input>
-        </Form.Item>
-        <Form.Item
+        <FormInputItem name={'source'} label={'Source'} required />
+        <FormInputItem name={'destination'} label={'Destination'} required />
+        <FormRadioItem
+          inputProps={{
+            options: [
+              { label: 'LEFT', value: 'LEFT' },
+              { label: 'RIGHT', value: 'RIGHT' }
+            ]
+          }}
           name={'wherefrom'}
           label={'Wherefrom'}
-          rules={[{ required: true }]}
-        >
-          <Radio.Group
-            optionType="button"
-            options={[
-              { label: 'LEFT', value: 'LEFT' },
-              { label: 'RIGHT', value: 'RIGHT' }
-            ]}
-          ></Radio.Group>
-        </Form.Item>
-        <Form.Item
+          required
+        ></FormRadioItem>
+
+        <FormRadioItem
           name={'whereto'}
           label={'Whereto'}
-          rules={[{ required: true }]}
-        >
-          <Radio.Group
-            optionType="button"
-            options={[
+          required
+          inputProps={{
+            options: [
               { label: 'LEFT', value: 'LEFT' },
               { label: 'RIGHT', value: 'RIGHT' }
-            ]}
-          ></Radio.Group>
-        </Form.Item>
-        <Form.Item
+            ]
+          }}
+        ></FormRadioItem>
+        <FormInputNumberItem
+          inputProps={{ min: 0 }}
           name={'timeout'}
+          required
           label="Timeout"
-          rules={[{ required: true }]}
-        >
-          <InputNumber min={0} />
-        </Form.Item>
+        />
       </ModalForm>
     </VersionAccess>
   )

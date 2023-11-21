@@ -6,7 +6,7 @@ import lodash from 'lodash'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
-import FieldInput from '@/components/FieldInput'
+import FieldInput from '@/components/InputJson'
 import JsonView from '@/components/JsonView'
 
 const JsonValue: React.FC<{

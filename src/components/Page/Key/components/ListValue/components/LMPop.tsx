@@ -1,10 +1,12 @@
-import { Form, Input, Button, Radio, InputNumber } from 'antd'
+import { Form, Button, Radio } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
-import FormListItem from '@/components/FormListItem'
+import FormListItem from '@/components/Form/FormListItem'
+import CusInputNumber from '@/components/CusInputNumber'
+import CusInput from '@/components/CusInput'
 
 const LMPop: React.FC<{
   keys: APP.ListKey
@@ -36,7 +38,7 @@ const LMPop: React.FC<{
           required
           rules={[{ required: true }]}
         >
-          <InputNumber min={0} precision={0}></InputNumber>
+          <CusInputNumber min={0} precision={0} />
         </Form.Item>
         <FormListItem
           itemProps={{
@@ -51,7 +53,7 @@ const LMPop: React.FC<{
                 required
                 rules={[{ required: true }]}
               >
-                <Input />
+                <CusInput />
               </Form.Item>
             )
           }}
@@ -70,7 +72,7 @@ const LMPop: React.FC<{
           ></Radio.Group>
         </Form.Item>
         <Form.Item name={'count'} label="Count">
-          <InputNumber min={0} />
+          <CusInputNumber min={0} />
         </Form.Item>
       </ModalForm>
     </VersionAccess>

@@ -2,8 +2,9 @@ import { Form, Button, Input } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
-import FormListItem from '@/components/FormListItem'
+import FormListItem from '@/components/Form/FormListItem'
 import { useTranslation } from 'react-i18next'
+import FormInputItem from '@/components/Form/FormInputItem'
 
 const SUnionStore: React.FC<{
   keys: APP.SetKey
@@ -33,21 +34,11 @@ const SUnionStore: React.FC<{
         <Input />
       </Form.Item>
       <FormListItem
-        itemProps={{
-          label: t('Keys'),
-          required: true
-        }}
+        label="Keys"
+        required
         name="value"
         renderItem={(field) => {
-          return (
-            <Form.Item
-              name={[field.name]}
-              required
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          )
+          return <FormInputItem {...field} required />
         }}
       ></FormListItem>
     </ModalForm>

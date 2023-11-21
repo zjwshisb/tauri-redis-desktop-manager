@@ -1,8 +1,8 @@
-import { Form, Input } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
-import FieldInput from '@/components/FieldInput'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
 
 const SMove: React.FC<{
   keys: APP.SetKey
@@ -25,19 +25,9 @@ const SMove: React.FC<{
       }}
       title={'SMOVE'}
     >
-      <Form.Item name={'name'} label="Source" rules={[{ required: true }]}>
-        <Input />
-      </Form.Item>
-      <Form.Item
-        name={'field'}
-        label="Destination"
-        rules={[{ required: true }]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item name={'value'} label="Member" rules={[{ required: true }]}>
-        <FieldInput />
-      </Form.Item>
+      <FormInputItem name={'name'} label="Source" required />
+      <FormInputItem name={'field'} label="Destination" required />
+      <FormInputJsonItem name={'value'} label="Member" required />
     </ModalForm>
   )
 }

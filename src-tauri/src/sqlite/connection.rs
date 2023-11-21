@@ -37,7 +37,7 @@ impl connection::Connectable for Connection {
                 port = p
             }
             let mut username = String::new();
-            if let Some(u) = &self.username {
+            if let Some(u) = &self.ssh_username {
                 username = u.clone();
             }
             let ssh_p = ssh::SshParams {

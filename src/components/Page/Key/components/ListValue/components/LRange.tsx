@@ -1,7 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, Input, InputNumber } from 'antd'
+import { Button, Form } from 'antd'
+import CusInput from '@/components/CusInput'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const LRange: React.FC<{
   keys: APP.ListKey
@@ -31,13 +33,13 @@ const LRange: React.FC<{
       }}
     >
       <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
-        <Input />
+        <CusInput />
       </Form.Item>
       <Form.Item name={'start'} label={'Start'} rules={[{ required: true }]}>
-        <InputNumber />
+        <CusInputNumber />
       </Form.Item>
       <Form.Item name={'end'} label={'Stop'} rules={[{ required: true }]}>
-        <InputNumber />
+        <CusInputNumber />
       </Form.Item>
     </ModalQueryForm>
   )

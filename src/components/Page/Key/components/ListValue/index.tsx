@@ -28,10 +28,12 @@ import LLen from './components/LLen'
 import LMove from './components/LMove'
 import LMPop from './components/LMPop'
 import LPos from './components/LPos'
-import LPushX from './components/LPushx'
+import LPushX from './components/LPushX'
 import LRange from './components/LRange'
 import LRem from './components/LRem'
 import { EditOutlined } from '@ant-design/icons'
+import RPopLPush from './components/RPopLPush'
+import RPushX from './components/RPushX'
 
 const ListValue: React.FC<{
   keys: APP.ListKey
@@ -179,9 +181,21 @@ const ListValue: React.FC<{
           <LPush keys={keys} onSuccess={onRefresh} />
           <LPushX keys={keys} onSuccess={onRefresh} />
           <LRem keys={keys} onSuccess={onRefresh} />
+          <LSet
+            keys={keys}
+            trigger={<Button type="primary">LSET</Button>}
+            defaultValue={{
+              name: keys.name
+            }}
+            onSuccess={() => {
+              onRefresh()
+            }}
+          />
           <LTrim keys={keys} onSuccess={onRefresh} />
-          <RPush keys={keys} onSuccess={onRefresh} />
           <RPop keys={keys} onSuccess={onRefresh} />
+          <RPopLPush keys={keys} onSuccess={onRefresh} />
+          <RPush keys={keys} onSuccess={onRefresh} />
+          <RPushX keys={keys} onSuccess={onRefresh} />
         </>
       }
     >

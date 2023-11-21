@@ -1,7 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, Input, InputNumber } from 'antd'
+import { Button, Form } from 'antd'
+import CusInput from '@/components/CusInput'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const LPop: React.FC<{
   keys: APP.ListKey
@@ -33,10 +35,10 @@ const LPop: React.FC<{
       }}
     >
       <Form.Item label={'Key'} name={'name'} rules={[{ required: true }]}>
-        <Input />
+        <CusInput />
       </Form.Item>
       <Form.Item label={'Count'} name={'value'}>
-        <InputNumber min={0} className="!w-full" />
+        <CusInputNumber min={0} />
       </Form.Item>
     </ModalQueryForm>
   )

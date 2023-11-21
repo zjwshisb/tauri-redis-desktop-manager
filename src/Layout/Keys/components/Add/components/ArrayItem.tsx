@@ -1,7 +1,7 @@
 import { Form } from 'antd'
 import React from 'react'
-import FieldInput from '@/components/FieldInput'
-import FormListItem from '@/components/FormListItem'
+import FieldInput from '@/components/InputJson'
+import FormListItem from '@/components/Form/FormListItem'
 import { useTranslation } from 'react-i18next'
 
 const ArrayItem: React.FC = () => {

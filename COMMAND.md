@@ -61,12 +61,12 @@ Those command which be checked are supported  at  GUI
 - [X] LOP
 - [X] LPOS
 - [X] LPUSH
-- [ ] LPUSHX
-- [ ] LRANGE
-- [ ] LREM
-- [ ] LSET
-- [ ] LTRIM
-- [ ] RPOP
-- [ ] RPOPLPUSH
-- [ ] RPUSH
-- [ ] RPUSHX
+- [X] LPUSHX
+- [X] LRANGE
+- [X] LREM
+- [X] LSET
+- [X] LTRIM
+- [X] RPOP
+- [X] RPOPLPUSH
+- [X] RPUSH
+- [X] RPUSHX

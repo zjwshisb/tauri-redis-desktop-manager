@@ -1,9 +1,11 @@
-import { Form, Input, Button, InputNumber } from 'antd'
+import { Form, Input, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
 import ModalQueryForm from '@/components/ModalQueryForm'
+import CusInput from '@/components/CusInput'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const LPos: React.FC<{
   keys: APP.ListKey
@@ -35,16 +37,16 @@ const LPos: React.FC<{
           label={'Element'}
           rules={[{ required: true }]}
         >
-          <Input></Input>
+          <CusInput />
         </Form.Item>
         <Form.Item name={'rank'} label={'Rank'}>
-          <InputNumber></InputNumber>
+          <CusInputNumber />
         </Form.Item>
         <Form.Item name={'count'} label={'Count'}>
-          <InputNumber></InputNumber>
+          <CusInputNumber />
         </Form.Item>
         <Form.Item name={'len'} label={'MaxLen'}>
-          <InputNumber></InputNumber>
+          <CusInputNumber />
         </Form.Item>
       </ModalQueryForm>
     </VersionAccess>

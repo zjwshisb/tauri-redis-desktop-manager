@@ -2,14 +2,16 @@ import React from 'react'
 import { Card, Input, Radio } from 'antd'
 import lodash from 'lodash'
 import { type InteractionProps } from 'react-json-view'
-import { useTranslation } from 'react-i18next'
 import JsonView from '../JsonView'
 
-const FieldInput: React.FC<{
+export interface InputJsonProps {
   value?: string
   onChange?: (v: string) => void
+  placeholder?: string
   readOnly?: boolean
-}> = (props) => {
+}
+
+const InputJson: React.FC<InputJsonProps> = (props) => {
   const { readOnly = false, onChange, value } = props
 
   const [jsonValue, setJsonValue] = React.useState<object>({})
@@ -43,14 +45,12 @@ const FieldInput: React.FC<{
     [onChange]
   )
 
-  const { t } = useTranslation()
-
   const children = React.useMemo(() => {
     if (types === 'text') {
       return (
         <Input.TextArea
           readOnly={readOnly}
-          placeholder={t('Please Enter').toString()}
+          placeholder={props.placeholder}
           value={value}
           onChange={(e) => {
             if (onChange !== undefined) {
@@ -75,7 +75,15 @@ const FieldInput: React.FC<{
         </Card>
       )
     }
-  }, [jsonValue, onChange, onJsonChange, readOnly, t, types, value])
+  }, [
+    jsonValue,
+    onChange,
+    onJsonChange,
+    props.placeholder,
+    readOnly,
+    types,
+    value
+  ])
 
   return (
     <div>
@@ -103,4 +111,4 @@ const FieldInput: React.FC<{
   )
 }
 
-export default FieldInput
+export default InputJson

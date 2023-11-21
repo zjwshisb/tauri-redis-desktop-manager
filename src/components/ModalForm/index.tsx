@@ -35,7 +35,6 @@ const ModalForm: React.ForwardRefRenderFunction<
       showOkNotice={showOkNotice}
       width={width}
       afterClose={() => {
-        console.log('close')
         form.resetFields()
       }}
       beforeOpen={() => {

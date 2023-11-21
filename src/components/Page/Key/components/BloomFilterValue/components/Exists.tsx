@@ -2,7 +2,7 @@ import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
 import { Button, Form } from 'antd'
-import FieldInput from '@/components/FieldInput'
+import FieldInput from '@/components/InputJson'
 
 const Exists: React.FC<{
   keys: APP.BloomFilterKey

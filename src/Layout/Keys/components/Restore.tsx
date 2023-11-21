@@ -1,12 +1,14 @@
 import { type KeyInfo } from '@/store/key'
 import request from '@/utils/request'
 import { ImportOutlined } from '@ant-design/icons'
-import { Button, Checkbox, Form, Input, InputNumber, Tooltip } from 'antd'
+import { Button, Checkbox, Form, Tooltip } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import TextArea from 'antd/es/input/TextArea'
 import VersionAccess from '@/components/VersionAccess'
 import ModalForm from '@/components/ModalForm'
+import CusInput from '@/components/CusInput'
+import CusInputNumber from '@/components/CusInputNumber'
 
 const Restore: React.FC<{
   onSuccess: (name: string) => void
@@ -46,12 +48,7 @@ const Restore: React.FC<{
           label={t('Key Name')}
           rules={[{ required: true }]}
         >
-          <Input
-            type="text"
-            placeholder={t('Please Enter {{name}}', {
-              name: t('Key Name')
-            }).toString()}
-          ></Input>
+          <CusInput />
         </Form.Item>
         <Form.Item
           name="ttl"
@@ -61,7 +58,7 @@ const Restore: React.FC<{
             'If ttl is 0 the key is created without any expire, otherwise the specified expire time (in milliseconds) is set.'
           )}
         >
-          <InputNumber min={0} max={100000000000}></InputNumber>
+          <CusInputNumber min={0} max={100000000000} />
         </Form.Item>
         <VersionAccess connection={info.connection} version="3.0.0">
           <Form.Item
@@ -83,7 +80,7 @@ const Restore: React.FC<{
           name={'value'}
           tooltip={t('The serialized-value created by dump command')}
         >
-          <TextArea></TextArea>
+          <TextArea placeholder={t('Please Enter').toString()}></TextArea>
         </Form.Item>
       </ModalForm>
     </VersionAccess>

@@ -2,9 +2,9 @@ import { Button, Col, Form, Input, Row } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
-import FieldInput from '@/components/FieldInput'
+import FieldInput from '@/components/InputJson'
 import ModalForm from '@/components/ModalForm'
-import FormListItem from '@/components/FormListItem'
+import FormListItem from '@/components/Form/FormListItem'
 
 const MSet: React.FC<{
   keys: APP.StringKey

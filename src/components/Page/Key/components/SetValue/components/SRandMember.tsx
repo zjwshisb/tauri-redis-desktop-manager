@@ -1,7 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, InputNumber } from 'antd'
+import { Button } from 'antd'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const SRandMember: React.FC<{
   keys: APP.SetKey
@@ -11,13 +13,15 @@ const SRandMember: React.FC<{
       title="SRANDMEMBER"
       width={400}
       documentUrl="https://redis.io/commands/srandmember/"
+      defaultValue={{
+        name: keys.name
+      }}
       trigger={<Button type="primary">SRANDMEMBER</Button>}
       onQuery={async (v) => {
         const res = await request(
           'set/srandmember',
           keys.connection_id,
           {
-            name: keys.name,
             db: keys.db,
             ...v
           },
@@ -28,9 +32,8 @@ const SRandMember: React.FC<{
         return res.data
       }}
     >
-      <Form.Item name={'value'} label={'Count'}>
-        <InputNumber className="!w-full" />
-      </Form.Item>
+      <FormInputItem name={'name'} label="Key" required />
+      <FormInputNumberItem name={'value'} label={'Count'} />
     </ModalQueryForm>
   )
 }

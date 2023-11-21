@@ -142,6 +142,17 @@ const Connection: React.FC<{
           )}
           {connection.open === true && (
             <>
+              <Tooltip title={t('Refresh')}>
+                <Button
+                  size="small"
+                  type="text"
+                  icon={<ReloadOutlined></ReloadOutlined>}
+                  onClick={(e) => {
+                    store.connection.getInfo(connection)
+                    e.stopPropagation()
+                  }}
+                ></Button>
+              </Tooltip>
               <Tooltip title={t('Terminal')}>
                 <Button
                   type="text"
@@ -154,17 +165,6 @@ const Connection: React.FC<{
                     })
                   }}
                   icon={<RightSquareOutlined />}
-                ></Button>
-              </Tooltip>
-              <Tooltip title={t('Refresh')}>
-                <Button
-                  size="small"
-                  type="text"
-                  icon={<ReloadOutlined></ReloadOutlined>}
-                  onClick={(e) => {
-                    store.connection.getInfo(connection)
-                    e.stopPropagation()
-                  }}
                 ></Button>
               </Tooltip>
               <Menu connection={connection} />

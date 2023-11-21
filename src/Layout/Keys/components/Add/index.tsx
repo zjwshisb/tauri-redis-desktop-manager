@@ -1,7 +1,7 @@
 import { type KeyInfo } from '@/store/key'
 import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Form, Input, InputNumber, Select, Tooltip } from 'antd'
+import { Button, Form, InputNumber, Select, Tooltip } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import useKeyTypes from '@/hooks/useKeyTypes'
@@ -16,7 +16,8 @@ import SimpleArrayItem from './components/SimpleArrayItem'
 import CuckooFilterItem from './components/CuckooFilterItem'
 
 import { type FormInstance } from 'antd/lib'
-import FieldInput from '@/components/FieldInput'
+import FieldInput from '@/components/InputJson'
+import CusInput from '@/components/CusInput'
 
 const Plus: React.FC<{
   onSuccess: (name: string) => void
@@ -193,11 +194,7 @@ const Plus: React.FC<{
         ></Select>
       </Form.Item>
       <Form.Item name="name" label={t('Key Name')} rules={[{ required: true }]}>
-        <Input
-          placeholder={t('Please Enter {{name}}', {
-            name: t('Key Name')
-          }).toString()}
-        ></Input>
+        <CusInput />
       </Form.Item>
       {additionFormItem}
     </ModalForm>
