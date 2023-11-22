@@ -1,8 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form } from 'antd'
-import FieldInput from '@/components/InputJson'
+
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const Exists: React.FC<{
   keys: APP.BloomFilterKey
@@ -12,7 +13,9 @@ const Exists: React.FC<{
       title="BF.EXISTS"
       width={500}
       documentUrl="https://redis.io/commands/bf.exists/"
-      trigger={<Button type="primary">EXISTS</Button>}
+      defaultValue={{
+        name: keys.name
+      }}
       onQuery={async (v) => {
         const res = await request<number>(
           'bloom-filter/exists',
@@ -26,14 +29,13 @@ const Exists: React.FC<{
         return res.data
       }}
     >
-      <Form.Item
-        rules={[{ required: true }]}
-        name={'value'}
-        label="Item"
-        tooltip="is an item to check."
-      >
-        <FieldInput />
-      </Form.Item>
+      <BaseKeyForm>
+        <FormInputJsonItem
+          name="value"
+          label="Item"
+          tooltip="is an item to check."
+        />
+      </BaseKeyForm>
     </ModalQueryForm>
   )
 }

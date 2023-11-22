@@ -1,8 +1,8 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, Input } from 'antd'
 import FormListItem from '@/components/Form/FormListItem'
+import FormInputItem from '@/components/Form/FormInputItem'
 
 const MGet: React.FC<{
   keys: APP.StringKey
@@ -15,7 +15,6 @@ const MGet: React.FC<{
         name: [keys.name]
       }}
       documentUrl="https://redis.io/commands/mget/"
-      trigger={<Button type="primary">MGET</Button>}
       onQuery={async (v) => {
         const res = await request<string>(
           'string/mget',
@@ -33,20 +32,9 @@ const MGet: React.FC<{
     >
       <FormListItem
         name="name"
-        itemProps={{
-          label: 'Keys',
-          required: true
-        }}
+        label="Keys"
         renderItem={({ name, ...restField }) => {
-          return (
-            <Form.Item
-              {...restField}
-              name={[name]}
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          )
+          return <FormInputItem {...restField} name={[name]} required />
         }}
       ></FormListItem>
     </ModalQueryForm>

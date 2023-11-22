@@ -1,10 +1,11 @@
-import { Form, Button, Radio } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
-import CusInput from '@/components/CusInput'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormRadioItem from '@/components/Form/FormRadioItem'
+import options from '../options'
 
 const LMove: React.FC<{
   keys: APP.ListKey
@@ -20,7 +21,6 @@ const LMove: React.FC<{
         defaultValue={{
           source: props.keys.name
         }}
-        trigger={<Button type="primary">LMOVE</Button>}
         onSubmit={async (v) => {
           await request<number>('list/lmove', props.keys.connection_id, {
             db: props.keys.db,
@@ -30,48 +30,24 @@ const LMove: React.FC<{
         }}
         title={'LMOVE'}
       >
-        <Form.Item
-          name={'source'}
-          label={'Source'}
-          required
-          rules={[{ required: true }]}
-        >
-          <CusInput />
-        </Form.Item>
-        <Form.Item
-          name={'destination'}
-          label={'Destination'}
-          required
-          rules={[{ required: true }]}
-        >
-          <CusInput />
-        </Form.Item>
-        <Form.Item
+        <FormInputItem name={'source'} label={'Source'} required />
+        <FormInputItem name={'destination'} label={'Destination'} required />
+        <FormRadioItem
           name={'wherefrom'}
           label={'Wherefrom'}
-          rules={[{ required: true }]}
-        >
-          <Radio.Group
-            optionType="button"
-            options={[
-              { label: 'LEFT', value: 'LEFT' },
-              { label: 'RIGHT', value: 'RIGHT' }
-            ]}
-          ></Radio.Group>
-        </Form.Item>
-        <Form.Item
+          required
+          inputProps={{
+            options
+          }}
+        />
+        <FormRadioItem
           name={'whereto'}
           label={'Whereto'}
-          rules={[{ required: true }]}
-        >
-          <Radio.Group
-            optionType="button"
-            options={[
-              { label: 'LEFT', value: 'LEFT' },
-              { label: 'RIGHT', value: 'RIGHT' }
-            ]}
-          ></Radio.Group>
-        </Form.Item>
+          required
+          inputProps={{
+            options
+          }}
+        />
       </ModalForm>
     </VersionAccess>
   )

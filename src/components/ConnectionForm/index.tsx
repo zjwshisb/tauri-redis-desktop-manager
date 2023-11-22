@@ -1,15 +1,4 @@
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  Space,
-  Checkbox,
-  Col,
-  Row,
-  Divider,
-  App
-} from 'antd'
+import { Form, Modal, Space, Row, Divider, App } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import React from 'react'
 import request from '@/utils/request'
@@ -17,22 +6,12 @@ import { useTranslation } from 'react-i18next'
 import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
 import { open } from '@tauri-apps/api/dialog'
-import CusInput from '../CusInput'
-import CusInputNumber from '../CusInputNumber'
-import { type PasswordProps } from 'antd/es/input'
 
-const CusPasswordInput = (p: PasswordProps) => {
-  const { t } = useTranslation()
-  return (
-    <Input.Password
-      {...p}
-      allowClear
-      placeholder={t('Please Enter {{name}}', {
-        name: ''
-      }).toString()}
-    ></Input.Password>
-  )
-}
+import FormInputItem from '../Form/FormInputItem'
+import FormInputNumberItem from '../Form/FormInputNumberItem'
+import FormInputPasswordItem from '../Form/FormInputPasswordItem'
+import FormCheckBoxItem from '../Form/FormCheckBoxItem'
+import CusButton from '../CusButton'
 
 const ConnectionForm: React.FC = () => {
   const [testLoading, setTestLoading] = React.useState(false)
@@ -84,24 +63,29 @@ const ConnectionForm: React.FC = () => {
       width={800}
       open={formItem.open}
       forceRender={true}
+      afterOpenChange={() => {
+        form.resetFields()
+        setIsSsh(false)
+      }}
       getContainer={() => {
         return document.getElementsByTagName('body')[0]
       }}
       title={
         formItem.item !== undefined ? t('Edit Connection') : t('New Connection')
       }
-      styles={{}}
       footer={
         <Space>
-          <Button
+          <CusButton
+            type={'default'}
             onClick={() => {
               store.connection.closeForm()
               form.resetFields()
             }}
           >
-            {t('Cancel')}
-          </Button>
-          <Button
+            Cancel
+          </CusButton>
+          <CusButton
+            type={'default'}
             loading={testLoading}
             onClick={() => {
               form
@@ -124,10 +108,9 @@ const ConnectionForm: React.FC = () => {
                 .catch(() => {})
             }}
           >
-            {t('Test Connection')}
-          </Button>
-          <Button
-            type="primary"
+            Test Connection
+          </CusButton>
+          <CusButton
             onClick={async () => {
               const v = await form.validateFields()
               if (formItem.item === undefined) {
@@ -155,14 +138,12 @@ const ConnectionForm: React.FC = () => {
               message.success(t('Success'))
             }}
           >
-            {t('OK')}
-          </Button>
+            OK
+          </CusButton>
         </Space>
       }
       onCancel={() => {
         store.connection.closeForm()
-        form.resetFields()
-        setIsSsh(false)
       }}
       destroyOnClose
     >
@@ -185,180 +166,132 @@ const ConnectionForm: React.FC = () => {
         }}
       >
         <Row gutter={20}>
-          <Col span={12}>
-            <Form.Item
-              name="host"
-              label={t('Host')}
-              rules={[{ required: true, max: 512 }]}
-            >
-              <CusInput />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="port"
-              label={t('Port')}
-              rules={[{ required: true }]}
-            >
-              <CusInputNumber min={0} max={65536} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={12}>
-            <Form.Item
-              name="name"
-              rules={[
-                {
-                  max: 255
-                }
-              ]}
-              label={t('Name')}
-              tooltip={t('The name for Connection')}
-            >
-              <CusInput />
-            </Form.Item>
-          </Col>
+          <FormInputItem
+            span={12}
+            name="host"
+            label="Host"
+            required
+            rules={[{ max: 512 }]}
+          />
+          <FormInputNumberItem
+            span={12}
+            name="port"
+            label={'Port'}
+            required
+            inputProps={{
+              precision: 0,
+              min: 0,
+              max: 65536
+            }}
+          />
         </Row>
         <Row gutter={20}>
-          <Col span={12}>
-            <Form.Item name="password" label={t('Password')}>
-              <CusPasswordInput />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name="username" label={t('Username')}>
-              <CusInput />
-            </Form.Item>
-          </Col>
+          <FormInputItem
+            span={12}
+            name="name"
+            label="Name"
+            tooltip="The name for Connection"
+            rules={[
+              {
+                max: 255
+              }
+            ]}
+          />
         </Row>
-        <Row>
-          <Col span={6}>
-            <Form.Item
-              tooltip={t('Other node will auto discover')}
-              name="is_cluster"
-              label={t('Cluster Mode')}
-              valuePropName="checked"
-            >
-              <Checkbox />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item
-              tooltip={t('Any action may change the value will be prohibited')}
-              name="readonly"
-              label={t('Readonly Mode')}
-              valuePropName="checked"
-            >
-              <Checkbox />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item
-              tooltip={t('SSH Tunnel')}
-              name="ssh"
-              label={t('SSH')}
-              valuePropName="checked"
-            >
-              <Checkbox checked={isSsh} />
-            </Form.Item>
-          </Col>
+        <Row gutter={20}>
+          <FormInputPasswordItem span={12} name="password" label="Password" />
+          <FormInputItem span={12} name="username" label="Username" />
+        </Row>
+        <Row gutter={20}>
+          <FormCheckBoxItem
+            span={6}
+            tooltip="Other node will auto discover"
+            name="is_cluster"
+            label="Cluster Mode"
+          />
+          <FormCheckBoxItem
+            span={6}
+            tooltip="Any action may change the value will be prohibited"
+            name="readonly"
+            label="Readonly Mode"
+          />
+          <FormCheckBoxItem
+            span={6}
+            tooltip="SSH Tunnel"
+            name="ssh"
+            label="SSH"
+          />
         </Row>
         {isSsh && (
           <>
             <Divider orientation="left">{t('SSH Tunnel')}</Divider>
             <Row gutter={20}>
-              <Col span={12}>
-                <Form.Item
-                  name="ssh_host"
-                  label={t('Host')}
-                  rules={[
-                    {
-                      required: true
-                    }
-                  ]}
-                >
-                  <CusInput />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="ssh_port"
-                  label={t('Port')}
-                  required={true}
-                  rules={[
-                    {
-                      required: true
-                    }
-                  ]}
-                >
-                  <CusInputNumber max={99999} />
-                </Form.Item>
-              </Col>
+              <FormInputItem span={12} name="ssh_host" label="Host" required />
+              <FormInputNumberItem
+                span={12}
+                name="ssh_port"
+                label="Port"
+                inputProps={{
+                  min: 0
+                }}
+                required
+              />
             </Row>
             <Row gutter={20}>
-              <Col span={12}>
-                <Form.Item
-                  name="ssh_username"
-                  label={t('Username')}
-                  rules={[
-                    {
-                      required: true,
-                      max: 255
-                    }
-                  ]}
-                >
-                  <CusInput />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="ssh_password"
-                  label={t('Password')}
-                  dependencies={['ssh_private_key']}
-                  rules={[
-                    ({ getFieldValue }) => ({
-                      async validator(_, value) {
-                        if (
-                          value == null &&
-                          getFieldValue('ssh_private_key') == null
-                        ) {
-                          return await Promise.reject(
-                            new Error(
-                              t('Password Or Private Key Required').toString()
-                            )
+              <FormInputItem
+                span={12}
+                required
+                name="ssh_username"
+                label="Username"
+                rules={[
+                  {
+                    max: 255
+                  }
+                ]}
+              />
+              <FormInputPasswordItem
+                span={12}
+                dependencies={['ssh_private_key']}
+                name="ssh_password"
+                label="Password"
+                rules={[
+                  ({ getFieldValue }) => ({
+                    async validator(_, value) {
+                      if (
+                        value == null &&
+                        getFieldValue('ssh_private_key') == null
+                      ) {
+                        return await Promise.reject(
+                          new Error(
+                            t('Password Or Private Key Required').toString()
                           )
-                        }
-                        await Promise.resolve()
+                        )
                       }
-                    })
-                  ]}
-                >
-                  <CusPasswordInput />
-                </Form.Item>
-              </Col>
+                      await Promise.resolve()
+                    }
+                  })
+                ]}
+              />
             </Row>
             <Row gutter={20}>
-              <Col span={12}>
-                <Form.Item name="ssh_private_key" label={t('Private Key')}>
-                  <CusInput
-                    onClick={() => {
-                      open({ multiple: false }).then((r) => {
-                        form.setFieldValue('ssh_private_key', r)
-                      })
-                    }}
-                    readOnly
-                    placeholder={t('Please Select {{name}}', {
-                      name: t(' ')
-                    }).toString()}
-                  ></CusInput>
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item name="ssh_passphrase" label={t('Passphrase')}>
-                  <CusPasswordInput />
-                </Form.Item>
-              </Col>
+              <FormInputItem
+                span={12}
+                name="ssh_private_key"
+                label="Private Key"
+                inputProps={{
+                  onClick() {
+                    open({ multiple: false }).then((r) => {
+                      form.setFieldValue('ssh_private_key', r)
+                    })
+                  },
+                  readOnly: true
+                }}
+              />
+              <FormInputPasswordItem
+                span={12}
+                name="ssh_passphrase"
+                label="Passphrase"
+              />
             </Row>
           </>
         )}

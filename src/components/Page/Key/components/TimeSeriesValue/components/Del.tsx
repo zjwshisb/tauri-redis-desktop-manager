@@ -1,50 +1,45 @@
 import React from 'react'
 
-import { Button, Form, InputNumber } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const Del: React.FC<{
   keys: APP.TimeSeriesKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
-  const { t } = useTranslation()
-
   return (
     <ModalForm
       title={'TS.DEL'}
       documentUrl="https://redis.io/commands/ts.del/"
       width={400}
-      trigger={<Button type="primary">DEL</Button>}
+      defaultValue={{
+        name: keys.name
+      }}
       onSubmit={async (v) => {
         await request('timeseries/del', keys.connection_id, {
           db: keys.db,
-          name: keys.name,
           ...v
         }).then(() => {
           onSuccess()
         })
       }}
     >
-      <Form.Item
-        name="start"
-        label="Form Timestamp"
-        rules={[{ required: true }]}
-      >
-        <InputNumber
-          min={0}
-          className="!w-full"
-          placeholder={t('Please Enter').toString()}
+      <BaseKeyForm>
+        <FormInputNumberItem
+          name="start"
+          label="Form Timestamp"
+          required
+          inputProps={{ min: 0 }}
         />
-      </Form.Item>
-      <Form.Item name="end" label="To Timestamp" rules={[{ required: true }]}>
-        <InputNumber
-          min={0}
-          className="!w-full"
-          placeholder={t('Please Enter').toString()}
+        <FormInputNumberItem
+          name="end"
+          label="To Timestamp"
+          required
+          inputProps={{ min: 0 }}
         />
-      </Form.Item>
+      </BaseKeyForm>
     </ModalForm>
   )
 }

@@ -1,9 +1,10 @@
-import { App, Button } from 'antd'
+import { App } from 'antd'
 import React from 'react'
 import { ExportOutlined } from '@ant-design/icons'
 import request from '@/utils/request'
 import TextArea from 'antd/es/input/TextArea'
 import Copy from '@/components/Copy'
+import CusButton from '@/components/CusButton'
 
 const Dump: React.FC<{
   keys: APP.Key
@@ -11,7 +12,8 @@ const Dump: React.FC<{
   const { modal } = App.useApp()
 
   return (
-    <Button
+    <CusButton
+      type="default"
       icon={<ExportOutlined />}
       onClick={() => {
         request<string>('key/dump', props.keys.connection_id, {
@@ -38,7 +40,7 @@ const Dump: React.FC<{
           })
         })
       }}
-    ></Button>
+    ></CusButton>
   )
 }
 export default Dump

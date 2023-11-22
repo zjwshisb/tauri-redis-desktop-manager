@@ -1,5 +1,5 @@
 import useRequest from '@/hooks/useRequest'
-import { Space, Tooltip, App, Button } from 'antd'
+import { Space, Tooltip, App } from 'antd'
 import React from 'react'
 import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { type ColumnType } from 'antd/es/table'
@@ -8,6 +8,7 @@ import Page from '..'
 import useTableColumn from '@/hooks/useTableColumn'
 import Editable from '@/components/Editable'
 import CusTable from '@/components/CusTable'
+import CusButton from '@/components/CusButton'
 
 interface ClientRow {
   id: string
@@ -151,13 +152,13 @@ const Client: React.FC<{
         return (
           <Space>
             <Editable connection={connection}>
-              <Button
+              <CusButton
                 type="link"
                 onClick={() => {
                   handleKill(record.id)
                 }}
                 icon={<DeleteOutlined />}
-              ></Button>
+              ></CusButton>
             </Editable>
           </Space>
         )

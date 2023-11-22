@@ -3,10 +3,11 @@ import Page from '..'
 import useStore from '@/hooks/useStore'
 import InteractiveContainer from '@/components/InteractiveContainer'
 import { observer } from 'mobx-react-lite'
-import { Button, Empty } from 'antd'
+import { Empty } from 'antd'
 import { DeleteRowOutlined } from '@ant-design/icons'
 import Container from '@/components/Container'
 import { type Page as PageInterface } from '@/store/page'
+import CusButton from '@/components/CusButton'
 
 const Collection: React.FC<{
   pageKey: string
@@ -46,15 +47,14 @@ const Collection: React.FC<{
                 <div className="px-4 min-w-[100px]">#{v.connection_id}</div>
                 <div className="px-4  flex-1">{v.name}</div>
                 <div className="px-4 w-28">
-                  <Button
-                    type="text"
+                  <CusButton
                     danger
                     icon={<DeleteRowOutlined />}
                     onClick={(e) => {
                       e.stopPropagation()
                       store.collection.removeByPageKey(v.key)
                     }}
-                  ></Button>
+                  ></CusButton>
                 </div>
               </InteractiveContainer>
             </Container>

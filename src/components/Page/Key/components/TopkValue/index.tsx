@@ -2,14 +2,18 @@ import React from 'react'
 
 import useRequest from '@/hooks/useRequest'
 import CusTable from '@/components/CusTable'
-import { Button, Descriptions, Form, Input, InputNumber, Space } from 'antd'
+import { Descriptions, Space } from 'antd'
 import ValueLayout from '../ValueLayout'
 import request from '@/utils/request'
 import useTableColumn from '@/hooks/useTableColumn'
 import { PlusOutlined } from '@ant-design/icons'
 import ModalForm from '@/components/ModalForm'
 import { type Field } from 'ahooks/lib/useFusionTable/types'
-import { useTranslation } from 'react-i18next'
+import BaseKeyForm from '../BaseKeyForm'
+import FormTextareaItem from '@/components/Form/FormTextAreaItem'
+import CusButton from '@/components/CusButton'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const TopKValue: React.FC<{
   keys: APP.TopKKey
@@ -43,8 +47,6 @@ const TopKValue: React.FC<{
     fetch()
     infoFetch()
   }, [fetch, infoFetch, keys])
-
-  const { t } = useTranslation()
 
   const columns = useTableColumn<APP.Field<number>>(
     [
@@ -80,27 +82,26 @@ const TopKValue: React.FC<{
               }}
               title="TOPK.INCRBY"
               trigger={
-                <Button
+                <CusButton
                   icon={<PlusOutlined></PlusOutlined>}
                   type="link"
-                ></Button>
+                ></CusButton>
               }
             >
-              <Form.Item name={'field'} label={'name'}>
-                <Input readOnly placeholder={t('Please Enter').toString()} />
-              </Form.Item>
-              <Form.Item
+              <FormInputItem
+                name={'field'}
+                label={'name'}
+                inputProps={{ readOnly: true }}
+              ></FormInputItem>
+              <FormInputNumberItem
                 name={'count'}
                 label={'count'}
-                rules={[{ required: true }]}
-              >
-                <InputNumber
-                  min={0}
-                  className="!w-full"
-                  max={99999999}
-                  placeholder={t('Please Enter').toString()}
-                />
-              </Form.Item>
+                required
+                inputProps={{
+                  min: 0,
+                  max: 99999999
+                }}
+              ></FormInputNumberItem>
             </ModalForm>
           </Space>
         )
@@ -129,10 +130,11 @@ const TopKValue: React.FC<{
         <ModalForm
           documentUrl="https://redis.io/commands/topk.add/"
           title="TOPK.ADD"
-          trigger={<Button type="primary">ADD</Button>}
+          defaultValue={{
+            name: keys.name
+          }}
           onSubmit={async (v) => {
             await request('topk/add', keys.connection_id, {
-              name: keys.name,
               value: v.value,
               db: keys.db
             }).then(() => {
@@ -140,9 +142,9 @@ const TopKValue: React.FC<{
             })
           }}
         >
-          <Form.Item required rules={[{ required: true }]} name={'value'}>
-            <Input.TextArea placeholder={t('Please Enter').toString()} />
-          </Form.Item>
+          <BaseKeyForm>
+            <FormTextareaItem name={'value'} label="Value"></FormTextareaItem>
+          </BaseKeyForm>
         </ModalForm>
       }
     >

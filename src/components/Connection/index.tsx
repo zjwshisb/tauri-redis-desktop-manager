@@ -10,7 +10,7 @@ import {
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { useThrottleFn } from 'ahooks'
-import { Button, Spin, Tooltip } from 'antd'
+import { Spin, Tooltip } from 'antd'
 import DBItem from './components/DBItem'
 import NodeItem from './components/NodeItem'
 import CurlMenu from './components/CurlMenu'
@@ -18,6 +18,7 @@ import Menu from './components/Menu'
 import { useTranslation } from 'react-i18next'
 import { computed } from 'mobx'
 import InteractiveContainer from '../InteractiveContainer'
+import CusButton from '../CusButton'
 
 const Connection: React.FC<{
   connection: APP.Connection
@@ -143,20 +144,16 @@ const Connection: React.FC<{
           {connection.open === true && (
             <>
               <Tooltip title={t('Refresh')}>
-                <Button
-                  size="small"
-                  type="text"
+                <CusButton
                   icon={<ReloadOutlined></ReloadOutlined>}
                   onClick={(e) => {
                     store.connection.getInfo(connection)
                     e.stopPropagation()
                   }}
-                ></Button>
+                ></CusButton>
               </Tooltip>
               <Tooltip title={t('Terminal')}>
-                <Button
-                  type="text"
-                  size="small"
+                <CusButton
                   onClick={() => {
                     store.page.addPage({
                       type: 'terminal',
@@ -165,7 +162,7 @@ const Connection: React.FC<{
                     })
                   }}
                   icon={<RightSquareOutlined />}
-                ></Button>
+                ></CusButton>
               </Tooltip>
               <Menu connection={connection} />
             </>

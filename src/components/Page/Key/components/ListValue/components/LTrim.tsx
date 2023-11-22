@@ -1,9 +1,9 @@
-import { Form, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
-import CusInput from '@/components/CusInput'
-import CusInputNumber from '@/components/CusInputNumber'
+
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const LTrim: React.FC<{
   keys: APP.ListKey
@@ -16,7 +16,6 @@ const LTrim: React.FC<{
       defaultValue={{
         name: props.keys.name
       }}
-      trigger={<Button type="primary">LTRIM</Button>}
       onSubmit={async (v) => {
         await request<number>('list/ltrim', props.keys.connection_id, {
           db: props.keys.db,
@@ -26,29 +25,20 @@ const LTrim: React.FC<{
       }}
       title={'LTRIM'}
     >
-      <Form.Item name={'name'} label="Key" rules={[{ required: true }]}>
-        <CusInput />
-      </Form.Item>
-      <Form.Item
-        name={'start'}
-        label={'Start'}
-        required
-        rules={[{ required: true }]}
-      >
-        <CusInputNumber min={0} precision={0} />
-      </Form.Item>
-      <Form.Item
-        name={'end'}
-        label={'Stop'}
-        required
-        rules={[{ required: true }]}
-      >
-        <CusInputNumber
-          min={0}
-          max={props.keys.length - 1}
-          precision={0}
-        ></CusInputNumber>
-      </Form.Item>
+      <BaseKeyForm>
+        <FormInputNumberItem
+          name={'start'}
+          label={'Start'}
+          required
+          inputProps={{ precision: 0 }}
+        />
+        <FormInputNumberItem
+          name={'end'}
+          label={'Stop'}
+          required
+          inputProps={{ precision: 0 }}
+        />
+      </BaseKeyForm>
     </ModalForm>
   )
 }

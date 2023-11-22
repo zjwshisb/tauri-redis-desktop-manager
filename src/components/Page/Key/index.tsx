@@ -1,5 +1,5 @@
 import React from 'react'
-import { App, Button, Input, Result, Space } from 'antd'
+import { App, Input, Result, Space } from 'antd'
 import StringValue from './components/StringValue'
 import HashValue from './components/HashValue'
 import ListValue from './components/ListValue'
@@ -24,6 +24,7 @@ import TTL from './components/TTL'
 import Editable from '@/components/Editable'
 import Context from './context'
 import Page from '..'
+import CusButton from '@/components/CusButton'
 
 function isShowLength(types: APP.Key['types']) {
   return (
@@ -183,12 +184,12 @@ const Key: React.FC<{
                 <Copy content={item.name} isButton />
                 <Dump keys={item}></Dump>
                 <Editable connection={connection}>
-                  <Button
+                  <CusButton
                     onClick={handleDelete}
                     type="primary"
                     danger
                     icon={<DeleteOutlined />}
-                  ></Button>
+                  ></CusButton>
                 </Editable>
               </Space>
             </div>

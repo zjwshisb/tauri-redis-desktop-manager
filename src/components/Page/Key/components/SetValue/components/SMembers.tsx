@@ -1,8 +1,7 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button } from 'antd'
-import FormInputItem from '@/components/Form/FormInputItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const SMembers: React.FC<{
   keys: APP.SetKey
@@ -16,7 +15,6 @@ const SMembers: React.FC<{
         name: keys.name
       }}
       queryWithOpen
-      trigger={<Button type="primary">SMEMBERS</Button>}
       onQuery={async (v) => {
         const res = await request(
           'set/smembers',
@@ -32,7 +30,7 @@ const SMembers: React.FC<{
         return res.data
       }}
     >
-      <FormInputItem name={'name'} label="Key" />
+      <BaseKeyForm></BaseKeyForm>
     </ModalQueryForm>
   )
 }

@@ -1,9 +1,9 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 
-import { Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
+import CusButton from '../CusButton'
 
 const LoadMore: React.FC<{
   disabled: boolean
@@ -15,7 +15,8 @@ const LoadMore: React.FC<{
   return (
     <div className="flex">
       <div className="flex-1">
-        <Button
+        <CusButton
+          type="default"
           disabled={disabled}
           loading={loading}
           icon={<PlusOutlined />}
@@ -23,10 +24,10 @@ const LoadMore: React.FC<{
           onClick={onGet}
         >
           {t('Load More')}
-        </Button>
+        </CusButton>
       </div>
       <div className="ml-2 flex-shrink-0">
-        <Button
+        <CusButton
           danger
           icon={<PlusOutlined />}
           type="primary"
@@ -34,7 +35,7 @@ const LoadMore: React.FC<{
           disabled={disabled}
         >
           {t('Load All')}
-        </Button>
+        </CusButton>
       </div>
     </div>
   )

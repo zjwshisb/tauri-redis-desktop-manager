@@ -1,55 +1,50 @@
 import React from 'react'
 
-import { Button, Form, InputNumber } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
+import BaseKeyForm from '../../BaseKeyForm'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const Incrby: React.FC<{
   keys: APP.TimeSeriesKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
-  const { t } = useTranslation()
-
   return (
     <ModalForm
       title={'TS.INCRBY'}
+      defaultValue={{
+        name: keys.name
+      }}
       width={400}
       documentUrl="https://redis.io/commands/ts.incrby/"
-      trigger={<Button type="primary">INCRBY</Button>}
       onSubmit={async (v) => {
         await request('timeseries/incrby', keys.connection_id, {
           db: keys.db,
-          name: keys.name,
           ...v
         }).then(() => {
           onSuccess()
         })
       }}
     >
-      <Form.Item
-        name="field"
-        label="Value"
-        rules={[{ required: true }]}
-        tooltip="is numeric value of the addend (double)."
-      >
-        <InputNumber
-          stringMode
-          className="!w-full"
-          placeholder={t('Please Enter').toString()}
-        ></InputNumber>
-      </Form.Item>
-      <Form.Item
-        name="value"
-        label="Timestamp"
-        tooltip="is Unix time (integer, in milliseconds) specifying the sample timestamp or * to set the sample timestamp to the Unix time of the server's clock."
-      >
-        <InputNumber
-          min={0}
-          className="!w-full"
-          placeholder={t('Please Enter').toString()}
-        />
-      </Form.Item>
+      <BaseKeyForm>
+        <FormInputNumberItem
+          name="field"
+          label="Value"
+          required
+          tooltip="is numeric value of the addend (double)."
+          inputProps={{
+            stringMode: true
+          }}
+        ></FormInputNumberItem>
+        <FormInputNumberItem
+          name="value"
+          label="Timestamp"
+          tooltip="is Unix time (integer, in milliseconds) specifying the sample timestamp or * to set the sample timestamp to the Unix time of the server's clock."
+          inputProps={{
+            min: 0
+          }}
+        ></FormInputNumberItem>
+      </BaseKeyForm>
     </ModalForm>
   )
 }

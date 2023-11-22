@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { Button } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
 import ValueItem from './ValueItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const ByRank: React.FC<{
   keys: APP.TDigestKey
@@ -12,16 +12,16 @@ const ByRank: React.FC<{
   return (
     <ModalForm
       defaultValue={{
+        name: keys.name,
         value: [undefined]
       }}
       title={'TDIGEST.BYRANK'}
       documentUrl="https://redis.io/commands/tdigest.byrank/"
       width={400}
-      trigger={<Button type="primary">BYRANK</Button>}
       onSubmit={async (v) => {
         await request<number[]>('tdigest/by-rank', keys.connection_id, {
           db: keys.db,
-          name: keys.name,
+
           ...v
         }).then((r) => {
           const f: Array<APP.Field<number>> = []
@@ -35,7 +35,9 @@ const ByRank: React.FC<{
         })
       }}
     >
-      <ValueItem label="Rank" />
+      <BaseKeyForm>
+        <ValueItem label="Rank" />
+      </BaseKeyForm>
     </ModalForm>
   )
 }

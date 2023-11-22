@@ -1,12 +1,11 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { type ListRef } from 'rc-virtual-list'
-import { Spin, Tooltip, Statistic, ConfigProvider, Button } from 'antd'
+import { Spin, Statistic, ConfigProvider } from 'antd'
 import { useDebounceFn } from 'ahooks'
 import useStore from '@/hooks/useStore'
 import ResizableDiv from '@/components/ResizableDiv'
 import { ReloadOutlined, KeyOutlined, WindowsOutlined } from '@ant-design/icons'
-import { useTranslation } from 'react-i18next'
 import VirtualKeyList from './components/VirtualKeyList'
 import LoadMore from '@/components/LoadMore'
 import { isMainWindow } from '@/utils'
@@ -20,6 +19,7 @@ import { type KeyInfo } from '@/store/key'
 import Context from './context'
 import reducer from './reducer'
 import Container from '@/components/Container'
+import CusButton from '@/components/CusButton'
 
 const isMain = isMainWindow()
 
@@ -66,8 +66,6 @@ const Index: React.FC<{
       window.removeEventListener('resize', getListHeightDb.run)
     }
   }, [getListHeightDb])
-
-  const { t } = useTranslation()
 
   const { keys, getAllKeys, getKeys, more } = useKeyScan(
     info.connection,
@@ -139,29 +137,27 @@ const Index: React.FC<{
                     />
                   </Editable>
                   {isMain && (
-                    <Tooltip title={t('Open In New Window')} placement="bottom">
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          store.keyInfo.newWindow(info.connection, info.db)
-                        }}
-                        type="text"
-                        icon={
-                          <WindowsOutlined className="text-lg"></WindowsOutlined>
-                        }
-                      ></Button>
-                    </Tooltip>
-                  )}
-                  <Tooltip title={t('Refresh')} placement="bottom">
-                    <Button
-                      size="small"
-                      type="text"
+                    <CusButton
                       onClick={() => {
-                        getKeys(true)
+                        store.keyInfo.newWindow(info.connection, info.db)
                       }}
-                      icon={<ReloadOutlined className="text-lg" />}
-                    ></Button>
-                  </Tooltip>
+                      icon={
+                        <WindowsOutlined className="text-lg"></WindowsOutlined>
+                      }
+                      tooltip={{
+                        title: 'Open In New Window'
+                      }}
+                    ></CusButton>
+                  )}
+                  <CusButton
+                    tooltip={{
+                      title: 'Refresh'
+                    }}
+                    onClick={() => {
+                      getKeys(true)
+                    }}
+                    icon={<ReloadOutlined className="text-lg" />}
+                  ></CusButton>
                 </div>
                 <div>
                   <ConfigProvider

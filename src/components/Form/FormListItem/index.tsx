@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  Button,
   Form,
   Row,
   Col,
@@ -9,6 +8,7 @@ import {
   Space
 } from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
+import CusButton from '@/components/CusButton'
 
 type FormListItemProps = FormItemProps & {
   renderItem: (f: FormListFieldData, index: number) => React.ReactNode
@@ -18,7 +18,7 @@ type FormListItemProps = FormItemProps & {
 
 const FormListItem: React.FC<FormListItemProps> = (p) => {
   const {
-    label = 'Value',
+    label = '',
     renderItem,
     showAdd = true,
     canBeZero = false,
@@ -31,29 +31,38 @@ const FormListItem: React.FC<FormListItemProps> = (p) => {
       <Form.List name={name}>
         {(fields, { add, remove }, { errors }) => (
           <>
+            {fields.length === 0 && canBeZero && (
+              <CusButton
+                type="dashed"
+                onClick={() => {
+                  add()
+                }}
+                icon={<PlusOutlined />}
+              ></CusButton>
+            )}
             {fields.map((field, index) => {
               return (
-                <Row key={field.name} className="item-center" gutter={20}>
+                <Row key={field.name} className="item-center mb-4" gutter={20}>
                   <Col span={20}>{renderItem(field, index)}</Col>
                   <Col>
                     <Space>
                       {(index > 0 || canBeZero) && (
-                        <Button
+                        <CusButton
                           type="dashed"
                           onClick={() => {
                             remove(field.name)
                           }}
                           icon={<DeleteOutlined />}
-                        ></Button>
+                        ></CusButton>
                       )}
                       {showAdd && index === 0 && (
-                        <Button
+                        <CusButton
                           type="dashed"
                           onClick={() => {
                             add()
                           }}
                           icon={<PlusOutlined />}
-                        ></Button>
+                        ></CusButton>
                       )}
                     </Space>
                   </Col>

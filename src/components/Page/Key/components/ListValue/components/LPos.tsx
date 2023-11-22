@@ -1,11 +1,11 @@
-import { Form, Input, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
 import ModalQueryForm from '@/components/ModalQueryForm'
-import CusInput from '@/components/CusInput'
-import CusInputNumber from '@/components/CusInputNumber'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const LPos: React.FC<{
   keys: APP.ListKey
@@ -20,7 +20,6 @@ const LPos: React.FC<{
         defaultValue={{
           name: props.keys.name
         }}
-        trigger={<Button type="primary">LPOS</Button>}
         onQuery={async (v) => {
           return await request<number>('list/lpos', props.keys.connection_id, {
             db: props.keys.db,
@@ -29,25 +28,12 @@ const LPos: React.FC<{
         }}
         title={'LPOS'}
       >
-        <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
-          <Input></Input>
-        </Form.Item>
-        <Form.Item
-          name={'element'}
-          label={'Element'}
-          rules={[{ required: true }]}
-        >
-          <CusInput />
-        </Form.Item>
-        <Form.Item name={'rank'} label={'Rank'}>
-          <CusInputNumber />
-        </Form.Item>
-        <Form.Item name={'count'} label={'Count'}>
-          <CusInputNumber />
-        </Form.Item>
-        <Form.Item name={'len'} label={'MaxLen'}>
-          <CusInputNumber />
-        </Form.Item>
+        <BaseKeyForm>
+          <FormInputItem name={'element'} label={'Element'} required />
+          <FormInputNumberItem name={'rank'} label={'Rank'} />
+          <FormInputNumberItem name={'count'} label={'Count'} />
+          <FormInputNumberItem name={'len'} label={'MaxLen'} />
+        </BaseKeyForm>
       </ModalQueryForm>
     </VersionAccess>
   )

@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { Button, Form } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
 import FormListItem from '@/components/Form/FormListItem'
-import FieldInput from '@/components/InputJson'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const Add: React.FC<{
   keys: APP.BloomFilterKey
@@ -13,12 +13,12 @@ const Add: React.FC<{
   return (
     <ModalForm
       defaultValue={{
-        value: [undefined]
+        value: [undefined],
+        name: keys.name
       }}
       title={'BF.MADD'}
       documentUrl="https://redis.io/commands/bf.madd/"
       width={400}
-      trigger={<Button type="primary">MADD</Button>}
       onSubmit={async (v) => {
         await request('bloom-filter/madd', keys.connection_id, {
           db: keys.db,
@@ -29,24 +29,17 @@ const Add: React.FC<{
         })
       }}
     >
-      <FormListItem
-        itemProps={{
-          tooltip: 'is an item to add.'
-        }}
-        name="value"
-        renderItem={({ key, name, ...restField }) => {
-          return (
-            <Form.Item
-              {...restField}
-              name={[name]}
-              required={true}
-              rules={[{ required: true }]}
-            >
-              <FieldInput />
-            </Form.Item>
-          )
-        }}
-      ></FormListItem>
+      <BaseKeyForm>
+        <FormListItem
+          tooltip="is an item to add."
+          name="value"
+          label="Items"
+          required
+          renderItem={({ ...restField }) => {
+            return <FormInputJsonItem {...restField} required />
+          }}
+        ></FormListItem>
+      </BaseKeyForm>
     </ModalForm>
   )
 }

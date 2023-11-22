@@ -1,4 +1,4 @@
-import { Button, Form } from 'antd'
+import { Form } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import CusModal from '@/components/CusModal'
@@ -8,10 +8,12 @@ import { LinkOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import XTerm, { type XTermAction } from '../XTerm'
 import { useLatest } from 'ahooks'
+import { isString } from 'lodash'
+import CusButton from '../CusButton'
 
 interface ModalQueryFormProps<T> {
   defaultValue?: Record<string, any>
-  trigger: React.ReactElement
+  trigger?: React.ReactElement | string
   onQuery: (value: Record<string, any>) => Promise<T>
   width?: string | number
   title?: React.ReactNode
@@ -24,7 +26,7 @@ interface ModalQueryFormProps<T> {
   queryWithOpen?: boolean
 }
 
-const welcome = 'Waiting for result...'
+const welcome = 'Waiting for Query...'
 
 function ModalQueryForm<T>(
   props: React.PropsWithChildren<ModalQueryFormProps<T>>,
@@ -34,7 +36,13 @@ function ModalQueryForm<T>(
 
   React.useImperativeHandle(ref, () => form)
 
-  const { width = 800, queryWithOpen = false, onQuery, afterQueryClose } = props
+  const {
+    width = 800,
+    queryWithOpen = false,
+    onQuery,
+    afterQueryClose,
+    title
+  } = props
 
   const term = React.useRef<XTermAction>(null)
 
@@ -43,6 +51,13 @@ function ModalQueryForm<T>(
   const onQueryRef = useLatest(onQuery)
 
   const [isQuerySuccess, setIsQuerySuccess] = React.useState(false)
+
+  const titleI18n = React.useMemo(() => {
+    if (isString(title)) {
+      return t(title)
+    }
+    return title
+  }, [t, title])
 
   const query = React.useCallback(async () => {
     const v = await form.validateFields()
@@ -67,6 +82,20 @@ function ModalQueryForm<T>(
     form.resetFields()
   }, [form])
 
+  const trigger: React.ReactElement = React.useMemo(() => {
+    if (props.trigger !== undefined) {
+      if (isString(props.trigger)) {
+        return <CusButton>{props.trigger}</CusButton>
+      }
+      return props.trigger
+    } else {
+      if (isString(props.title)) {
+        return <CusButton>{props.title}</CusButton>
+      }
+    }
+    return <></>
+  }, [props.title, props.trigger])
+
   return (
     <CusModal
       forceRender={false}
@@ -74,12 +103,15 @@ function ModalQueryForm<T>(
       autoClose={false}
       onCancel={props.onCancel}
       showOkNotice={false}
+      trigger={trigger}
       cancelText={t('Close')}
       width={width}
       footer={(_, { OkBtn, CancelBtn }) => (
         <div>
           <CancelBtn />
-          <Button onClick={clear}>{t('Reset')}</Button>
+          <CusButton onClick={clear} type="default">
+            Reset
+          </CusButton>
           <OkBtn />
         </div>
       )}
@@ -97,11 +129,10 @@ function ModalQueryForm<T>(
       beforeOpen={() => {
         form.setFieldsValue(props.defaultValue)
       }}
-      trigger={props.trigger}
       onOk={query}
       title={
         <div>
-          {props.title}
+          {titleI18n}
           {props.documentUrl !== undefined && (
             <Link href={props.documentUrl} className="ml-2">
               <LinkOutlined />

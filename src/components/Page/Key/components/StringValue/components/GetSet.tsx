@@ -1,7 +1,8 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, Input } from 'antd'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const GetSet: React.FC<{
   keys: APP.StringKey
@@ -15,7 +16,6 @@ const GetSet: React.FC<{
         name: keys.name
       }}
       documentUrl="https://redis.io/commands/getset/"
-      trigger={<Button type="primary">GETSET</Button>}
       afterQueryClose={onSuccess}
       onQuery={async (v) => {
         const res = await request<string>(
@@ -32,12 +32,9 @@ const GetSet: React.FC<{
         return res.data
       }}
     >
-      <Form.Item label={'name'} name={'name'} rules={[{ required: true }]}>
-        <Input readOnly />
-      </Form.Item>
-      <Form.Item label={'value'} name={'value'} rules={[{ required: true }]}>
-        <Input />
-      </Form.Item>
+      <BaseKeyForm>
+        <FormInputJsonItem label="Value" name="value" required />
+      </BaseKeyForm>
     </ModalQueryForm>
   )
 }

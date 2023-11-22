@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input, Space } from 'antd'
+import { Input, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import SAdd from './components/SAdd'
 import SRem from './components/SRem'
@@ -26,6 +26,7 @@ import SPop from './components/SPop'
 import SRandMember from './components/SRandMember'
 import SUnion from './components/SUnion'
 import SUnionStore from './components/SUnionStore'
+import CusButton from '@/components/CusButton'
 
 const SetValue: React.FC<{
   keys: APP.SetKey
@@ -89,9 +90,12 @@ const SetValue: React.FC<{
         return (
           <Space>
             <SRem
-              trigger={<Button type="link" icon={<DeleteOutlined />}></Button>}
+              trigger={
+                <CusButton type="link" icon={<DeleteOutlined />}></CusButton>
+              }
               keys={keys}
               defaultValue={{
+                name: keys.name,
                 value: [record.value]
               }}
               onSuccess={() => {
@@ -106,7 +110,9 @@ const SetValue: React.FC<{
                 value: record.value
               }}
               keys={keys}
-              trigger={<Button type="link" icon={<ScissorOutlined />}></Button>}
+              trigger={
+                <CusButton type="link" icon={<ScissorOutlined />}></CusButton>
+              }
             ></SMove>
           </Space>
         )
@@ -140,11 +146,11 @@ const SetValue: React.FC<{
               name: keys.name
             }}
             keys={keys}
-            trigger={<Button type="primary">SMOVE</Button>}
+            trigger={<CusButton>SMOVE</CusButton>}
           ></SMove>
           <SPop keys={keys} onSuccess={onRefresh}></SPop>
           <SRem
-            trigger={<Button type="primary">SREM</Button>}
+            trigger={<CusButton>SREM</CusButton>}
             keys={keys}
             onSuccess={onRefresh}
             defaultValue={{ value: [undefined], name: keys.name }}

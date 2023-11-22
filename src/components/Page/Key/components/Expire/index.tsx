@@ -1,17 +1,13 @@
-import { Form } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
-import CusInputNumber from '@/components/CusInputNumber'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const Expire: React.FC<{
   keys: APP.Key
   trigger: React.ReactElement
   onSuccess: (ttl: number) => void
 }> = (props) => {
-  const { t } = useTranslation()
-
   return (
     <ModalForm
       width={400}
@@ -30,13 +26,14 @@ const Expire: React.FC<{
         ttl: props.keys.ttl
       }}
     >
-      <Form.Item
-        name={'ttl'}
-        label={'TTL'}
-        tooltip={t('-1 mean PERSIST the key')}
-      >
-        <CusInputNumber min={-1}></CusInputNumber>
-      </Form.Item>
+      <FormInputNumberItem
+        name="ttl"
+        label="TTL"
+        tooltip="-1 mean PERSIST the key"
+        inputProps={{
+          min: 1
+        }}
+      />
     </ModalForm>
   )
 }

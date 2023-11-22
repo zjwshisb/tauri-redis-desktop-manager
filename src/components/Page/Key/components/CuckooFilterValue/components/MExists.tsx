@@ -1,31 +1,28 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form } from 'antd'
 import FormListItem from '@/components/Form/FormListItem'
-import FieldInput from '@/components/InputJson'
-import { useTranslation } from 'react-i18next'
+
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const MExists: React.FC<{
   keys: APP.CuckooFilterKey
 }> = ({ keys }) => {
-  const { t } = useTranslation()
-
   return (
     <ModalQueryForm
       title="CF.MEXISTS"
       defaultValue={{
-        value: [undefined]
+        value: [undefined],
+        name: keys.name
       }}
       width={500}
       documentUrl="https://redis.io/commands/cf.mexists/"
-      trigger={<Button type="primary">MEXISTS</Button>}
       onQuery={async (v) => {
         const res = await request<number>(
           'cuckoo-filter/mexists',
           keys.connection_id,
           {
-            name: keys.name,
             db: keys.db,
             ...v
           },
@@ -36,27 +33,19 @@ const MExists: React.FC<{
         return res.data
       }}
     >
-      <FormListItem
-        itemProps={{
-          tooltip: 'Is an item to check.',
-          label: t('Item').toString(),
-          required: true,
-          rules: [{ required: true }]
-        }}
-        name="value"
-        renderItem={({ key, name, ...restField }) => {
-          return (
-            <Form.Item
-              {...restField}
-              name={[name]}
-              required={true}
-              rules={[{ required: true }]}
-            >
-              <FieldInput />
-            </Form.Item>
-          )
-        }}
-      ></FormListItem>
+      <BaseKeyForm>
+        <FormListItem
+          tooltip="Is an item to check."
+          label="Item"
+          required
+          name="value"
+          renderItem={({ key, name, ...restField }) => {
+            return (
+              <FormInputJsonItem {...restField} name={[name]} required={true} />
+            )
+          }}
+        ></FormListItem>
+      </BaseKeyForm>
     </ModalQueryForm>
   )
 }

@@ -1,8 +1,7 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form } from 'antd'
-import CusInput from '@/components/CusInput'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const LLen: React.FC<{
   keys: APP.ListKey
@@ -16,7 +15,6 @@ const LLen: React.FC<{
         name: keys.name
       }}
       documentUrl="https://redis.io/commands/llen/"
-      trigger={<Button type="primary">LLEN</Button>}
       onQuery={async (v) => {
         const res = await request(
           'list/llen',
@@ -32,9 +30,7 @@ const LLen: React.FC<{
         return res.data
       }}
     >
-      <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
-        <CusInput />
-      </Form.Item>
+      <BaseKeyForm></BaseKeyForm>
     </ModalQueryForm>
   )
 }

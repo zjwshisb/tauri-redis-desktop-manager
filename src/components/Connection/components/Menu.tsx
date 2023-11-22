@@ -12,8 +12,9 @@ import {
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import { Button, Dropdown } from 'antd'
+import { Dropdown } from 'antd'
 import { useTranslation } from 'react-i18next'
+import CusButton from '@/components/CusButton'
 
 interface MenuItem {
   key: string
@@ -180,7 +181,7 @@ const Menu: React.FC<{
         items: connectionMenus
       }}
     >
-      <Button type="text" size="small" icon={<MenuOutlined />}></Button>
+      <CusButton icon={<MenuOutlined />}></CusButton>
     </Dropdown>
   )
 }

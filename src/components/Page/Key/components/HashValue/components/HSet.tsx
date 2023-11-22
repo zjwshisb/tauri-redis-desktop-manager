@@ -1,10 +1,11 @@
-import { Col, Form, Input, Row } from 'antd'
+import { Row } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
-import FieldInput from '@/components/InputJson'
 import ModalForm from '@/components/ModalForm'
 import FormListItem from '@/components/Form/FormListItem'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
 
 const FieldForm: React.FC<{
   keys: APP.HashKey
@@ -58,31 +59,26 @@ const FieldForm: React.FC<{
     >
       <FormListItem
         name="value"
-        itemProps={{
-          label: ''
-        }}
+        label=""
         showAdd={props.field === undefined}
         renderItem={(field) => {
           return (
             <Row gutter={20}>
-              <Col span={8}>
-                <Form.Item
-                  name={[field.name, 'field']}
-                  label={t('Field Name')}
-                  rules={[{ required: true }]}
-                >
-                  <Input readOnly={isEdit}></Input>
-                </Form.Item>
-              </Col>
-              <Col span={16}>
-                <Form.Item
-                  name={[field.name, 'value']}
-                  label={t('Field Value')}
-                  rules={[{ required: true }]}
-                >
-                  <FieldInput></FieldInput>
-                </Form.Item>
-              </Col>
+              <FormInputItem
+                span={8}
+                name={[field.name, 'field']}
+                label={t('Field Name')}
+                required
+                inputProps={{
+                  readOnly: isEdit
+                }}
+              />
+              <FormInputJsonItem
+                span={16}
+                name={[field.name, 'value']}
+                label={t('Field Value')}
+                required
+              />
             </Row>
           )
         }}

@@ -1,12 +1,13 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, Popover, Button } from 'antd'
+import { Typography, Popover } from 'antd'
 import useStore from '@/hooks/useStore'
 import { SearchOutlined } from '@ant-design/icons'
 import context from '../context'
 import Container from '@/components/Container'
 import InteractiveContainer from '@/components/InteractiveContainer'
 import Highlighter from 'react-highlight-words'
+import CusButton from '@/components/CusButton'
 
 const KeyItem: React.FC<{
   name: string
@@ -31,7 +32,7 @@ const KeyItem: React.FC<{
             return (
               <Container key={v} className="p-1 flex items-center border-b">
                 <span>{str}</span>
-                <Button
+                <CusButton
                   type="link"
                   icon={<SearchOutlined></SearchOutlined>}
                   onClick={() => {
@@ -42,7 +43,7 @@ const KeyItem: React.FC<{
                       }
                     })
                   }}
-                ></Button>
+                ></CusButton>
               </Container>
             )
           })}

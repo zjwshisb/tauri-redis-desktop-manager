@@ -61,7 +61,6 @@ const App: React.FC = () => {
             <Space>
               <div className="w-[200px]">
                 <Input
-                  placeholder="filter"
                   onChange={(e) => {
                     searchRef.current = e.target.value
                   }}

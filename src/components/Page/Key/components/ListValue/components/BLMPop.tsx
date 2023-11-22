@@ -1,4 +1,3 @@
-import { Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
@@ -8,6 +7,7 @@ import FormListItem from '@/components/Form/FormListItem'
 import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 import FormInputItem from '@/components/Form/FormInputItem'
 import FormRadioItem from '@/components/Form/FormRadioItem'
+import options from '../options'
 
 const BLMPop: React.FC<{
   keys: APP.ListKey
@@ -23,7 +23,6 @@ const BLMPop: React.FC<{
         defaultValue={{
           keys: [props.keys.name]
         }}
-        trigger={<Button type="primary">BLMPOP</Button>}
         onSubmit={async (v) => {
           await request<number>('list/blmpop', props.keys.connection_id, {
             db: props.keys.db,
@@ -48,10 +47,7 @@ const BLMPop: React.FC<{
           label={'Wherefrom'}
           required
           inputProps={{
-            options: [
-              { label: 'LEFT', value: 'LEFT' },
-              { label: 'RIGHT', value: 'RIGHT' }
-            ]
+            options
           }}
         ></FormRadioItem>
         <FormInputNumberItem name={'count'} label="Count" />

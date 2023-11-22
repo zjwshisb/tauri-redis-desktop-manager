@@ -1,6 +1,6 @@
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Space } from 'antd'
+import { Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import LTrim from './components/LTrim'
 import LSet from './components/LSet'
@@ -34,6 +34,7 @@ import LRem from './components/LRem'
 import { EditOutlined } from '@ant-design/icons'
 import RPopLPush from './components/RPopLPush'
 import RPushX from './components/RPushX'
+import CusButton from '@/components/CusButton'
 
 const ListValue: React.FC<{
   keys: APP.ListKey
@@ -140,7 +141,7 @@ const ListValue: React.FC<{
           <Space>
             <LSet
               keys={keys}
-              trigger={<Button type="link" icon={<EditOutlined />} />}
+              trigger={<CusButton type="link" icon={<EditOutlined />} />}
               defaultValue={{
                 field: index,
                 value: record.value,
@@ -183,7 +184,7 @@ const ListValue: React.FC<{
           <LRem keys={keys} onSuccess={onRefresh} />
           <LSet
             keys={keys}
-            trigger={<Button type="primary">LSET</Button>}
+            trigger={<CusButton>LSET</CusButton>}
             defaultValue={{
               name: keys.name
             }}

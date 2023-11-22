@@ -1,9 +1,7 @@
 import { type KeyInfo } from '@/store/key'
 import request from '@/utils/request'
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Form, InputNumber, Select, Tooltip } from 'antd'
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 import useKeyTypes from '@/hooks/useKeyTypes'
 import ModalForm from '@/components/ModalForm'
 import TopKItem from './components/TopkItem'
@@ -16,15 +14,16 @@ import SimpleArrayItem from './components/SimpleArrayItem'
 import CuckooFilterItem from './components/CuckooFilterItem'
 
 import { type FormInstance } from 'antd/lib'
-import FieldInput from '@/components/InputJson'
-import CusInput from '@/components/CusInput'
+import FormSelectItem from '@/components/Form/FormSelectItem'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import CusButton from '@/components/CusButton'
 
 const Plus: React.FC<{
   onSuccess: (name: string) => void
   info: KeyInfo
 }> = (props) => {
-  const { t } = useTranslation()
-
   const keyTypes = useKeyTypes()
 
   const form = React.useRef<FormInstance>(null)
@@ -42,27 +41,17 @@ const Plus: React.FC<{
       }
       case 'TDIS-TYPE': {
         return (
-          <Form.Item
+          <FormInputNumberItem
             name={'compression'}
             label={'Compression'}
             tooltip="is a controllable tradeoff between accuracy and memory consumption. 100 is a common value for normal uses. 1000 is more accurate. If no value is passed by default the compression will be 100."
-          >
-            <InputNumber className="!w-[300px]"></InputNumber>
-          </Form.Item>
+          />
         )
       }
       case 'string':
       case 'ReJSON-RL': {
         form.current?.setFieldValue('value', undefined)
-        return (
-          <Form.Item
-            name={'value'}
-            label={t('Value')}
-            rules={[{ required: true }]}
-          >
-            <FieldInput />
-          </Form.Item>
-        )
+        return <FormInputJsonItem name={'value'} label={'Value'} required />
       }
       case 'zset': {
         form.current?.setFieldValue('value', [
@@ -99,7 +88,7 @@ const Plus: React.FC<{
       }
     }
     return <></>
-  }, [t, types])
+  }, [types])
 
   const path = React.useMemo(() => {
     switch (types) {
@@ -160,15 +149,14 @@ const Plus: React.FC<{
       ref={form}
       onValueChange={onValueChange}
       trigger={
-        <Tooltip title={t('New Key')} placement="bottom">
-          <Button
-            type="text"
-            size="small"
-            icon={<PlusOutlined className="text-lg"></PlusOutlined>}
-          ></Button>
-        </Tooltip>
+        <CusButton
+          tooltip={{
+            title: 'New Key'
+          }}
+          icon={<PlusOutlined className="text-lg"></PlusOutlined>}
+        />
       }
-      title={t('New Key')}
+      title="New Key"
       onCancel={() => {
         setTypes(undefined)
       }}
@@ -181,21 +169,15 @@ const Plus: React.FC<{
         setTypes(undefined)
       }}
     >
-      <Form.Item
+      <FormSelectItem
         name="types"
-        label={t('Key Type')}
-        rules={[{ required: true }]}
-      >
-        <Select
-          options={keyTypes}
-          placeholder={t('Please Select {{name}}', {
-            name: t('Key Type')
-          })}
-        ></Select>
-      </Form.Item>
-      <Form.Item name="name" label={t('Key Name')} rules={[{ required: true }]}>
-        <CusInput />
-      </Form.Item>
+        label="Key Type"
+        required
+        inputProps={{
+          options: keyTypes
+        }}
+      />
+      <FormInputItem name="name" label="Key Name" required />
       {additionFormItem}
     </ModalForm>
   )

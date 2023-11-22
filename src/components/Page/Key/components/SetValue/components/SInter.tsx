@@ -1,7 +1,6 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button } from 'antd'
 import FormListItem from '@/components/Form/FormListItem'
 import FormInputItem from '@/components/Form/FormInputItem'
 
@@ -16,7 +15,6 @@ const SInter: React.FC<{
         value: [keys.name, undefined]
       }}
       documentUrl="https://redis.io/commands/sinter/"
-      trigger={<Button type="primary">SINTER</Button>}
       onQuery={async (v) => {
         const res = await request(
           'set/sinter',

@@ -1,17 +1,15 @@
-import { Button, Col, Form, Input, Row } from 'antd'
+import { Row } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
-import FieldInput from '@/components/InputJson'
 import ModalForm from '@/components/ModalForm'
 import FormListItem from '@/components/Form/FormListItem'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
 
 const MSet: React.FC<{
   keys: APP.StringKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
-  const { t } = useTranslation()
-
   return (
     <ModalForm
       title={'MSET'}
@@ -25,7 +23,6 @@ const MSet: React.FC<{
           }
         ]
       }}
-      trigger={<Button type="primary">MSET</Button>}
       onSubmit={async (v) => {
         await request<number>('string/mset', keys.connection_id, {
           db: keys.db,
@@ -37,30 +34,21 @@ const MSet: React.FC<{
     >
       <FormListItem
         name="value"
-        itemProps={{
-          label: ''
-        }}
         renderItem={(field) => {
           return (
             <Row gutter={20}>
-              <Col span={8}>
-                <Form.Item
-                  name={[field.name, 'field']}
-                  label={t('Name')}
-                  rules={[{ required: true }]}
-                >
-                  <Input></Input>
-                </Form.Item>
-              </Col>
-              <Col span={16}>
-                <Form.Item
-                  name={[field.name, 'value']}
-                  label={t('Value')}
-                  rules={[{ required: true }]}
-                >
-                  <FieldInput></FieldInput>
-                </Form.Item>
-              </Col>
+              <FormInputItem
+                span={8}
+                name={[field.name, 'field']}
+                label="Name"
+                required
+              />
+              <FormInputJsonItem
+                span={16}
+                name={[field.name, 'value']}
+                label="Value"
+                required
+              />
             </Row>
           )
         }}

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { Button, Input } from 'antd'
+import { Input } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import HSet from './components/HSet'
 import HDel from './components/HDel'
@@ -13,6 +13,7 @@ import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
 import Highlighter from 'react-highlight-words'
+import CusButton from '@/components/CusButton'
 
 const HashValue: React.FC<{
   keys: APP.HashKey
@@ -78,7 +79,9 @@ const HashValue: React.FC<{
           <div>
             <Editable connection={connection}>
               <HSet
-                trigger={<Button icon={<EditOutlined />} type="link"></Button>}
+                trigger={
+                  <CusButton icon={<EditOutlined />} type="link"></CusButton>
+                }
                 keys={keys}
                 field={record}
                 onSuccess={onRefresh}
@@ -100,7 +103,7 @@ const HashValue: React.FC<{
         <HSet
           keys={keys}
           onSuccess={onRefresh}
-          trigger={<Button type="primary">{'HSET'}</Button>}
+          trigger={<CusButton>HSET</CusButton>}
         />
       }
     >

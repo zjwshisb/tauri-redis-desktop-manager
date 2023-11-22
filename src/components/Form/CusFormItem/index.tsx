@@ -1,13 +1,14 @@
-import { Form, type FormItemProps } from 'antd'
+import { type ColProps, Form, type FormItemProps, Col } from 'antd'
+import { isString } from 'lodash'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-export type CusFormItemProps<T> = Omit<FormItemProps, 'label'> & {
+export type CusFormItemProps<T> = FormItemProps & {
   inputProps?: T
-  label?: string
   render: (p?: T) => React.ReactElement
-  placeholderFormat?: string
+  placeholderMsg?: string
   requiredMsg?: string
+  span?: ColProps['span']
 }
 
 export function CusFormItem<T extends Record<string, any>>(
@@ -16,15 +17,31 @@ export function CusFormItem<T extends Record<string, any>>(
   const {
     required,
     rules,
-    placeholderFormat = 'Please enter {{name}}',
+    placeholderMsg = 'Please enter {{name}}',
     requiredMsg = 'Please enter {{name}}',
     label = '',
     render,
     inputProps,
+    tooltip = undefined,
+    span,
     ...other
   } = p
 
   const { t } = useTranslation()
+
+  const labelI18n = React.useMemo(() => {
+    if (isString(label)) {
+      return t(label)
+    }
+    return label
+  }, [label, t])
+
+  const tooltipI18n = React.useMemo(() => {
+    if (isString(tooltip)) {
+      return t(tooltip)
+    }
+    return undefined
+  }, [t, tooltip])
 
   const appendRules = React.useMemo(() => {
     const newRule = rules === undefined ? [] : [...rules]
@@ -32,18 +49,18 @@ export function CusFormItem<T extends Record<string, any>>(
       newRule.push({
         required: true,
         message: t(requiredMsg, {
-          name: t(label)
+          name: labelI18n
         }).toString()
       })
     }
     return newRule
-  }, [label, required, requiredMsg, rules, t])
+  }, [labelI18n, required, requiredMsg, rules, t])
 
   const placeholder = React.useMemo(() => {
-    return t(placeholderFormat, {
-      name: t(label)
+    return t(placeholderMsg, {
+      name: labelI18n
     }).toString()
-  }, [label, placeholderFormat, t])
+  }, [labelI18n, placeholderMsg, t])
 
   const inputPropsNew = React.useMemo(() => {
     return {
@@ -52,11 +69,23 @@ export function CusFormItem<T extends Record<string, any>>(
     } as unknown as T
   }, [p.inputProps, placeholder])
 
-  return (
-    <Form.Item label={t(label)} rules={appendRules} {...other}>
-      {render(inputPropsNew)}
-    </Form.Item>
-  )
+  const item = React.useMemo(() => {
+    return (
+      <Form.Item
+        label={labelI18n}
+        tooltip={tooltipI18n}
+        rules={appendRules}
+        {...other}
+      >
+        {render(inputPropsNew)}
+      </Form.Item>
+    )
+  }, [appendRules, inputPropsNew, labelI18n, other, render, tooltipI18n])
+
+  if (span === undefined) {
+    return item
+  }
+  return <Col span={span}>{item}</Col>
 }
 
 export default CusFormItem

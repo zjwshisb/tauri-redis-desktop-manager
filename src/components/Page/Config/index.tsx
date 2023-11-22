@@ -1,7 +1,7 @@
 import Editable from '@/components/Editable'
 import useRequest from '@/hooks/useRequest'
 import { EditOutlined, SearchOutlined } from '@ant-design/icons'
-import { Button, Input } from 'antd'
+import { Input, Space } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Edit from './Components/Edit'
@@ -12,6 +12,7 @@ import Page from '..'
 import CusTable from '@/components/CusTable'
 import useTableColumn from '@/hooks/useTableColumn'
 import Highlighter from 'react-highlight-words'
+import CusButton from '@/components/CusButton'
 
 const Config: React.FC<{
   connection: APP.Connection
@@ -63,7 +64,9 @@ const Config: React.FC<{
               connection={connection}
               onSuccess={fetch}
               field={record}
-              trigger={<Button icon={<EditOutlined />} type="link"></Button>}
+              trigger={
+                <CusButton icon={<EditOutlined />} type="link"></CusButton>
+              }
             ></Edit>
           </Editable>
         )
@@ -76,18 +79,20 @@ const Config: React.FC<{
   return (
     <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
       <div className="flex mb-2">
-        <div className="w-[300px]">
-          <Input
-            prefix={<SearchOutlined />}
-            placeholder={t('Filter').toString()}
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value)
-            }}
-          ></Input>
-        </div>
-        <Rewrite connection={connection}></Rewrite>
-        <ResetStat connection={connection}></ResetStat>
+        <Space>
+          <div className="w-[300px]">
+            <Input
+              prefix={<SearchOutlined />}
+              placeholder={t('Filter').toString()}
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+              }}
+            ></Input>
+          </div>
+          <Rewrite connection={connection} onSuccess={fetch}></Rewrite>
+          <ResetStat connection={connection} onSuccess={fetch}></ResetStat>
+        </Space>
       </div>
       <CusTable
         rowKey={'field'}

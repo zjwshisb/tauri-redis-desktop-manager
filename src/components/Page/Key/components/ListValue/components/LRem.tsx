@@ -1,9 +1,10 @@
-import { Form, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
-import CusInput from '@/components/CusInput'
-import CusInputNumber from '@/components/CusInputNumber'
+
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const LRem: React.FC<{
   keys: APP.ListKey
@@ -13,7 +14,6 @@ const LRem: React.FC<{
     <ModalForm
       width={400}
       documentUrl="https://redis.io/commands/lrem/"
-      trigger={<Button type="primary">LREM</Button>}
       defaultValue={{
         name: props.keys.name
       }}
@@ -26,15 +26,15 @@ const LRem: React.FC<{
       }}
       title={'LREM'}
     >
-      <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
-        <CusInput />
-      </Form.Item>
-      <Form.Item name={'value'} label={'Count'} rules={[{ required: true }]}>
-        <CusInputNumber precision={0} />
-      </Form.Item>
-      <Form.Item name={'field'} label={'Element'} rules={[{ required: true }]}>
-        <CusInput />
-      </Form.Item>
+      <BaseKeyForm>
+        <FormInputNumberItem
+          name={'value'}
+          label={'Count'}
+          required
+          inputProps={{ precision: 0 }}
+        />
+        <FormInputJsonItem name={'field'} label={'Element'} required />
+      </BaseKeyForm>
     </ModalForm>
   )
 }

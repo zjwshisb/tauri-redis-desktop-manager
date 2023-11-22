@@ -1,28 +1,30 @@
 import React from 'react'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
-import ButtonAction from '@/components/ButtonAction'
+import ModalQueryForm from '@/components/ModalQueryForm'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const Decr: React.FC<{
   keys: APP.StringKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
-  const { t } = useTranslation()
-
   return (
-    <ButtonAction
-      type="primary"
+    <ModalQueryForm
+      width={400}
+      defaultValue={{
+        name: keys.name
+      }}
+      title="DECR"
+      afterQueryClose={onSuccess}
       documentUrl={'https://redis.io/commands/decr/'}
-      onSubmit={async () => {
-        await request('string/decr', keys.connection_id, {
+      onQuery={async (v) => {
+        return await request('string/decr', keys.connection_id, {
           db: keys.db,
-          name: keys.name
-        })
-        onSuccess()
+          ...v
+        }).then((r) => r.data)
       }}
     >
-      {t('DECR')}
-    </ButtonAction>
+      <BaseKeyForm />
+    </ModalQueryForm>
   )
 }
 export default Decr

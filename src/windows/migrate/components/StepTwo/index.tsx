@@ -8,16 +8,7 @@ import classNames from 'classnames'
 import Context from '../../context'
 import Header from '../Header'
 import { useTranslation } from 'react-i18next'
-import {
-  type ButtonProps,
-  Form,
-  Input,
-  Checkbox,
-  Col,
-  Row,
-  Button,
-  App
-} from 'antd'
+import { type ButtonProps, Form, Row, Button, App } from 'antd'
 import Action, { type ActionRef } from './Action'
 import { useSourceConnection, useTargetConnection } from '../../hooks'
 import { getCurrent } from '@tauri-apps/api/window'
@@ -25,6 +16,8 @@ import { confirm } from '@tauri-apps/api/dialog'
 import { type UnlistenFn } from '@tauri-apps/api/event'
 import { useLatest } from 'ahooks'
 import Container from '@/components/Container'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormCheckBoxItem from '@/components/Form/FormCheckBoxItem'
 
 interface ConfigForm {
   pattern: string
@@ -118,13 +111,16 @@ const StepTwo: React.FC = () => {
     const webview = getCurrent()
     webview
       .onCloseRequested(async (e) => {
+        console.log(e)
         if (changeDisabledRef.current) {
           const confirmed = await confirm(
             t('Are you sure stop action and quite?')
           )
-          if (!confirmed) {
-            e.preventDefault()
+          if (confirmed) {
+            webview.close()
           }
+        } else {
+          webview.close()
         }
       })
       .then((f) => {
@@ -174,46 +170,33 @@ const StepTwo: React.FC = () => {
               }}
             >
               <Row gutter={20}>
-                <Col span={12}>
-                  <Form.Item
-                    label={t('Key Pattern')}
-                    name={'pattern'}
-                    tooltip={t("'*' is not required")}
-                  >
-                    <Input
-                      disabled={changeDisabled}
-                      placeholder={t('Please Enter {{name}}', {
-                        name: t('Key Pattern')
-                      }).toString()}
-                    ></Input>
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    label={t('Replace Target Key')}
-                    valuePropName={'checked'}
-                    name={'replace'}
-                    tooltip={t(
-                      'Replace or not If the target database has the key'
-                    )}
-                  >
-                    <Checkbox disabled={changeDisabled}></Checkbox>
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    name={'delete'}
-                    label={t('Delete Source Key')}
-                    valuePropName={'checked'}
-                    tooltip={t(
-                      'Delete the key or not in the Source database If had migrated to the target'
-                    )}
-                  >
-                    <Checkbox
-                      disabled={changeDisabled || sourceConnection.readonly}
-                    ></Checkbox>
-                  </Form.Item>
-                </Col>
+                <FormInputItem
+                  span={12}
+                  label="Key Pattern"
+                  name="pattern"
+                  tooltip="'*' is not required"
+                  inputProps={{
+                    disabled: changeDisabled
+                  }}
+                />
+                <FormCheckBoxItem
+                  span={6}
+                  label="Replace Target Key"
+                  name="replace"
+                  tooltip="Replace or not If the target database has the key"
+                  inputProps={{
+                    disabled: changeDisabled
+                  }}
+                />
+                <FormCheckBoxItem
+                  span={6}
+                  name="delete"
+                  label="Delete Source Key"
+                  tooltip="Delete the key or not in the Source database If had migrated to the target"
+                  inputProps={{
+                    disabled: changeDisabled || sourceConnection.readonly
+                  }}
+                />
               </Row>
             </Form>
           </div>

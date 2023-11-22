@@ -17,7 +17,7 @@ import Terminal from '@/components/Page/Terminal'
 import Collection from '@/components/Page/Collection'
 
 const DetailPage: React.FC<
-  Omit<Page, 'children' | 'label' | 'name'> & {
+  Omit<Page, 'label' | 'name'> & {
     name?: string
   }
 > = (props) => {

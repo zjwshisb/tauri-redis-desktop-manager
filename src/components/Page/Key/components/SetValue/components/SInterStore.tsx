@@ -1,4 +1,3 @@
-import { Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
@@ -14,7 +13,6 @@ const SInterStore: React.FC<{
       defaultValue={{
         value: [keys.name, undefined]
       }}
-      trigger={<Button type="primary">SINTERSTORE</Button>}
       onSubmit={async (v) => {
         await request<number>('set/sinterstore', keys.connection_id, {
           db: keys.db,

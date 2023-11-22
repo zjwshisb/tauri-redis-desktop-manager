@@ -12,7 +12,6 @@ import classNames from 'classnames'
 import Container from '@/components/Container'
 import InteractiveContainer from '@/components/InteractiveContainer'
 import useStore from '@/hooks/useStore'
-import Key from '@/components/Page/Key'
 
 type Status = 'before' | 'finished' | 'stop'
 
@@ -227,27 +226,13 @@ const Action: React.ForwardRefRenderFunction<ActionRef, ActionProps> = (
                   <InteractiveContainer
                     className="h-[24px] border-b-[0.5px] box-border flex items-center px-2"
                     onClick={() => {
-                      const page = store.page.createPage(
-                        {
-                          connection: source.connection,
-                          name: item.name,
-                          db: source.database,
-                          type: 'key'
-                        },
-                        ({ key }) => (
-                          <Key
-                            name={item.name}
-                            db={
-                              source.database === undefined
-                                ? 0
-                                : source.database
-                            }
-                            connection={source.connection}
-                            pageKey={key}
-                          ></Key>
-                        )
-                      )
-                      store.page.openPage(page)
+                      const page = store.page.createPage({
+                        connection: source.connection,
+                        name: item.name,
+                        db: source.database,
+                        type: 'key'
+                      })
+                      store.page.addPageOrInNewWindow(page)
                     }}
                   >
                     <div className="w-[100px] flex-shrink-0">{index + 1}</div>

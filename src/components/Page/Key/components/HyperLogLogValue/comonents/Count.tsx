@@ -1,16 +1,13 @@
 import React from 'react'
 
-import { Button, Form, Input } from 'antd'
 import request from '@/utils/request'
 import FormListItem from '@/components/Form/FormListItem'
-import { useTranslation } from 'react-i18next'
 import ModalQueryForm from '@/components/ModalQueryForm'
+import FormInputItem from '@/components/Form/FormInputItem'
 
 const Add: React.FC<{
   keys: APP.HyperLogLogKey
 }> = ({ keys }) => {
-  const { t } = useTranslation()
-
   return (
     <ModalQueryForm
       defaultValue={{
@@ -19,7 +16,6 @@ const Add: React.FC<{
       title={'PFCOUNT'}
       documentUrl="https://redis.io/commands/pfcount/"
       width={400}
-      trigger={<Button type="primary">PFCOUNT</Button>}
       onQuery={async (v) => {
         const res = await request(
           'hyperloglog/pfcount',
@@ -37,19 +33,9 @@ const Add: React.FC<{
     >
       <FormListItem
         name="name"
-        itemProps={{
-          label: 'Name'
-        }}
+        label="Name"
         renderItem={({ name, ...restField }) => {
-          return (
-            <Form.Item
-              {...restField}
-              name={[name]}
-              rules={[{ required: true }]}
-            >
-              <Input placeholder={t('Please Enter').toString()} />
-            </Form.Item>
-          )
+          return <FormInputItem {...restField} name={[name]} required />
         }}
       ></FormListItem>
     </ModalQueryForm>

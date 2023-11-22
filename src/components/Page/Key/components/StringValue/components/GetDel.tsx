@@ -1,9 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, Input } from 'antd'
 import connectionContext from '../../../context'
 import VersionAccess from '@/components/VersionAccess'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const GetDel: React.FC<{
   keys: APP.StringKey
@@ -20,7 +20,6 @@ const GetDel: React.FC<{
           name: keys.name
         }}
         documentUrl="https://redis.io/commands/getdel/"
-        trigger={<Button type="primary">GETDEL</Button>}
         afterQueryClose={onSuccess}
         onQuery={async (v) => {
           const res = await request<string>(
@@ -37,9 +36,7 @@ const GetDel: React.FC<{
           return res.data
         }}
       >
-        <Form.Item label={'key'} name={'name'} rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
+        <BaseKeyForm />
       </ModalQueryForm>
     </VersionAccess>
   )

@@ -1,30 +1,16 @@
-import { Form } from 'antd'
 import React from 'react'
 import FormListItem from '@/components/Form/FormListItem'
-import { useTranslation } from 'react-i18next'
-import CusInput from '@/components/CusInput'
+import FormInputItem from '@/components/Form/FormInputItem'
 
 const SimpleArrayItem: React.FC = () => {
-  const { t } = useTranslation()
-
   return (
     <FormListItem
       name="value"
       renderItem={(field) => {
-        return (
-          <Form.Item
-            {...field}
-            name={[field.name]}
-            rules={[{ required: true }]}
-          >
-            <CusInput />
-          </Form.Item>
-        )
+        return <FormInputItem {...field} required />
       }}
-      itemProps={{
-        label: t('Value'),
-        required: true
-      }}
+      label="Value"
+      required
     ></FormListItem>
   )
 }

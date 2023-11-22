@@ -1,4 +1,3 @@
-import { Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
@@ -22,7 +21,6 @@ const BLPop: React.FC<{
         defaultValue={{
           name: [props.keys.name]
         }}
-        trigger={<Button type="primary">BLPOP</Button>}
         onSubmit={async (v) => {
           await request<number>('list/blpop', props.keys.connection_id, {
             db: props.keys.db,

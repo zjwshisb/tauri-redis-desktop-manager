@@ -1,47 +1,32 @@
 import React from 'react'
-import { Button, Form } from 'antd'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
-import FieldInput from '@/components/InputJson'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const Set: React.FC<{
   keys: APP.StringKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
-  const [value, setValue] = React.useState(keys.data)
-
-  const { t } = useTranslation()
-
-  React.useEffect(() => {
-    setValue(keys.data)
-  }, [keys.data])
-
   return (
     <ModalForm
       documentUrl="https://redis.io/commands/set/"
-      title={t('SET')}
-      trigger={<Button type="primary">{t('SET')}</Button>}
+      title="SET"
       onSubmit={async (v) => {
         await request('string/set', keys.connection_id, {
           db: keys.db,
-          name: keys.name,
-          value: v.value
+          ...v
         })
         onSuccess()
       }}
       defaultValue={{
-        value
+        name: keys.name,
+        value: keys.data
       }}
     >
-      <Form.Item
-        name={'value'}
-        label={t('Value')}
-        rules={[{ required: true }]}
-        required
-      >
-        <FieldInput />
-      </Form.Item>
+      <BaseKeyForm>
+        <FormInputJsonItem name="value" label="Value" required />
+      </BaseKeyForm>
     </ModalForm>
   )
 }

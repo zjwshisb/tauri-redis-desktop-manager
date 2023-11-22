@@ -1,30 +1,23 @@
 import React from 'react'
 
-import { Form, InputNumber } from 'antd'
-import { useTranslation } from 'react-i18next'
 import FormListItem from '@/components/Form/FormListItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const ValueItem: React.FC<{
   label?: string
 }> = ({ label = 'Value' }) => {
-  const { t } = useTranslation()
-
   return (
     <FormListItem
       name="value"
-      itemProps={{
-        label,
-        required: true
-      }}
+      label={label}
+      required
       renderItem={({ name, ...restField }) => {
         return (
-          <Form.Item {...restField} name={[name]} rules={[{ required: true }]}>
-            <InputNumber
-              stringMode
-              placeholder={t('Please Enter').toString()}
-              className="!w-full"
-            />
-          </Form.Item>
+          <FormInputNumberItem
+            {...restField}
+            name={[name]}
+            required
+          ></FormInputNumberItem>
         )
       }}
     ></FormListItem>

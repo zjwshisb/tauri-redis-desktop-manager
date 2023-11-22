@@ -1,37 +1,35 @@
 import React from 'react'
-import { Button, Form, InputNumber } from 'antd'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import context from '../../../context'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 const IncrByFloat: React.FC<{
   keys: APP.StringKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
-  const { t } = useTranslation()
-
   const connection = React.useContext(context)
 
   return (
     <VersionAccess connection={connection} version="2.6.0">
       <ModalForm
         documentUrl="https://redis.io/commands/incrbyfloat/"
-        title={t('INCRBYFLOAT')}
+        title="INCRBYFLOAT"
+        defaultValue={{
+          name: keys.name
+        }}
         width={400}
-        trigger={<Button type="primary">{t('INCRBYFLOAT')}</Button>}
         onSubmit={async (v) => {
           await request('string/incrbyfloat', keys.connection_id, {
             db: keys.db,
-            name: keys.name,
             ...v
           })
           onSuccess()
         }}
       >
-        <Form.Item name={'value'} rules={[{ required: true }]} required>
-          <InputNumber className="!w-full" />
-        </Form.Item>
+        <FormInputItem name="name" label="Key" required />
+        <FormInputNumberItem name={'value'} label="Value" required />
       </ModalForm>
     </VersionAccess>
   )

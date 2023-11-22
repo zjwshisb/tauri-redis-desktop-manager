@@ -1,10 +1,9 @@
-import { Form, Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import FieldInput from '@/components/InputJson'
 import ModalForm from '@/components/ModalForm'
 import FormListItem from '@/components/Form/FormListItem'
-import CusInput from '@/components/CusInput'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const LPush: React.FC<{
   keys: APP.ListKey
@@ -14,7 +13,6 @@ const LPush: React.FC<{
     <ModalForm
       width={500}
       documentUrl="https://redis.io/commands/lpush/"
-      trigger={<Button type="primary">LPUSH</Button>}
       defaultValue={{
         name: props.keys.name,
         value: [undefined]
@@ -28,19 +26,16 @@ const LPush: React.FC<{
       }}
       title={'LPUSH'}
     >
-      <Form.Item rules={[{ required: true }]} name={'name'} label={'Key'}>
-        <CusInput />
-      </Form.Item>
-      <FormListItem
-        name="value"
-        renderItem={(f) => {
-          return (
-            <Form.Item name={[f.name]} rules={[{ required: true }]}>
-              <FieldInput />
-            </Form.Item>
-          )
-        }}
-      ></FormListItem>
+      <BaseKeyForm>
+        <FormListItem
+          name="value"
+          label="Items"
+          required
+          renderItem={(f) => {
+            return <FormInputJsonItem {...f} required />
+          }}
+        ></FormListItem>
+      </BaseKeyForm>
     </ModalForm>
   )
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input } from 'antd'
+import { Input } from 'antd'
 
 import { EditOutlined } from '@ant-design/icons'
 
@@ -7,6 +7,7 @@ import Rename from '../Rename'
 import { isReadonly } from '@/components/Editable'
 import Context from '../../context'
 import Copy from '@/components/Copy'
+import CusButton from '@/components/CusButton'
 const Name: React.FC<{
   keys: APP.Key
   onChange: (name: string) => void
@@ -28,7 +29,11 @@ const Name: React.FC<{
     return (
       <Rename
         trigger={
-          <Button icon={<EditOutlined />} type="text" size="small"></Button>
+          <CusButton
+            icon={<EditOutlined />}
+            type="text"
+            size="small"
+          ></CusButton>
         }
         keys={keys}
         onSuccess={onChange}

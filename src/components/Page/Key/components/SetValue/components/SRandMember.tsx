@@ -1,9 +1,8 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button } from 'antd'
-import FormInputItem from '@/components/Form/FormInputItem'
 import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const SRandMember: React.FC<{
   keys: APP.SetKey
@@ -16,7 +15,6 @@ const SRandMember: React.FC<{
       defaultValue={{
         name: keys.name
       }}
-      trigger={<Button type="primary">SRANDMEMBER</Button>}
       onQuery={async (v) => {
         const res = await request(
           'set/srandmember',
@@ -32,8 +30,9 @@ const SRandMember: React.FC<{
         return res.data
       }}
     >
-      <FormInputItem name={'name'} label="Key" required />
-      <FormInputNumberItem name={'value'} label={'Count'} />
+      <BaseKeyForm>
+        <FormInputNumberItem name={'value'} label={'Count'} />
+      </BaseKeyForm>
     </ModalQueryForm>
   )
 }

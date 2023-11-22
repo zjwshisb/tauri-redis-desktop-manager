@@ -1,7 +1,7 @@
-import { Button } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalQueryForm from '@/components/ModalQueryForm'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const Min: React.FC<{
   keys: APP.TDigestKey
@@ -10,12 +10,14 @@ const Min: React.FC<{
     <ModalQueryForm
       title="TDIGEST.MIN"
       queryWithOpen={true}
+      defaultValue={{
+        name: props.keys.name
+      }}
       onQuery={async () => {
         const res = await request<string>(
           'tdigest/min',
           props.keys.connection_id,
           {
-            name: props.keys.name,
             db: props.keys.db
           },
           {
@@ -24,8 +26,9 @@ const Min: React.FC<{
         )
         return res.data
       }}
-      trigger={<Button type="primary">MIN</Button>}
-    ></ModalQueryForm>
+    >
+      <BaseKeyForm />
+    </ModalQueryForm>
   )
 }
 export default Min

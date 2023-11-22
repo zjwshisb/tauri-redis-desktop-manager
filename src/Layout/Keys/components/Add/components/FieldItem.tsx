@@ -1,44 +1,32 @@
-import { Form, Row, Col } from 'antd'
+import { Row } from 'antd'
 import React from 'react'
-import { useTranslation } from 'react-i18next'
-import FieldInput from '@/components/InputJson'
 import FormListItem from '@/components/Form/FormListItem'
-import CusInput from '@/components/CusInput'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
 
 const FieldItem: React.FC = () => {
-  const { t } = useTranslation()
-
   return (
     <FormListItem
       name="value"
       renderItem={({ name, ...restField }) => {
         return (
           <Row gutter={20}>
-            <Col span={12}>
-              <Form.Item
-                {...restField}
-                name={[name, 'field']}
-                label={t('Field Name')}
-                rules={[{ required: true }]}
-              >
-                <CusInput />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                {...restField}
-                label={t('Field Value')}
-                name={[name, 'value']}
-                rules={[{ required: true }]}
-              >
-                <FieldInput />
-              </Form.Item>
-            </Col>
+            <FormInputItem
+              span={12}
+              {...restField}
+              name={[name, 'field']}
+              label="Field Name"
+              required
+            />
+            <FormInputJsonItem
+              span={12}
+              {...restField}
+              label="Field Value"
+              name={[name, 'value']}
+              required
+            />
           </Row>
         )
-      }}
-      itemProps={{
-        label: t('Value')
       }}
     ></FormListItem>
   )

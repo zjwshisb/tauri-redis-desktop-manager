@@ -1,13 +1,14 @@
 import React from 'react'
-import { Button, Card, Form } from 'antd'
+import { Card } from 'antd'
 
 import ValueLayout from '../ValueLayout'
 import lodash from 'lodash'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import ModalForm from '@/components/ModalForm'
-import FieldInput from '@/components/InputJson'
 import JsonView from '@/components/JsonView'
+import CusButton from '@/components/CusButton'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
 
 const JsonValue: React.FC<{
   keys: APP.JsonKey
@@ -55,11 +56,9 @@ const JsonValue: React.FC<{
           }}
           defaultValue={{ value: formatValue }}
           title={t('Edit')}
-          trigger={<Button type="primary">{t('Edit')}</Button>}
+          trigger={<CusButton>Edit</CusButton>}
         >
-          <Form.Item name={'value'}>
-            <FieldInput />
-          </Form.Item>
+          <FormInputJsonItem name={'value'} />
         </ModalForm>
       }
     >

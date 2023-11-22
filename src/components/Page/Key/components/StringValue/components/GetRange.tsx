@@ -1,7 +1,8 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form, InputNumber } from 'antd'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const GetRange: React.FC<{
   keys: APP.StringKey
@@ -11,13 +12,14 @@ const GetRange: React.FC<{
       title="GETRANGE"
       width={400}
       documentUrl="https://redis.io/commands/getrange/"
-      trigger={<Button type="primary">GETRANGE</Button>}
+      defaultValue={{
+        name: keys.name
+      }}
       onQuery={async (v) => {
         const res = await request<string>(
           'string/getrange',
           keys.connection_id,
           {
-            name: keys.name,
             db: keys.db,
             ...v
           },
@@ -28,12 +30,20 @@ const GetRange: React.FC<{
         return res.data
       }}
     >
-      <Form.Item rules={[{ required: true }]} name={'start'} label="start">
-        <InputNumber className="!w-full"></InputNumber>
-      </Form.Item>
-      <Form.Item rules={[{ required: true }]} name={'end'} label="end">
-        <InputNumber className="!w-full"></InputNumber>
-      </Form.Item>
+      <BaseKeyForm>
+        <FormInputNumberItem
+          name={'start'}
+          label="Start"
+          required
+          inputProps={{ precision: 0 }}
+        />
+        <FormInputNumberItem
+          name={'end'}
+          label="End"
+          required
+          inputProps={{ precision: 0 }}
+        />
+      </BaseKeyForm>
     </ModalQueryForm>
   )
 }

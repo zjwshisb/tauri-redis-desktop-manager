@@ -5,12 +5,15 @@ import CusModal from '@/components/CusModal'
 import { type FormInstance, type FormProps } from 'antd/lib'
 import Link from '../Link'
 import { LinkOutlined } from '@ant-design/icons'
+import { isString } from 'lodash'
+import { useTranslation } from 'react-i18next'
+import CusButton from '../CusButton'
 
 const ModalForm: React.ForwardRefRenderFunction<
   FormInstance,
   React.PropsWithChildren<{
     defaultValue?: Record<string, any>
-    trigger: React.ReactElement
+    trigger?: React.ReactElement | string
     onSubmit: (value: Record<string, any>) => Promise<any>
     width?: string | number
     title?: React.ReactNode
@@ -25,7 +28,30 @@ const ModalForm: React.ForwardRefRenderFunction<
 
   React.useImperativeHandle(ref, () => form)
 
-  const { showOkNotice = true, width = 800 } = props
+  const { showOkNotice = true, width = 800, title } = props
+
+  const { t } = useTranslation()
+
+  const titleI18n = React.useMemo(() => {
+    if (isString(title)) {
+      return t(title)
+    }
+    return title
+  }, [t, title])
+
+  const trigger: React.ReactElement = React.useMemo(() => {
+    if (props.trigger !== undefined) {
+      if (isString(props.trigger)) {
+        return <CusButton>{props.trigger}</CusButton>
+      }
+      return props.trigger
+    } else {
+      if (isString(props.title)) {
+        return <CusButton>{props.title}</CusButton>
+      }
+    }
+    return <></>
+  }, [props.title, props.trigger])
 
   return (
     <CusModal
@@ -40,14 +66,14 @@ const ModalForm: React.ForwardRefRenderFunction<
       beforeOpen={() => {
         form.setFieldsValue(props.defaultValue)
       }}
-      trigger={props.trigger}
+      trigger={trigger}
       onOk={async () => {
         const v = await form.validateFields()
         return await props.onSubmit(v)
       }}
       title={
         <div>
-          {props.title}
+          {titleI18n}
           {props.documentUrl !== undefined && (
             <Link href={props.documentUrl} className="ml-2">
               <LinkOutlined />

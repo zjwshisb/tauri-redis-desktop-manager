@@ -1,28 +1,30 @@
 import React from 'react'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
-import ButtonAction from '@/components/ButtonAction'
+import ModalQueryForm from '@/components/ModalQueryForm'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const Incr: React.FC<{
   keys: APP.StringKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
-  const { t } = useTranslation()
-
   return (
-    <ButtonAction
-      type="primary"
-      documentUrl="https://redis.io/commands/incr/"
-      onSubmit={async () => {
-        await request('string/incr', keys.connection_id, {
+    <ModalQueryForm
+      width={400}
+      defaultValue={{
+        name: keys.name
+      }}
+      title="INCR"
+      afterQueryClose={onSuccess}
+      documentUrl={'https://redis.io/commands/incr/'}
+      onQuery={async (v) => {
+        return await request('string/incr', keys.connection_id, {
           db: keys.db,
-          name: keys.name
-        })
-        onSuccess()
+          ...v
+        }).then((r) => r.data)
       }}
     >
-      {t('INCR')}
-    </ButtonAction>
+      <BaseKeyForm />
+    </ModalQueryForm>
   )
 }
 export default Incr

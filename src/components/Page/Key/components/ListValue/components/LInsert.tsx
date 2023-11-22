@@ -1,11 +1,13 @@
-import { Form, Button, Radio } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import FieldInput from '@/components/InputJson'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
-import CusInput from '@/components/CusInput'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormRadioItem from '@/components/Form/FormRadioItem'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import options from '../options'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const LInsert: React.FC<{
   keys: APP.ListKey
@@ -20,7 +22,6 @@ const LInsert: React.FC<{
         defaultValue={{
           name: props.keys.name
         }}
-        trigger={<Button type="primary">LINSERT</Button>}
         onSubmit={async (v) => {
           await request<number>('list/linsert', props.keys.connection_id, {
             db: props.keys.db,
@@ -30,43 +31,18 @@ const LInsert: React.FC<{
         }}
         title={'LINSERT'}
       >
-        <Form.Item
-          name={'name'}
-          label={'Key'}
-          required
-          rules={[{ required: true }]}
-        >
-          <CusInput />
-        </Form.Item>
-        <Form.Item
-          name={'pivot'}
-          label={'Pivot'}
-          required
-          rules={[{ required: true }]}
-        >
-          <CusInput />
-        </Form.Item>
-        <Form.Item
-          name={'whereto'}
-          label={'Whereto'}
-          rules={[{ required: true }]}
-        >
-          <Radio.Group
-            optionType="button"
-            options={[
-              { label: 'BEFORE', value: 'BEFORE' },
-              { label: 'AFTER', value: 'AFTER' }
-            ]}
-          ></Radio.Group>
-        </Form.Item>
-        <Form.Item
-          name={'value'}
-          label={'Value'}
-          required
-          rules={[{ required: true }]}
-        >
-          <FieldInput />
-        </Form.Item>
+        <BaseKeyForm>
+          <FormInputItem name={'pivot'} label={'Pivot'} required />
+          <FormRadioItem
+            name={'whereto'}
+            label={'Whereto'}
+            required
+            inputProps={{
+              options
+            }}
+          />
+          <FormInputJsonItem name={'value'} label={'Value'} required />
+        </BaseKeyForm>
       </ModalForm>
     </VersionAccess>
   )

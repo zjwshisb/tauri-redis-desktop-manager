@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { Button } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
 import { type FormInstance } from 'antd/lib'
 import lodash from 'lodash'
 import TimeSeriesItem from '@/Layout/Keys/components/Add/components/TimeSeriesItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const Alter: React.FC<{
   keys: APP.TimeSeriesKey
@@ -22,32 +22,34 @@ const Alter: React.FC<{
       })
     }
     return {
+      name: keys.name,
       rentention: info.find((v) => v.field === 'retentionTime')?.value,
       size: info.find((v) => v.field === 'chunkSize')?.value,
       policy: info.find((v) => v.field === 'duplicatePolicy')?.value,
       labels
     }
-  }, [info])
+  }, [info, keys.name])
 
   return (
     <ModalForm
       defaultValue={defaultValue}
       ref={form}
-      title={'TS.ALTER'}
+      title="TS.ALTER"
       documentUrl="https://redis.io/commands/ts.alter/"
       width={400}
-      trigger={<Button type="primary">ALTER</Button>}
       onSubmit={async (v) => {
         await request('timeseries/alter', keys.connection_id, {
           db: keys.db,
-          name: keys.name,
+
           ...v
         }).then(() => {
           onSuccess()
         })
       }}
     >
-      <TimeSeriesItem type="alter"></TimeSeriesItem>
+      <BaseKeyForm>
+        <TimeSeriesItem type="alter"></TimeSeriesItem>
+      </BaseKeyForm>
     </ModalForm>
   )
 }

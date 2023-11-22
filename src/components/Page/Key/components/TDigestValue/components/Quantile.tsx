@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { Button } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
 import ValueItem from './ValueItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const Quantile: React.FC<{
   keys: APP.TDigestKey
@@ -12,16 +12,15 @@ const Quantile: React.FC<{
   return (
     <ModalForm
       defaultValue={{
+        name: keys.name,
         value: [undefined]
       }}
       title={'TDIGEST.QUANTILE'}
       documentUrl="https://redis.io/commands/tdigest.quantile/"
       width={400}
-      trigger={<Button type="primary">QUANTILE</Button>}
       onSubmit={async (v) => {
         await request<string[]>('tdigest/quantile', keys.connection_id, {
           db: keys.db,
-          name: keys.name,
           ...v
         }).then((r) => {
           const f: Array<APP.Field<string>> = []
@@ -35,7 +34,9 @@ const Quantile: React.FC<{
         })
       }}
     >
-      <ValueItem label="Quantile" />
+      <BaseKeyForm>
+        <ValueItem label="Quantile" />
+      </BaseKeyForm>
     </ModalForm>
   )
 }

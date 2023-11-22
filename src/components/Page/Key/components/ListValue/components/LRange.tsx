@@ -1,9 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form } from 'antd'
-import CusInput from '@/components/CusInput'
-import CusInputNumber from '@/components/CusInputNumber'
+
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const LRange: React.FC<{
   keys: APP.ListKey
@@ -16,7 +16,6 @@ const LRange: React.FC<{
         name: keys.name
       }}
       documentUrl="https://redis.io/commands/lrange/"
-      trigger={<Button type="primary">LRANGE</Button>}
       onQuery={async (v) => {
         const res = await request(
           'list/lrange',
@@ -32,15 +31,10 @@ const LRange: React.FC<{
         return res.data
       }}
     >
-      <Form.Item name={'name'} label={'Key'} rules={[{ required: true }]}>
-        <CusInput />
-      </Form.Item>
-      <Form.Item name={'start'} label={'Start'} rules={[{ required: true }]}>
-        <CusInputNumber />
-      </Form.Item>
-      <Form.Item name={'end'} label={'Stop'} rules={[{ required: true }]}>
-        <CusInputNumber />
-      </Form.Item>
+      <BaseKeyForm>
+        <FormInputNumberItem name={'start'} label={'Start'} required />
+        <FormInputNumberItem name={'end'} label={'Stop'} required />
+      </BaseKeyForm>
     </ModalQueryForm>
   )
 }

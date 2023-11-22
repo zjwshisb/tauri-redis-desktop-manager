@@ -1,7 +1,6 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button } from 'antd'
 import FormListItem from '@/components/Form/FormListItem'
 import VersionAccess from '@/components/VersionAccess'
 import connectionContext from '../../../context'
@@ -21,7 +20,6 @@ const SInterCard: React.FC<{
           keys: [keys.name, undefined]
         }}
         documentUrl="https://redis.io/commands/sintercard/"
-        trigger={<Button type="primary">SINTERCARD</Button>}
         onQuery={async (v) => {
           const res = await request(
             'set/sintercard',

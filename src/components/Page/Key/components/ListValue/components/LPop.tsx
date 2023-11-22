@@ -1,9 +1,9 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button, Form } from 'antd'
-import CusInput from '@/components/CusInput'
-import CusInputNumber from '@/components/CusInputNumber'
+
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const LPop: React.FC<{
   keys: APP.ListKey
@@ -18,7 +18,6 @@ const LPop: React.FC<{
         name: keys.name
       }}
       documentUrl="https://redis.io/commands/lpop/"
-      trigger={<Button type="primary">LPOP</Button>}
       onQuery={async (v) => {
         const res = await request(
           'list/lpop',
@@ -34,12 +33,15 @@ const LPop: React.FC<{
         return res.data
       }}
     >
-      <Form.Item label={'Key'} name={'name'} rules={[{ required: true }]}>
-        <CusInput />
-      </Form.Item>
-      <Form.Item label={'Count'} name={'value'}>
-        <CusInputNumber min={0} />
-      </Form.Item>
+      <BaseKeyForm>
+        <FormInputNumberItem
+          label={'Count'}
+          name={'value'}
+          inputProps={{
+            min: 0
+          }}
+        />
+      </BaseKeyForm>
     </ModalQueryForm>
   )
 }

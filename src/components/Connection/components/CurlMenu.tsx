@@ -8,8 +8,9 @@ import {
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import { Dropdown, App, Button } from 'antd'
+import { Dropdown, App } from 'antd'
 import { useTranslation } from 'react-i18next'
+import CusButton from '@/components/CusButton'
 
 export interface DBType {
   db: number
@@ -123,7 +124,7 @@ const Index: React.FC<{
           items: connectionMenus
         }}
       >
-        <Button size="small" type="text" icon={<AppstoreOutlined />}></Button>
+        <CusButton icon={<AppstoreOutlined />}></CusButton>
       </Dropdown>
     </>
   )

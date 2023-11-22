@@ -1,54 +1,57 @@
-import CusInputNumber from '@/components/CusInputNumber'
-import { Checkbox, Col, Form, Row } from 'antd'
+import FormCheckBoxItem from '@/components/Form/FormCheckBoxItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import { Row } from 'antd'
 import React from 'react'
 
 const BloomFilterItem: React.FC = () => {
   return (
     <>
-      <Row>
-        <Col span={8}>
-          <Form.Item
-            name="error_rate"
-            label={'Error Rate'}
-            tooltip={
-              'The desired probability for false positives. The rate is a decimal value between 0 and 1. For example, for a desired false positive rate of 0.1% (1 in 1000), error_rate should be set to 0.001.'
-            }
-            rules={[{ required: true }]}
-          >
-            <CusInputNumber min={0} max={1} stringMode />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item
-            name="capacity"
-            label={'Capacity'}
-            rules={[{ required: true }]}
-            tooltip="The number of entries intended to be added to the filter. If your filter allows scaling, performance will begin to degrade after adding more items than this number. The actual degradation depends on how far the limit has been exceeded. Performance degrades linearly with the number of sub-filters."
-          >
-            <CusInputNumber min={1} max={99999999} />
-          </Form.Item>
-        </Col>
-      </Row>
+      <Row gutter={20}>
+        <FormInputNumberItem
+          span={8}
+          inputProps={{
+            max: 1,
+            min: 0,
+            stringMode: true
+          }}
+          name="error_rate"
+          required
+          label="Error Rate"
+          tooltip={
+            'The desired probability for false positives. The rate is a decimal value between 0 and 1. For example, for a desired false positive rate of 0.1% (1 in 1000), error_rate should be set to 0.001.'
+          }
+        />
 
-      <Row>
-        <Col span={8}>
-          <Form.Item
-            name="expansion"
-            label={'Expansion'}
-            tooltip="When capacity is reached, an additional sub-filter is created. The size of the new sub-filter is the size of the last sub-filter multiplied by expansion, specified as a positive integer."
-          >
-            <CusInputNumber min={1} max={99999999} />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item
-            name="Nonscaling"
-            label={'NONSCALING'}
-            tooltip="Prevents the filter from creating additional sub-filters if initial capacity is reached. Non-scaling filters requires slightly less memory than their scaling counterparts. The filter returns an error when capacity is reached."
-          >
-            <Checkbox />
-          </Form.Item>
-        </Col>
+        <FormInputNumberItem
+          span={8}
+          name="capacity"
+          label="Capacity"
+          required
+          inputProps={{
+            min: 1,
+            max: 99999999
+          }}
+          tooltip="The number of entries intended to be added to the filter. If your filter allows scaling, performance will begin to degrade after adding more items than this number. The actual degradation depends on how far the limit has been exceeded. Performance degrades linearly with the number of sub-filters."
+        />
+      </Row>
+      <Row gutter={20}>
+        <FormInputNumberItem
+          span={8}
+          name="expansion"
+          label="Expansion"
+          inputProps={{
+            min: 1,
+            max: 99999999
+          }}
+          tooltip="When capacity is reached, an additional sub-filter is created. The size of the new sub-filter is the size of the last sub-filter multiplied by expansion, specified as a positive integer."
+        />
+
+        <FormCheckBoxItem
+          span={8}
+          name="Nonscaling"
+          label={'NONSCALING'}
+          tooltip="Prevents the filter from creating additional sub-filters if initial capacity is reached. Non-scaling filters requires slightly less memory than their scaling counterparts. The filter returns an error when capacity is reached."
+        />
       </Row>
     </>
   )

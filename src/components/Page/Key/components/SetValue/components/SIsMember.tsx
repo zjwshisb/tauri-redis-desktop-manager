@@ -1,9 +1,8 @@
 import ModalQueryForm from '@/components/ModalQueryForm'
 import React from 'react'
 import request from '@/utils/request'
-import { Button } from 'antd'
-import FormInputItem from '@/components/Form/FormInputItem'
 import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import BaseKeyForm from '../../BaseKeyForm'
 
 const SIsMember: React.FC<{
   keys: APP.SetKey
@@ -16,7 +15,6 @@ const SIsMember: React.FC<{
       defaultValue={{
         name: keys.name
       }}
-      trigger={<Button type="primary">SISMEMBER</Button>}
       onQuery={async (v) => {
         const res = await request(
           'set/sismember',
@@ -32,8 +30,9 @@ const SIsMember: React.FC<{
         return res.data
       }}
     >
-      <FormInputItem name={'name'} label={'Key'} required></FormInputItem>
-      <FormInputJsonItem name={'value'} label={'Item'} required />
+      <BaseKeyForm>
+        <FormInputJsonItem name={'value'} label={'Item'} required />
+      </BaseKeyForm>
     </ModalQueryForm>
   )
 }
