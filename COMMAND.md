@@ -2,6 +2,40 @@
 
 Those command which be checked are supported  at  GUI
 
+## generic
+
+- [ ] COPY
+- [X] DEL
+- [X] DUMP
+- [ ] EXISTS
+- [ ] EXPIRE
+- [ ] EXPIREAT
+- [ ] EXPIRETIME
+- [ ] KEYS
+- [ ] MIGRATE
+- [ ] MOVE
+- [ ] OBJECT ENCODING
+- [ ] OBJECT IDLETIME
+- [ ] OBJECT REFCOUNT
+- [ ] PERSIST
+- [ ] PEXPIRE
+- [ ] PEXPIREAT
+- [ ] PEXPIRETIME
+- [ ] PTTL
+- [ ] RANDOMKEY
+- [ ] RENAME
+- [ ] RENAMENX
+- [ ] RESOTRE
+- [ ] SCAN
+- [ ] SORT
+- [ ] SORT_RO
+- [ ] TOUCH
+- [ ] TTL
+- [ ] TYPE
+- [ ] UNLINK
+- [ ] WAIT
+- [ ] WAITAOF
+
 ## STRING
 
 - [x] APPEND
@@ -89,3 +123,56 @@ Those command which be checked are supported  at  GUI
 - [X] HSETNX
 - [X] HSTRLEN
 - [X] HVALS
+
+## Sorted Set
+
+- [ ] BZMPOP
+- [ ] BZPOPMAX
+- [ ] BZPOPMIN
+- [ ] ZADD
+- [ ] ZCARD
+- [ ] ZCOUNT
+- [ ] ZDIFF
+- [ ] ZDIFFSTORE
+- [ ] ZINCRBY
+- [ ] ZINTER
+- [ ] ZINTERCARD
+- [ ] ZINTERSTORE
+- [ ] ZLEXCOUNT
+- [ ] ZMPOP
+- [ ] ZMSCORE
+- [ ] ZPOPMAX
+- [ ] ZPOPMIN
+- [ ] ZRANDMEMBER
+- [ ] ZRANGE
+- [ ] ZRANGEBYLEX
+- [ ] ZRANGEBYSCORE
+- [ ] ZRANGESTORE
+- [ ] ZRANK
+- [ ] ZREM
+- [ ] ZREMRANGEBYLEX
+- [ ] ZREMRANGEBYSCORE
+- [ ] ZREVRANGE
+- [ ] ZREVRANGEBYLEX
+- [ ] ZREVRANGEBYSCORE
+- [ ] ZREVRANK
+- [ ] ZSCAN
+- [ ] ZSCORE
+- [ ] ZUNION
+- [ ] ZUNIONSOTRE
+
+## Pub/Sub
+
+- [ ] PSUBSCRIBE
+- [ ] PUBLISH
+- [ ] PUBSUB CHANNELS
+- [ ] PUBSUB NUMPAT
+- [ ] PUBSUB NUMSUB
+- [ ] PUBSUB SHARDCHANNELS
+- [ ] PUBSUB SHARDNUMSUB
+- [ ] PUBSUBSCRIBE
+- [ ] SPUBLISH
+- [ ] SSUBSCRIBE
+- [ ] SUBSCRIBE
+- [ ] SUBSUBSCRIBE
+- [ ] UNSUBSCRIBE
