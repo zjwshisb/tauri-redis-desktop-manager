@@ -2,9 +2,10 @@ import React from 'react'
 import XTerm, { type XTermAction } from '@/components/XTerm'
 import Page from '..'
 import request from '@/utils/request'
-import { Input, AutoComplete, Button, Space } from 'antd'
+import { Input, AutoComplete, Space } from 'antd'
 import { emit } from '@tauri-apps/api/event'
 import { useEventListen } from '@/hooks/useEventListen'
+import CusButton from '@/components/CusButton'
 
 interface EventName {
   send: string
@@ -134,13 +135,13 @@ const Terminal: React.FC<{
       <div className="pt-2">
         <Space>
           <span>
-            <Button
+            <CusButton
               onClick={() => {
                 term.current?.clear()
               }}
             >
               Clear
-            </Button>
+            </CusButton>
           </span>
           <span>
             Enter to execute command, Arrow Down/Arrow Up to switch history

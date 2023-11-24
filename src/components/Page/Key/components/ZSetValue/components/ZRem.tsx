@@ -1,8 +1,9 @@
 import React from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
-import { App, Button } from 'antd'
+import { App } from 'antd'
 import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
+import CusButton from '@/components/CusButton'
 
 const ZRem: React.FC<{
   keys: APP.Key
@@ -14,7 +15,7 @@ const ZRem: React.FC<{
   const { modal, message } = App.useApp()
 
   return (
-    <Button
+    <CusButton
       type="link"
       icon={<DeleteOutlined />}
       onClick={() => {
@@ -34,7 +35,7 @@ const ZRem: React.FC<{
           }
         })
       }}
-    ></Button>
+    ></CusButton>
   )
 }
 export default ZRem

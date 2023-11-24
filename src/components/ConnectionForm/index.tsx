@@ -63,9 +63,11 @@ const ConnectionForm: React.FC = () => {
       width={800}
       open={formItem.open}
       forceRender={true}
-      afterOpenChange={() => {
-        form.resetFields()
-        setIsSsh(false)
+      afterOpenChange={(v) => {
+        if (!v) {
+          form.resetFields()
+          setIsSsh(false)
+        }
       }}
       getContainer={() => {
         return document.getElementsByTagName('body')[0]

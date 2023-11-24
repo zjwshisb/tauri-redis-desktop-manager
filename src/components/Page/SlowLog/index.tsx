@@ -3,12 +3,12 @@ import React from 'react'
 import dayjs from 'dayjs'
 import Page from '..'
 import CusTable from '@/components/CusTable'
-import useTableColumn from '@/hooks/useTableColumn'
-import { App, Button, Descriptions, Input, Space } from 'antd'
+import { App, Descriptions, Input, Space } from 'antd'
 import { useTranslation } from 'react-i18next'
 import request from '@/utils/request'
 import Highlighter from 'react-highlight-words'
 import { SearchOutlined } from '@ant-design/icons'
+import CusButton from '@/components/CusButton'
 
 const SlowLog: React.FC<{
   connection: APP.Connection
@@ -34,45 +34,6 @@ const SlowLog: React.FC<{
       return data?.logs
     })
   }, [data?.logs, search])
-
-  const columns = useTableColumn<APP.SlowLog>([
-    {
-      dataIndex: 'id',
-      title: 'id'
-    },
-    {
-      dataIndex: 'processed_at',
-      title: 'processed_at',
-      render(v) {
-        return dayjs.unix(v).format('YYYY-MM-DDTHH:mm:ssZ[Z]')
-      }
-    },
-    {
-      dataIndex: 'time',
-      title: 'amount time(us)',
-      defaultSortOrder: 'descend',
-      sorter(a, b) {
-        return a.time > b.time ? 1 : -1
-      }
-    },
-    {
-      dataIndex: 'cmd',
-      title: 'cmd',
-      render(v) {
-        return (
-          <Highlighter searchWords={[search]} textToHighlight={v}></Highlighter>
-        )
-      }
-    },
-    {
-      dataIndex: 'client_ip',
-      title: 'client_ip'
-    },
-    {
-      dataIndex: 'client_name',
-      title: 'client_name'
-    }
-  ])
 
   return (
     <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
@@ -103,7 +64,7 @@ const SlowLog: React.FC<{
               setSearch(e.target.value)
             }}
           />
-          <Button
+          <CusButton
             danger
             type="primary"
             onClick={() => {
@@ -121,15 +82,55 @@ const SlowLog: React.FC<{
               })
             }}
           >
-            {t('Clear')}
-          </Button>
+            Clear
+          </CusButton>
         </Space>
       </div>
       <CusTable
         rowKey={'uid'}
         virtual={false}
         dataSource={items}
-        columns={columns}
+        columns={[
+          {
+            dataIndex: 'id',
+            title: 'id'
+          },
+          {
+            dataIndex: 'processed_at',
+            title: 'processed_at',
+            render(v) {
+              return dayjs.unix(v).format('YYYY-MM-DDTHH:mm:ssZ[Z]')
+            }
+          },
+          {
+            dataIndex: 'time',
+            title: 'amount time(us)',
+            defaultSortOrder: 'descend',
+            sorter(a, b) {
+              return a.time > b.time ? 1 : -1
+            }
+          },
+          {
+            dataIndex: 'cmd',
+            title: 'cmd',
+            render(v) {
+              return (
+                <Highlighter
+                  searchWords={[search]}
+                  textToHighlight={v}
+                ></Highlighter>
+              )
+            }
+          },
+          {
+            dataIndex: 'client_ip',
+            title: 'client_ip'
+          },
+          {
+            dataIndex: 'client_name',
+            title: 'client_name'
+          }
+        ]}
       ></CusTable>
     </Page>
   )

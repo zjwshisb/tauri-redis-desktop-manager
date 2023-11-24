@@ -1,7 +1,8 @@
 import { useDebounceFn } from 'ahooks'
-import { Table, type TableProps } from 'antd'
+import { Table, type TableColumnType, type TableProps } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { isString } from 'lodash'
 
 export default function CusTable<T extends object>(
   props: TableProps<T> & {
@@ -9,9 +10,20 @@ export default function CusTable<T extends object>(
     more?: boolean
     showIndex?: boolean
     showFooter?: boolean
+    action?: TableColumnType<T>
+    readonly?: boolean
+    addIndex?: boolean
   }
 ) {
-  const { columns, virtual = true, showFooter = true, ...others } = props
+  const {
+    columns,
+    virtual = true,
+    showFooter = true,
+    action,
+    readonly = false,
+    addIndex = false,
+    ...others
+  } = props
 
   const container = React.useRef<HTMLDivElement>(null)
 
@@ -19,7 +31,40 @@ export default function CusTable<T extends object>(
 
   const { t } = useTranslation()
 
-  const db = useDebounceFn(
+  const newColumns: TableProps<T>['columns'] = React.useMemo(() => {
+    let cols: TableProps<T>['columns'] = []
+    if (columns !== undefined) {
+      cols = [...columns]
+    }
+    if (addIndex) {
+      cols.unshift({
+        title: '#',
+        width: 100,
+        render(_, __, index) {
+          return index
+        }
+      })
+    }
+    if (action != null && !readonly) {
+      const newAction: TableColumnType<T> = {
+        title: 'Action',
+        fixed: 'right',
+        ...action
+      }
+      cols.push(newAction)
+    }
+    cols.forEach((v) => {
+      if (isString(v.title) && v.title !== '') {
+        v.title = t(v.title)
+      }
+      if (v.align === undefined) {
+        v.align = 'center'
+      }
+    })
+    return cols
+  }, [action, addIndex, columns, readonly, t])
+
+  const getScrollX = useDebounceFn(
     () => {
       if (container.current !== null) {
         let containerWith = container.current?.clientWidth - 1
@@ -34,21 +79,21 @@ export default function CusTable<T extends object>(
     }
   )
   React.useEffect(() => {
-    db.run()
-  }, [db])
+    getScrollX.run()
+  }, [getScrollX])
 
   React.useLayoutEffect(() => {
     const div = container.current
     if (div !== null) {
       const observer = new ResizeObserver((entries) => {
-        db.run()
+        getScrollX.run()
       })
       observer.observe(div)
       return () => {
         observer.unobserve(div)
       }
     }
-  }, [db])
+  }, [getScrollX])
 
   const scroll = React.useMemo(() => {
     if (virtual) {
@@ -87,7 +132,7 @@ export default function CusTable<T extends object>(
         footer={footer}
         bordered
         scroll={scroll}
-        columns={columns}
+        columns={newColumns}
         {...others}
       ></Table>
     </div>

@@ -1,10 +1,11 @@
 import useRequest from '@/hooks/useRequest'
-import { App, Button, Card, Descriptions } from 'antd'
+import { App, Card, Descriptions } from 'antd'
 import React from 'react'
 import { isArray } from 'lodash'
 import { useTranslation } from 'react-i18next'
 import Link from '@/components/Link'
 import request from '@/utils/request'
+import CusButton from '@/components/CusButton'
 
 const Stats: React.FC<{
   connection: APP.Connection
@@ -72,8 +73,7 @@ const Stats: React.FC<{
   return (
     <div>
       <div className="mb-2">
-        <Button
-          type="primary"
+        <CusButton
           onClick={() => {
             modal.confirm({
               title: t('Notice'),
@@ -96,7 +96,7 @@ const Stats: React.FC<{
           }}
         >
           MEMORY PURGE
-        </Button>
+        </CusButton>
       </div>
       {children}
     </div>

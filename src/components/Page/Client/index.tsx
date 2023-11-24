@@ -5,8 +5,7 @@ import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { type ColumnType } from 'antd/es/table'
 import request from '@/utils/request'
 import Page from '..'
-import useTableColumn from '@/hooks/useTableColumn'
-import Editable from '@/components/Editable'
+import Editable, { isReadonly } from '@/components/Editable'
 import CusTable from '@/components/CusTable'
 import CusButton from '@/components/CusButton'
 
@@ -100,80 +99,88 @@ const Client: React.FC<{
     [connection.id, fetch, message, modal]
   )
 
-  const columns = useTableColumn(
-    [
-      clientColumn('id', 'a unique 64-bit client ID'),
-      clientColumn('addr', 'address/port of the client'),
-      clientColumn(
-        'laddr',
-        'address/port of local address client connected to (bind address)'
-      ),
-      clientColumn('fd', ' file descriptor corresponding to the socket'),
-      clientColumn('name', 'the name set by the client with CLIENT SETNAME'),
-      clientColumn('age', 'total duration of the connection in seconds'),
-      clientColumn('idle', 'idle time of the connection in seconds'),
-      clientColumn('flags', 'client flags (see below)'),
-      clientColumn('db', 'current database ID'),
-      clientColumn('sub', 'number of channel subscriptions'),
-      clientColumn('psub', 'number of pattern matching subscriptions'),
-      clientColumn(
-        'ssub',
-        'number of shard channel subscriptions. Added in Redis 7.0.3'
-      ),
-      clientColumn('multi', 'number of commands in a MULTI/EXEC context'),
-      clientColumn('qbuf', 'query buffer length (0 means no query pending)'),
-      clientColumn(
-        'qbuf-free',
-        'free space of the query buffer (0 means the buffer is full)'
-      ),
-      clientColumn('argv-mem', 'argv-mem'),
-      clientColumn(
-        'multi-mem',
-        'memory is used up by buffered multi commands. Added in Redis 7.0'
-      ),
-      clientColumn('obl', 'output buffer length'),
-      clientColumn(
-        'oll',
-        'output list length (replies are queued in this list when the buffer is full)'
-      ),
-      clientColumn('omem', 'output buffer memory usage'),
-      clientColumn(
-        'tot-mem',
-        'total memory consumed by this client in its various buffers'
-      ),
-      clientColumn('events', 'file descriptor events (see below)'),
-      clientColumn('cmd', 'last command played'),
-      clientColumn('user', ' the authenticated username of the client'),
-      clientColumn('redir', 'client id of current client tracking redirection'),
-      clientColumn('resp', 'client RESP protocol version. Added in Redis 7.0')
-    ],
-    {
-      render(_, record) {
-        return (
-          <Space>
-            <Editable connection={connection}>
-              <CusButton
-                type="link"
-                onClick={() => {
-                  handleKill(record.id)
-                }}
-                icon={<DeleteOutlined />}
-              ></CusButton>
-            </Editable>
-          </Space>
-        )
-      }
-    },
-    !connection.readonly
-  )
-
   return (
     <Page onRefresh={fetch} pageKey={pageKey} loading={loading}>
       <CusTable
+        readonly={isReadonly(connection)}
+        action={{
+          render(_, record) {
+            return (
+              <Space>
+                <Editable connection={connection}>
+                  <CusButton
+                    type="link"
+                    onClick={() => {
+                      handleKill(record.id)
+                    }}
+                    icon={<DeleteOutlined />}
+                  ></CusButton>
+                </Editable>
+              </Space>
+            )
+          }
+        }}
         virtual={false}
         rowKey={'id'}
         dataSource={clients}
-        columns={columns}
+        columns={[
+          clientColumn('id', 'a unique 64-bit client ID'),
+          clientColumn('addr', 'address/port of the client'),
+          clientColumn(
+            'laddr',
+            'address/port of local address client connected to (bind address)'
+          ),
+          clientColumn('fd', ' file descriptor corresponding to the socket'),
+          clientColumn(
+            'name',
+            'the name set by the client with CLIENT SETNAME'
+          ),
+          clientColumn('age', 'total duration of the connection in seconds'),
+          clientColumn('idle', 'idle time of the connection in seconds'),
+          clientColumn('flags', 'client flags (see below)'),
+          clientColumn('db', 'current database ID'),
+          clientColumn('sub', 'number of channel subscriptions'),
+          clientColumn('psub', 'number of pattern matching subscriptions'),
+          clientColumn(
+            'ssub',
+            'number of shard channel subscriptions. Added in Redis 7.0.3'
+          ),
+          clientColumn('multi', 'number of commands in a MULTI/EXEC context'),
+          clientColumn(
+            'qbuf',
+            'query buffer length (0 means no query pending)'
+          ),
+          clientColumn(
+            'qbuf-free',
+            'free space of the query buffer (0 means the buffer is full)'
+          ),
+          clientColumn('argv-mem', 'argv-mem'),
+          clientColumn(
+            'multi-mem',
+            'memory is used up by buffered multi commands. Added in Redis 7.0'
+          ),
+          clientColumn('obl', 'output buffer length'),
+          clientColumn(
+            'oll',
+            'output list length (replies are queued in this list when the buffer is full)'
+          ),
+          clientColumn('omem', 'output buffer memory usage'),
+          clientColumn(
+            'tot-mem',
+            'total memory consumed by this client in its various buffers'
+          ),
+          clientColumn('events', 'file descriptor events (see below)'),
+          clientColumn('cmd', 'last command played'),
+          clientColumn('user', ' the authenticated username of the client'),
+          clientColumn(
+            'redir',
+            'client id of current client tracking redirection'
+          ),
+          clientColumn(
+            'resp',
+            'client RESP protocol version. Added in Redis 7.0'
+          )
+        ]}
       ></CusTable>
     </Page>
   )

@@ -1,32 +1,28 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, type ButtonProps, Space } from 'antd'
-import { useTranslation } from 'react-i18next'
+import { type ButtonProps, Space } from 'antd'
 import Container from '@/components/Container'
+import CusButton from '@/components/CusButton'
 
 const SubmitBar: React.FC<{
   prevProps?: ButtonProps
   nextProps?: ButtonProps
   extra?: React.ReactNode
 }> = (props) => {
-  const { t } = useTranslation()
-
   const { prevProps, nextProps } = props
 
   return (
     <Container className="flex items-end justify-end p-4 " level={2}>
       <Space>
         {prevProps != null && (
-          <Button {...prevProps}>
-            {prevProps?.children !== undefined
-              ? prevProps?.children
-              : t('Prev')}
-          </Button>
+          <CusButton {...prevProps}>
+            {prevProps?.children !== undefined ? prevProps?.children : 'Prev'}
+          </CusButton>
         )}
 
-        <Button type="primary" {...nextProps}>
-          {nextProps?.children !== undefined ? nextProps?.children : t('Next')}
-        </Button>
+        <CusButton type="primary" {...nextProps}>
+          {nextProps?.children !== undefined ? nextProps?.children : 'Next'}
+        </CusButton>
         {props.extra}
       </Space>
     </Container>

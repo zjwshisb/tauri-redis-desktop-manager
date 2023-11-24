@@ -83,7 +83,7 @@ const Item: React.FC<{
               dataSource={items}
               columns={[
                 {
-                  title: t('Key'),
+                  title: 'Key',
                   dataIndex: 'field',
                   defaultSortOrder: 'ascend',
                   render(value) {
@@ -99,7 +99,7 @@ const Item: React.FC<{
                   }
                 },
                 {
-                  title: t('Value'),
+                  title: 'Value',
                   dataIndex: 'value'
                 }
               ]}

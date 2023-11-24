@@ -1,7 +1,7 @@
-import { Form, Input } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
+import FormInputItem from '@/components/Form/FormInputItem'
 
 const Rename: React.FC<{
   keys: APP.Key
@@ -25,9 +25,7 @@ const Rename: React.FC<{
       }}
       title={'RENAME'}
     >
-      <Form.Item name={'name'} label={'Name'} rules={[{ required: true }]}>
-        <Input />
-      </Form.Item>
+      <FormInputItem name={'name'} label={'Name'} required />
     </ModalForm>
   )
 }

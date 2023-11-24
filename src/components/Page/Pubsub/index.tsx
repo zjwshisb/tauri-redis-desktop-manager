@@ -60,14 +60,20 @@ const Pubsub: React.FC<{
           <div key={v} className="py-1 w-[400px]">
             <Input.Search
               placeholder="payload"
-              enterButton={<Button>{t('Publish')}</Button>}
+              enterButton={
+                <Button size="small" type="primary">
+                  {t('Publish')}
+                </Button>
+              }
               addonBefore={v}
               onSearch={(e) => {
-                request('pubsub/publish', props.connection.id, {
-                  channel: v,
-                  value: e,
-                  db: form.db
-                })
+                if (e.length > 0) {
+                  request('pubsub/publish', props.connection.id, {
+                    channel: v,
+                    value: e,
+                    db: form.db
+                  })
+                }
               }}
             ></Input.Search>
           </div>

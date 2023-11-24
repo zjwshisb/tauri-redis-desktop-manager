@@ -1,9 +1,8 @@
-import { Form, InputNumber } from 'antd'
 import React from 'react'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
-import FieldInput from '@/components/InputJson'
 import ModalForm from '@/components/ModalForm'
+import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const FieldForm: React.FC<{
   keys: APP.ZSetKey
@@ -11,8 +10,6 @@ const FieldForm: React.FC<{
   onSuccess: () => void
   trigger: React.ReactElement
 }> = (props) => {
-  const { t } = useTranslation()
-
   return (
     <ModalForm
       defaultValue={props.field}
@@ -32,27 +29,15 @@ const FieldForm: React.FC<{
       }}
       title={'ZADD'}
     >
-      <Form.Item
+      <FormInputJsonItem
         name={'field'}
-        label={t('Field')}
+        label="Field"
         required
-        rules={[{ required: true }]}
-      >
-        <FieldInput readOnly={props.field != null}></FieldInput>
-      </Form.Item>
-      <Form.Item
-        name={'value'}
-        label={t('Score')}
-        required
-        rules={[{ required: true }]}
-      >
-        <InputNumber
-          className="!w-[200px]"
-          placeholder={t('Please Enter {{name}}', {
-            name: t('Score')
-          }).toString()}
-        ></InputNumber>
-      </Form.Item>
+        inputProps={{
+          readOnly: props.field != null
+        }}
+      />
+      <FormInputNumberItem name="value" label="Score" required />
     </ModalForm>
   )
 }

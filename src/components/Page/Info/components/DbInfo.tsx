@@ -44,23 +44,19 @@ const DbInfo: React.FC<{
         columns={[
           {
             dataIndex: 'name',
-            title: 'db',
-            align: 'center'
+            title: 'db'
           },
           {
             dataIndex: 'keys',
-            title: 'keys',
-            align: 'center'
+            title: 'keys'
           },
           {
             dataIndex: 'expires',
-            title: 'expires',
-            align: 'center'
+            title: 'expires'
           },
           {
             dataIndex: 'avg_ttl',
-            title: 'avg_ttl',
-            align: 'center'
+            title: 'avg_ttl'
           }
         ]}
       ></CusTable>

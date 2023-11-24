@@ -1,16 +1,16 @@
 import React from 'react'
 
-import { Button, Form, Input, InputNumber, Select } from 'antd'
+import { Button } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
-import { useTranslation } from 'react-i18next'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormSelectItem from '@/components/Form/FormSelectItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 
 const CreateRule: React.FC<{
   keys: APP.TimeSeriesKey
   onSuccess: () => void
 }> = ({ keys, onSuccess }) => {
-  const { t } = useTranslation()
-
   return (
     <ModalForm
       documentUrl="https://redis.io/commands/ts.createrule/"
@@ -30,31 +30,26 @@ const CreateRule: React.FC<{
         })
       }}
     >
-      <Form.Item
+      <FormInputItem
         name="source_key"
-        label="sourceKey"
-        rules={[{ required: true }]}
+        label="Source Key"
+        required
         tooltip="is key name for the source time series."
-      >
-        <Input placeholder={t('Please Enter').toString()}></Input>
-      </Form.Item>
-      <Form.Item
+      ></FormInputItem>
+
+      <FormInputItem
         name="dest_key"
-        label="destKey"
-        rules={[{ required: true }]}
+        label="Dest Key"
+        required
         tooltip="is key name for destination (compacted) time series. It must be created before TS.CREATERULE is called."
-      >
-        <Input placeholder={t('Please Enter').toString()}></Input>
-      </Form.Item>
-      <Form.Item
+      ></FormInputItem>
+      <FormSelectItem
         tooltip="aggregates results into time buckets"
         name="aggregation"
-        label="AGGREGATION"
-        rules={[{ required: true }]}
-      >
-        <Select
-          placeholder={t('Please Select').toString()}
-          options={[
+        label="Aggregation"
+        required
+        inputProps={{
+          options: [
             'avg',
             'sum',
             'min',
@@ -73,32 +68,26 @@ const CreateRule: React.FC<{
               value: v,
               label: v
             }
-          })}
-        ></Select>
-      </Form.Item>
-      <Form.Item
+          })
+        }}
+      />
+      <FormInputNumberItem
         tooltip="bucketDuration is duration of each bucket, in milliseconds."
         name={'bucket_duration'}
-        label="bucketDuration"
-        rules={[{ required: true }]}
-      >
-        <InputNumber
-          min={0}
-          className="!w-full"
-          placeholder={t('Please Enter').toString()}
-        />
-      </Form.Item>
-      <Form.Item
+        label="Bucket Duration"
+        required
+        inputProps={{
+          min: 0
+        }}
+      />
+      <FormInputNumberItem
         name={'align_timestamp'}
-        label="alignTimestamp"
+        label="Align Timestamp"
         tooltip="ensures that there is a bucket that starts exactly at alignTimestamp and aligns all other buckets accordingly. It is expressed in milliseconds. The default value is 0: aligned with the Unix epoch."
-      >
-        <InputNumber
-          min={0}
-          className="!w-full"
-          placeholder={t('Please Enter').toString()}
-        />
-      </Form.Item>
+        inputProps={{
+          min: 0
+        }}
+      />
     </ModalForm>
   )
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input } from 'antd'
+import { Input } from 'antd'
 import { useTranslation } from 'react-i18next'
 import ZRem from './components/ZRem'
 import { observer } from 'mobx-react-lite'
@@ -8,11 +8,10 @@ import { EditOutlined } from '@ant-design/icons'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
-import { isReadonly } from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
-import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
+import CusButton from '@/components/CusButton'
 
 const Index: React.FC<{
   keys: APP.ZSetKey
@@ -26,90 +25,85 @@ const Index: React.FC<{
   const { fields, more, loading, getFields, getAllFields } =
     useFieldScan<APP.Field>('key/zset/zscan', keys, params)
 
-  const columns = useTableColumn<APP.Field>(
-    [
-      {
-        title: (
-          <div className="flex items-center justify-center">
-            <div>{t('Value')}</div>
-            <div
-              className="w-30 ml-2"
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            >
-              <Input.Search
-                allowClear
-                size="small"
-                onSearch={(e) => {
-                  setParams({ search: e })
-                }}
-              />
-            </div>
-          </div>
-        ),
-        dataIndex: 'field',
-        align: 'center',
-        render(_) {
-          return <FieldViewer content={_} />
-        }
-      },
-      {
-        dataIndex: 'value',
-        title: t('Score'),
-        render(_) {
-          return <FieldViewer content={_} typesArr={['datetime', 'text']} />
-        },
-        sorter: (a, b) => {
-          if (a.value === b.value) {
-            return 0
-          }
-          return parseFloat(a.value) > parseFloat(b.value) ? 1 : -1
-        }
-      }
-    ],
-    {
-      width: 200,
-      fixed: 'right',
-      render(_, record) {
-        return (
-          <div>
-            <ZRem
-              keys={keys}
-              value={record.field}
-              onSuccess={() => {
-                onRefresh()
-              }}
-            ></ZRem>
-            <FieldForm
-              onSuccess={onRefresh}
-              keys={keys}
-              field={record}
-              trigger={<Button icon={<EditOutlined />} type="link" />}
-            ></FieldForm>
-          </div>
-        )
-      }
-    },
-    !isReadonly(connection)
-  )
   return (
     <ValueLayout
       actions={
         <FieldForm
           onSuccess={onRefresh}
           keys={keys}
-          trigger={<Button type="primary">ZADD</Button>}
+          trigger={<CusButton>ZADD</CusButton>}
         ></FieldForm>
       }
     >
       <CusTable
+        action={{
+          width: 200,
+          render(_, record) {
+            return (
+              <div>
+                <ZRem
+                  keys={keys}
+                  value={record.field}
+                  onSuccess={() => {
+                    onRefresh()
+                  }}
+                ></ZRem>
+                <FieldForm
+                  onSuccess={onRefresh}
+                  keys={keys}
+                  field={record}
+                  trigger={<CusButton icon={<EditOutlined />} type="link" />}
+                ></FieldForm>
+              </div>
+            )
+          }
+        }}
         loading={loading}
         more={more}
         onLoadMore={getFields}
         rowKey={'value'}
         dataSource={fields}
-        columns={columns}
+        readonly={connection?.readonly}
+        columns={[
+          {
+            title: (
+              <div className="flex items-center justify-center">
+                <div>{t('Value')}</div>
+                <div
+                  className="w-30 ml-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                >
+                  <Input.Search
+                    allowClear
+                    size="small"
+                    onSearch={(e) => {
+                      setParams({ search: e })
+                    }}
+                  />
+                </div>
+              </div>
+            ),
+            dataIndex: 'field',
+            render(_) {
+              return <FieldViewer content={_} />
+            }
+          },
+          {
+            dataIndex: 'value',
+            title: 'Score',
+            render(_) {
+              return <FieldViewer content={_} typesArr={['datetime', 'text']} />
+            },
+            sorter: (a, b) => {
+              if (a.value === b.value) {
+                return 0
+              }
+              return parseFloat(a.value) > parseFloat(b.value) ? 1 : -1
+            }
+          }
+        ]}
       ></CusTable>
       <div className="py-2 mb-4">
         <LoadMore

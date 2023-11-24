@@ -1,7 +1,6 @@
 import React from 'react'
 import request from '@/utils/request'
 import { Space } from 'antd'
-import { useTranslation } from 'react-i18next'
 import LTrim from './components/LTrim'
 import LSet from './components/LSet'
 import LInsert from './components/LInsert'
@@ -14,8 +13,7 @@ import useStore from '@/hooks/useStore'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
-import { isReadonly } from '@/components/Editable'
-import useTableColumn from '@/hooks/useTableColumn'
+
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
 import BLMove from './components/BLMove'
@@ -47,8 +45,6 @@ const ListValue: React.FC<{
   const [loading, setLoading] = React.useState(false)
 
   const [more, setMore] = React.useState(true)
-
-  const { t } = useTranslation()
 
   const index = React.useRef(0)
 
@@ -116,48 +112,6 @@ const ListValue: React.FC<{
     getFields(true)
   }, [getFields])
 
-  const columns = useTableColumn<APP.IndexValue>(
-    [
-      {
-        title: t('Index'),
-        dataIndex: 'index',
-        align: 'center',
-        width: 100
-      },
-      {
-        dataIndex: 'value',
-        title: t('Value'),
-        width: 'auto',
-        render(_) {
-          return <FieldViewer content={_} />
-        }
-      }
-    ],
-    {
-      title: t('Action'),
-      fixed: 'right',
-      render(_, record, index) {
-        return (
-          <Space>
-            <LSet
-              keys={keys}
-              trigger={<CusButton type="link" icon={<EditOutlined />} />}
-              defaultValue={{
-                field: index,
-                value: record.value,
-                name: keys.name
-              }}
-              onSuccess={() => {
-                onRefresh()
-              }}
-            />
-          </Space>
-        )
-      }
-    },
-    !isReadonly(connection),
-    false
-  )
   return (
     <ValueLayout
       readonlyAction={
@@ -206,8 +160,44 @@ const ListValue: React.FC<{
         loading={loading}
         rowKey={'index'}
         onLoadMore={getFields}
+        readonly={connection?.readonly}
         dataSource={data}
-        columns={columns}
+        action={{
+          render(_, record, index) {
+            return (
+              <Space>
+                <LSet
+                  keys={keys}
+                  trigger={<CusButton type="link" icon={<EditOutlined />} />}
+                  defaultValue={{
+                    field: index,
+                    value: record.value,
+                    name: keys.name
+                  }}
+                  onSuccess={() => {
+                    onRefresh()
+                  }}
+                />
+              </Space>
+            )
+          }
+        }}
+        columns={[
+          {
+            title: 'Index',
+            dataIndex: 'index',
+            align: 'center',
+            width: 100
+          },
+          {
+            dataIndex: 'value',
+            title: 'Value',
+            width: 'auto',
+            render(_) {
+              return <FieldViewer content={_} />
+            }
+          }
+        ]}
       ></CusTable>
       <div className="py-2 mb-4">
         <LoadMore

@@ -7,9 +7,7 @@ import { observer } from 'mobx-react-lite'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
-import { isReadonly } from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
-import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
 import SDiff from './components/SDiff'
@@ -52,75 +50,6 @@ const SetValue: React.FC<{
     })
   }, [fields])
 
-  const columns = useTableColumn<APP.IndexValue>(
-    [
-      {
-        title: (
-          <div className="flex items-center justify-center">
-            <div>{t('Value')}</div>
-            <div
-              className="w-30 ml-2"
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            >
-              <Input.Search
-                allowClear
-                size="small"
-                onSearch={(e) => {
-                  setParams({
-                    search: e
-                  })
-                }}
-              />
-            </div>
-          </div>
-        ),
-        dataIndex: 'value',
-        sorter: (a, b) => {
-          return a.value > b.value ? 1 : -1
-        },
-        render(_) {
-          return <FieldViewer content={_}></FieldViewer>
-        }
-      }
-    ],
-    {
-      render(_, record, index) {
-        return (
-          <Space>
-            <SRem
-              trigger={
-                <CusButton type="link" icon={<DeleteOutlined />}></CusButton>
-              }
-              keys={keys}
-              defaultValue={{
-                name: keys.name,
-                value: [record.value]
-              }}
-              onSuccess={() => {
-                onRefresh()
-              }}
-            ></SRem>
-
-            <SMove
-              onSuccess={onRefresh}
-              defaultValue={{
-                name: keys.name,
-                value: record.value
-              }}
-              keys={keys}
-              trigger={
-                <CusButton type="link" icon={<ScissorOutlined />}></CusButton>
-              }
-            ></SMove>
-          </Space>
-        )
-      }
-    },
-    !isReadonly(connection)
-  )
-
   return (
     <ValueLayout
       readonlyAction={
@@ -160,12 +89,84 @@ const SetValue: React.FC<{
       }
     >
       <CusTable
+        addIndex
+        readonly={connection?.readonly}
+        action={{
+          width: 200,
+          render(_, record) {
+            return (
+              <Space>
+                <SRem
+                  trigger={
+                    <CusButton
+                      type="link"
+                      icon={<DeleteOutlined />}
+                    ></CusButton>
+                  }
+                  keys={keys}
+                  defaultValue={{
+                    name: keys.name,
+                    value: [record.value]
+                  }}
+                  onSuccess={() => {
+                    onRefresh()
+                  }}
+                ></SRem>
+                <SMove
+                  onSuccess={onRefresh}
+                  defaultValue={{
+                    name: keys.name,
+                    value: record.value
+                  }}
+                  keys={keys}
+                  trigger={
+                    <CusButton
+                      type="link"
+                      icon={<ScissorOutlined />}
+                    ></CusButton>
+                  }
+                ></SMove>
+              </Space>
+            )
+          }
+        }}
         loading={loading}
         more={more}
         onLoadMore={getFields}
         rowKey={'value'}
         dataSource={data}
-        columns={columns}
+        columns={[
+          {
+            title: (
+              <div className="flex items-center justify-center">
+                <div>{t('Value')}</div>
+                <div
+                  className="w-30 ml-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                >
+                  <Input.Search
+                    allowClear
+                    size="small"
+                    onSearch={(e) => {
+                      setParams({
+                        search: e
+                      })
+                    }}
+                  />
+                </div>
+              </div>
+            ),
+            dataIndex: 'value',
+            sorter: (a, b) => {
+              return a.value > b.value ? 1 : -1
+            },
+            render(_) {
+              return <FieldViewer content={_}></FieldViewer>
+            }
+          }
+        ]}
       ></CusTable>
       <div className="py-2 mb-4">
         <LoadMore

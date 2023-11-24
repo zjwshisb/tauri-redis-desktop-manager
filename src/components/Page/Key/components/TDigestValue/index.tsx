@@ -87,8 +87,8 @@ const TDigestValue: React.FC<{
               setColumns(f)
             }}
           ></Cdf>
-          <Max keys={keys}></Max>
-          <Min keys={keys}></Min>
+          <Max keys={keys} />
+          <Min keys={keys} />
           <TrimmedMean keys={keys} />
         </>
       }

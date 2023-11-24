@@ -1,4 +1,3 @@
-import { Form, Select, InputNumber, Checkbox } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { observer } from 'mobx-react-lite'
@@ -7,9 +6,12 @@ import useStore from '@/hooks/useStore'
 import lodash from 'lodash'
 import Template from '../Template'
 import ModalForm from '@/components/ModalForm'
+import FormSelectItem from '@/components/Form/FormSelectItem'
+import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import FormCheckBoxItem from '@/components/Form/FormCheckBoxItem'
 
 const Index: React.FC = () => {
-  const { i18n, t } = useTranslation()
+  const { i18n } = useTranslation()
 
   const store = useStore()
 
@@ -30,42 +32,41 @@ const Index: React.FC = () => {
         }
       }}
       trigger={<Template icon={<SettingOutlined />} title="Setting" />}
-      title={t('Setting')}
+      title="Setting"
       onSubmit={async (v) => {
         store.setting.update(v)
       }}
     >
-      <Form.Item name="locale" label={t('Language')}>
-        <Select
-          options={Object.keys(i18n.store.data).map((v) => {
+      <FormSelectItem
+        name="locale"
+        label="Language"
+        inputProps={{
+          options: Object.keys(i18n.store.data).map((v) => {
             return {
               value: v,
               label: i18n.store.data[v].label as string
             }
-          })}
-        ></Select>
-      </Form.Item>
-      <Form.Item
+          })
+        }}
+      />
+      <FormInputNumberItem
         name="key_count"
-        label={t('Key Load Number')}
-        tooltip={t('The COUNT option for command SCAN')}
-      >
-        <InputNumber min={1} />
-      </Form.Item>
-      <Form.Item
+        label="Key Load Number"
+        tooltip="The COUNT option for command SCAN"
+        inputProps={{
+          min: 1
+        }}
+      />
+
+      <FormInputNumberItem
         name="field_count"
-        label={t('Field Load Number')}
-        tooltip={t('The COUNT option for command HSCAN,SSCAN,ZSCAN')}
-      >
-        <InputNumber min={1} />
-      </Form.Item>
-      <Form.Item
-        name="dark_mode"
-        label={t('Dark Mode')}
-        valuePropName="checked"
-      >
-        <Checkbox />
-      </Form.Item>
+        label="Field Load Number"
+        tooltip="The COUNT option for command HSCAN,SSCAN,ZSCAN"
+        inputProps={{
+          min: 1
+        }}
+      />
+      <FormCheckBoxItem name="dark_mode" label="Dark Mode" />
     </ModalForm>
   )
 }

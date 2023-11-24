@@ -8,7 +8,7 @@ import classNames from 'classnames'
 import Context from '../../context'
 import Header from '../Header'
 import { useTranslation } from 'react-i18next'
-import { type ButtonProps, Form, Row, Button, App } from 'antd'
+import { type ButtonProps, Form, Row, App } from 'antd'
 import Action, { type ActionRef } from './Action'
 import { useSourceConnection, useTargetConnection } from '../../hooks'
 import { getCurrent } from '@tauri-apps/api/window'
@@ -18,6 +18,7 @@ import { useLatest } from 'ahooks'
 import Container from '@/components/Container'
 import FormInputItem from '@/components/Form/FormInputItem'
 import FormCheckBoxItem from '@/components/Form/FormCheckBoxItem'
+import CusButton from '@/components/CusButton'
 
 interface ConfigForm {
   pattern: string
@@ -98,7 +99,6 @@ const StepTwo: React.FC = () => {
           ref.current?.stop()
         },
         danger: true,
-        type: 'default',
         children: t('Stop')
       }
     }
@@ -246,6 +246,7 @@ const StepTwo: React.FC = () => {
         nextProps={previewProps}
         prevProps={{
           disabled: changeDisabled,
+          type: 'default',
           onClick() {
             dispatch({
               type: 'step',
@@ -254,9 +255,9 @@ const StepTwo: React.FC = () => {
           }
         }}
         extra={
-          <Button type="primary" {...startProps}>
+          <CusButton type="primary" {...startProps}>
             {startProps.children}
-          </Button>
+          </CusButton>
         }
       ></SubmitBar>
     </Container>

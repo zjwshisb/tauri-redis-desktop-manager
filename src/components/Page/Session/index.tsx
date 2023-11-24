@@ -23,8 +23,7 @@ const Session: React.FC = () => {
     return fields.map((v) => {
       return {
         dataIndex: v,
-        title: v,
-        align: 'center'
+        title: v
       }
     })
   }, [])

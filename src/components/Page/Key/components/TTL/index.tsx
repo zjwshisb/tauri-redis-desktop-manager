@@ -1,9 +1,10 @@
 import React, { useContext } from 'react'
-import { Button, Input } from 'antd'
+import { Input } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import Expire from '../Expire'
 import context from '../../context'
 import { isReadonly } from '@/components/Editable'
+import CusButton from '@/components/CusButton'
 
 const TTL: React.FC<{
   keys: APP.Key
@@ -20,7 +21,11 @@ const TTL: React.FC<{
         keys={keys}
         onSuccess={onChange}
         trigger={
-          <Button icon={<EditOutlined />} size="small" type="text"></Button>
+          <CusButton
+            icon={<EditOutlined />}
+            size="small"
+            type="text"
+          ></CusButton>
         }
       />
     )

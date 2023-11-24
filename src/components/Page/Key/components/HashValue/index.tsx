@@ -9,7 +9,6 @@ import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
 import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
-import useTableColumn from '@/hooks/useTableColumn'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
 import Highlighter from 'react-highlight-words'
@@ -28,75 +27,6 @@ const HashValue: React.FC<{
   const { fields, getFields, loading, more, getAllFields } =
     useFieldScan<APP.Field>('key/hash/hscan', keys, params)
 
-  const columns = useTableColumn<APP.Field>(
-    [
-      {
-        dataIndex: 'field',
-        width: 300,
-        title: (
-          <div className="flex items-center justify-center">
-            <div>{t('Field Name')}</div>
-            <div
-              className="ml-2"
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            >
-              <Input.Search
-                allowClear
-                size="small"
-                onSearch={(e) => {
-                  setParams({
-                    search: e
-                  })
-                }}
-              />
-            </div>
-          </div>
-        ),
-        render(value) {
-          return (
-            <Highlighter
-              textToHighlight={value}
-              searchWords={[params.search]}
-            />
-          )
-        }
-      },
-      {
-        dataIndex: 'value',
-        title: t('Field Value'),
-        render(_, record) {
-          return <FieldViewer content={_}></FieldViewer>
-        }
-      }
-    ],
-    {
-      width: 200,
-      fixed: 'right',
-      render(_, record, index) {
-        return (
-          <div>
-            <Editable connection={connection}>
-              <HSet
-                trigger={
-                  <CusButton icon={<EditOutlined />} type="link"></CusButton>
-                }
-                keys={keys}
-                field={record}
-                onSuccess={onRefresh}
-              />
-            </Editable>
-            <Editable connection={connection}>
-              <HDel keys={keys} field={record} onSuccess={onRefresh} />
-            </Editable>
-          </div>
-        )
-      }
-    },
-    connection !== undefined && !connection.readonly
-  )
-
   return (
     <ValueLayout
       actions={
@@ -111,9 +41,77 @@ const HashValue: React.FC<{
         loading={loading}
         rowKey={'field'}
         more={more}
+        readonly={connection?.readonly}
         onLoadMore={getFields}
         dataSource={fields}
-        columns={columns}
+        action={{
+          width: 200,
+          fixed: 'right',
+          render(_, record, index) {
+            return (
+              <div>
+                <Editable connection={connection}>
+                  <HSet
+                    trigger={
+                      <CusButton
+                        icon={<EditOutlined />}
+                        type="link"
+                      ></CusButton>
+                    }
+                    keys={keys}
+                    field={record}
+                    onSuccess={onRefresh}
+                  />
+                </Editable>
+                <Editable connection={connection}>
+                  <HDel keys={keys} field={record} onSuccess={onRefresh} />
+                </Editable>
+              </div>
+            )
+          }
+        }}
+        columns={[
+          {
+            dataIndex: 'field',
+            width: 300,
+            title: (
+              <div className="flex items-center justify-center">
+                <div>{t('Field Name')}</div>
+                <div
+                  className="ml-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                >
+                  <Input.Search
+                    allowClear
+                    size="small"
+                    onSearch={(e) => {
+                      setParams({
+                        search: e
+                      })
+                    }}
+                  />
+                </div>
+              </div>
+            ),
+            render(value) {
+              return (
+                <Highlighter
+                  textToHighlight={value}
+                  searchWords={[params.search]}
+                />
+              )
+            }
+          },
+          {
+            dataIndex: 'value',
+            title: t('Field Value'),
+            render(_, record) {
+              return <FieldViewer content={_}></FieldViewer>
+            }
+          }
+        ]}
       ></CusTable>
       <div className="py-2 mb-4">
         <LoadMore

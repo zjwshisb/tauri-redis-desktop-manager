@@ -14,7 +14,6 @@ import Alter from './components/Alter'
 import DeleteRule from './components/DeleteRule'
 
 import CreateRule from './components/CreateRule'
-import useTableColumn from '@/hooks/useTableColumn'
 
 const TimeSeriesValue: React.FC<{
   keys: APP.TimeSeriesKey
@@ -85,17 +84,6 @@ const TimeSeriesValue: React.FC<{
     )
   }, [info])
 
-  const columns = useTableColumn<APP.Field>([
-    {
-      dataIndex: 'field',
-      title: 'Value'
-    },
-    {
-      dataIndex: 'value',
-      title: 'Timestamp'
-    }
-  ])
-
   return (
     <ValueLayout
       loading={loading}
@@ -114,7 +102,19 @@ const TimeSeriesValue: React.FC<{
       }
       header={header}
     >
-      <CusTable dataSource={items} columns={columns}></CusTable>
+      <CusTable
+        dataSource={items}
+        columns={[
+          {
+            dataIndex: 'field',
+            title: 'Value'
+          },
+          {
+            dataIndex: 'value',
+            title: 'Timestamp'
+          }
+        ]}
+      ></CusTable>
     </ValueLayout>
   )
 }

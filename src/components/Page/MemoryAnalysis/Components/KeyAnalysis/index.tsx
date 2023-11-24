@@ -2,7 +2,7 @@ import React from 'react'
 import Item from './Item'
 import request from '@/utils/request'
 import VirtualList from 'rc-virtual-list'
-import { Button, Space, message, Statistic, InputNumber, Empty } from 'antd'
+import { Space, message, Statistic, InputNumber, Empty } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { memoryFormat } from '@/utils'
 import Filter, { type FilterForm } from './Filter'
@@ -11,6 +11,7 @@ import { useScanCursor } from '@/hooks/useKeyScan'
 import classNames from 'classnames'
 import useStore from '@/hooks/useStore'
 import Container from '@/components/Container'
+import CusButton from '@/components/CusButton'
 
 export interface KeyItem {
   name: string
@@ -153,7 +154,7 @@ const KeyAnalysis: React.FC<{
         <Filter value={form} onValueChange={setForm} connection={connection} />
         <div className="mb-2 mr-2">
           <Space>
-            <Button
+            <CusButton
               loading={loading}
               type="primary"
               disabled={loading}
@@ -161,13 +162,13 @@ const KeyAnalysis: React.FC<{
                 analysis(formRef.current, true)
               }}
             >
-              {t('Analysis')}
-            </Button>
+              Analysis
+            </CusButton>
             {loading && !finished && (
-              <Button onClick={stopAnalysis}>{t('Suspend')}</Button>
+              <CusButton onClick={stopAnalysis}>Suspend</CusButton>
             )}
             {!loading && !finished && (
-              <Button onClick={continueAnalysis}>{t('Continue')}</Button>
+              <CusButton onClick={continueAnalysis}>Continue</CusButton>
             )}
           </Space>
         </div>
