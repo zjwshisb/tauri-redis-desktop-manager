@@ -8,7 +8,6 @@ export default function CusTable<T extends object>(
   props: TableProps<T> & {
     onLoadMore?: () => Promise<any>
     more?: boolean
-    showIndex?: boolean
     showFooter?: boolean
     action?: TableColumnType<T>
     readonly?: boolean

@@ -1,29 +1,47 @@
 import React from 'react'
-import { DeleteOutlined } from '@ant-design/icons'
 import request from '@/utils/request'
-import ButtonAction from '@/components/ButtonAction'
+import ModalForm from '@/components/ModalForm'
+
+import BaseKeyForm from '../../BaseKeyForm'
+import FormInputItem from '@/components/Form/FormInputItem'
+import FormListItem from '@/components/Form/FormListItem'
 
 const HDel: React.FC<{
-  keys: APP.Key
-  field: APP.Field
-  onSuccess: (f: APP.Field) => void
-}> = ({ field, keys, onSuccess }) => {
+  keys: APP.HashKey
+  onSuccess: () => void
+  trigger?: React.ReactElement
+  defaultValue?: Record<string, any>
+}> = (props) => {
   return (
-    <ButtonAction
-      type="link"
+    <ModalForm
+      width={400}
+      trigger={props.trigger}
       documentUrl="https://redis.io/commands/hdel/"
-      showConfirm
-      title="HDEL"
-      onSubmit={async () => {
-        await request('key/hash/hdel', keys.connection_id, {
-          name: keys.name,
-          fields: [field.field],
-          db: keys.db
-        })
-        onSuccess(field)
+      defaultValue={{
+        name: props.keys.name,
+        value: [undefined],
+        ...props.defaultValue
       }}
-      icon={<DeleteOutlined />}
-    ></ButtonAction>
+      onSubmit={async (v) => {
+        await request<number>('hash/hdel', props.keys.connection_id, {
+          db: props.keys.db,
+          ...v
+        })
+        props.onSuccess()
+      }}
+      title={'HDEL'}
+    >
+      <BaseKeyForm>
+        <FormListItem
+          name={'value'}
+          label="Fields"
+          required
+          renderItem={(f) => {
+            return <FormInputItem {...f} required></FormInputItem>
+          }}
+        />
+      </BaseKeyForm>
+    </ModalForm>
   )
 }
 export default HDel

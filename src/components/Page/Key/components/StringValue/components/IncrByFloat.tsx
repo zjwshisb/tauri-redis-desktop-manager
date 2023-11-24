@@ -3,8 +3,8 @@ import request from '@/utils/request'
 import ModalForm from '@/components/ModalForm'
 import VersionAccess from '@/components/VersionAccess'
 import context from '../../../context'
-import FormInputItem from '@/components/Form/FormInputItem'
 import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
+import BaseKeyForm from '../../BaseKeyForm'
 const IncrByFloat: React.FC<{
   keys: APP.StringKey
   onSuccess: () => void
@@ -28,8 +28,9 @@ const IncrByFloat: React.FC<{
           onSuccess()
         }}
       >
-        <FormInputItem name="name" label="Key" required />
-        <FormInputNumberItem name={'value'} label="Value" required />
+        <BaseKeyForm>
+          <FormInputNumberItem name={'value'} label="Value" required />
+        </BaseKeyForm>
       </ModalForm>
     </VersionAccess>
   )

@@ -25,10 +25,10 @@ pub struct ItemScanArgs {
 }
 
 #[derive(Deserialize)]
-pub struct CommonValueArgs<T = String, K = String> {
+pub struct CommonValueArgs<V = String, K = String> {
     pub name: K,
     pub db: Option<u8>,
-    pub value: T,
+    pub value: V,
 }
 
 #[derive(Deserialize)]

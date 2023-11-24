@@ -70,3 +70,22 @@ Those command which be checked are supported  at  GUI
 - [X] RPOPLPUSH
 - [X] RPUSH
 - [X] RPUSHX
+
+## Hash
+
+- [X] HEL
+- [X] HEXISTS
+- [X] HGET
+- [X] HGETALL
+- [X] HINCRBY
+- [X] HINCRBYFLOAT
+- [X] HKEYS
+- [X] HLEN
+- [X] HMGET
+- [ ] ~~HMSET~~(deprecated)
+- [X] HRANDFIELD
+- [X] HSCAN
+- [X] HSET
+- [X] HSETNX
+- [X] HSTRLEN
+- [X] HVALS

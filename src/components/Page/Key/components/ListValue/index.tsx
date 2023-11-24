@@ -155,7 +155,6 @@ const ListValue: React.FC<{
       }
     >
       <CusTable
-        showIndex={false}
         more={more}
         loading={loading}
         rowKey={'index'}

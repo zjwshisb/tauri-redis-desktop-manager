@@ -1,18 +1,29 @@
 import React, { useContext, useState } from 'react'
 import { Input } from 'antd'
-import { EditOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import HSet from './components/HSet'
 import HDel from './components/HDel'
 import { useTranslation } from 'react-i18next'
 import CusTable from '@/components/CusTable'
 import FieldViewer from '@/components/FieldViewer'
 import context from '../../context'
-import Editable from '@/components/Editable'
 import { useFieldScan } from '@/hooks/useFieldScan'
 import ValueLayout from '../ValueLayout'
 import LoadMore from '@/components/LoadMore'
 import Highlighter from 'react-highlight-words'
 import CusButton from '@/components/CusButton'
+import HExists from './components/HExists'
+import HGet from './components/HGet'
+import HGetAll from './components/HGetAll'
+import HIncrBy from './components/IncrBy'
+import HIncrByFloat from './components/IncrByFloat'
+import HKeys from './components/HKeys'
+import HLen from './components/HLen'
+import HMGet from './components/HMGet'
+import HRandField from './components/HRandField'
+import HSetNx from './components/HSetNx'
+import HStrLen from './components/HStrLen'
+import HVals from './components/HVals'
 
 const HashValue: React.FC<{
   keys: APP.HashKey
@@ -25,47 +36,84 @@ const HashValue: React.FC<{
   const { t } = useTranslation()
 
   const { fields, getFields, loading, more, getAllFields } =
-    useFieldScan<APP.Field>('key/hash/hscan', keys, params)
+    useFieldScan<APP.Field>('hash/hscan', keys, params)
 
   return (
     <ValueLayout
+      readonlyAction={
+        <>
+          <HExists keys={keys} />
+          <HGet keys={keys} />
+          <HGetAll keys={keys} />
+          <HKeys keys={keys} />
+          <HLen keys={keys} />
+          <HMGet keys={keys} />
+          <HRandField keys={keys} />
+          <HStrLen keys={keys} />
+          <HVals keys={keys} />
+        </>
+      }
       actions={
-        <HSet
-          keys={keys}
-          onSuccess={onRefresh}
-          trigger={<CusButton>HSET</CusButton>}
-        />
+        <>
+          <HDel keys={keys} onSuccess={onRefresh} />
+          <HIncrBy keys={keys} onSuccess={onRefresh} />
+          <HIncrByFloat keys={keys} onSuccess={onRefresh} />
+          <HSet
+            keys={keys}
+            onSuccess={onRefresh}
+            defaultValue={{
+              value: [undefined]
+            }}
+          />
+          <HSetNx keys={keys} onSuccess={onRefresh} />
+        </>
       }
     >
       <CusTable
         loading={loading}
         rowKey={'field'}
         more={more}
+        addIndex
         readonly={connection?.readonly}
         onLoadMore={getFields}
         dataSource={fields}
         action={{
           width: 200,
-          fixed: 'right',
-          render(_, record, index) {
+          render(_, record) {
             return (
               <div>
-                <Editable connection={connection}>
-                  <HSet
-                    trigger={
-                      <CusButton
-                        icon={<EditOutlined />}
-                        type="link"
-                      ></CusButton>
-                    }
-                    keys={keys}
-                    field={record}
-                    onSuccess={onRefresh}
-                  />
-                </Editable>
-                <Editable connection={connection}>
-                  <HDel keys={keys} field={record} onSuccess={onRefresh} />
-                </Editable>
+                <HIncrBy
+                  keys={keys}
+                  onSuccess={onRefresh}
+                  defaultValue={{
+                    field: record.field
+                  }}
+                  trigger={
+                    <CusButton type="link" icon={<PlusOutlined />}></CusButton>
+                  }
+                />
+                <HSet
+                  trigger={
+                    <CusButton icon={<EditOutlined />} type="link"></CusButton>
+                  }
+                  keys={keys}
+                  defaultValue={{
+                    value: [
+                      {
+                        ...record
+                      }
+                    ]
+                  }}
+                  onSuccess={onRefresh}
+                />
+                <HDel
+                  keys={keys}
+                  trigger={<CusButton type="link" icon={<DeleteOutlined />} />}
+                  defaultValue={{
+                    value: [record.field]
+                  }}
+                  onSuccess={onRefresh}
+                />
               </div>
             )
           }
@@ -76,7 +124,7 @@ const HashValue: React.FC<{
             width: 300,
             title: (
               <div className="flex items-center justify-center">
-                <div>{t('Field Name')}</div>
+                <div>{t('Field')}</div>
                 <div
                   className="ml-2"
                   onClick={(e) => {
@@ -106,8 +154,8 @@ const HashValue: React.FC<{
           },
           {
             dataIndex: 'value',
-            title: t('Field Value'),
-            render(_, record) {
+            title: 'Value',
+            render(_) {
               return <FieldViewer content={_}></FieldViewer>
             }
           }
