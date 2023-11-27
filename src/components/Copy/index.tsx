@@ -1,8 +1,10 @@
 import { CopyOutlined, CheckOutlined } from '@ant-design/icons'
 import React from 'react'
 import { clipboard } from '@tauri-apps/api'
-import { Button, type ButtonProps, message } from 'antd'
+import { type ButtonProps, message } from 'antd'
 import { useTranslation } from 'react-i18next'
+import CusButton from '../CusButton'
+import classNames from 'classnames'
 
 const Copy: React.FC<
   React.PropsWithChildren<{
@@ -28,7 +30,12 @@ const Copy: React.FC<
 
   const icon = React.useMemo(() => {
     if (showSuccess) {
-      return <CheckOutlined className={className} style={style} />
+      return (
+        <CheckOutlined
+          className={classNames([className, 'text-green-600'])}
+          style={style}
+        />
+      )
     }
 
     return (
@@ -51,7 +58,7 @@ const Copy: React.FC<
   }
 
   if (isButton === true) {
-    return <Button {...buttonProps} icon={icon} onClick={copy}></Button>
+    return <CusButton {...buttonProps} icon={icon} onClick={copy}></CusButton>
   }
   return icon
 }

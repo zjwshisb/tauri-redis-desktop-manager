@@ -1,10 +1,10 @@
 import React from 'react'
-import { Input } from 'antd'
+import { Input, Space } from 'antd'
 
 import { EditOutlined } from '@ant-design/icons'
 
-import Rename from '../Rename'
-import { isReadonly } from '@/components/Editable'
+import NameForm from './NameForm'
+import Editable from '@/components/Editable'
 import Context from '../../context'
 import Copy from '@/components/Copy'
 import CusButton from '@/components/CusButton'
@@ -22,34 +22,40 @@ const Name: React.FC<{
     return types
   }, [keys.sub_types, keys.types])
 
-  const edit = React.useMemo(() => {
-    if (isReadonly(connection)) {
-      return undefined
-    }
+  const addonAfter = React.useMemo(() => {
     return (
-      <Rename
-        trigger={
-          <CusButton
-            icon={<EditOutlined />}
-            type="text"
-            size="small"
-          ></CusButton>
-        }
-        keys={keys}
-        onSuccess={onChange}
-      />
+      <Space>
+        <Copy
+          isButton
+          content={keys.name}
+          buttonProps={{
+            type: 'text'
+          }}
+        ></Copy>
+        <Editable connection={connection}>
+          <NameForm
+            trigger={
+              <CusButton
+                icon={<EditOutlined />}
+                type="text"
+                size="small"
+              ></CusButton>
+            }
+            keys={keys}
+            onSuccess={onChange}
+          />
+        </Editable>
+      </Space>
     )
   }, [connection, keys, onChange])
 
   return (
-    <Copy content={keys.name}>
-      <Input
-        value={keys.name}
-        readOnly
-        addonBefore={types}
-        addonAfter={edit}
-      ></Input>
-    </Copy>
+    <Input
+      value={keys.name}
+      readOnly
+      addonBefore={types}
+      addonAfter={addonAfter}
+    ></Input>
   )
 }
 

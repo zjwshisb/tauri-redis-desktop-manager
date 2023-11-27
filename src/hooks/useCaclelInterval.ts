@@ -1,6 +1,6 @@
 import { useInterval, useUnmount } from 'ahooks'
 
-export default function useCancelIntercal(
+export default function useCancelInterval(
   fn: () => void,
   delay?: number,
   options?: {

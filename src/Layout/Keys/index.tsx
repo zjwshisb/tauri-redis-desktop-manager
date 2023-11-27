@@ -5,7 +5,12 @@ import { Spin, Statistic, ConfigProvider } from 'antd'
 import { useDebounceFn } from 'ahooks'
 import useStore from '@/hooks/useStore'
 import ResizableDiv from '@/components/ResizableDiv'
-import { ReloadOutlined, KeyOutlined, WindowsOutlined } from '@ant-design/icons'
+import {
+  ReloadOutlined,
+  KeyOutlined,
+  WindowsOutlined,
+  QuestionOutlined
+} from '@ant-design/icons'
 import VirtualKeyList from './components/VirtualKeyList'
 import LoadMore from '@/components/LoadMore'
 import { isMainWindow } from '@/utils'
@@ -20,6 +25,7 @@ import Context from './context'
 import reducer from './reducer'
 import Container from '@/components/Container'
 import CusButton from '@/components/CusButton'
+import request from '@/utils/request'
 
 const isMain = isMainWindow()
 
@@ -157,6 +163,23 @@ const Index: React.FC<{
                       getKeys(true)
                     }}
                     icon={<ReloadOutlined className="text-lg" />}
+                  ></CusButton>
+                  <CusButton
+                    onClick={() => {
+                      request<string>('key/randomkey', info.connection.id, {
+                        db: info.db
+                      }).then((res) => {
+                        store.page.addPage({
+                          type: 'key',
+                          name: res.data,
+                          connection: info.connection
+                        })
+                      })
+                    }}
+                    tooltip={{
+                      title: 'Random Key'
+                    }}
+                    icon={<QuestionOutlined />}
                   ></CusButton>
                 </div>
                 <div>

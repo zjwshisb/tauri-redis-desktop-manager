@@ -51,7 +51,8 @@ const CusModal: React.FC<
   const trigger = React.useMemo(() => {
     if (otherProps.trigger !== undefined) {
       return React.cloneElement(props.trigger as React.ReactElement, {
-        onClick() {
+        onClick(e: React.MouseEvent) {
+          e.stopPropagation()
           changeOpen(true)
         }
       })

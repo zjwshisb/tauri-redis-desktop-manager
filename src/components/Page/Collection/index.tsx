@@ -27,12 +27,12 @@ const Collection: React.FC<{
             <Container
               key={v.id}
               level={index % 2 === 0 ? 4 : 3}
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.stopPropagation()
                 const connection = store.connection.connections.find(
                   (c) => c.id === v.connection_id
                 )
-                if (connection != null && connection.open !== true) {
+                if (connection !== undefined && connection.open !== true) {
                   store.connection.open(connection.id)
                 }
                 store.page.addPageOrInNewWindow({

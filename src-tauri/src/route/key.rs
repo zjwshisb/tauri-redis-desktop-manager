@@ -1,7 +1,7 @@
-use crate::connection::Manager;
+use crate::connection::{CValue, Manager};
 use crate::err::CusError;
 
-use crate::request::NameArgs;
+use crate::request::{CommonValueArgs, DBArgs, NameArgs};
 use crate::{
     err::{self},
     key::Key,
@@ -42,6 +42,32 @@ pub async fn scan<'r>(
     Ok(ScanLikeResult::<String, String>::build(value)?)
 }
 
+#[derive(Deserialize)]
+struct CopyArgs {
+    db: Option<u8>,
+    source: String,
+    destination: String,
+    destination_db: Option<u8>,
+    replace: bool,
+}
+
+pub async fn copy<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CopyArgs = serde_json::from_str(&payload)?;
+    let mut cmd = redis::cmd("COPY");
+    cmd.arg(args.source).arg(args.destination);
+    if let Some(v) = args.destination_db {
+        cmd.arg(("DB", v));
+    }
+    if args.replace {
+        cmd.arg("REPLACE");
+    }
+    manager.execute(cid, &mut cmd, args.db).await
+}
+
 pub async fn get<'r>(
     payload: String,
     cid: u32,
@@ -66,9 +92,11 @@ pub async fn get<'r>(
 
 #[derive(Deserialize)]
 struct DelArgs {
-    names: Vec<String>,
-    db: u8,
+    command: String,
+    name: Vec<String>,
+    db: Option<u8>,
 }
+
 pub async fn del<'r>(
     payload: String,
     cid: u32,
@@ -76,46 +104,46 @@ pub async fn del<'r>(
 ) -> Result<i64, CusError> {
     let args: DelArgs = serde_json::from_str(&payload)?;
     manager
-        .execute(cid, redis::cmd("del").arg(&args.names), Some(args.db))
+        .execute(cid, redis::cmd(&args.command).arg(&args.name), args.db)
         .await
 }
 #[derive(Deserialize)]
 struct ExpireArgs {
+    command: String,
     name: String,
-    ttl: i64,
+    ttl: Option<i64>,
     db: u8,
+    option: Option<String>,
 }
 pub async fn expire<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<i64, CusError> {
+) -> Result<CValue, CusError> {
     let args: ExpireArgs = serde_json::from_str(&payload)?;
-    if args.ttl == -1 {
-        let i: i64 = manager
-            .execute(cid, redis::cmd("PERSIST").arg(&args.name), Some(args.db))
-            .await?;
-        match i {
-            0 => Err(CusError::build(
-                "Key does not exist or does not have an associated timeout.",
-            )),
-            _ => Ok(i),
+    let mut cmd: redis::Cmd;
+    match args.command.as_str() {
+        "PERSIST" => {
+            cmd = redis::cmd("PERSIST");
+            cmd.arg(args.name);
         }
-    } else {
-        let i: i64 = manager
-            .execute(
-                cid,
-                redis::cmd("EXPIRE").arg(&args.name).arg(args.ttl),
-                Some(args.db),
-            )
-            .await?;
-        match i {
-            0 => Err(CusError::build(
-                "Key doesn't exist, or operation skipped due to the provided arguments.",
-            )),
-            _ => Ok(i),
+        s => {
+            cmd = redis::cmd(s);
+            cmd.arg(args.name).arg(args.ttl).arg(args.option);
         }
     }
+    manager.execute(cid, &mut cmd, Some(args.db)).await
+}
+
+pub async fn ttl<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs = serde_json::from_str(&payload)?;
+    manager
+        .execute(cid, redis::cmd(&args.value).arg(args.name), args.db)
+        .await
 }
 
 #[derive(Deserialize)]
@@ -123,21 +151,28 @@ struct RenameArgs {
     name: String,
     new_name: String,
     db: u8,
+    command: String,
 }
 
 pub async fn rename<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<String, CusError> {
+) -> Result<CValue, CusError> {
     let args: RenameArgs = serde_json::from_str(&payload)?;
-    manager
+    let v: CValue = manager
         .execute(
             cid,
-            redis::cmd("rename").arg(&args.name).arg(&args.new_name),
+            redis::cmd(&args.command)
+                .arg(&args.name)
+                .arg(&args.new_name),
             Some(args.db),
         )
-        .await
+        .await?;
+    if let CValue::Int(0) = v {
+        return Err(CusError::build("New key already exists."));
+    }
+    return Ok(v);
 }
 
 #[derive(Deserialize)]
@@ -219,4 +254,46 @@ pub async fn restore<'r>(
         }
     }
     manager.execute(cid, &mut cmd, Some(args.db)).await
+}
+
+pub async fn object<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs = serde_json::from_str(&payload)?;
+    let version = manager.get_version(cid).await?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("OBJECT").arg(args.value).arg(args.name),
+            args.db,
+        )
+        .await
+}
+
+pub async fn move_key<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<i64> = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("MOVE").arg(args.name).arg(args.value),
+            args.db,
+        )
+        .await
+}
+
+pub async fn random_key<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: DBArgs = serde_json::from_str(&payload)?;
+    manager
+        .execute(cid, &mut redis::cmd("RANDOMKEY"), args.db)
+        .await
 }

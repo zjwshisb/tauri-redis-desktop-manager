@@ -2,7 +2,7 @@ import React from 'react'
 
 import { observer } from 'mobx-react-lite'
 
-import useCancelIntercal from '@/hooks/useCaclelInterval'
+import useCancelInterval from '@/hooks/useCaclelInterval'
 import useRequest from '@/hooks/useRequest'
 import { type ColumnsType } from 'antd/es/table'
 import AppLayout from '@/components/AppLayout'
@@ -21,7 +21,7 @@ interface Session {
 const App: React.FC = () => {
   const { data, fetch } = useRequest<Session[]>('debug/clients')
 
-  useCancelIntercal(fetch, 2000)
+  useCancelInterval(fetch, 2000)
 
   const columns: ColumnsType<Session> = React.useMemo(() => {
     const fields = ['id', 'host', 'types', 'created_at', 'proxy']

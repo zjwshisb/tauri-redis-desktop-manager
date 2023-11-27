@@ -11,6 +11,11 @@ pub struct ScanLikeArgs<T> {
 }
 
 #[derive(Deserialize)]
+pub struct DBArgs {
+    pub db: Option<u8>,
+}
+
+#[derive(Deserialize)]
 pub struct IdArgs<T> {
     pub id: T,
 }

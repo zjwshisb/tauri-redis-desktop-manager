@@ -1,4 +1,4 @@
-import useCancelIntercal from '@/hooks/useCaclelInterval'
+import useCancelInterval from '@/hooks/useCaclelInterval'
 import useRequest from '@/hooks/useRequest'
 import { type ColumnsType } from 'antd/es/table'
 import React from 'react'
@@ -16,7 +16,7 @@ interface Client {
 const Session: React.FC = () => {
   const { data, fetch } = useRequest<Client[]>('debug/clients')
 
-  useCancelIntercal(fetch, 2000)
+  useCancelInterval(fetch, 2000)
 
   const columns: ColumnsType<Client> = React.useMemo(() => {
     const fields = ['id', 'host', 'types', 'created_at', 'proxy']

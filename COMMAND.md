@@ -4,35 +4,36 @@ Those command which be checked are supported  at  GUI
 
 ## generic
 
-- [ ] COPY
+- [X] COPY
 - [X] DEL
 - [X] DUMP
 - [ ] EXISTS
-- [ ] EXPIRE
-- [ ] EXPIREAT
-- [ ] EXPIRETIME
+- [X] EXPIRE
+- [X] EXPIREAT
+- [X] EXPIRETIME
 - [ ] KEYS
 - [ ] MIGRATE
-- [ ] MOVE
+- [X] MOVE
 - [ ] OBJECT ENCODING
+- [ ] OBJECT FREQ
 - [ ] OBJECT IDLETIME
 - [ ] OBJECT REFCOUNT
-- [ ] PERSIST
-- [ ] PEXPIRE
-- [ ] PEXPIREAT
-- [ ] PEXPIRETIME
-- [ ] PTTL
-- [ ] RANDOMKEY
-- [ ] RENAME
-- [ ] RENAMENX
-- [ ] RESOTRE
-- [ ] SCAN
+- [X] PERSIST
+- [X] PEXPIRE
+- [X] PEXPIREAT
+- [X] PEXPIRETIME
+- [X] PTTL
+- [X] RANDOMKEY
+- [X] RENAME
+- [X] RENAMENX
+- [X] RESOTRE
+- [X] SCAN
 - [ ] SORT
 - [ ] SORT_RO
 - [ ] TOUCH
-- [ ] TTL
-- [ ] TYPE
-- [ ] UNLINK
+- [X] TTL
+- [X] TYPE
+- [X] UNLINK
 - [ ] WAIT
 - [ ] WAITAOF
 

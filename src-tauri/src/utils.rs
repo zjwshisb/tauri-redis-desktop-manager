@@ -5,6 +5,35 @@ use rand::prelude::*;
 use std::net::Ipv6Addr;
 use std::net::{IpAddr, Ipv4Addr};
 
+pub fn compare_version(version1: &String, version2: &String) -> i8 {
+    let arr1: Vec<_> = version1.split(".").into_iter().collect();
+    let arr2: Vec<_> = version2.split(".").into_iter().collect();
+    let mut len = arr1.len();
+    if arr2.len() > len {
+        len = arr2.len()
+    }
+    let mut i = 0;
+    while i < len {
+        let v1 = arr1.get(i);
+        let v2 = arr2.get(i);
+        let mut v1_num = 0;
+        let mut v2_num = 0;
+        if let Some(v1_str) = v1 {
+            v1_num = v1_str.parse().unwrap_or_default();
+        }
+        if let Some(v2_str) = v1 {
+            v2_num = v2_str.parse().unwrap_or_default();
+        }
+        if v1_num > v2_num {
+            return 1;
+        } else if v1_num < v2_num {
+            return -1;
+        }
+        i = i + 1
+    }
+    return 0;
+}
+
 pub fn random_str(length: usize) -> String {
     let mut rng = rand::thread_rng();
     Alphanumeric

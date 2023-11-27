@@ -1,5 +1,5 @@
 import React from 'react'
-import { App, Input, Result, Space } from 'antd'
+import { Input, Result, Space } from 'antd'
 import StringValue from './components/StringValue'
 import HashValue from './components/HashValue'
 import ListValue from './components/ListValue'
@@ -14,17 +14,16 @@ import HyperLogLogValue from './components/HyperLogLogValue'
 import CuckooFilterKey from './components/CuckooFilterValue'
 import Name from './components/Name'
 import Dump from './components/Dump'
-import { DeleteOutlined } from '@ant-design/icons'
-import Copy from '@/components/Copy'
 import useRequest from '@/hooks/useRequest'
-import request from '@/utils/request'
 import useStore from '@/hooks/useStore'
-import { useTranslation } from 'react-i18next'
 import TTL from './components/TTL'
-import Editable from '@/components/Editable'
+import Copy from './components/Copy'
+
 import Context from './context'
 import Page from '..'
-import CusButton from '@/components/CusButton'
+import DelForm from './components/DelForm'
+import Move from './components/Move'
+import ObjectInfo from './components/ObjectInfo'
 
 function isShowLength(types: APP.Key['types']) {
   return (
@@ -61,10 +60,6 @@ const Key: React.FC<{
   )
 
   const store = useStore()
-
-  const { t } = useTranslation()
-
-  const { modal, message } = App.useApp()
 
   const value = React.useMemo(() => {
     if (item !== undefined) {
@@ -116,26 +111,6 @@ const Key: React.FC<{
     return <></>
   }, [item, fetch])
 
-  const handleDelete = React.useCallback(() => {
-    if (item !== undefined) {
-      modal.confirm({
-        title: t('Notice'),
-        content: t('Are you sure delete <{{name}}>?', {
-          name: item.name
-        }),
-        async onOk() {
-          await request('key/del', item?.connection_id, {
-            db: item.db,
-            names: [item.name]
-          }).then(() => {
-            message.success('success')
-            store.page.removePage(pageKey)
-          })
-        }
-      })
-    }
-  }, [item, message, modal, pageKey, store.page, t])
-
   if (error !== '') {
     return <Result status="warning" title={error}></Result>
   }
@@ -162,7 +137,7 @@ const Key: React.FC<{
               </div>
               <Space wrap>
                 <div className="w-[300px]">
-                  <TTL keys={item} onChange={fetch}></TTL>
+                  <TTL keys={item}></TTL>
                 </div>
                 <div className="w-[300px]">
                   <Input
@@ -181,17 +156,19 @@ const Key: React.FC<{
                     ></Input>
                   </div>
                 )}
-                <Copy content={item.name} isButton />
-                <Dump keys={item}></Dump>
-                <Editable connection={connection}>
-                  <CusButton
-                    onClick={handleDelete}
-                    type="primary"
-                    danger
-                    icon={<DeleteOutlined />}
-                  ></CusButton>
-                </Editable>
+                <Move
+                  keys={item}
+                  onSuccess={() => {
+                    store.page.removePage(pageKey)
+                  }}
+                />
+                <Copy keys={item} />
+                <Dump keys={item} />
+                <DelForm keys={item} onSuccess={() => {}} />
               </Space>
+            </div>
+            <div>
+              <ObjectInfo keys={item} />
             </div>
             <div>{value}</div>
           </div>

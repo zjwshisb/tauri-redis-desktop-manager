@@ -42,7 +42,7 @@ const FormListItem: React.FC<FormListItemProps> = (p) => {
             )}
             {fields.map((field, index) => {
               return (
-                <Row key={field.name} className="item-center mb-4" gutter={20}>
+                <Row key={field.name} className="item-center" gutter={20}>
                   <Col span={20}>{renderItem(field, index)}</Col>
                   <Col>
                     <Space>

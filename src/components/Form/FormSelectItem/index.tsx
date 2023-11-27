@@ -10,6 +10,7 @@ const FormSelectItem: React.FC<
     <CusFormItem
       {...p}
       requiredMsg="Please select {{name}}"
+      placeholderMsg="Please select {{name}}"
       render={(props = {}) => {
         const { allowClear = true, ...other } = props
         return <Select allowClear={allowClear} {...other} />

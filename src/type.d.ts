@@ -159,4 +159,12 @@ declare namespace APP {
     key: string
     created_at: string
   }
+
+  interface Command {
+    label: string
+    value: string
+    url?: string
+    version?: string
+    type?: 'greater' | 'less'
+  }
 }

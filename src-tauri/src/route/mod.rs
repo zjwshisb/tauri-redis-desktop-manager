@@ -58,8 +58,6 @@ pub async fn dispatch<'r>(
         "server/reset-slow-log" => Response::new(server::reset_slow_log(cid, manager).await?),
         "server/module" => Response::new(server::module(cid, manager).await?),
 
-        "key/scan" => Response::new(key::scan(payload, cid, manager).await?),
-
         "hash/hscan" => Response::new(hash::hscan(payload, cid, manager).await?),
         "hash/hdel" => Response::new(hash::hdel(payload, cid, manager).await?),
         "hash/hexists" => Response::new(hash::hexists(payload, cid, manager).await?),
@@ -102,15 +100,20 @@ pub async fn dispatch<'r>(
         "key/zset/zscan" => Response::new(zset::zscan(payload, cid, manager).await?),
         "key/zset/zrem" => Response::new(zset::zrem(payload, cid, manager).await?),
         "key/zset/zadd" => Response::new(zset::zadd(payload, cid, manager).await?),
-        "key/rename" => Response::new(key::rename(payload, cid, manager).await?),
 
+        "key/copy" => Response::new(key::copy(payload, cid, manager).await?),
+        "key/rename" => Response::new(key::rename(payload, cid, manager).await?),
         "key/add" => Response::new(key::add(payload, cid, manager).await?),
         "key/del" => Response::new(key::del(payload, cid, manager).await?),
         "key/get" => Response::new(key::get(payload, cid, manager).await?),
-
         "key/dump" => Response::new(key::dump(payload, cid, manager).await?),
         "key/restore" => Response::new(key::restore(payload, cid, manager).await?),
         "key/expire" => Response::new(key::expire(payload, cid, manager).await?),
+        "key/scan" => Response::new(key::scan(payload, cid, manager).await?),
+        "key/ttl" => Response::new(key::ttl(payload, cid, manager).await?),
+        "key/object" => Response::new(key::object(payload, cid, manager).await?),
+        "key/move" => Response::new(key::move_key(payload, cid, manager).await?),
+        "key/randomkey" => Response::new(key::random_key(payload, cid, manager).await?),
 
         "set/sscan" => Response::new(set::sscan(payload, cid, manager).await?),
         "set/sadd" => Response::new(set::sadd(payload, cid, manager).await?),
