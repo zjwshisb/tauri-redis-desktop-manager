@@ -8,10 +8,10 @@
 + Readonly Mode
 + SSH Proxy
 + Scan、Sscan、Hscan、Zscan For Key/Field Paginate
-+ Publish/Subscribe command
-+ Monitor command
++ Publish/Subscribe
++ Monitor
 + Key Memory Analysis  
-+ Multiwindow
++ Multiple Window
 + Debug Log
 + Data Migrate
 + JSON Type
@@ -20,7 +20,7 @@
 + Dark Mode
 + Terminal
   
-## Command Support (At GUI)
+## Command Support (In GUI)
 
 [Detail](https://github.com/zjwshisb/tauri-redis-desktop-manager/blob/main/COMMAND.md)
 

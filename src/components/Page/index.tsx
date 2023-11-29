@@ -15,6 +15,7 @@ import { useLatest, useLocalStorageState } from 'ahooks'
 import { useTranslation } from 'react-i18next'
 import { computed } from 'mobx'
 import useHasMultiPage from '@/hooks/useHasMultiPage'
+import Container from '../Container'
 
 interface PageProps {
   pageKey: string
@@ -116,7 +117,10 @@ const Page: React.FC<React.PropsWithChildren<PageProps>> = (props) => {
           offsetBottom={20}
           style={{ zIndex: 2 }}
         >
-          <div className="flex justify-between border-b px-3 py-1 bg-white">
+          <Container
+            className="flex justify-between border-b px-3 py-1 "
+            level={4}
+          >
             <div>
               <Space>
                 {collected && <Collect pageKey={props.pageKey} />}
@@ -159,7 +163,7 @@ const Page: React.FC<React.PropsWithChildren<PageProps>> = (props) => {
                 )}
               </Space>
             </div>
-          </div>
+          </Container>
         </StickyBox>
       )}
 

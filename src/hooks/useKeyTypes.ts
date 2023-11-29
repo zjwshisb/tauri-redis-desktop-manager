@@ -69,6 +69,11 @@ export default function useKeyTypes(
         searchable: true
       },
       {
+        label: t('Count-Min Sketch'),
+        value: 'CMSk-TYPE',
+        searchable: true
+      },
+      {
         label: t('HyperLogLog'),
         value: 'HyperLogLog',
         searchable: false

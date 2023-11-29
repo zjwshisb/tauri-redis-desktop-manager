@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  Form,
-  Row,
-  Col,
-  type FormListFieldData,
-  type FormItemProps,
-  Space
-} from 'antd'
+import { Form, type FormListFieldData, type FormItemProps, Space } from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import CusButton from '@/components/CusButton'
 
@@ -14,6 +7,7 @@ type FormListItemProps = FormItemProps & {
   renderItem: (f: FormListFieldData, index: number) => React.ReactNode
   canBeZero?: boolean
   showAdd?: boolean
+  showRemove?: boolean
 }
 
 const FormListItem: React.FC<FormListItemProps> = (p) => {
@@ -22,6 +16,7 @@ const FormListItem: React.FC<FormListItemProps> = (p) => {
     renderItem,
     showAdd = true,
     canBeZero = false,
+    showRemove = true,
     name,
     ...others
   } = p
@@ -42,11 +37,11 @@ const FormListItem: React.FC<FormListItemProps> = (p) => {
             )}
             {fields.map((field, index) => {
               return (
-                <Row key={field.name} className="item-center" gutter={20}>
-                  <Col span={20}>{renderItem(field, index)}</Col>
-                  <Col>
+                <div key={field.name} className="flex">
+                  <div className="flex-1">{renderItem(field, index)}</div>
+                  <div className="flex-shirk-0 ml-2">
                     <Space>
-                      {(index > 0 || canBeZero) && (
+                      {(index > 0 || canBeZero) && showRemove && (
                         <CusButton
                           type="dashed"
                           onClick={() => {
@@ -65,8 +60,8 @@ const FormListItem: React.FC<FormListItemProps> = (p) => {
                         ></CusButton>
                       )}
                     </Space>
-                  </Col>
-                </Row>
+                  </div>
+                </div>
               )
             })}
           </>

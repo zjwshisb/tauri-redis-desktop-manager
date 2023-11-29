@@ -19,6 +19,7 @@ import FormInputItem from '@/components/Form/FormInputItem'
 import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 import FormInputJsonItem from '@/components/Form/FormInputJsonItem'
 import CusButton from '@/components/CusButton'
+import CountMinItem from './components/CountMinItem'
 
 const Plus: React.FC<{
   onSuccess: (name: string) => void
@@ -82,6 +83,9 @@ const Plus: React.FC<{
       case 'MBbloomCF': {
         return <CuckooFilterItem />
       }
+      case 'CMSk-TYPE': {
+        return <CountMinItem />
+      }
       case 'HyperLogLog': {
         form.current?.setFieldValue('value', [undefined])
         return <SimpleArrayItem />
@@ -96,16 +100,16 @@ const Plus: React.FC<{
         return 'topk/reserve'
       }
       case 'set': {
-        return 'key/set/sadd'
+        return 'set/sadd'
       }
       case 'list': {
-        return 'key/list/lpush'
+        return 'list/lpush'
       }
       case 'hash': {
-        return 'key/hash/hset'
+        return 'hash/hset'
       }
       case 'zset': {
-        return 'key/zset/zadd'
+        return 'zset/zadd'
       }
       case 'TSDB-TYPE': {
         return 'timeseries/create'
@@ -121,6 +125,9 @@ const Plus: React.FC<{
       }
       case 'MBbloomCF': {
         return 'cuckoo-filter/reserve'
+      }
+      case 'CMSk-TYPE': {
+        return 'cms/init'
       }
       default: {
         return 'key/add'

@@ -35,7 +35,7 @@ const Filter: React.FC<{
     <div className="flex item-center p-2">
       <Input.Search
         value={search}
-        addonBefore={
+        prefix={
           <Tooltip title={t('Exact Search')} placement="bottom">
             <Checkbox
               checked={state.filter.exact}
@@ -60,7 +60,7 @@ const Filter: React.FC<{
         }}
       />
       <TypeSelect
-        className="!w-28 ml-2 flex-shrink-0"
+        className="!w-32 ml-2 flex-shrink-0"
         selectClassName="w-full"
         value={state.filter.types}
         connection={connection}

@@ -40,6 +40,7 @@ const Terminal: React.FC<{
     },
     (v) => {
       const data = v.payload.data
+      console.log(data)
       if (v.payload.success) {
         term.current?.writeRedisResult(data)
       } else {

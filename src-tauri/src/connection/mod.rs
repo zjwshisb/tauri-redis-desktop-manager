@@ -1,4 +1,3 @@
-use crate::utils;
 use redis::{FromRedisValue, RedisResult, Value as RedisValue};
 mod conn;
 mod event;
@@ -49,7 +48,7 @@ impl CValue {
                         return Self::Str(ss);
                     }
                     Err(_) => {
-                        let ss = utils::binary_to_redis_str(&s);
+                        let ss = String::from_utf8_lossy(&s).to_string();
                         return Self::Str(ss);
                     }
                 }

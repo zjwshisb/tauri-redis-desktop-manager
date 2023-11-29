@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::connection::{CValue, Manager};
 use crate::err::CusError;
 

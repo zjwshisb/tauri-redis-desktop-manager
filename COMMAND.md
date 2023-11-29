@@ -290,6 +290,15 @@ Those command which be checked are supported  at  GUI
 - [ ] TOPK.QUERY
 - [X] TOPK.RESERVE
 
+## Count-Min Sketch
+
+- [X] CMS.INCRBY
+- [X] CMS.INFO
+- [X] CMS.INITBYDIM
+- [X] CMS.INITBYPROB
+- [X] CMS.MERGE
+- [X] CMD.QUERY
+
 ## Connection Management
 
 - [X] AUTH

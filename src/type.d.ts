@@ -79,6 +79,7 @@ declare namespace APP {
     | BloomFilterKey
     | CuckooFilterKey
     | HyperLogLogKey
+    | CountMinKey
 
   type StringKey = BaseKey<'string', string>
 
@@ -103,6 +104,8 @@ declare namespace APP {
   type CuckooFilterKey = BaseKey<'MBbloomCF', string>
 
   type HyperLogLogKey = BaseKey<'string', string, 'HyperLogLog'>
+
+  type CountMinKey = BaseKey<'CMSk-TYPE', string>
 
   interface IndexValue {
     index: number

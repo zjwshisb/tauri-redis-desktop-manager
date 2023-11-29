@@ -26,6 +26,7 @@ import Move from './components/Move'
 import ObjectInfo from './components/ObjectInfo'
 import { useTranslation } from 'react-i18next'
 import { useLocalStorageState } from 'ahooks'
+import CountMin from './components/CountMin'
 
 function isShowLength(types: APP.Key['types']) {
   return (
@@ -33,7 +34,8 @@ function isShowLength(types: APP.Key['types']) {
     types !== 'TopK-TYPE' &&
     types !== 'TSDB-TYPE' &&
     types !== 'TDIS-TYPE' &&
-    types !== 'MBbloomCF'
+    types !== 'MBbloomCF' &&
+    types !== 'CMSk-TYPE'
   )
 }
 
@@ -110,16 +112,16 @@ const Key: React.FC<{
         case 'MBbloom--': {
           return <BloomFilterValue keys={item} onRefresh={fetch} />
         }
+        case 'CMSk-TYPE': {
+          return <CountMin keys={item} onRefresh={fetch} />
+        }
         case 'MBbloomCF': {
-          return (
-            <CuckooFilterKey keys={item} onRefresh={fetch}></CuckooFilterKey>
-          )
+          return <CuckooFilterKey keys={item} onRefresh={fetch} />
         }
       }
     }
     return <></>
   }, [item, fetch])
-
   if (error !== '') {
     return (
       <Result status="warning" subTitle={name} title="Key not exists."></Result>

@@ -8,6 +8,7 @@ use crate::response::Response;
 pub mod bloom;
 pub mod client;
 pub mod cluster;
+pub mod cms;
 pub mod collection;
 pub mod config;
 pub mod connection;
@@ -230,6 +231,12 @@ pub async fn dispatch<'r>(
 
         "hyperloglog/pfcount" => Response::new(hyperloglog::pfcount(payload, cid, manager).await?),
         "hyperloglog/pfadd" => Response::new(hyperloglog::pfadd(payload, cid, manager).await?),
+
+        "cms/init" => Response::new(cms::init(payload, cid, manager).await?),
+        "cms/info" => Response::new(cms::info(payload, cid, manager).await?),
+        "cms/incrby" => Response::new(cms::incrby(payload, cid, manager).await?),
+        "cms/query" => Response::new(cms::query(payload, cid, manager).await?),
+        "cms/merge" => Response::new(cms::merge(payload, cid, manager).await?),
 
         "terminal/open" => Response::new(terminal::open(cid, window, manager, event_manage).await?),
         "terminal/cancel" => Response::new(terminal::cancel(payload, window, event_manage).await?),
