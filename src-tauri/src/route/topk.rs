@@ -1,6 +1,6 @@
-use crate::connection::Manager;
+use crate::connection::{CValue, Manager};
 use crate::err::CusError;
-use crate::request::{CommonValueArgs, FieldValueArgs, NameArgs};
+use crate::request::{CommonValueArgs, FieldValueArgs, FieldValueItem, NameArgs};
 use crate::response::{Field, FieldValue};
 use redis::{FromRedisValue, Value};
 use serde::Deserialize;
@@ -106,18 +106,42 @@ pub async fn incrby<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<String, CusError> {
-    let args: FieldValueArgs<i64> = serde_json::from_str(&payload)?;
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<Vec<FieldValueItem<i64>>> = serde_json::from_str(&payload)?;
+    let mut cmd = redis::cmd("TOPK.INCRBY");
+    cmd.arg(args.name);
+    for x in args.value {
+        cmd.arg((x.field, x.value));
+    }
+    manager.execute(cid, &mut cmd, args.db).await
+}
+
+pub async fn query<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
-            redis::cmd("TOPK.INCRBY")
-                .arg(args.name)
-                .arg(args.field)
-                .arg(args.value),
+            redis::cmd("TOPK.QUERY").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
+        .await
+}
 
-    Ok(String::from("Ok"))
+pub async fn count<'r>(
+    payload: String,
+    cid: u32,
+    manager: tauri::State<'r, Manager>,
+) -> Result<CValue, CusError> {
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
+    manager
+        .execute(
+            cid,
+            redis::cmd("TOPK.COUNT").arg(args.name).arg(args.value),
+            args.db,
+        )
+        .await
 }

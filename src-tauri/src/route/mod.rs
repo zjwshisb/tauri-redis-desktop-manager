@@ -182,6 +182,8 @@ pub async fn dispatch<'r>(
         "topk/add" => Response::new(topk::add(payload, cid, manager).await?),
         "topk/incrby" => Response::new(topk::incrby(payload, cid, manager).await?),
         "topk/reserve" => Response::new(topk::reserve(payload, cid, manager).await?),
+        "topk/query" => Response::new(topk::query(payload, cid, manager).await?),
+        "topk/count" => Response::new(topk::count(payload, cid, manager).await?),
 
         "timeseries/info" => Response::new(timeseries::info(payload, cid, manager).await?),
         "timeseries/range" => Response::new(timeseries::range(payload, cid, manager).await?),

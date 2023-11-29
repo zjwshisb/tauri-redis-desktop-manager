@@ -283,11 +283,11 @@ Those command which be checked are supported  at  GUI
 ## Top-k
 
 - [X] TOPK.ADD
-- [ ] TOPK.COUNT
+- [X] TOPK.COUNT
 - [X] TOPK.INCRBY
 - [X] TOPK.INFO
 - [X] TOPK.LIST
-- [ ] TOPK.QUERY
+- [X] TOPK.QUERY
 - [X] TOPK.RESERVE
 
 ## Count-Min Sketch
