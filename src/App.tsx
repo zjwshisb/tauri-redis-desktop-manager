@@ -10,6 +10,9 @@ import ActionBar from './Layout/ActionBar'
 
 const App: React.FC = () => {
   const store = useStore()
+  React.useEffect(() => {
+    store.window.setName('main')
+  }, [store.window])
   return (
     <AppLayout header={<ActionBar />}>
       {store.connection.connections.length > 0 && <Connections />}

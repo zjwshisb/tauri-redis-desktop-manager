@@ -10,6 +10,7 @@ import XTerm, { type XTermAction } from '@/components/XTerm'
 import { Checkbox, Input, Space } from 'antd'
 import { useEventListen } from '@/hooks/useEventListen'
 import { useTranslation } from 'react-i18next'
+import { SearchOutlined } from '@ant-design/icons'
 
 const App: React.FC = () => {
   const searchRef = React.useRef('')
@@ -50,7 +51,7 @@ const App: React.FC = () => {
   return (
     <AppLayout>
       <Container level={4}>
-        <Page pageKey="log" wFull>
+        <Page pageKey="log" wFull showAction={false}>
           <XTerm
             ref={term}
             onReady={(term) => {
@@ -61,6 +62,8 @@ const App: React.FC = () => {
             <Space>
               <div className="w-[200px]">
                 <Input
+                  prefix={<SearchOutlined />}
+                  placeholder="filters"
                   onChange={(e) => {
                     searchRef.current = e.target.value
                   }}

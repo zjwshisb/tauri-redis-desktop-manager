@@ -1,10 +1,10 @@
 import { makeAutoObservable } from 'mobx'
 import i18n from '@/i18n'
 import { emit, listen } from '@tauri-apps/api/event'
-import { SETTING_CHANGE } from '@/event'
 import { isMainWindow } from '@/utils'
 
 const SETTING_CACHE_KEY = 'SETTING_CACHE_KEY'
+const SETTING_CHANGE = 'SETTING_CHANGE'
 
 export interface AppSetting {
   locale: string

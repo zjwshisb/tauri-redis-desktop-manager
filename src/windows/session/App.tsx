@@ -36,7 +36,7 @@ const App: React.FC = () => {
   return (
     <AppLayout>
       <Container level={4}>
-        <Page pageKey="session" wFull>
+        <Page pageKey="session" wFull onRefresh={fetch} collected={false}>
           <Table
             dataSource={data}
             size="small"

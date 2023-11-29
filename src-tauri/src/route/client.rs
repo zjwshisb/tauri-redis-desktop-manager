@@ -1,13 +1,17 @@
-use crate::{connection::Manager, err::CusError, request};
+use crate::{
+    connection::{CValue, Manager},
+    err::CusError,
+    request,
+};
 use redis::{self};
 
 pub async fn list<'r>(
     _payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<String, CusError> {
+) -> Result<CValue, CusError> {
     manager
-        .execute(cid, redis::cmd("client").arg("list"), None)
+        .execute(cid, redis::cmd("CLIENT").arg("LIST"), None)
         .await
 }
 

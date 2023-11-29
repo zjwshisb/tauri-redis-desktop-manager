@@ -1,13 +1,19 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import pageObj from './page'
 import request from '@/utils/request'
+import { listen, emit } from '@tauri-apps/api/event'
+
+const COLLECTION_CHANGE = 'collection_change'
 
 class CollectionStore {
   public items: APP.Collection[]
   constructor() {
     this.items = []
-    this.getAll()
     makeAutoObservable(this)
+    this.getAll()
+    listen(COLLECTION_CHANGE, () => {
+      this.getAll()
+    })
   }
 
   getAll() {
@@ -22,10 +28,11 @@ class CollectionStore {
     const index = this.items.findIndex((v) => v.key === key)
     if (index > -1) {
       const i = this.items.splice(index, 1)
-      console.log(i[0].id)
       request('collections/del', 0, {
         id: i[0].id
-      }).then(() => {})
+      }).then(() => {
+        emit(COLLECTION_CHANGE)
+      })
     }
   }
 
@@ -38,10 +45,8 @@ class CollectionStore {
         connection_id: page.connection != null ? page.connection.id : 0,
         key,
         db: page.db
-      }).then((res) => {
-        runInAction(() => {
-          this.items.unshift(res.data)
-        })
+      }).then(() => {
+        emit(COLLECTION_CHANGE)
       })
     }
   }

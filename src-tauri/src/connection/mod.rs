@@ -9,7 +9,7 @@ pub use conn::{Connectable, ConnectedParam, Connection, ConnectionParams, Connec
 pub use event::EventManager;
 pub use manager::Manager;
 pub use node::Node;
-
+#[derive(Clone, Debug)]
 pub enum CValue {
     Str(String),
     Vec(Vec<CValue>),

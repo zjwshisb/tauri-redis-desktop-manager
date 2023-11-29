@@ -1,7 +1,11 @@
+use std::collections::HashMap;
+
 use crate::connection::{CValue, Manager};
 use crate::err::CusError;
 
 use crate::request::{CommonValueArgs, DBArgs, NameArgs};
+use crate::response::{Field, FieldValue};
+use crate::utils::compare_version;
 use crate::{
     err::{self},
     key::Key,
@@ -260,16 +264,75 @@ pub async fn object<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<CValue, CusError> {
-    let args: CommonValueArgs = serde_json::from_str(&payload)?;
+) -> Result<Vec<Field>, CusError> {
+    let args: NameArgs = serde_json::from_str(&payload)?;
     let version = manager.get_version(cid).await?;
-    manager
-        .execute(
-            cid,
-            redis::cmd("OBJECT").arg(args.value).arg(args.name),
-            args.db,
-        )
-        .await
+    let mut resp: Vec<Field> = vec![];
+
+    if compare_version(&version, "2.2.3") > -1 {
+        let s: Result<CValue, CusError> = manager
+            .execute(
+                cid,
+                redis::cmd("OBJECT").arg("ENCODING").arg(&args.name),
+                args.db,
+            )
+            .await;
+        if let Ok(v) = s {
+            resp.push(Field {
+                field: String::from("OBJECT ENCODING"),
+                value: FieldValue::Value(v),
+            })
+        }
+    }
+
+    if compare_version(&version, "4.0.0") > -1 {
+        let s: Result<CValue, CusError> = manager
+            .execute(
+                cid,
+                redis::cmd("OBJECT").arg("FREQ").arg(&args.name),
+                args.db,
+            )
+            .await;
+        if let Ok(v) = s {
+            resp.push(Field {
+                field: String::from("OBJECT FREQ"),
+                value: FieldValue::Value(v),
+            })
+        }
+    }
+
+    if compare_version(&version, "2.2.3") > -1 {
+        let s: Result<CValue, CusError> = manager
+            .execute(
+                cid,
+                redis::cmd("OBJECT").arg("IDLETIME").arg(&args.name),
+                args.db,
+            )
+            .await;
+        if let Ok(v) = s {
+            resp.push(Field {
+                field: String::from("OBJECT IDLETIME"),
+                value: FieldValue::Value(v),
+            })
+        }
+    }
+
+    if compare_version(&version, "2.2.3") > -1 {
+        let s: Result<CValue, CusError> = manager
+            .execute(
+                cid,
+                redis::cmd("OBJECT").arg("REFCOUNT").arg(&args.name),
+                args.db,
+            )
+            .await;
+        if let Ok(v) = s {
+            resp.push(Field {
+                field: String::from("OBJECT REFCOUNT"),
+                value: FieldValue::Value(v),
+            })
+        }
+    }
+    Ok(resp)
 }
 
 pub async fn move_key<'r>(

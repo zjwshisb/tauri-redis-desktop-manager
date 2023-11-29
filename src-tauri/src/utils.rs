@@ -5,7 +5,7 @@ use rand::prelude::*;
 use std::net::Ipv6Addr;
 use std::net::{IpAddr, Ipv4Addr};
 
-pub fn compare_version(version1: &String, version2: &String) -> i8 {
+pub fn compare_version(version1: &str, version2: &str) -> i8 {
     let arr1: Vec<_> = version1.split(".").into_iter().collect();
     let arr2: Vec<_> = version2.split(".").into_iter().collect();
     let mut len = arr1.len();
@@ -21,7 +21,7 @@ pub fn compare_version(version1: &String, version2: &String) -> i8 {
         if let Some(v1_str) = v1 {
             v1_num = v1_str.parse().unwrap_or_default();
         }
-        if let Some(v2_str) = v1 {
+        if let Some(v2_str) = v2 {
             v2_num = v2_str.parse().unwrap_or_default();
         }
         if v1_num > v2_num {

@@ -129,6 +129,23 @@ const Index: React.FC<{
                       info={info}
                     />
                   </Editable>
+                  <CusButton
+                    onClick={() => {
+                      request<string>('key/randomkey', info.connection.id, {
+                        db: info.db
+                      }).then((res) => {
+                        store.page.addPage({
+                          type: 'key',
+                          name: res.data,
+                          connection: info.connection
+                        })
+                      })
+                    }}
+                    tooltip={{
+                      title: 'Random Key'
+                    }}
+                    icon={<QuestionOutlined />}
+                  ></CusButton>
                   <Editable connection={info.connection}>
                     <Restore
                       info={info}
@@ -163,23 +180,6 @@ const Index: React.FC<{
                       getKeys(true)
                     }}
                     icon={<ReloadOutlined className="text-lg" />}
-                  ></CusButton>
-                  <CusButton
-                    onClick={() => {
-                      request<string>('key/randomkey', info.connection.id, {
-                        db: info.db
-                      }).then((res) => {
-                        store.page.addPage({
-                          type: 'key',
-                          name: res.data,
-                          connection: info.connection
-                        })
-                      })
-                    }}
-                    tooltip={{
-                      title: 'Random Key'
-                    }}
-                    icon={<QuestionOutlined />}
                   ></CusButton>
                 </div>
                 <div>

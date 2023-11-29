@@ -15,6 +15,7 @@ import Config from '@/components/Page/Config'
 import MemoryAnalysis from '@/components/Page/MemoryAnalysis'
 import Terminal from '@/components/Page/Terminal'
 import Collection from '@/components/Page/Collection'
+import { Result } from 'antd'
 
 const DetailPage: React.FC<
   Omit<Page, 'label' | 'name'> & {
@@ -24,7 +25,7 @@ const DetailPage: React.FC<
   const { connection, pageKey, type, db, name } = props
 
   const children = React.useMemo(() => {
-    let node = <></>
+    let node = <Result title="Connection Not Found"></Result>
     if (connection !== undefined) {
       switch (type) {
         case 'key': {

@@ -159,7 +159,7 @@ impl Manager {
         if wrapper.nodes.len() == 0 {
             let params = wrapper.model.get_params();
             let values = self
-                .execute_with(redis::cmd("CLUSTER").arg("nodes"), wrapper)
+                .execute_with(redis::cmd("CLUSTER").arg("NODES"), wrapper)
                 .await?;
             let csv = String::from_redis_value(&values)?;
             let items: Vec<&str> = csv.split("\n").collect();

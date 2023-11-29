@@ -1,7 +1,6 @@
 import React from 'react'
-import { Card, Col, Row, Descriptions, Input } from 'antd'
+import { Card, Col, Row, Descriptions } from 'antd'
 import { useTranslation } from 'react-i18next'
-import { SearchOutlined } from '@ant-design/icons'
 
 import DbInfo from './DbInfo'
 import Module from './Module'
@@ -12,10 +11,9 @@ import Highlighter from 'react-highlight-words'
 const Item: React.FC<{
   data: Record<string, string>
   connection: APP.Connection
-}> = ({ data, connection }) => {
+  search: string
+}> = ({ data, connection, search }) => {
   const { t } = useTranslation()
-
-  const [search, setSearch] = React.useState('')
 
   const items = React.useMemo(() => {
     const fields: APP.Field[] = []
@@ -66,17 +64,6 @@ const Item: React.FC<{
       <Row className="mt-4">
         <Col span={24}>
           <Card title={t('Info')}>
-            <div className="mb-2 w-[200px]">
-              <Input
-                prefix={<SearchOutlined />}
-                value={search}
-                allowClear
-                placeholder={t('search').toString()}
-                onChange={(e) => {
-                  setSearch(e.target.value)
-                }}
-              />
-            </div>
             <CusTable
               rowKey={'field'}
               virtual={false}

@@ -19,20 +19,27 @@ export default function useRequest<T>(
 
   const optionRef = useLatest(options)
 
-  const fetch = React.useCallback(() => {
-    setLoading(true)
-    request<T>(cmd, cid, argsRef.current, optionRef.current)
-      .then((res) => {
-        setData(res.data)
-      })
-      .catch((err) => {
-        setError(err as string)
-      })
-      .finally(() => {
-        setInit(true)
-        setLoading(false)
-      })
-  }, [cmd, cid, argsRef, optionRef])
+  const fetch = React.useCallback(
+    (showLoading = true) => {
+      if (showLoading) {
+        setLoading(true)
+      }
+      request<T>(cmd, cid, argsRef.current, optionRef.current)
+        .then((res) => {
+          setData(res.data)
+        })
+        .catch((err) => {
+          setError(err as string)
+        })
+        .finally(() => {
+          setInit(true)
+          if (showLoading) {
+            setLoading(false)
+          }
+        })
+    },
+    [cmd, cid, argsRef, optionRef]
+  )
 
   React.useEffect(() => {
     if (immediately) {

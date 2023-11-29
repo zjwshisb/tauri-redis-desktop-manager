@@ -10,6 +10,8 @@ import { type Page } from '@/store/page'
 import AppLayout from '@/components/AppLayout'
 import Container from '@/components/Container'
 import DetailPage from '@/components/Page/DetailPage'
+import { getCurrent } from '@tauri-apps/api/window'
+import { FloatButton, Result } from 'antd'
 
 const App: React.FC = () => {
   const store = useStore()
@@ -39,24 +41,42 @@ const App: React.FC = () => {
     }
   }, [connection?.id, store.connection])
 
+  const ref = React.useRef<HTMLElement>(null)
+
   if (params.key === undefined || params.type === undefined) {
-    return <></>
+    return <Result title="Page Not Found"></Result>
   }
+
+  store.page.addExistsPage({
+    pageKey: decodeURI(params.key),
+    type: params.type,
+    name: params.name !== undefined ? params.name : params.type,
+    db: params.db !== undefined ? parseInt(params.db) : undefined,
+    label: getCurrent().label,
+    connection
+  })
 
   return (
     <AppLayout>
       <Container className="flex-1 w-full flex" level={4}>
-        <MacScrollbar className="w-full overflow-scroll" id="container">
-          <div>
-            <DetailPage
-              connection={connection}
-              pageKey={params.key}
-              type={params.type}
-              name={params.name}
-              db={params.db !== undefined ? parseInt(params.db) : undefined}
-            ></DetailPage>
-          </div>
+        <MacScrollbar
+          className="w-full overflow-scroll"
+          id="container"
+          ref={ref}
+        >
+          <DetailPage
+            connection={connection}
+            pageKey={decodeURI(params.key)}
+            type={params.type}
+            name={params.name}
+            db={params.db !== undefined ? parseInt(params.db) : undefined}
+          ></DetailPage>
         </MacScrollbar>
+        <FloatButton.BackTop
+          target={() => {
+            return ref.current as HTMLElement
+          }}
+        ></FloatButton.BackTop>
       </Container>
     </AppLayout>
   )

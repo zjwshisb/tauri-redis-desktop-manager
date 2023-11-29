@@ -68,7 +68,7 @@ const ButtonAction: React.FC<
           modal.confirm({
             title: (
               <div>
-                {titleI18n}{' '}
+                {titleI18n}
                 {documentUrl !== undefined && (
                   <Link href={documentUrl} className="ml-2">
                     <LinkOutlined />

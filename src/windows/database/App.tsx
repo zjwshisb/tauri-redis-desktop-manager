@@ -17,6 +17,10 @@ const App: React.FC = () => {
 
   const store = useStore()
 
+  React.useEffect(() => {
+    store.window.setName('database')
+  }, [store.window])
+
   const connection = React.useMemo(() => {
     if (params.cid !== undefined) {
       return store.connection.connections.find((v) => {

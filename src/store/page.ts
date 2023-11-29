@@ -1,7 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import type React from 'react'
 import spark from 'spark-md5'
-import { isMainWindow, openWindow } from '@/utils'
+import { openWindow } from '@/utils'
+import window from './window'
 
 export type Page =
   | MonitorPage
@@ -200,7 +201,7 @@ class PageStore {
 
   addPageOrInNewWindow(props: CreatePageProps) {
     const page = this.createPage(props)
-    if (isMainWindow()) {
+    if (window.isMultiWindow()) {
       this.addPage(page)
     } else {
       this.openPageInNewWindow(page)
@@ -233,6 +234,10 @@ class PageStore {
       pageKey,
       label: this.getPageLabel(p)
     }
+  }
+
+  addExistsPage(p: Page) {
+    this.pages.push(p)
   }
 
   addPage(props: CreatePageProps) {

@@ -1,7 +1,13 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
-import { Tabs, Dropdown, type TabsProps, ConfigProvider } from 'antd'
+import {
+  Tabs,
+  Dropdown,
+  type TabsProps,
+  ConfigProvider,
+  FloatButton
+} from 'antd'
 import { useTranslation } from 'react-i18next'
 import { MacScrollbar } from 'mac-scrollbar'
 import StickyBox from 'react-sticky-box'
@@ -103,9 +109,16 @@ const Index: React.FC = () => {
     })
   )
 
+  const containerRef = React.useRef<HTMLElement>(null)
+
   return (
     <Container className={'flex flex-1  box-border overflow-hidden'} level={4}>
-      <MacScrollbar className="w-full" style={{ zIndex: 9 }} id={'container'}>
+      <MacScrollbar className="w-full" style={{ zIndex: 9 }} ref={containerRef}>
+        <FloatButton.BackTop
+          target={() => {
+            return containerRef.current as HTMLElement
+          }}
+        />
         <ConfigProvider
           theme={{
             components: {

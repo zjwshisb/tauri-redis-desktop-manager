@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { Button } from 'antd'
 import ModalForm from '@/components/ModalForm'
 import request from '@/utils/request'
 import FormInputItem from '@/components/Form/FormInputItem'
@@ -19,7 +18,6 @@ const CreateRule: React.FC<{
       }}
       title={'TS.CREATERULE'}
       width={400}
-      trigger={<Button type="primary">CREATERULE</Button>}
       onSubmit={async (v) => {
         await request('timeseries/create-rule', keys.connection_id, {
           db: keys.db,

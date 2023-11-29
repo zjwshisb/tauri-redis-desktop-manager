@@ -9,6 +9,7 @@ const Reset: React.FC<{
   return (
     <ButtonAction
       type="primary"
+      title="TDIGEST.RESET"
       documentUrl="https://redis.io/commands/tdigest.reset/"
       onSubmit={async () => {
         await request<number>('tdigest/reset', props.keys.connection_id, {
@@ -18,7 +19,7 @@ const Reset: React.FC<{
         props.onSuccess()
       }}
     >
-      RESET
+      TDIGEST.RESET
     </ButtonAction>
   )
 }

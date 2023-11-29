@@ -4,6 +4,7 @@ import KeysStoreObj, { type KeysStore } from './key'
 import React from 'react'
 import SettingStoreObj, { type SettingStore } from './setting'
 import CollectionObj, { type CollectionStore } from './collection'
+import WindowObj, { type WindowStore } from './window'
 
 class Store {
   connection: ConnectionStore
@@ -11,6 +12,7 @@ class Store {
   keyInfo: KeysStore
   setting: SettingStore
   collection: CollectionStore
+  window: WindowStore
 
   constructor() {
     this.connection = ConnectionStoreObj
@@ -18,6 +20,7 @@ class Store {
     this.keyInfo = KeysStoreObj
     this.setting = SettingStoreObj
     this.collection = CollectionObj
+    this.window = WindowObj
   }
 }
 

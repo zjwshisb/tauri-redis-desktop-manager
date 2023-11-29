@@ -1,3 +1,4 @@
+use crate::connection::CValue;
 use crate::err::CusError;
 use chrono::prelude::*;
 use redis::FromRedisValue;
@@ -48,12 +49,13 @@ where
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub enum FieldValue {
     Str(String),
     Vec(Vec<Field>),
     DimVec(Vec<Vec<Field>>),
     Int(i64),
+    Value(CValue),
     Nil,
 }
 
@@ -75,6 +77,7 @@ impl Serialize for FieldValue {
             FieldValue::Vec(v) => v.serialize(serializer),
             FieldValue::Int(v) => v.serialize(serializer),
             FieldValue::DimVec(v) => v.serialize(serializer),
+            FieldValue::Value(v) => v.serialize(serializer),
             FieldValue::Nil => serializer.serialize_none(),
         }
     }

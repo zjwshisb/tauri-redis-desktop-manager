@@ -1,5 +1,5 @@
 import React from 'react'
-import { Input, Result, Space } from 'antd'
+import { Checkbox, Input, Result, Space, Tooltip } from 'antd'
 import StringValue from './components/StringValue'
 import HashValue from './components/HashValue'
 import ListValue from './components/ListValue'
@@ -24,6 +24,8 @@ import Page from '..'
 import DelForm from './components/DelForm'
 import Move from './components/Move'
 import ObjectInfo from './components/ObjectInfo'
+import { useTranslation } from 'react-i18next'
+import { useLocalStorageState } from 'ahooks'
 
 function isShowLength(types: APP.Key['types']) {
   return (
@@ -60,6 +62,13 @@ const Key: React.FC<{
   )
 
   const store = useStore()
+
+  const { t } = useTranslation()
+
+  const [showObjectInfo, setShowObjectInfo] = useLocalStorageState<boolean>(
+    'KeyShowObjectInfo',
+    { defaultValue: false }
+  )
 
   const value = React.useMemo(() => {
     if (item !== undefined) {
@@ -112,16 +121,34 @@ const Key: React.FC<{
   }, [item, fetch])
 
   if (error !== '') {
-    return <Result status="warning" title={error}></Result>
+    return (
+      <Result status="warning" subTitle={name} title="Key not exists."></Result>
+    )
   }
 
   return (
-    <Page pageKey={pageKey} onRefresh={fetch} loading={loading}>
+    <Page
+      pageKey={pageKey}
+      onRefresh={fetch}
+      loading={loading}
+      actionRight={
+        <>
+          <Tooltip title={t('Show Object Info')} placement="left">
+            <Checkbox
+              checked={showObjectInfo}
+              onChange={(e) => {
+                setShowObjectInfo(e.target.checked)
+              }}
+            ></Checkbox>
+          </Tooltip>
+        </>
+      }
+    >
       <Context.Provider value={connection}>
         {item !== undefined && (
           <div>
             <div className="mb-2">
-              <div className="w-full mb-2">
+              <div className="mb-2">
                 <Name
                   keys={item}
                   onChange={(newName) => {
@@ -164,13 +191,16 @@ const Key: React.FC<{
                 />
                 <Copy keys={item} />
                 <Dump keys={item} />
-                <DelForm keys={item} onSuccess={() => {}} />
+                <DelForm
+                  keys={item}
+                  onSuccess={() => {
+                    store.page.removePage(pageKey)
+                  }}
+                />
               </Space>
             </div>
-            <div>
-              <ObjectInfo keys={item} />
-            </div>
-            <div>{value}</div>
+            {showObjectInfo === true && <ObjectInfo keys={item} />}
+            {value}
           </div>
         )}
       </Context.Provider>

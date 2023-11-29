@@ -15,7 +15,12 @@ const Collection: React.FC<{
   const store = useStore()
 
   return (
-    <Page pageKey={pageKey} collected={false} noPadding={true}>
+    <Page
+      pageKey={pageKey}
+      showAction={false}
+      collected={false}
+      noPadding={true}
+    >
       <div>
         {store.collection.items.length === 0 && (
           <div className="mt-20">
