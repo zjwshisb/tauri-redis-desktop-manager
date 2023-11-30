@@ -15,13 +15,13 @@ const FieldItem: React.FC = () => {
               span={12}
               {...restField}
               name={[name, 'field']}
-              label="Field Name"
+              label="Field"
               required
             />
             <FormInputJsonItem
               span={12}
               {...restField}
-              label="Field Value"
+              label="Value"
               name={[name, 'value']}
               required
             />

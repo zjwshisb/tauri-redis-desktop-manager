@@ -10,7 +10,7 @@ const ArrayItem: React.FC = () => {
         return <FormInputJsonItem {...field} required />
       }}
       required
-      label="Value"
+      label="Member"
     ></FormListItem>
   )
 }

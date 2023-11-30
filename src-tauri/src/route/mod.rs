@@ -98,9 +98,42 @@ pub async fn dispatch<'r>(
         "list/rpush" => Response::new(list::rpush(payload, cid, manager).await?),
         "list/rpushx" => Response::new(list::rpushx(payload, cid, manager).await?),
 
-        "key/zset/zscan" => Response::new(zset::zscan(payload, cid, manager).await?),
-        "key/zset/zrem" => Response::new(zset::zrem(payload, cid, manager).await?),
-        "key/zset/zadd" => Response::new(zset::zadd(payload, cid, manager).await?),
+        "zset/zscan" => Response::new(zset::zscan(payload, cid, manager).await?),
+
+        "zset/zadd" => Response::new(zset::zadd(payload, cid, manager).await?),
+        "zset/bzmpop" => Response::new(zset::bzmpop(payload, cid, manager).await?),
+        "zset/bzpopmax" => Response::new(zset::bzpop_max(payload, cid, manager).await?),
+        "zset/bzpopmin" => Response::new(zset::bzpop_min(payload, cid, manager).await?),
+        "zset/zcount" => Response::new(zset::zcount(payload, cid, manager).await?),
+        "zset/zdiff" => Response::new(zset::zdiff(payload, cid, manager).await?),
+        "zset/zdiffstore" => Response::new(zset::zdiff_store(payload, cid, manager).await?),
+        "zset/zincrby" => Response::new(zset::zincr_by(payload, cid, manager).await?),
+        "zset/zinter" => Response::new(zset::zinter(payload, cid, manager).await?),
+        "zset/zintercard" => Response::new(zset::zinter_card(payload, cid, manager).await?),
+        "zset/zinterstore" => Response::new(zset::zinter_store(payload, cid, manager).await?),
+        "zset/zlexcount" => Response::new(zset::zlex_count(payload, cid, manager).await?),
+        "zset/zmpop" => Response::new(zset::zmpop(payload, cid, manager).await?),
+        "zset/zmscore" => Response::new(zset::zmscore(payload, cid, manager).await?),
+        "zset/zpopmax" => Response::new(zset::zpop_max(payload, cid, manager).await?),
+        "zset/zpopmin" => Response::new(zset::zpop_min(payload, cid, manager).await?),
+        "zset/zrandmember" => Response::new(zset::zrand_member(payload, cid, manager).await?),
+        "zset/zrange" => Response::new(zset::zrange(payload, cid, manager).await?),
+        "zset/zrangestore" => Response::new(zset::zrange_store(payload, cid, manager).await?),
+        "zset/zrank" => Response::new(zset::zrank(payload, cid, manager).await?),
+        "zset/zrem" => Response::new(zset::zrem(payload, cid, manager).await?),
+        "zset/zremrangebylex" => {
+            Response::new(zset::zrem_range_by_lex(payload, cid, manager).await?)
+        }
+        "zset/zremrangebyrank" => {
+            Response::new(zset::zrem_range_by_rank(payload, cid, manager).await?)
+        }
+        "zset/zremrangebyscore" => {
+            Response::new(zset::zrem_range_by_score(payload, cid, manager).await?)
+        }
+        "zset/zrevrank" => Response::new(zset::zrev_rank(payload, cid, manager).await?),
+        "zset/zscore" => Response::new(zset::zscore(payload, cid, manager).await?),
+        "zset/zunion" => Response::new(zset::zunion(payload, cid, manager).await?),
+        "zset/zunionstore" => Response::new(zset::zunion_store(payload, cid, manager).await?),
 
         "key/copy" => Response::new(key::copy(payload, cid, manager).await?),
         "key/rename" => Response::new(key::rename(payload, cid, manager).await?),

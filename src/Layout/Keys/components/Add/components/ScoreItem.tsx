@@ -15,7 +15,7 @@ const ScoreItem: React.FC = () => {
               span={12}
               {...restField}
               name={[name, 'field']}
-              label="Field Name"
+              label="Member"
               required
             />
             <FormInputNumberItem
