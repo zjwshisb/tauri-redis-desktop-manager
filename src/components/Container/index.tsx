@@ -16,13 +16,13 @@ const Container: React.FC<
       // eslint-disable-next-line react/prop-types
       className={classNames([
         level === 4 &&
-          'bg-gray-1 dark:bg-gray-10 text-neutral-text-2 dark:text-neutral-text-2-dark',
+          'bg-white dark:bg-gray-10 text-neutral-text-2 dark:text-neutral-text-2-dark',
         level === 3 &&
-          'bg-gray-2 dark:bg-gray-11 text-neutral-text-2 dark:text-neutral-text-2-dark',
+          'bg-gray-50 dark:bg-gray-11 text-neutral-text-2 dark:text-neutral-text-2-dark',
         level === 2 &&
-          'bg-gray-3 dark:bg-gray-12 text-neutral-text-1 dark:text-neutral-text-1-dark',
+          'bg-stone-50 dark:bg-gray-12 text-neutral-text-1 dark:text-neutral-text-1-dark',
         level === 1 &&
-          'bg-gray-4 dark:bg-gray-12 text-neutral-text-1 dark:text-neutral-text-1-dark',
+          'bg-gray-100 dark:bg-gray-12 text-neutral-text-1 dark:text-neutral-text-1-dark',
         'border-neutral-border',
         'dark:border-neutral-border-dark',
         other.className

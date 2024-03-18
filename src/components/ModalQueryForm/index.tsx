@@ -26,7 +26,7 @@ interface ModalQueryFormProps<T> {
   queryWithOpen?: boolean
 }
 
-const welcome = 'Waiting for Query...'
+const welcome = ' Waiting for Query...'
 
 function ModalQueryForm<T>(
   props: React.PropsWithChildren<ModalQueryFormProps<T>>,
