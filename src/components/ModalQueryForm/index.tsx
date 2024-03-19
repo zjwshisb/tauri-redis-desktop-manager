@@ -1,4 +1,4 @@
-import { Form } from 'antd'
+import { Form, Space } from 'antd'
 import React from 'react'
 import { useForm } from 'antd/es/form/Form'
 import CusModal from '@/components/CusModal'
@@ -26,7 +26,7 @@ interface ModalQueryFormProps<T> {
   queryWithOpen?: boolean
 }
 
-const welcome = 'Waiting for Query...'
+const welcome = ' Waiting for Query...'
 
 function ModalQueryForm<T>(
   props: React.PropsWithChildren<ModalQueryFormProps<T>>,
@@ -107,13 +107,13 @@ function ModalQueryForm<T>(
       cancelText={t('Close')}
       width={width}
       footer={(_, { OkBtn, CancelBtn }) => (
-        <div>
+        <Space>
           <CancelBtn />
           <CusButton onClick={clear} type="default">
             Reset
           </CusButton>
           <OkBtn />
-        </div>
+        </Space>
       )}
       afterClose={() => {
         clear()

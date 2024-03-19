@@ -14,8 +14,8 @@
     "@ant-design/icons": "^5.2.6",
     "@tauri-apps/api": "^1.5.1",
     "Buffer": "^0.0.0",
-    "ahooks": "^3.7.8",
-    "antd": "^5.11.2",
+    "ahooks": "^3.7.10",
+    "antd": "^5.15.3",
     "autoprefixer": "^10.4.14",
     "classnames": "^2.3.2",
     "i18next": "^22.4.15",
@@ -60,7 +60,7 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^2.8.8",
-    "tailwindcss": "^3.3.2",
+    "tailwindcss": "^3.4.1",
     "typescript": "*",
     "vite": "^4.2.1"
   }
