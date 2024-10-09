@@ -9,7 +9,7 @@ const Edit: React.FC<{
   connection: APP.Connection
   field: APP.Field
   trigger: React.ReactElement
-  onSuccess: (newField: APP.Field) => void
+  onSuccess: () => void
 }> = (props) => {
   const { t } = useTranslation()
 
@@ -24,7 +24,7 @@ const Edit: React.FC<{
           name: props.field.field,
           value: v.value
         })
-        props.onSuccess(v as APP.Field)
+        props.onSuccess()
       }}
       title={t('Edit Config')}
     >
