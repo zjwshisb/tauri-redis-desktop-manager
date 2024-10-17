@@ -1,4 +1,4 @@
-use tauri::Window;
+use tauri::{Emitter, Listener, Window};
 
 use crate::connection::{CValue, EventManager, Manager};
 use crate::err::CusError;
@@ -7,6 +7,7 @@ use crate::{response::EventResp, utils};
 use redis::{Cmd, RedisResult, Value as RedisValue};
 use std::cell::RefCell;
 #[derive(serde::Serialize)]
+
 pub struct OpenArgs {
     send: String,
     receive: String,
@@ -64,34 +65,34 @@ pub async fn open<'r>(
 
     if manager.get_is_cluster(cid).await {
         let cell_conn = RefCell::new(manager.get_sync_cluster_conn(cid).await?);
-        let event_handle = window.listen(inner_send_event_name.as_str(), move |event| {
-            if let Some(p) = event.payload() {
-                let mut resp_item = cmd_handle(p, |cmd| {
-                    let mut conn = cell_conn.borrow_mut();
-                    return cmd.query(&mut conn);
-                });
-                resp_item.event = inner_receive_event_name.clone();
-                window_copy
-                    .emit(inner_receive_event_name.as_str(), &resp_item)
-                    .unwrap();
-            }
-        });
-        event.add(inner_send_event_name, event_handle).await;
+        // let event_handle = window.listen(inner_send_event_name.as_str(), move |event| {
+        //     if let Some(p) = event.payload() {
+        //         let mut resp_item = cmd_handle(p, |cmd| {
+        //             let mut conn = cell_conn.borrow_mut();
+        //             return cmd.query(&mut conn);
+        //         });
+        //         resp_item.event = inner_receive_event_name.clone();
+        //         window_copy
+        //             .emit(inner_receive_event_name.as_str(), &resp_item)
+        //             .unwrap();
+        //     }
+        // });
+        // event.add(inner_send_event_name, event_handle).await;
     } else {
         let cell_conn = RefCell::new(manager.get_sync_conn(cid).await?);
-        let event_handle = window.listen(inner_send_event_name.as_str(), move |event| {
-            if let Some(p) = event.payload() {
-                let mut resp_item = cmd_handle(p, |cmd| {
-                    let mut conn = cell_conn.borrow_mut();
-                    return cmd.query(&mut conn);
-                });
-                resp_item.event = inner_receive_event_name.clone();
-                window_copy
-                    .emit(inner_receive_event_name.as_str(), &resp_item)
-                    .unwrap();
-            }
-        });
-        event.add(inner_send_event_name, event_handle).await;
+        // let event_handle = window.listen(inner_send_event_name.as_str(), move |event| {
+        //     if let Some(p) = event.payload() {
+        //         let mut resp_item = cmd_handle(p, |cmd| {
+        //             let mut conn = cell_conn.borrow_mut();
+        //             return cmd.query(&mut conn);
+        //         });
+        //         resp_item.event = inner_receive_event_name.clone();
+        //         window_copy
+        //             .emit(inner_receive_event_name.as_str(), &resp_item)
+        //             .unwrap();
+        //     }
+        // });
+        // event.add(inner_send_event_name, event_handle).await;
     }
 
     // event.add(id, conn);
@@ -108,7 +109,7 @@ pub async fn cancel<'r>(
 ) -> Result<(), CusError> {
     let args: IdArgs<String> = serde_json::from_str(&payload)?;
     if let Some(handle) = event.take(args.id).await {
-        window.unlisten(handle);
+        // window.unlisten(handle);
     }
     Ok(())
 }

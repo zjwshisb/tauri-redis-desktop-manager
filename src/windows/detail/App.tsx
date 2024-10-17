@@ -10,7 +10,7 @@ import { type Page } from '@/store/page'
 import AppLayout from '@/components/AppLayout'
 import Container from '@/components/Container'
 import DetailPage from '@/components/Page/DetailPage'
-import { getCurrent } from '@tauri-apps/api/window'
+import { getCurrent } from '@tauri-apps/api/webviewWindow'
 import { FloatButton, Result } from 'antd'
 
 const App: React.FC = () => {

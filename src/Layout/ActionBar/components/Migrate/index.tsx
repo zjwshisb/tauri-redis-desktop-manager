@@ -7,12 +7,13 @@ import { useTranslation } from 'react-i18next'
 const Sync: React.FC = () => {
   const { t } = useTranslation()
 
-  const { open, active } = useOpenWindow('migrate', {
-    url: 'src/windows/migrate/index.html',
-    title: t('Data Migrate').toString(),
-    minHeight: 700,
-    minWidth: 600
-  })
+  const { open, active } = useOpenWindow(
+    'migrate',
+    t('Data Migrate').toString(),
+    {
+      url: 'src/windows/migrate/index.html'
+    }
+  )
 
   return (
     <Template

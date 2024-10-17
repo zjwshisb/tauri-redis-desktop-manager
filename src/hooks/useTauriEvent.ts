@@ -4,7 +4,7 @@ import {
   type UnlistenFn
 } from '@tauri-apps/api/event'
 import React from 'react'
-import { type WebviewWindow } from '@tauri-apps/api/window'
+import { type WebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { useLatest } from 'ahooks'
 
 export function useTauriEvent<T = string>(

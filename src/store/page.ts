@@ -162,10 +162,8 @@ class PageStore {
       if (p.connection != null) {
         label = `${p.connection.id}-${label}`
       }
-      await openWindow(label, {
-        url,
-        title: p.label as string,
-        focus: true
+      await openWindow(label, p.label as string, {
+        url
       })
     } else {
       return await Promise.reject(new Error('invalid page'))

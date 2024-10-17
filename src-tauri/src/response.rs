@@ -102,7 +102,7 @@ impl Field {
         let mut r = vec![];
         for x in value_vec {
             match x {
-                Value::Bulk(v) => {
+                Value::Array(v) => {
                     if let Some(value) = v.get(0) {
                         if let Some(field) = v.get(1) {
                             r.push(Field {
@@ -129,21 +129,21 @@ impl Field {
                 f.field = String::from_redis_value(field)?;
                 if let Some(value) = value_vec.get(i + 1) {
                     match value {
-                        Value::Data(v) => {
+                        Value::BulkString(v) => {
                             f.value = FieldValue::Str(String::from_utf8_lossy(&v).to_string());
                         }
                         Value::Int(v) => {
                             f.value = FieldValue::Int(*v);
                         }
-                        Value::Bulk(v) => {
+                        Value::Array(v) => {
                             // judge by first element type
                             if let Some(first) = v.get(0) {
                                 match first {
-                                    Value::Bulk(_) => {
+                                    Value::Array(_) => {
                                         let mut dim_vec = vec![];
                                         for vv in v {
                                             match vv {
-                                                Value::Bulk(vvv) => {
+                                                Value::Array(vvv) => {
                                                     dim_vec.push(Self::build_vec(vvv)?)
                                                 }
                                                 _ => {
@@ -167,9 +167,18 @@ impl Field {
                         Value::Nil => {
                             f.value = FieldValue::Nil;
                         }
-                        Value::Status(s) => {
+                        Value::SimpleString(s) => {
                             f.value = FieldValue::Str(s.to_string());
                         }
+                        Value::Map(_) => todo!(),
+                        Value::Attribute { data, attributes } => todo!(),
+                        Value::Set(_) => todo!(),
+                        Value::Double(_) => todo!(),
+                        Value::Boolean(_) => todo!(),
+                        Value::VerbatimString { format, text } => todo!(),
+                        Value::BigNumber(big_int) => todo!(),
+                        Value::Push { kind, data } => todo!(),
+                        Value::ServerError(server_error) => todo!(),
                     }
                     r.push(f);
                 }

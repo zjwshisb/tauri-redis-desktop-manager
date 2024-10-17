@@ -5,10 +5,12 @@ use crate::response::EventResp;
 use crate::sqlite::Connection as ConnectionModel;
 use crate::utils;
 use futures::stream::StreamExt;
-use redis::aio::Connection as RedisConnection;
+use futures::FutureExt;
+use redis::aio::MultiplexedConnection;
 use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
 
+use tauri::Emitter;
 use tauri::State;
 
 use tokio::sync::oneshot;
@@ -32,58 +34,59 @@ pub async fn subscribe<'r>(
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
     let model = ConnectionModel::first(cid)?;
     let mut connection = Connection::new(model.get_params());
-    let conn: RedisConnection = connection.get_normal().await?;
-    let mut pubsub = conn.into_pubsub();
-    for x in args.channels {
-        pubsub.subscribe(&x).await?;
-    }
-    let event_name = utils::random_str(32);
-    let event_name_resp = event_name.clone();
-    // a channel to stop loop when frontend close the page
-    let (tx, rx) = oneshot::channel::<()>();
-    pubsub_manager.add(
-        event_name.clone(),
-        PubsubItem::new(
-            tx,
-            event_name.clone(),
-            connection.get_host(),
-            "pubsub".to_string(),
-            connection.get_proxy(),
-        ),
-    );
-    tokio::spawn(async move {
-        let event_str = event_name.as_str();
-        let mut stream = pubsub.on_message();
+    let conn: MultiplexedConnection = connection.get_normal().await?;
+    // let mut pubsub = conn.into_stream()
+    // for x in args.channels {
+    //     pubsub.subscribe(&x).await?;
+    // }
+    // let event_name = utils::random_str(32);
+    // let event_name_resp = event_name.clone();
+    // // a channel to stop loop when frontend close the page
+    // let (tx, rx) = oneshot::channel::<()>();
+    // pubsub_manager.add(
+    //     event_name.clone(),
+    //     PubsubItem::new(
+    //         tx,
+    //         event_name.clone(),
+    //         connection.get_host(),
+    //         "pubsub".to_string(),
+    //         connection.get_proxy(),
+    //     ),
+    // );
+    // tokio::spawn(async move {
+    //     let event_str = event_name.as_str();
+    //     let mut stream = pubsub.on_message();
 
-        tokio::select! {
+    //     tokio::select! {
 
-            _ = async {
-                while let Some(msg) = stream.next().await {
-                    let channel_r: Result<redis::Value, redis::RedisError> = msg.get_channel::<redis::Value>();
-                    if let Ok(channel) = channel_r {
-                        let payload_r = msg.get_payload::<redis::Value>();
-                        if let Ok(payload) = payload_r {
-                            let r: EventResp<Message> = EventResp::new(
-                                Message {
-                                    payload: String::from_redis_value(&payload).unwrap(),
-                                    channel: String::from_redis_value(&channel).unwrap(),
-                                },
-                                String::from(event_str),
-                            );
-                            let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
+    //         _ = async {
+    //             while let Some(msg) = stream.next().await {
+    //                 let channel_r: Result<redis::Value, redis::RedisError> = msg.get_channel::<redis::Value>();
+    //                 if let Ok(channel) = channel_r {
+    //                     let payload_r = msg.get_payload::<redis::Value>();
+    //                     if let Ok(payload) = payload_r {
+    //                         let r: EventResp<Message> = EventResp::new(
+    //                             Message {
+    //                                 payload: String::from_redis_value(&payload).unwrap(),
+    //                                 channel: String::from_redis_value(&channel).unwrap(),
+    //                             },
+    //                             String::from(event_str),
+    //                         );
+    //                         let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
 
-                        }
-                    }
-                }
-            } => {
+    //                     }
+    //                 }
+    //             }
+    //         } => {
 
-            }
-            _ = rx => {
-            }
-        }
-        drop(connection);
-    });
-    Ok(event_name_resp)
+    //         }
+    //         _ = rx => {
+    //         }
+    //     }
+    //     drop(connection);
+    // });
+    // Ok(event_name_resp)
+    Ok(utils::random_str(32))
 }
 
 #[derive(Deserialize)]
@@ -136,27 +139,27 @@ pub async fn monitor<'r>(
             connection.get_proxy(),
         ),
     );
-    tokio::spawn(async move {
-        let event_str = event_name.as_str();
-        let mut monitor: redis::aio::Monitor = conn.into_monitor();
-        let _ = monitor.monitor().await;
-        let mut stream = monitor.into_on_message::<redis::Value>();
-        tokio::select! {
-            _ = async {
-                while let Some(msg) = stream.next().await {
-                    let msg_string =  String::from_redis_value(&msg).unwrap();
-                    let r: EventResp<String> = EventResp::new(
-                        msg_string,
-                        String::from(event_str),
-                    );
-                    let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
-                }
-            } => {
-            }
-            _ = rx => {
-            }
-        }
-    });
+    // tokio::spawn(async move {
+    //     let event_str = event_name.as_str();
+    //     let mut monitor: redis::aio::Monitor = conn.into_monitor();
+    //     let _ = monitor.monitor().await;
+    //     let mut stream = monitor.into_on_message::<redis::Value>();
+    //     tokio::select! {
+    //         _ = async {
+    //             while let Some(msg) = stream.next().await {
+    //                 let msg_string =  String::from_redis_value(&msg).unwrap();
+    //                 let r: EventResp<String> = EventResp::new(
+    //                     msg_string,
+    //                     String::from(event_str),
+    //                 );
+    //                 let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
+    //             }
+    //         } => {
+    //         }
+    //         _ = rx => {
+    //         }
+    //     }
+    // });
     Ok(event_name_resp)
 }
 

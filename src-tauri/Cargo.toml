@@ -1,37 +1,50 @@
 [package]
 name = "tauriredis"
-version = "0.0.0"
+version = "0.0.1"
 description = "A Tauri App"
 authors = ["you"]
 license = ""
 repository = ""
 edition = "2021"
-
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib", "lib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.4", features = [] }
+tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "1.5", features = [ "shell-all", "clipboard-all", "dialog-all", "fs-all", "system-tray", "window-all"] }
+tauri = { version = "2", features = ["tray-icon", 'unstable'] }
 tokio-stream = "*"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-redis = { version = "0.25.3", features = ["tokio-comp", "cluster-async", "tokio-rustls-comp", "bytes", "json"] }
+redis = { version = "0.27.4", features = [
+    "tokio-comp",
+    "cluster-async",
+    "tokio-rustls-comp",
+    "bytes",
+    "json",
+] }
 rusqlite = { version = "0.29.0", features = ["bundled"] }
 dirs-next = "2.0.0"
 thiserror = "1.0.40"
 tokio = { version = "1", features = ["full"] }
-once_cell= "*"
+once_cell = "*"
 futures = "*"
-bytes="*"
-ssh_jumper="*"
-async-trait="*"
-rand="*"
-chrono="*"
-hex="*"
+bytes = "*"
+ssh_jumper = "*"
+async-trait = "*"
+rand = "*"
+chrono = "*"
+hex = "*"
 reqwest = { version = "0.11", features = ["json"] }
 encoding = "0.2"
+tauri-plugin-core = "2.0.0-beta.0"
+tauri-plugin-shell = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-clipboard-manager = "2.0.1"
 
 
 [features]

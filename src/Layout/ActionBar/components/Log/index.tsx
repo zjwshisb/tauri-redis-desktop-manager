@@ -7,10 +7,8 @@ import { useTranslation } from 'react-i18next'
 const Index: React.FC = () => {
   const { t } = useTranslation()
 
-  const { open, active } = useOpenWindow('Log', {
-    url: 'src/windows/log/index.html',
-    title: t('Log').toString(),
-    focus: true
+  const { open, active } = useOpenWindow('Log', 'Log', {
+    url: 'src/windows/log/index.html'
   })
 
   return (

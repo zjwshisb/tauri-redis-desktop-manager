@@ -4,7 +4,6 @@ import { observer } from 'mobx-react-lite'
 import ResizableDiv from '@/components/ResizableDiv'
 import useStore from '@/hooks/useStore'
 import { MacScrollbar } from 'mac-scrollbar'
-import ConnectionForm from '@/components/ConnectionForm'
 import Container from '@/components/Container'
 
 const Index: React.FC = () => {
@@ -24,7 +23,6 @@ const Index: React.FC = () => {
         level={2}
         id="connection"
       >
-        <ConnectionForm />
         <MacScrollbar>
           <div>
             {store.connection.connections.map((v) => {

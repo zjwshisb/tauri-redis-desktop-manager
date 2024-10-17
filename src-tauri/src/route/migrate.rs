@@ -84,7 +84,7 @@ pub async fn migrate<'r>(
             .execute_with(redis::cmd("dump").arg(&k), &mut source_connection)
             .await?;
         match dump_value {
-            Value::Data(v) => {
+            Value::SimpleString(v) => {
                 restore_cmd.arg(&v);
                 if args.replace {
                     restore_cmd.arg("replace");

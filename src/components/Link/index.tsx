@@ -1,5 +1,5 @@
 import React from 'react'
-import { open } from '@tauri-apps/api/shell'
+import { open } from '@tauri-apps/plugin-shell'
 import classNames from 'classnames'
 const Link: React.FC<
   React.PropsWithChildren<{

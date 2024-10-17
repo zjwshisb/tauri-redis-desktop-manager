@@ -114,15 +114,15 @@ impl Manager {
         };
         let mut result: HashMap<String, HashMap<String, String>> = HashMap::new();
         match v {
-            Value::Data(cc) => {
+            Value::BulkString(cc) => {
                 if let Ok(r) = String::from_utf8(cc) {
                     result.insert(conn.get_host(), format_fn(r));
                 }
             }
-            Value::Bulk(vv) => {
+            Value::Array(vv) => {
                 for vvv in vv {
                     match &vvv {
-                        Value::Bulk(vvvv) => {
+                        Value::Array(vvvv) => {
                             if let Some(h) = vvvv.get(0) {
                                 let host = String::from_redis_value(h)?;
 

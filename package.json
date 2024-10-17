@@ -12,7 +12,10 @@
   "dependencies": {
     "@ant-design/colors": "^7.0.0",
     "@ant-design/icons": "^5.2.6",
-    "@tauri-apps/api": "^1.5.1",
+    "@tauri-apps/api": "^2.0.2",
+    "@tauri-apps/plugin-clipboard-manager": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-shell": "^2.0.0",
     "Buffer": "^0.0.0",
     "ahooks": "^3.7.10",
     "antd": "^5.15.3",
@@ -40,7 +43,7 @@
     "xterm-addon-fit": "^0.8.0"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.5.2",
+    "@tauri-apps/cli": "^2.0.3",
     "@types/lodash": "^4.14.194",
     "@types/node": "^18.7.10",
     "@types/react": "^18.0.15",

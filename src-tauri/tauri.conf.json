@@ -2,68 +2,27 @@
   "build": {
     "beforeDevCommand": "yarn dev",
     "beforeBuildCommand": "yarn build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist",
-    "withGlobalTauri": true
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
   },
-  "package": {
-    "productName": "Tauri Desktop Redis Manager",
-    "version": "0.0.2"
+  "bundle": {
+    "active": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "targets": "all"
   },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "fs": {
-        "all": true
-      },
-      "shell": {
-        "scope": [{
-          "name": "bash",
-          "cmd": "/bin/bash"
-        }],
-        "all": true,
-        "open": true,
-        "execute": true,
-        "sidecar": true 
-      },
-      "dialog": {
-        "all": true,
-        "ask": false,
-        "confirm": false,
-        "message": false,
-        "open": false,
-        "save": false
-      },
-      "window": {
-        "all": true
-      },
-      "clipboard": {
-        "all": true
-
-      }
-    },
-    "bundle": {
-      "active": true,
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "zjwshisb.com.github",
-      "targets": "all"
-    },
-    "security": {
-      "csp": null
-    },
-    "updater": {
-      "active": false
-    },
-    "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true
-    },
+  "productName": "Tauri Desktop Redis Manager",
+  "mainBinaryName": "Tauri Desktop Redis Manager",
+  "version": "0.0.2",
+  "identifier": "zjwshisb.com.github",
+  "plugins": {},
+  "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "label": "main",
@@ -72,8 +31,16 @@
         "title": "Tauri Desktop Redis Manager",
         "width": 1400,
         "height": 1000,
-        "titleBarStyle": "Overlay"
+        "titleBarStyle": "Overlay",
+        "decorations": true
       }
-    ]
+    ],
+    "security": {
+      "csp": null
+    },
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    }
   }
 }

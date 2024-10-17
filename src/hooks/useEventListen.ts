@@ -4,7 +4,8 @@ import { type UnlistenFn, type Event, TauriEvent } from '@tauri-apps/api/event'
 import { useLatest } from 'ahooks'
 import { isString } from 'lodash'
 import { isMainWindow } from '@/utils'
-import { appWindow } from '@tauri-apps/api/window'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+const appWindow = getCurrentWebviewWindow()
 
 export function useEventListen<T = string>(
   getNameFn: string | (() => Promise<string>),

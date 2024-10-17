@@ -41,7 +41,7 @@ impl CValue {
     pub fn build(v: RedisValue) -> CValue {
         match v {
             RedisValue::Okay => return Self::Str("Ok".to_string()),
-            RedisValue::Data(s) => {
+            RedisValue::BulkString(s) => {
                 let result = String::from_utf8(s.clone());
                 match result {
                     Ok(ss) => {
@@ -53,7 +53,7 @@ impl CValue {
                     }
                 }
             }
-            RedisValue::Bulk(v) => {
+            RedisValue::Array(v) => {
                 let mut vec = vec![];
                 for x in v {
                     vec.push(Self::build(x));
@@ -61,8 +61,17 @@ impl CValue {
                 return Self::Vec(vec);
             }
             RedisValue::Nil => return Self::Nil,
-            RedisValue::Status(s) => return Self::Str(s),
+            RedisValue::SimpleString(s) => return Self::Str(s),
             RedisValue::Int(s) => return Self::Int(s),
+            RedisValue::Map(_) => todo!(),
+            RedisValue::Attribute { data, attributes } => todo!(),
+            RedisValue::Set(_) => todo!(),
+            RedisValue::Double(_) => todo!(),
+            RedisValue::Boolean(_) => todo!(),
+            RedisValue::VerbatimString { format, text } => todo!(),
+            RedisValue::BigNumber(big_int) => todo!(),
+            RedisValue::Push { kind, data } => todo!(),
+            RedisValue::ServerError(server_error) => todo!(),
         }
     }
 }

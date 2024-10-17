@@ -6,7 +6,7 @@ use crate::{
     utils,
 };
 use chrono::prelude::*;
-use redis::aio::{Connection as RedisConnection, ConnectionLike};
+use redis::aio::{ConnectionLike, MultiplexedConnection};
 use redis::cluster::{ClusterClient, ClusterConnection as RedisSyncClusterConnection};
 use redis::cluster_async::ClusterConnection;
 use redis::Arg;
@@ -37,6 +37,7 @@ impl redis::IntoConnectionInfo for ConnectedParam {
                 db: 0,
                 username: self.username,
                 password: self.password,
+                protocol: redis::ProtocolVersion::RESP2
             },
         })
     }
@@ -151,11 +152,15 @@ impl Connection {
         }
     }
 
-    pub async fn get_normal(&mut self) -> Result<RedisConnection, CusError> {
+    pub async fn get_normal(&mut self) -> Result<MultiplexedConnection, CusError> {
         ssh::create_tunnel(self).await?;
         let params = self.get_connected_params();
         let client = Client::open(params)?;
-        let rx = timeout(Duration::from_secs(2), client.get_async_connection()).await;
+        let rx = timeout(
+            Duration::from_secs(2),
+            client.get_multiplexed_async_connection(),
+        )
+        .await;
         match rx {
             Ok(conn_result) => match conn_result {
                 Ok(connection) => {

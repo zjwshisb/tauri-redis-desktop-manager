@@ -5,7 +5,7 @@ import request from '@/utils/request'
 import { useTranslation } from 'react-i18next'
 import useStore from '@/hooks/useStore'
 import { observer } from 'mobx-react-lite'
-import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/plugin-dialog'
 
 import FormInputItem from '../Form/FormInputItem'
 import FormInputNumberItem from '../Form/FormInputNumberItem'

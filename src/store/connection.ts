@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import request from '../utils/request'
-import { getAll } from '@tauri-apps/api/window'
+import { getAllWebviewWindows } from '@tauri-apps/api/webviewWindow'
 import pageStore from './page'
 import keysStore from './key'
 import collectionStore from './collection'
@@ -114,16 +114,17 @@ class ConnectionStore {
         connection.nodes = undefined
         pageStore.removeByConnectionId(id)
         keysStore.remove(id)
-        const allWindow = getAll()
-        for (const x of allWindow) {
-          const index = x.label.indexOf('-')
-          if (index > -1) {
-            const webviewId = x.label.substring(0, index)
-            if (id.toString() === webviewId) {
-              x.close()
+        getAllWebviewWindows().then((allWindow) => {
+          for (const x of allWindow) {
+            const index = x.label.indexOf('-')
+            if (index > -1) {
+              const webviewId = x.label.substring(0, index)
+              if (id.toString() === webviewId) {
+                x.close()
+              }
             }
           }
-        }
+        })
       })
     }
   }

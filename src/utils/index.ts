@@ -1,10 +1,9 @@
-import {
-  WebviewWindow,
-  getCurrent,
-  type WindowLabel,
-  type WindowOptions
-} from '@tauri-apps/api/window'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { WebviewLabel, WebviewOptions } from '@tauri-apps/api/webview'
 import { store } from '@/store'
+import { Window } from '@tauri-apps/api/window'
+import { Webview } from '@tauri-apps/api/webview'
+import _ from 'lodash'
 
 export function versionCompare(v1: string, v2: string) {
   const sources = v1.split('.')
@@ -28,32 +27,30 @@ export function versionCompare(v1: string, v2: string) {
 }
 
 export async function openWindow(
-  label: WindowLabel,
-  options: WindowOptions = {}
-): Promise<WebviewWindow> {
-  const {
-    focus = true,
-    titleBarStyle = 'overlay',
-    width = 1000,
-    height = 800,
-    ...other
-  } = options
+  label: WebviewLabel,
+  title: string,
+  options: Partial<WebviewOptions>
+): Promise<Window> {
+  const { width = 1000, height = 800, x = 0, y = 0, ...other } = options
+
+  const window = new Window(label, {
+    title
+  })
 
   return await new Promise((resolve, reject) => {
-    const webview = new WebviewWindow(label, {
-      focus,
-      titleBarStyle,
+    const webview = new Webview(window, label, {
       width,
       height,
-      theme: store.setting.setting.dark_mode ? 'dark' : 'light',
+      x,
+      y,
       ...other
     })
     webview.once('tauri://created', function () {
-      resolve(webview)
+      resolve(window)
     })
     webview.once('tauri://error', function (e) {
-      webview.setFocus()
-      reject(webview)
+      window.setFocus()
+      reject(e)
     })
   })
 }
@@ -69,6 +66,6 @@ export function memoryFormat(memory: number) {
 }
 
 export function isMainWindow() {
-  const window = getCurrent()
+  const window = getCurrentWebviewWindow()
   return window.label === 'main'
 }

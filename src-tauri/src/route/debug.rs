@@ -1,3 +1,5 @@
+use tauri::Emitter;
+
 use crate::{connection::Manager, err::CusError, model::Command, pubsub::PubsubManager, response};
 
 pub async fn log<'r>(

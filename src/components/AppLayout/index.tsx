@@ -16,7 +16,6 @@ import zhCN from 'antd/locale/zh_CN'
 import { type Locale } from 'antd/es/locale'
 import classNames from 'classnames'
 import useStore from '@/hooks/useStore'
-import Container from '../Container'
 
 const langs: Record<string, Locale> = {
   zh_CN: zhCN,
@@ -58,11 +57,6 @@ const AppLayout: React.FC<
                   className
                 ])}
               >
-                <Container
-                  level={1}
-                  className="h-[30px] flex-shrink-0"
-                  data-tauri-drag-region="true"
-                ></Container>
                 <div className="flex-1 flex flex-col overflow-hidden">
                   {header !== undefined && header}
                   <div className="flex flex-1 overflow-hidden">{children}</div>

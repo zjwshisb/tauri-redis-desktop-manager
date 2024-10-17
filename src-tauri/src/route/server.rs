@@ -98,7 +98,7 @@ pub async fn module<'r>(
     let mut resp: Vec<HashMap<String, String>> = vec![];
     for v in arr {
         match v {
-            Value::Bulk(v) => {
+            Value::Array(v) => {
                 let mut i = 0;
                 let length = v.len();
                 let mut item: HashMap<String, String> = HashMap::new();
@@ -112,11 +112,11 @@ pub async fn module<'r>(
                         if let Some(value) = value_o {
                             let mut value_str = String::from("");
                             match value {
-                                Value::Data(vv) => {
+                                Value::BulkString(vv) => {
                                     value_str = String::from_utf8(vv.to_vec())?;
                                 }
                                 Value::Int(vv) => value_str = vv.to_string(),
-                                Value::Bulk(vv) => {
+                                Value::Array(vv) => {
                                     let mut a = vec![];
                                     for x in vv {
                                         let s = String::from_redis_value(x)?;

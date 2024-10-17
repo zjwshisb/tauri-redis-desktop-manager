@@ -105,10 +105,10 @@ pub async fn memory_doctor<'r>(
         .await?;
     let mut r = vec![];
     match values {
-        Value::Data(v) => {
+        Value::BulkString(v) => {
             r.push(String::from_utf8(v)?);
         }
-        Value::Bulk(v) => {
+        Value::Array(v) => {
             for vv in v {
                 r.push(String::from_redis_value(&vv)?)
             }

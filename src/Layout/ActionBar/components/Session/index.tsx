@@ -8,10 +8,8 @@ import { useTranslation } from 'react-i18next'
 const Client: React.FC = () => {
   const { t } = useTranslation()
 
-  const { open, active } = useOpenWindow('Session', {
-    url: 'src/windows/session/index.html',
-    title: t('Session').toString(),
-    focus: true
+  const { open, active } = useOpenWindow('Session', t('Session').toString(), {
+    url: 'src/windows/session/index.html'
   })
 
   return (

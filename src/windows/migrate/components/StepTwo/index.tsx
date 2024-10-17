@@ -11,8 +11,8 @@ import { useTranslation } from 'react-i18next'
 import { type ButtonProps, Form, Row, App } from 'antd'
 import Action, { type ActionRef } from './Action'
 import { useSourceConnection, useTargetConnection } from '../../hooks'
-import { getCurrent } from '@tauri-apps/api/window'
-import { confirm } from '@tauri-apps/api/dialog'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { confirm } from '@tauri-apps/plugin-dialog'
 import { type UnlistenFn } from '@tauri-apps/api/event'
 import { useLatest } from 'ahooks'
 import Container from '@/components/Container'
@@ -108,7 +108,7 @@ const StepTwo: React.FC = () => {
   const unListenFn = React.useRef<UnlistenFn>()
 
   React.useEffect(() => {
-    const webview = getCurrent()
+    const webview = getCurrentWebviewWindow()
     webview
       .onCloseRequested(async (e) => {
         console.log(e)
