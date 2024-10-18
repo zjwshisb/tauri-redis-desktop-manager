@@ -3,7 +3,7 @@
   "description": "permissions that were migrated from v1",
   "local": true,
   "windows": [
-    "main"
+    "*"
   ],
   "permissions": [
     "core:default",
@@ -41,6 +41,7 @@
     "core:window:allow-set-fullscreen",
     "core:window:allow-set-focus",
     "core:window:allow-set-icon",
+    "core:window:allow-set-theme",
     "core:window:allow-set-skip-taskbar",
     "core:window:allow-set-cursor-grab",
     "core:window:allow-set-cursor-visible",

@@ -2,7 +2,8 @@ import { makeAutoObservable } from 'mobx'
 import i18n from '@/i18n'
 import { emit, listen } from '@tauri-apps/api/event'
 import { isMainWindow } from '@/utils'
-
+import { getAllWindows } from '@tauri-apps/api/window'
+import { Theme } from '@tauri-apps/api/window'
 const SETTING_CACHE_KEY = 'SETTING_CACHE_KEY'
 const SETTING_CHANGE = 'SETTING_CHANGE'
 
@@ -46,11 +47,19 @@ class SettingStore {
       const htmls = document.getElementsByTagName('html')
       if (htmls.length >= 1) {
         const html = htmls[0]
+        let theme: Theme = 'light'
         if (data.dark_mode) {
           html.classList.add('dark')
+          theme = 'dark'
         } else {
           html.classList.remove('dark')
         }
+        getAllWindows().then((r) => {
+          r.forEach((v) => {
+            console.log('111')
+            v.setTheme(theme)
+          })
+        })
       }
     }
     this.setting = {

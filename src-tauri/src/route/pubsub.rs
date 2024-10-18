@@ -1,13 +1,19 @@
 use crate::connection::{Connectable, Connection, Manager};
-use crate::err::CusError;
+use crate::err::{self, CusError};
 use crate::pubsub::{PubsubItem, PubsubManager};
 use crate::response::EventResp;
 use crate::sqlite::Connection as ConnectionModel;
 use crate::utils;
+use chrono::format;
+use futures::future::OkInto;
 use futures::stream::StreamExt;
 use futures::FutureExt;
+use rand::Error;
 use redis::aio::MultiplexedConnection;
-use redis::FromRedisValue;
+use redis::{
+    AsyncCommands, AsyncConnectionConfig, Commands, Connection as RedisConnection, FromRedisValue,
+    PushInfo,
+};
 use serde::{Deserialize, Serialize};
 
 use tauri::Emitter;
@@ -32,61 +38,72 @@ pub async fn subscribe<'r>(
     cid: u32,
 ) -> Result<String, CusError> {
     let args: SubscribeArgs = serde_json::from_str(&payload)?;
+
+    let event_name = utils::random_str(32);
+    let event_name_resp = event_name.clone();
     let model = ConnectionModel::first(cid)?;
-    let mut connection = Connection::new(model.get_params());
-    let conn: MultiplexedConnection = connection.get_normal().await?;
-    // let mut pubsub = conn.into_stream()
-    // for x in args.channels {
-    //     pubsub.subscribe(&x).await?;
-    // }
-    // let event_name = utils::random_str(32);
-    // let event_name_resp = event_name.clone();
-    // // a channel to stop loop when frontend close the page
-    // let (tx, rx) = oneshot::channel::<()>();
-    // pubsub_manager.add(
-    //     event_name.clone(),
-    //     PubsubItem::new(
-    //         tx,
-    //         event_name.clone(),
-    //         connection.get_host(),
-    //         "pubsub".to_string(),
-    //         connection.get_proxy(),
-    //     ),
-    // );
-    // tokio::spawn(async move {
-    //     let event_str = event_name.as_str();
-    //     let mut stream = pubsub.on_message();
-
-    //     tokio::select! {
-
-    //         _ = async {
-    //             while let Some(msg) = stream.next().await {
-    //                 let channel_r: Result<redis::Value, redis::RedisError> = msg.get_channel::<redis::Value>();
-    //                 if let Ok(channel) = channel_r {
-    //                     let payload_r = msg.get_payload::<redis::Value>();
-    //                     if let Ok(payload) = payload_r {
-    //                         let r: EventResp<Message> = EventResp::new(
-    //                             Message {
-    //                                 payload: String::from_redis_value(&payload).unwrap(),
-    //                                 channel: String::from_redis_value(&channel).unwrap(),
-    //                             },
-    //                             String::from(event_str),
-    //                         );
-    //                         let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
-
-    //                     }
-    //                 }
-    //             }
-    //         } => {
-
-    //         }
-    //         _ = rx => {
-    //         }
-    //     }
-    //     drop(connection);
-    // });
-    // Ok(event_name_resp)
-    Ok(utils::random_str(32))
+    let (tx, rx) = oneshot::channel::<()>();
+    // a channel to stop loop when frontend close the page
+    let connection = Connection::new(model.get_params());
+    pubsub_manager.add(
+        event_name.clone(),
+        PubsubItem::new(
+            tx,
+            event_name.clone(),
+            connection.get_host(),
+            "pubsub".to_string(),
+            connection.get_proxy(),
+        ),
+    );
+    tokio::spawn(async move {
+        let conn_result = connection.get_sync_one().await;
+        match conn_result {
+            Err(e) => {
+                println!("{}", e)
+            }
+            Ok(mut conn) => {
+                let mut subpub = conn.as_pubsub();
+                for x in args.channels {
+                    let result = subpub.subscribe(&x);
+                    match result {
+                        Err(e) => {
+                            println!("{}", e)
+                        }
+                        Ok(_) => {
+                            println!("ok")
+                        }
+                    }
+                }
+                let event_str = event_name.as_str();
+                tokio::select! {
+                    _ = async {
+                            loop {
+                                let msg = subpub.get_message();
+                                if let Ok(msg_payload) = msg {
+                                    let payload = msg_payload.get_payload();
+                                    if let Ok(result) = payload {
+                                        println!("收到消息: {}", result);
+                                        let r: EventResp<Message> = EventResp::new(
+                                            Message {
+                                                channel: msg_payload.get_channel_name().to_string(),
+                                                payload: result,
+                                            },
+                                            String::from(event_str),
+                                        );
+                                        let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
+                                    }
+                                }
+                            }
+                    } => {},
+                    _ = rx => {
+                        println!("terminating accept loop");
+                    }
+                }
+            }
+        }
+        drop(connection);
+    });
+    Ok(event_name_resp)
 }
 
 #[derive(Deserialize)]
@@ -118,16 +135,12 @@ pub async fn monitor<'r>(
 ) -> Result<String, CusError> {
     let model = ConnectionModel::first(cid)?;
     let mut connection = Connection::new(model.get_params());
-    let mut conn = connection.get_normal().await?;
+    let mut conn: RedisConnection = connection.get_sync_one().await?;
 
     let event_name = utils::random_str(32);
     let event_name_resp = event_name.clone();
-    redis::cmd("CLIENT")
-        .arg("SETNAME")
-        .arg("monitor")
-        .query_async(&mut conn)
-        .await?;
-    // a channel to stop loop when frontend close the page
+
+    // // a channel to stop loop when frontend close the page
     let (tx, rx) = oneshot::channel::<()>();
     pubsub_manager.add(
         event_name_resp.clone(),
@@ -139,27 +152,40 @@ pub async fn monitor<'r>(
             connection.get_proxy(),
         ),
     );
-    // tokio::spawn(async move {
-    //     let event_str = event_name.as_str();
-    //     let mut monitor: redis::aio::Monitor = conn.into_monitor();
-    //     let _ = monitor.monitor().await;
-    //     let mut stream = monitor.into_on_message::<redis::Value>();
-    //     tokio::select! {
-    //         _ = async {
-    //             while let Some(msg) = stream.next().await {
-    //                 let msg_string =  String::from_redis_value(&msg).unwrap();
-    //                 let r: EventResp<String> = EventResp::new(
-    //                     msg_string,
-    //                     String::from(event_str),
-    //                 );
-    //                 let _ = window.emit(event_str, serde_json::to_string(&r).unwrap());
-    //             }
-    //         } => {
-    //         }
-    //         _ = rx => {
-    //         }
-    //     }
-    // });
+    tokio::spawn(async move {
+        let event_str = event_name.as_str();
+        // redis::cmd("CLIENT")
+        //     .arg("SETNAME")
+        //     .arg("monitor")
+        //     .query(&mut conn);
+        let result = conn.send_packed_command(b"monitor");
+        match result {
+            Ok(()) => {
+                tokio::select! {
+                    _ = async {
+                        loop {
+                            let r = conn.recv_response();
+                            match r {
+                                Ok(rr) => {
+                                    println!("{:?}", rr)
+                                },
+                                Err(e) => {
+                                    println!("{:?}", e)
+
+                                }
+                            }
+                        }
+                    } => {
+                    }
+                    _ = rx => {
+                    }
+                }
+            }
+            Err(e) => {
+                println!("{:?}", e)
+            }
+        }
+    });
     Ok(event_name_resp)
 }
 

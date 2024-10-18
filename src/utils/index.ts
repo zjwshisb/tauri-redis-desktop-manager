@@ -34,7 +34,8 @@ export async function openWindow(
   const { width = 1000, height = 800, x = 0, y = 0, ...other } = options
 
   const window = new Window(label, {
-    title
+    title,
+    theme: store.setting.setting.dark_mode ? 'dark' : 'light'
   })
 
   return await new Promise((resolve, reject) => {

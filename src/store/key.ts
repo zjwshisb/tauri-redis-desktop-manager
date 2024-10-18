@@ -26,9 +26,8 @@ class KeysStore {
   }
 
   newWindow(connection: APP.Connection, db: number = 0) {
-    openWindow(`${connection.id}-${db}`, {
-      url: `src/windows/database/index.html?cid=${connection.id}&db=${db}`,
-      title: `${connection.name}@${db}`
+    openWindow(`${connection.id}-${db}`, `${connection.name}@${db}`, {
+      url: `src/windows/database/index.html?cid=${connection.id}&db=${db}`
     })
   }
 }

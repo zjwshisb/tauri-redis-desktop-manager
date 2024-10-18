@@ -6,13 +6,17 @@ use crate::{
     utils,
 };
 use chrono::prelude::*;
-use redis::aio::{ConnectionLike, MultiplexedConnection};
+use futures::future::ok;
 use redis::cluster::{ClusterClient, ClusterConnection as RedisSyncClusterConnection};
 use redis::cluster_async::ClusterConnection;
 use redis::Arg;
 use redis::Client;
 use redis::Connection as RedisSyncConnection;
 use redis::FromRedisValue;
+use redis::{
+    aio::{ConnectionLike, MultiplexedConnection},
+    AsyncConnectionConfig,
+};
 
 use ssh_jumper::model::SshForwarderEnd;
 use std::net::SocketAddr;
@@ -37,7 +41,7 @@ impl redis::IntoConnectionInfo for ConnectedParam {
                 db: 0,
                 username: self.username,
                 password: self.password,
-                protocol: redis::ProtocolVersion::RESP2
+                protocol: redis::ProtocolVersion::RESP2,
             },
         })
     }
@@ -152,28 +156,17 @@ impl Connection {
         }
     }
 
-    pub async fn get_normal(&mut self) -> Result<MultiplexedConnection, CusError> {
+    pub async fn get_normal(
+        &mut self,
+        config: &AsyncConnectionConfig,
+    ) -> Result<MultiplexedConnection, CusError> {
         ssh::create_tunnel(self).await?;
         let params = self.get_connected_params();
-        let client = Client::open(params)?;
-        let rx = timeout(
-            Duration::from_secs(2),
-            client.get_multiplexed_async_connection(),
-        )
-        .await;
-        match rx {
-            Ok(conn_result) => match conn_result {
-                Ok(connection) => {
-                    return Ok(connection);
-                }
-                Err(e) => {
-                    return Err(CusError::App(e.to_string()));
-                }
-            },
-            Err(_) => {
-                return Err(CusError::App(String::from("Connection Timeout")));
-            }
-        }
+        let client: Client = Client::open(params)?;
+        let conn: MultiplexedConnection = client
+            .get_multiplexed_async_connection_with_config(config)
+            .await?;
+        Ok(conn)
     }
     pub async fn get_cluster(&mut self) -> Result<ClusterConnection, CusError> {
         ssh::create_tunnel(self).await?;
@@ -213,7 +206,7 @@ impl ConnectionWrapper {
         if connection.params.is_cluster {
             b = Box::new(connection.get_cluster().await?)
         } else {
-            b = Box::new(connection.get_normal().await?);
+            b = Box::new(connection.get_normal(&AsyncConnectionConfig::new()).await?);
         }
         let r = Self {
             id: utils::random_str(32),

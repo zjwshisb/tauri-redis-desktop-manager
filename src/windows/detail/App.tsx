@@ -10,7 +10,7 @@ import { type Page } from '@/store/page'
 import AppLayout from '@/components/AppLayout'
 import Container from '@/components/Container'
 import DetailPage from '@/components/Page/DetailPage'
-import { getCurrent } from '@tauri-apps/api/webviewWindow'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { FloatButton, Result } from 'antd'
 
 const App: React.FC = () => {
@@ -52,7 +52,7 @@ const App: React.FC = () => {
     type: params.type,
     name: params.name !== undefined ? params.name : params.type,
     db: params.db !== undefined ? parseInt(params.db) : undefined,
-    label: getCurrent().label,
+    label: getCurrentWebviewWindow().label,
     connection
   })
 

@@ -1,11 +1,11 @@
 import { CopyOutlined, CheckOutlined } from '@ant-design/icons'
 import React from 'react'
-import {  } from '@tauri-apps/api'
+import {} from '@tauri-apps/api'
 import { type ButtonProps, message } from 'antd'
 import { useTranslation } from 'react-i18next'
 import CusButton from '../CusButton'
 import classNames from 'classnames'
-import * as clipboard from "@tauri-apps/plugin-clipboard-manager"
+import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 
 const Copy: React.FC<
   React.PropsWithChildren<{
@@ -21,7 +21,7 @@ const Copy: React.FC<
   const { t } = useTranslation()
 
   const copy = React.useCallback(async () => {
-    await clipboard.writeText(content)
+    await writeText(content)
     setShowSuccess(true)
     message.success(t('Copy Success'))
     setTimeout(() => {

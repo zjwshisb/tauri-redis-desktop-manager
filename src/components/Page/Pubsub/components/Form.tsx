@@ -21,28 +21,33 @@ const Subscribe: React.FC<{
   return (
     <div className="mb-2">
       <Form layout="inline" form={form}>
-        {!props.connection.is_cluster && (
+        <div className="mb-2">
+          {!props.connection.is_cluster && (
+            <FormSelectItem
+              label="db"
+              className="w-[200px] mb-2"
+              required
+              initialValue={0}
+              name="db"
+              inputProps={{
+                options
+              }}
+            ></FormSelectItem>
+          )}
+        </div>
+        <div className="mb-2">
           <FormSelectItem
-            label="db"
-            className="w-[200px]"
+            className="w-[400px] mb-2"
+            label="Channel"
+            name="channels"
             required
-            initialValue={0}
-            name="db"
             inputProps={{
-              options
+              mode: 'tags'
             }}
-          ></FormSelectItem>
-        )}
-        <FormSelectItem
-          className="w-[200px]"
-          label="Channel"
-          name="channels"
-          required
-          inputProps={{
-            mode: 'tags'
-          }}
-        />
+          />
+        </div>
         <CusButton
+          className="mb-2"
           type="primary"
           onClick={() => {
             form.validateFields().then((res: SubscribeForm) => {

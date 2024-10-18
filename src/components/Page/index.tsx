@@ -147,21 +147,19 @@ const Page: React.FC<React.PropsWithChildren<PageProps>> = (props) => {
                 )}
               </Space>
             </div>
-            <div>
-              <Space>
-                {actionRight}
-                {refreshRef.current !== undefined && (
-                  <Tooltip title={t('Auto Refresh')} placement="left">
-                    <Switch
-                      size="small"
-                      checked={autoRefresh}
-                      onChange={(e) => {
-                        setAutoRefresh(e)
-                      }}
-                    ></Switch>
-                  </Tooltip>
-                )}
-              </Space>
+            <div className="flex items-center">
+              <div className="mr-2">{actionRight}</div>
+              {refreshRef.current !== undefined && (
+                <Tooltip title={t('Auto Refresh')} placement="left">
+                  <Switch
+                    size="small"
+                    checked={autoRefresh}
+                    onChange={(e) => {
+                      setAutoRefresh(e)
+                    }}
+                  ></Switch>
+                </Tooltip>
+              )}
             </div>
           </Container>
         </StickyBox>

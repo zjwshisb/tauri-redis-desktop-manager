@@ -6,33 +6,30 @@ import NewConnection from './components/NewConnection'
 import Session from './components/Session'
 import Migrate from './components/Migrate'
 import Collection from './components/Collection'
-import {
-  type WebviewWindow,
-  getAllWebviewWindows
-} from '@tauri-apps/api/webviewWindow'
 import { WindowsOutlined } from '@ant-design/icons'
 import { TauriEvent } from '@tauri-apps/api/event'
 import { useTauriEvent } from '@/hooks/useTauriEvent'
 import Container from '@/components/Container'
+import { getAllWindows, Window } from '@tauri-apps/api/window'
 
 const ActionBar: React.FC = () => {
-  const [window, setWindow] = React.useState<WebviewWindow[]>()
+  const [windows, setWindows] = React.useState<Window[]>([])
 
   useEffect(() => {
-    getAllWebviewWindows().then((r) => {
-      setWindow(r)
+    getAllWindows().then((r) => {
+      setWindows(r)
     })
   }, [])
 
   useTauriEvent(TauriEvent.WINDOW_CREATED, () => {
-    getAllWebviewWindows().then((r) => {
-      setWindow(r)
+    getAllWindows().then((r) => {
+      setWindows(r)
     })
   })
   useTauriEvent(TauriEvent.WINDOW_DESTROYED, () => {
-    setTimeout(() => {
-      setWindow([])
-    }, 300)
+    getAllWindows().then((r) => {
+      setWindows(r)
+    })
   })
 
   return (
@@ -52,7 +49,7 @@ const ActionBar: React.FC = () => {
           </Space>
         </div>
         <div className="flex px-4">
-          <span className="mr-2">{window?.length || 0}</span>
+          <span className="mr-2">{windows?.length}</span>
           <WindowsOutlined />
         </div>
       </div>
