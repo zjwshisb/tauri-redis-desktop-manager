@@ -18,7 +18,7 @@
   },
   "productName": "Tauri Desktop Redis Manager",
   "mainBinaryName": "Tauri Desktop Redis Manager",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "identifier": "zjwshisb.com.github",
   "plugins": {},
   "app": {

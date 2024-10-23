@@ -14,7 +14,11 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
+[target.x86_64-apple-darwin.dependencies]
+openssl-sys = { version = "0.9", features = ["vendored"] }
+
 [dependencies]
+
 tauri = { version = "2", features = ["tray-icon", 'unstable'] }
 tokio-stream = "*"
 serde = { version = "1.0", features = ["derive"] }
