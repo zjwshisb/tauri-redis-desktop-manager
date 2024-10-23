@@ -7,7 +7,7 @@ import { Dropdown, Spin } from 'antd'
 
 import formatter, { type TypeFormat } from './Types'
 import { MenuOutlined } from '@ant-design/icons'
-import { type MenuItemType } from 'antd/es/menu/hooks/useItems'
+import { ItemType } from 'antd/es/menu/interface'
 
 const FieldViewer: React.FC<{
   content: string
@@ -25,7 +25,7 @@ const FieldViewer: React.FC<{
   const [init, setInit] = React.useState(false)
 
   const menus = React.useMemo(() => {
-    const m: MenuItemType[] = []
+    const m: ItemType[] = []
     Object.keys(formatter)
       .filter((v) => {
         if (typesArr !== undefined) {

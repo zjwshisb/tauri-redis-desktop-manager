@@ -4,8 +4,8 @@ import useStore from '@/hooks/useStore'
 import request from '@/utils/request'
 import ItemLayout from '../ItemLayout'
 import { Dropdown, App } from 'antd'
+import { ItemType } from 'antd/es/menu/interface'
 import { t } from 'i18next'
-import { type ItemType } from 'antd/es/menu/hooks/useItems'
 import { observer } from 'mobx-react-lite'
 
 const DBItem: React.FC<{
