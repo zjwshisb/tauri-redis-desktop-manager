@@ -1,6 +1,5 @@
 import { type KeyInfo } from '@/store/key'
 import request from '@/utils/request'
-import { ImportOutlined } from '@ant-design/icons'
 import React from 'react'
 import VersionAccess from '@/components/VersionAccess'
 import ModalForm from '@/components/ModalForm'
@@ -10,6 +9,7 @@ import FormInputNumberItem from '@/components/Form/FormInputNumberItem'
 import FormCheckBoxItem from '@/components/Form/FormCheckBoxItem'
 import FormTextareaItem from '@/components/Form/FormTextAreaItem'
 import CusButton from '@/components/CusButton'
+import { Icon } from '@iconify/react'
 
 const Restore: React.FC<{
   onSuccess: (name: string) => void
@@ -26,7 +26,7 @@ const Restore: React.FC<{
             tooltip={{
               title: 'Restore Key'
             }}
-            icon={<ImportOutlined className="text-lg"></ImportOutlined>}
+            icon={<Icon icon={'iconoir:database-restore'} fontSize={18} />}
           ></CusButton>
         }
         title={'Restore Key'}

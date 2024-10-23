@@ -161,6 +161,7 @@ pub async fn monitor<'r>(
         let result = conn.send_packed_command(b"monitor");
         match result {
             Ok(()) => {
+                println!("hahah");
                 tokio::select! {
                     _ = async {
                         loop {

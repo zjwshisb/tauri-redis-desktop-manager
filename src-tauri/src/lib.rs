@@ -15,6 +15,7 @@ use pubsub::PubsubManager;
 pub fn run() {
     sqlite::init();
     tauri::Builder::default()
+        .plugin(tauri_plugin_clipboard_manager::init())
         .manage(PubsubManager::new())
         .manage(connection::Manager::new())
         .manage(connection::EventManager::new())

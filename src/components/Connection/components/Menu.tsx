@@ -1,20 +1,11 @@
 import React from 'react'
-import {
-  HomeOutlined,
-  ControlOutlined,
-  MenuOutlined,
-  NodeIndexOutlined,
-  UnorderedListOutlined,
-  SettingOutlined,
-  CalculatorOutlined,
-  BookOutlined,
-  MonitorOutlined
-} from '@ant-design/icons'
+import { MenuOutlined, NodeIndexOutlined } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { Dropdown } from 'antd'
 import { useTranslation } from 'react-i18next'
 import CusButton from '@/components/CusButton'
+import { Icon } from '@iconify/react'
 
 interface MenuItem {
   key: string
@@ -25,12 +16,12 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   {
     key: 'info',
-    icon: <HomeOutlined className="hover:text-blue-600" />,
+    icon: <Icon fontSize={18} icon="material-symbols:info-outline" />,
     title: 'Info'
   },
   {
     key: 'config',
-    icon: <SettingOutlined className="hover:text-blue-600" />,
+    icon: <Icon icon="mynaui:config" fontSize={18} />,
     title: 'Config'
   },
   {
@@ -41,28 +32,28 @@ const menuItems: MenuItem[] = [
   },
   {
     key: 'client',
-    icon: <ControlOutlined className="hover:text-blue-600" />,
+    icon: <Icon icon={'mdi:connection'} fontSize={18} />,
     title: 'Client'
   },
   {
     key: 'slow-log',
-    icon: <UnorderedListOutlined className="hover:text-blue-600" />,
+    icon: <Icon icon="icon-park-outline:log" fontSize={18} />,
     title: 'Slow Log'
   },
   {
     key: 'memory',
-    icon: <CalculatorOutlined className="hover:text-blue-600" />,
+    icon: <Icon icon="material-symbols:memory" fontSize={18} />,
     title: 'Memory Analysis'
   },
   {
     key: 'pubsub',
-    icon: <BookOutlined className="hover:text-blue-600" />,
+    icon: <Icon icon={'simple-icons:googlepubsub'} />,
     title: 'Subscribe',
     mode: 'single'
   },
   {
     key: 'monitor',
-    icon: <MonitorOutlined className="hover:text-blue-600" />,
+    icon: <Icon icon="mdi:monitor" />,
     title: 'Monitor',
     mode: 'single'
   }

@@ -72,7 +72,7 @@ const Item: React.FC<{
                 {
                   title: 'Key',
                   dataIndex: 'field',
-                  defaultSortOrder: 'ascend',
+                  // defaultSortOrder: 'ascend',
                   render(value) {
                     return (
                       <Highlighter

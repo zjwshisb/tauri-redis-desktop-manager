@@ -26,6 +26,7 @@ import reducer from './reducer'
 import Container from '@/components/Container'
 import CusButton from '@/components/CusButton'
 import request from '@/utils/request'
+import { Icon } from '@iconify/react'
 
 const isMain = isMainWindow()
 
@@ -144,7 +145,7 @@ const Index: React.FC<{
                     tooltip={{
                       title: 'Random Key'
                     }}
-                    icon={<QuestionOutlined />}
+                    icon={<Icon icon={'mingcute:random-line'} fontSize={18} />}
                   ></CusButton>
                   <Editable connection={info.connection}>
                     <Restore
@@ -193,7 +194,12 @@ const Index: React.FC<{
                     }}
                   >
                     <Statistic
-                      prefix={<KeyOutlined />}
+                      prefix={
+                        <Icon
+                          icon={'fluent:key-multiple-16-regular'}
+                          fontSize={14}
+                        />
+                      }
                       value={keys.length}
                     ></Statistic>
                   </ConfigProvider>

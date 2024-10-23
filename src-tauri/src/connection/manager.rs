@@ -31,14 +31,14 @@ impl Manager {
             let _ = self.set_name(conn, "tauri-redis".to_string()).await;
         }
     }
+
     pub async fn set_name(
         &self,
         conn: &mut ConnectionWrapper,
         name: String,
-    ) -> Result<(), CusError> {
-        self.execute_with(redis::cmd("CLIENT").arg("SETNAME").arg(&name), conn)
-            .await?;
-        Ok(())
+    ) -> Result<String, CusError> {
+        self.execute_with::<String>(redis::cmd("CLIENT").arg("SETNAME").arg(&name), conn)
+            .await
     }
 
     pub async fn get_config(&self, id: u32, pattern: &str) -> Result<Vec<Field>, CusError> {
@@ -184,7 +184,7 @@ impl Manager {
     where
         T: FromRedisValue,
     {
-        let result: Result<(T, Command), (CusError, Command)> = conn.execute(cmd).await;
+        let result: Result<(T, Command), (CusError, Command)> = conn.execute::<T>(cmd).await;
         match result {
             Ok((value, cmd)) => {
                 if let Some(tx) = self.debug_tx.lock().await.get_mut(0) {
@@ -214,15 +214,24 @@ impl Manager {
             if !conn.model.get_is_cluster() {
                 if let Some(database) = db {
                     if database != conn.db {
-                        let _ = self
-                            .execute_with(redis::cmd("select").arg(db), conn)
-                            .await?;
+                        let result: Result<String, CusError> =
+                            self.execute_with(redis::cmd("select").arg(db), conn).await;
+                        if let Err(err) = result {
+                            return Err(err);
+                        }
                         conn.db = database
                     }
                 }
             }
-            let v = self.execute_with(cmd, conn).await?;
-            return Ok(v);
+            let result: Result<T, CusError> = self.execute_with(cmd, conn).await;
+            match result {
+                Ok(value) => {
+                    return Ok(value);
+                }
+                Err(err) => {
+                    return Err(err);
+                }
+            }
         }
         return Err(CusError::reopen());
     }

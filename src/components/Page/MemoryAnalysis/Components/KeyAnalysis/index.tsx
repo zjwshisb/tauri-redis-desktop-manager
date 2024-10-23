@@ -2,7 +2,7 @@ import React from 'react'
 import Item from './Item'
 import request from '@/utils/request'
 import VirtualList from 'rc-virtual-list'
-import { Space, message, Statistic, InputNumber, Empty } from 'antd'
+import { Space, Statistic, InputNumber, Empty, App } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { memoryFormat } from '@/utils'
 import Filter, { type FilterForm } from './Filter'
@@ -30,6 +30,8 @@ const KeyAnalysis: React.FC<{
 
   const formRef = React.useRef(form)
   formRef.current = form
+
+  const { message } = App.useApp()
 
   const { cursor, isMore, resetCursor, setCursor, isInit } =
     useScanCursor<KeyItem>(connection)

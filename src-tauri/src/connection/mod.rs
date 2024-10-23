@@ -13,7 +13,10 @@ pub enum CValue {
     Str(String),
     Vec(Vec<CValue>),
     Int(i64),
+    Float(f64),
     Nil,
+    Bool(bool),
+    Map(Vec<(CValue, CValue)>),
 }
 impl FromRedisValue for CValue {
     fn from_redis_value(v: &RedisValue) -> RedisResult<Self> {
@@ -33,12 +36,16 @@ impl serde::Serialize for CValue {
             CValue::Vec(v) => v.serialize(serializer),
             CValue::Int(v) => v.serialize(serializer),
             CValue::Nil => serializer.serialize_none(),
+            CValue::Float(v) => v.serialize(serializer),
+            CValue::Bool(v) => v.serialize(serializer),
+            CValue::Map(v) => v.serialize(serializer),
         }
     }
 }
 
 impl CValue {
     pub fn build(v: RedisValue) -> CValue {
+        println!("{:?}", v);
         match v {
             RedisValue::Okay => return Self::Str("Ok".to_string()),
             RedisValue::BulkString(s) => {
@@ -63,12 +70,24 @@ impl CValue {
             RedisValue::Nil => return Self::Nil,
             RedisValue::SimpleString(s) => return Self::Str(s),
             RedisValue::Int(s) => return Self::Int(s),
-            RedisValue::Map(_) => todo!(),
+            RedisValue::Map(v) => {
+                let mut vec = vec![];
+                for (x, y) in v {
+                    vec.push((Self::build(x), Self::build(y)));
+                }
+                return Self::Map(vec);
+            }
             RedisValue::Attribute { data, attributes } => todo!(),
-            RedisValue::Set(_) => todo!(),
-            RedisValue::Double(_) => todo!(),
-            RedisValue::Boolean(_) => todo!(),
-            RedisValue::VerbatimString { format, text } => todo!(),
+            RedisValue::Set(v) => {
+                let mut vec = vec![];
+                for x in v {
+                    vec.push(Self::build(x));
+                }
+                return Self::Vec(vec);
+            }
+            RedisValue::Double(v) => Self::Float(v),
+            RedisValue::Boolean(v) => Self::Bool(v),
+            RedisValue::VerbatimString { format, text } => Self::Str(text),
             RedisValue::BigNumber(big_int) => todo!(),
             RedisValue::Push { kind, data } => todo!(),
             RedisValue::ServerError(server_error) => todo!(),

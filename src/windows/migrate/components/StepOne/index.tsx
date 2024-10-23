@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { useForm } from 'antd/es/form/Form'
 import SubmitBar from '../SubmitBar'
 import ConnectionSelect from './ConnectionSelect'
-import { message } from 'antd'
+import { App } from 'antd'
 import classNames from 'classnames'
 import Header from '../Header'
 import Context from '../../context'
@@ -22,6 +22,8 @@ const StepOne: React.FC = () => {
   const [targetForm] = useForm<MigrateItem>()
 
   const [state, dispatch] = React.useContext(Context)
+
+  const { message } = App.useApp()
 
   return (
     <Container

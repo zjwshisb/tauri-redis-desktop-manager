@@ -36,7 +36,7 @@ pub async fn migrate<'r>(
     if !source_connection.is_cluster() {
         if let Some(db) = args.source_db {
             manager
-                .execute_with(redis::cmd("select").arg(db), &mut source_connection)
+                .execute_with::<String>(redis::cmd("select").arg(db), &mut source_connection)
                 .await?;
         } else {
             return Err(CusError::build("target db not select"));
@@ -47,7 +47,7 @@ pub async fn migrate<'r>(
     if !target_connection.is_cluster() {
         if let Some(db) = args.target_db {
             manager
-                .execute_with(redis::cmd("select").arg(db), &mut target_connection)
+                .execute_with::<String>(redis::cmd("select").arg(db), &mut target_connection)
                 .await?;
         } else {
             return Err(CusError::build("target db not select"));
@@ -80,36 +80,31 @@ pub async fn migrate<'r>(
                 restore_cmd.arg(i);
             }
         }
-        let dump_value = manager
+        let dump_value: Vec<u8> = manager
             .execute_with(redis::cmd("dump").arg(&k), &mut source_connection)
             .await?;
-        match dump_value {
-            Value::SimpleString(v) => {
-                restore_cmd.arg(&v);
-                if args.replace {
-                    restore_cmd.arg("replace");
-                }
-                let restore_result: Result<String, CusError> = manager
-                    .execute_with(&mut restore_cmd, &mut target_connection)
-                    .await;
-                match restore_result {
-                    Ok(s) => {
-                        r.message = s;
-                        r.success = true;
-                        if args.delete {
-                            let _: Result<i64, CusError> = manager
-                                .execute_with(redis::cmd("del").arg(&k), &mut source_connection)
-                                .await;
-                        }
-                    }
-                    Err(e) => {
-                        r.message = e.to_string();
-                    }
-                }
-                result.push(r);
-            }
-            _ => {}
+        restore_cmd.arg(&dump_value);
+        if args.replace {
+            restore_cmd.arg("replace");
         }
+        let restore_result: Result<String, CusError> = manager
+            .execute_with(&mut restore_cmd, &mut target_connection)
+            .await;
+        match restore_result {
+            Ok(s) => {
+                r.message = s;
+                r.success = true;
+                if args.delete {
+                    let _: Result<i64, CusError> = manager
+                        .execute_with(redis::cmd("del").arg(&k), &mut source_connection)
+                        .await;
+                }
+            }
+            Err(e) => {
+                r.message = e.to_string();
+            }
+        }
+        result.push(r);
     }
     Ok(result)
 }

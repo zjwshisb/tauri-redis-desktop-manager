@@ -3,9 +3,8 @@
   "description": "default permissions",
   "local": true,
   "windows": [
-    "main"
+    "*"
   ],
   "permissions": [
-
   ]
 }

@@ -1,9 +1,9 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { FileSyncOutlined } from '@ant-design/icons'
 import Template from '../Template'
 import { useOpenWindow } from '@/hooks/useOpenWindow'
 import { useTranslation } from 'react-i18next'
+import { Icon } from '@iconify/react'
 const Sync: React.FC = () => {
   const { t } = useTranslation()
 
@@ -19,7 +19,7 @@ const Sync: React.FC = () => {
     <Template
       title="Data Migrate"
       active={active}
-      icon={<FileSyncOutlined />}
+      icon={<Icon icon={'carbon:migrate'} />}
       onClick={open}
     ></Template>
   )

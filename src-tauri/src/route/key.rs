@@ -27,13 +27,12 @@ pub async fn scan<'r>(
         .arg(&["count", &args.count.to_string()]);
 
     if let Some(mut search) = args.search {
-        match args.exact {
-            None => search = format!("*{}*", search),
-            Some(exact) => {
-                if !exact {
-                    search = format!("*{}*", search)
-                }
+        if let Some(exact) = args.exact {
+            if !exact {
+                search = format!("*{}*", search)
             }
+        } else {
+            search = format!("*{}*", search)
         }
         cmd.arg(&["MATCH", &search]);
     }

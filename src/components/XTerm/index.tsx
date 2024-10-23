@@ -125,7 +125,7 @@ const XTerm: React.ForwardRefRenderFunction<XTermAction, XTermProps> = (
       <div
         ref={div}
         className={classNames([
-          'bg-black rounded-md overflow-hidden border h-full',
+          'bg-black rounded-md overflow-hidden border h-full pl-1 pt-1 pb-1',
           props.className
         ])}
       ></div>

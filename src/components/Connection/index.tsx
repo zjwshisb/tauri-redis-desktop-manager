@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next'
 import { computed } from 'mobx'
 import InteractiveContainer from '../InteractiveContainer'
 import CusButton from '../CusButton'
+import { Icon } from '@iconify/react'
 
 const Connection: React.FC<{
   connection: APP.Connection
@@ -124,18 +125,17 @@ const Connection: React.FC<{
       <InteractiveContainer
         className={'flex justify-between text-lg px-2  py-1'}
       >
-        <div className={'flex overflow-hidden flex-1 items-center'}>
+        <div
+          className={'flex overflow-hidden flex-1 items-center'}
+          onClick={onTrigger}
+        >
           <span className="text-sm mr-1 ">{icon}</span>
-          <div
-            className="truncate flex-1"
-            onDoubleClick={onItemClickTh.run}
-            onClick={onTrigger}
-          >
+          <div className="truncate flex-1" onDoubleClick={onItemClickTh.run}>
             <span className="pr-2 ">#{connection.id}</span>
             {connection.name}
           </div>
         </div>
-        <div className={'flex-shrink-0 pl-2'}>
+        <div className={'flex-shrink-0 pl-2 flex'}>
           {connection.err !== undefined && (
             <Tooltip title={connection.err} color="volcano">
               <WarningOutlined className="text-orange-600"></WarningOutlined>
@@ -161,7 +161,7 @@ const Connection: React.FC<{
                       connection
                     })
                   }}
-                  icon={<RightSquareOutlined />}
+                  icon={<Icon fontSize={18} icon="mynaui:terminal" />}
                 ></CusButton>
               </Tooltip>
               <Menu connection={connection} />

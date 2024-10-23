@@ -40,7 +40,6 @@ const Terminal: React.FC<{
     },
     (v) => {
       const data = v.payload.data
-      console.log(data)
       if (v.payload.success) {
         term.current?.writeRedisResult(data)
       } else {
@@ -67,7 +66,6 @@ const Terminal: React.FC<{
       <XTerm className="rounded-b-none" ref={term} />
       <AutoComplete
         value={cmd}
-        bordered={false}
         className="w-full"
         options={[]}
         onChange={(e) => {
@@ -125,7 +123,6 @@ const Terminal: React.FC<{
         }}
       >
         <Input
-          bordered={false}
           className="!rounded-t-none !bg-black !text-white"
           prefix={prefix}
           classNames={{

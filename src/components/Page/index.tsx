@@ -115,7 +115,7 @@ const Page: React.FC<React.PropsWithChildren<PageProps>> = (props) => {
         <StickyBox
           offsetTop={offsetTop}
           offsetBottom={20}
-          style={{ zIndex: 2 }}
+          style={{ zIndex: 99 }}
         >
           <Container
             className="flex justify-between border-b px-3 py-1 "

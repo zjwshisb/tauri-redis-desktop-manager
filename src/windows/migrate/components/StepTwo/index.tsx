@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 import { type ButtonProps, Form, Row, App } from 'antd'
 import Action, { type ActionRef } from './Action'
 import { useSourceConnection, useTargetConnection } from '../../hooks'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { confirm } from '@tauri-apps/plugin-dialog'
 import { type UnlistenFn } from '@tauri-apps/api/event'
@@ -111,16 +112,13 @@ const StepTwo: React.FC = () => {
     const webview = getCurrentWebviewWindow()
     webview
       .onCloseRequested(async (e) => {
-        console.log(e)
         if (changeDisabledRef.current) {
           const confirmed = await confirm(
             t('Are you sure stop action and quite?')
           )
-          if (confirmed) {
-            webview.close()
+          if (!confirmed) {
+            e.preventDefault()
           }
-        } else {
-          webview.close()
         }
       })
       .then((f) => {

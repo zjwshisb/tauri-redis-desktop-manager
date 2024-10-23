@@ -52,7 +52,7 @@ const Index: React.FC = () => {
   }, [t])
 
   const renderTabBar: TabsProps['renderTabBar'] = (props, DefaultTabBar) => (
-    <StickyBox offsetTop={0} offsetBottom={20} style={{ zIndex: 1 }}>
+    <StickyBox offsetTop={0} offsetBottom={20} style={{ zIndex: 101 }}>
       <DefaultTabBar {...props} className="!mb-0 bg-gray-1 dark:bg-gray-13" />
     </StickyBox>
   )
@@ -123,7 +123,8 @@ const Index: React.FC = () => {
           theme={{
             components: {
               Tabs: {
-                cardGutter: 0
+                cardGutter: 0,
+                zIndexBase: 100
               }
             }
           }}
@@ -132,9 +133,6 @@ const Index: React.FC = () => {
             {store.page.pages.length === 0 && <Welcome />}
             {store.page.pages.length > 0 && (
               <Tabs
-                style={{
-                  paddingTop: 0
-                }}
                 renderTabBar={renderTabBar}
                 size="small"
                 hideAdd

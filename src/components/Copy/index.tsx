@@ -1,7 +1,6 @@
 import { CopyOutlined, CheckOutlined } from '@ant-design/icons'
 import React from 'react'
-import {} from '@tauri-apps/api'
-import { type ButtonProps, message } from 'antd'
+import { App, type ButtonProps } from 'antd'
 import { useTranslation } from 'react-i18next'
 import CusButton from '../CusButton'
 import classNames from 'classnames'
@@ -19,6 +18,8 @@ const Copy: React.FC<
   const [showSuccess, setShowSuccess] = React.useState(false)
 
   const { t } = useTranslation()
+
+  const { message } = App.useApp()
 
   const copy = React.useCallback(async () => {
     await writeText(content)
@@ -38,7 +39,6 @@ const Copy: React.FC<
         />
       )
     }
-
     return (
       <CopyOutlined
         className={className}

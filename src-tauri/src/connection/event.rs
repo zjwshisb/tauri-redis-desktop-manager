@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
-use tauri::AppHandle;
 use tokio::sync::Mutex;
 
 pub struct EventManager {
-    inners: Mutex<HashMap<String, AppHandle>>,
+    inners: Mutex<HashMap<String, u32>>,
 }
 
 impl EventManager {
@@ -13,11 +12,11 @@ impl EventManager {
             inners: Mutex::new(HashMap::new()),
         }
     }
-    pub async fn add(&self, name: String, handle: AppHandle) {
-        self.inners.lock().await.insert(name, handle);
+    pub async fn add(&self, name: String, id: u32) {
+        self.inners.lock().await.insert(name, id);
     }
 
-    pub async fn take(&self, name: String) -> Option<AppHandle> {
+    pub async fn take(&self, name: String) -> Option<u32> {
         self.inners.lock().await.remove(&name)
     }
 }

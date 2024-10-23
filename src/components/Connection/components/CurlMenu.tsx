@@ -1,16 +1,11 @@
 import React from 'react'
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PoweroffOutlined,
-  AppstoreOutlined,
-  EyeOutlined
-} from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { Dropdown, App } from 'antd'
 import { useTranslation } from 'react-i18next'
 import CusButton from '@/components/CusButton'
+import { Icon } from '@iconify/react'
 
 export interface DBType {
   db: number
@@ -52,8 +47,8 @@ const Index: React.FC<{
       menus.unshift({
         key: 'close',
         label: (
-          <div className="flex">
-            <PoweroffOutlined />
+          <div className="flex items-center">
+            <Icon icon={'clarity:disconnect-line'} />
             <div className="ml-2">{t('Close Connection')}</div>
           </div>
         )
@@ -62,8 +57,8 @@ const Index: React.FC<{
       menus.unshift({
         key: 'open',
         label: (
-          <div className="flex">
-            <EyeOutlined />
+          <div className="flex items-center">
+            <Icon icon={'hugeicons:connect'} />
             <div className="ml-2">{t('Open Connection')}</div>
           </div>
         )
@@ -124,7 +119,9 @@ const Index: React.FC<{
           items: connectionMenus
         }}
       >
-        <CusButton icon={<AppstoreOutlined />}></CusButton>
+        <CusButton
+          icon={<Icon icon={'material-symbols:edit-outline'}></Icon>}
+        ></CusButton>
       </Dropdown>
     </>
   )
