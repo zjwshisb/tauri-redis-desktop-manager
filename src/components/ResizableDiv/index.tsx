@@ -16,7 +16,18 @@ const ResizableDiv: React.FC<
   const [width, setWidth] = React.useState(props.defaultWidth)
   const [height, setHeight] = React.useState(props.defaultHeight)
 
-  const { enable = { right: true } } = props
+  const {
+    enable = {
+      right: true,
+      top: false,
+      bottom: false,
+      left: false,
+      topRight: false,
+      bottomRight: false,
+      bottomLeft: false,
+      topLeft: false
+    }
+  } = props
 
   return (
     <Resizable

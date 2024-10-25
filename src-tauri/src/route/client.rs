@@ -29,9 +29,9 @@ pub async fn kill<'r>(
         )
         .await?;
     match count {
-        0 => return Err(CusError::build("Client has been kill")),
+        0 => Err(CusError::build("Client has been kill")),
         _ => {
-            return Ok(count);
+            Ok(count)
         }
     }
 }

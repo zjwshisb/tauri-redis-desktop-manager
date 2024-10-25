@@ -1,6 +1,6 @@
 use crate::connection::{CValue, Manager};
 use crate::err::CusError;
-use crate::request::{CommonValueArgs, FieldValueArgs, FieldValueItem, NameArgs};
+use crate::request::{CommonValueArgs, FieldValueItem, NameArgs};
 use crate::response::{Field, FieldValue};
 use redis::{FromRedisValue, Value};
 use serde::Deserialize;

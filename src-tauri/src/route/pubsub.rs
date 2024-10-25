@@ -1,4 +1,4 @@
-use crate::connection::{Connectable, Connection, Manager};
+use crate::connection::{CValue, Connectable, Connection, Manager};
 use crate::err::{self, CusError};
 use crate::pubsub::{PubsubItem, PubsubManager};
 use crate::response::EventResp;
@@ -10,10 +10,7 @@ use futures::stream::StreamExt;
 use futures::FutureExt;
 use rand::Error;
 use redis::aio::MultiplexedConnection;
-use redis::{
-    AsyncCommands, AsyncConnectionConfig, Commands, Connection as RedisConnection, FromRedisValue,
-    PushInfo,
-};
+use redis::{AsyncCommands, AsyncConnectionConfig, Commands, Connection as RedisConnection, FromRedisValue, PushInfo, RedisError};
 use serde::{Deserialize, Serialize};
 
 use tauri::Emitter;
@@ -154,14 +151,14 @@ pub async fn monitor<'r>(
     );
     tokio::spawn(async move {
         let event_str = event_name.as_str();
-        // redis::cmd("CLIENT")
-        //     .arg("SETNAME")
-        //     .arg("monitor")
-        //     .query(&mut conn);
+        let v: Result<CValue, RedisError> = redis::cmd("CLIENT")
+            .arg("SETNAME")
+            .arg("monitor")
+            .query(&mut conn);
         let result = conn.send_packed_command(b"monitor");
+        println!("{:?}", result);
         match result {
             Ok(()) => {
-                println!("hahah");
                 tokio::select! {
                     _ = async {
                         loop {

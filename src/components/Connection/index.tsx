@@ -131,14 +131,13 @@ const Connection: React.FC<{
         >
           <span className="text-sm mr-1 ">{icon}</span>
           <div className="truncate flex-1" onDoubleClick={onItemClickTh.run}>
-            <span className="pr-2 ">#{connection.id}</span>
             {connection.name}
           </div>
         </div>
         <div className={'flex-shrink-0 pl-2 flex'}>
           {connection.err !== undefined && (
             <Tooltip title={connection.err} color="volcano">
-              <WarningOutlined className="text-orange-600"></WarningOutlined>
+              <WarningOutlined className="text-red-600"></WarningOutlined>
             </Tooltip>
           )}
           {connection.open === true && (
@@ -147,7 +146,7 @@ const Connection: React.FC<{
                 <CusButton
                   icon={<ReloadOutlined></ReloadOutlined>}
                   onClick={(e) => {
-                    store.connection.getInfo(connection)
+                    store.connection.getInfo(connection).then()
                     e.stopPropagation()
                   }}
                 ></CusButton>

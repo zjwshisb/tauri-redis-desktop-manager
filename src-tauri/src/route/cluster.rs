@@ -71,7 +71,7 @@ pub async fn node_size<'r>(
             return Ok(i64::from_redis_value(&value)?);
         }
     }
-    return Ok(0);
+    Ok(0)
 }
 
 pub async fn node<'r>(cid: u32, manager: tauri::State<'r, Manager>) -> Result<Vec<Node>, CusError> {
@@ -125,8 +125,8 @@ pub async fn analysis<'r>(
                                 .await?;
                             let km = KeyWithMemory {
                                 name: k,
-                                memory: memory,
-                                types: types,
+                                memory,
+                                types,
                             };
                             resp.values.push(km);
                         }

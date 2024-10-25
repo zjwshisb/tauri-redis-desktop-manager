@@ -19,7 +19,7 @@ class ConnectionStore {
 
   constructor() {
     makeAutoObservable(this)
-    this.fetchConnections()
+    this.fetchConnections().then()
   }
 
   openForm(connection?: APP.Connection) {
@@ -82,7 +82,6 @@ class ConnectionStore {
         runInAction(() => {
           connection.loading = true
         })
-
         await request('connections/open', connection.id)
         runInAction(() => {
           if (connection.err !== undefined) {
@@ -90,7 +89,6 @@ class ConnectionStore {
           }
           connection.loading = false
         })
-
         await this.getInfo(connection)
       } catch (err) {
         runInAction(() => {

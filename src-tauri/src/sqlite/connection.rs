@@ -42,8 +42,8 @@ impl connection::Connectable for Connection {
             }
             let ssh_p = ssh::SshParams {
                 host: ssh_host.clone(),
-                port: port,
-                username: username,
+                port,
+                username,
                 password: self.ssh_password.clone(),
                 private_key: self.ssh_private_key.clone(),
                 passphrase: self.ssh_passphrase.clone(),
@@ -218,7 +218,7 @@ impl Connection {
     }
 
     pub fn all() -> Result<Vec<Connection>, CusError> {
-        let conn = crate::sqlite::get_client()?;
+        let conn = sqlite::get_client()?;
         let mut stmt_result = conn.prepare(
             "select id,
                 name,
@@ -240,7 +240,7 @@ impl Connection {
         let connections_result = stmt_result.query_map([], |row| Ok(Self::build(row)))?;
         let mut result: Vec<Connection> = vec![];
         for x in connections_result.into_iter() {
-            result.push(x.unwrap());
+            result.push(x?);
         }
         Ok(result)
     }

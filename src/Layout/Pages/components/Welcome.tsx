@@ -1,20 +1,16 @@
-import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { getVersion } from '@tauri-apps/api/app'
 import { Typography } from 'antd'
+import useAppName from '@/hooks/useAppName'
+import useAppVersion from '@/hooks/useAppVersion'
 
 const Welcome = () => {
-  const [version, setVersion] = React.useState('')
+  const name = useAppName()
 
-  React.useEffect(() => {
-    getVersion().then((r) => {
-      setVersion(r)
-    })
-  }, [])
+  const version = useAppVersion()
 
   return (
     <div className="w-full h-[500px] flex flex-col items-center justify-center">
-      <Typography.Title level={3}>Tauri Redis Desktop Manager</Typography.Title>
+      <Typography.Title level={3}>{name}</Typography.Title>
       <Typography.Text>v{version}</Typography.Text>
     </div>
   )

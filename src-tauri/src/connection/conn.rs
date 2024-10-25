@@ -91,7 +91,7 @@ impl Drop for Connection {
 impl Connection {
     pub fn new(params: ConnectionParams) -> Self {
         Self {
-            params: params,
+            params,
             cancel_tunnel_rx: None,
             tunnel_addr: None,
         }
@@ -117,7 +117,7 @@ impl Connection {
     }
     // get the redis params
     // if proxy set
-    // host/port will be replace
+    // host/port will be replaced
     pub fn get_connected_params(&self) -> ConnectedParam {
         let mut params = self.params.redis_params.clone();
         if let Some(addr) = self.tunnel_addr {
@@ -145,12 +145,12 @@ impl Connection {
         let params: ConnectedParam = self.get_connected_params();
         let client = ClusterClient::new(vec![params])?;
         let result = client.get_connection();
-        match result {
+        return match result {
             Ok(c) => {
-                return Ok(c);
+                Ok(c)
             }
             Err(e) => {
-                return Err(CusError::App(e.to_string()));
+                Err(CusError::App(e.to_string()))
             }
         }
     }

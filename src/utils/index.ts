@@ -35,6 +35,7 @@ export async function openWindow(
 
   const window = new Window(label, {
     title,
+    decorations: false,
     theme: store.setting.setting.dark_mode ? 'dark' : 'light'
   })
 

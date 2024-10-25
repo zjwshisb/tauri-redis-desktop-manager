@@ -6,5 +6,6 @@
     "*"
   ],
   "permissions": [
+    "os:default"
   ]
 }

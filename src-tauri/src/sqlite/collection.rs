@@ -77,7 +77,7 @@ impl Collection {
     }
 
     pub fn all() -> Result<Vec<Collection>, CusError> {
-        let conn = crate::sqlite::get_client()?;
+        let conn = sqlite::get_client()?;
         let mut stmt_result = conn.prepare(
             "select
             id, 
@@ -92,7 +92,7 @@ impl Collection {
         let connections_result = stmt_result.query_map([], |row| Ok(Self::build(row)))?;
         let mut result: Vec<Collection> = vec![];
         for x in connections_result.into_iter() {
-            result.push(x.unwrap());
+            result.push(x?);
         }
         Ok(result)
     }

@@ -25,3 +25,8 @@ dist-ssr
 *.sw?
 .vs
 .history
+vite.config.ts*
+
+# Added by cargo
+
+/target

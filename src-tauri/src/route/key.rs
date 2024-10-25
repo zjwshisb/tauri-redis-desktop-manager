@@ -173,7 +173,7 @@ pub async fn rename<'r>(
     if let CValue::Int(0) = v {
         return Err(CusError::build("New key already exists."));
     }
-    return Ok(v);
+    Ok(v)
 }
 
 #[derive(Deserialize)]
@@ -267,67 +267,59 @@ pub async fn object<'r>(
     let mut resp: Vec<Field> = vec![];
 
     if compare_version(&version, "2.2.3") > -1 {
-        let s: Result<CValue, CusError> = manager
+        let s: CValue = manager
             .execute(
                 cid,
                 redis::cmd("OBJECT").arg("ENCODING").arg(&args.name),
                 args.db,
             )
-            .await;
-        if let Ok(v) = s {
-            resp.push(Field {
-                field: String::from("OBJECT ENCODING"),
-                value: FieldValue::Value(v),
-            })
-        }
+            .await?;
+        resp.push(Field {
+            field: String::from("OBJECT ENCODING"),
+            value: FieldValue::Value(s),
+        })
     }
 
     if compare_version(&version, "4.0.0") > -1 {
-        let s: Result<CValue, CusError> = manager
+        let s: CValue = manager
             .execute(
                 cid,
                 redis::cmd("OBJECT").arg("FREQ").arg(&args.name),
                 args.db,
             )
-            .await;
-        if let Ok(v) = s {
-            resp.push(Field {
-                field: String::from("OBJECT FREQ"),
-                value: FieldValue::Value(v),
-            })
-        }
+            .await?;
+        resp.push(Field {
+            field: String::from("OBJECT FREQ"),
+            value: FieldValue::Value(s),
+        })
     }
 
     if compare_version(&version, "2.2.3") > -1 {
-        let s: Result<CValue, CusError> = manager
+        let s: CValue = manager
             .execute(
                 cid,
                 redis::cmd("OBJECT").arg("IDLETIME").arg(&args.name),
                 args.db,
             )
-            .await;
-        if let Ok(v) = s {
-            resp.push(Field {
-                field: String::from("OBJECT IDLETIME"),
-                value: FieldValue::Value(v),
-            })
-        }
+            .await?;
+        resp.push(Field {
+            field: String::from("OBJECT IDLETIME"),
+            value: FieldValue::Value(s),
+        })
     }
 
     if compare_version(&version, "2.2.3") > -1 {
-        let s: Result<CValue, CusError> = manager
+        let s: CValue = manager
             .execute(
                 cid,
                 redis::cmd("OBJECT").arg("REFCOUNT").arg(&args.name),
                 args.db,
             )
-            .await;
-        if let Ok(v) = s {
-            resp.push(Field {
-                field: String::from("OBJECT REFCOUNT"),
-                value: FieldValue::Value(v),
-            })
-        }
+            .await?;
+        resp.push(Field {
+            field: String::from("OBJECT REFCOUNT"),
+            value: FieldValue::Value(s),
+        })
     }
     Ok(resp)
 }

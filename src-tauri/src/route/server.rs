@@ -5,7 +5,7 @@ use crate::{
     err::CusError,
     model::SlowLog,
     response::{self, Field},
-    sqlite::{self, Connection},
+    sqlite::Connection,
 };
 use redis::{FromRedisValue, Value};
 
@@ -44,7 +44,7 @@ pub async fn slow_log<'r>(
     manager: tauri::State<'r, Manager>,
 ) -> Result<SlowLogResp, CusError> {
     let config = manager.get_config(cid, "slowlog*").await?;
-    let conn = sqlite::Connection::first(cid)?;
+    let conn = Connection::first(cid)?;
     let mut time = String::default();
     if let Some(v) = Field::first("slowlog-log-slower-than", &config) {
         match v.value {
@@ -92,7 +92,7 @@ pub async fn module<'r>(
     cid: u32,
     manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<HashMap<String, String>>, CusError> {
-    let arr: Vec<redis::Value> = manager
+    let arr: Vec<Value> = manager
         .execute(cid, redis::cmd("MODULE").arg("LIST"), None)
         .await?;
     let mut resp: Vec<HashMap<String, String>> = vec![];

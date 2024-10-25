@@ -4,18 +4,21 @@ import { observer } from 'mobx-react-lite'
 import { PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import CusButton from '../CusButton'
+import { SizeType } from 'antd/es/config-provider/SizeContext'
 
 const LoadMore: React.FC<{
   disabled: boolean
   onGet: () => void
   loading?: boolean
   onGetAll: () => void
-}> = ({ disabled, onGet, onGetAll, loading }) => {
+  size?: SizeType
+}> = ({ disabled, onGet, onGetAll, loading, size }) => {
   const { t } = useTranslation()
   return (
     <div className="flex">
       <div className="flex-1">
         <CusButton
+          size={size}
           type="default"
           disabled={disabled}
           loading={loading}
@@ -28,6 +31,7 @@ const LoadMore: React.FC<{
       </div>
       <div className="ml-2 flex-shrink-0">
         <CusButton
+          size={size}
           danger
           icon={<PlusOutlined />}
           type="primary"

@@ -9,7 +9,6 @@ const InteractiveContainer: React.FC<
     active?: boolean
   }
 > = (props) => {
-  // eslint-disable-next-line react/prop-types
   const { active = false, className, ...other } = props
 
   return (

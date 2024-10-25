@@ -54,7 +54,6 @@ const Index: React.FC<{
   const getListHeight = React.useCallback(() => {
     const container = document.getElementById(id)
     if (container != null) {
-      console.log(container.clientHeight)
       setListHeight(container.clientHeight - 102 - 30)
     }
   }, [id])

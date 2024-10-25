@@ -45,7 +45,7 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_config_with(pattern, conn).await;
         }
-        return Err(CusError::reopen());
+        Err(CusError::reopen())
     }
 
     pub async fn get_config_with(
@@ -63,7 +63,7 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_version_with(conn).await;
         }
-        return Err(CusError::reopen());
+        Err(CusError::reopen())
     }
 
     // get redis server version
@@ -76,7 +76,7 @@ impl Manager {
                 }
             }
         }
-        return Err(CusError::reopen());
+        Err(CusError::reopen())
     }
 
     pub async fn get_info(
@@ -86,7 +86,7 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_info_with(conn).await;
         }
-        return Err(CusError::reopen());
+        Err(CusError::reopen())
     }
 
     // get the server info
@@ -145,7 +145,7 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return Ok(self.get_nodes_with(conn).await?);
         }
-        return Err(CusError::reopen());
+        Err(CusError::reopen())
     }
 
     // get cluster server nodes
@@ -190,13 +190,13 @@ impl Manager {
                 if let Some(tx) = self.debug_tx.lock().await.get_mut(0) {
                     let _ = tx.send(cmd).await;
                 }
-                return Ok(value);
+                Ok(value)
             }
             Err((err, cmd)) => {
                 if let Some(tx) = self.debug_tx.lock().await.get_mut(0) {
                     let _ = tx.send(cmd).await;
                 }
-                return Err(err);
+                Err(err)
             }
         }
     }
@@ -204,7 +204,7 @@ impl Manager {
     pub async fn execute<T>(
         &self,
         cid: u32,
-        cmd: &mut redis::Cmd,
+        cmd: &mut Cmd,
         db: Option<u8>,
     ) -> Result<T, CusError>
     where
@@ -224,30 +224,30 @@ impl Manager {
                 }
             }
             let result: Result<T, CusError> = self.execute_with(cmd, conn).await;
-            match result {
+            return match result {
                 Ok(value) => {
-                    return Ok(value);
+                    Ok(value)
                 }
                 Err(err) => {
-                    return Err(err);
+                    Err(err)
                 }
             }
         }
-        return Err(CusError::reopen());
+        Err(CusError::reopen())
     }
 
     pub async fn get_is_cluster(&self, cid: u32) -> bool {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
             return conn.is_cluster();
         }
-        return false;
+        false
     }
 
     pub async fn get_sync_conn(&self, cid: u32) -> Result<RedisSyncConnection, CusError> {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
             return Ok(conn.model.get_sync_one().await?);
         }
-        return Err(CusError::build("not found"));
+        Err(CusError::build("not found"))
     }
 
     pub async fn get_sync_cluster_conn(
@@ -257,7 +257,7 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
             return Ok(conn.model.get_sync_cluster_one().await?);
         }
-        return Err(CusError::build("not found"));
+        Err(CusError::build("not found"))
     }
 
     // get connected connections info

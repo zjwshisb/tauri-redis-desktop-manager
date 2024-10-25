@@ -13,6 +13,9 @@ const App: React.FC = () => {
   React.useEffect(() => {
     store.window.setName('main')
   }, [store.window])
+
+
+
   return (
     <AppLayout header={<ActionBar />}>
       <ConnectionForm />

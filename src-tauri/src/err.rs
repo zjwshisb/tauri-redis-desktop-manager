@@ -42,9 +42,9 @@ impl serde::Serialize for CusError {
     where
         S: serde::ser::Serializer,
     {
-        return match &self {
+        match &self {
             CusError::App(s) => serializer.serialize_str(s),
             _ => serializer.serialize_str(self.to_string().as_ref()),
-        };
+        }
     }
 }

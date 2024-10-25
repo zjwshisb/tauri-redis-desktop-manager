@@ -3,7 +3,7 @@ use crate::err::CusError;
 
 use crate::request::NameArgs;
 use crate::response::{Field, KeyWithMemory, ScanLikeResult};
-use crate::{request, response, sqlite};
+use crate::{request, sqlite};
 
 use redis::FromRedisValue;
 use redis::Value;
@@ -79,7 +79,7 @@ pub async fn analysis<'r>(
 pub async fn memory_stats<'r>(
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<Vec<Vec<response::Field>>, CusError> {
+) -> Result<Vec<Vec<Field>>, CusError> {
     let value: Vec<Value> = manager
         .execute(cid, redis::cmd("memory").arg("stats"), None)
         .await?;

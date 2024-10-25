@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-dynamic-delete */
 import { invoke } from '@tauri-apps/api/core'
-import { notification } from 'antd'
 import { isObject, isString } from 'lodash'
+import  {emit} from '@tauri-apps/api/event'
 
 export interface Response<T> {
   data: T
@@ -32,14 +31,12 @@ export default async function request<T = any>(
     }
     const res = await invoke('dispatch', params)
     const data = JSON.parse(res as string)
-    console.log(path, args, data)
     return data as Response<T>
   } catch (err) {
     if (option.showNotice) {
-      notification.error({
-        message: err as string,
-        duration: 3
-      })
+      emit("error-notification", {
+        message: err as string
+      }).then()
     }
     console.log(path, args, err)
     throw err

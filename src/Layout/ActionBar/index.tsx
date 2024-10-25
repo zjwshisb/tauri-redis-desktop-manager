@@ -1,4 +1,3 @@
-import Log from '@/Layout/ActionBar/components/Log'
 import Setting from '@/Layout/ActionBar/components/Setting'
 import { Space } from 'antd'
 import React, { useEffect } from 'react'
@@ -10,6 +9,7 @@ import { WindowsOutlined } from '@ant-design/icons'
 import { TauriEvent } from '@tauri-apps/api/event'
 import { useTauriEvent } from '@/hooks/useTauriEvent'
 import Container from '@/components/Container'
+import Log from '@/Layout/ActionBar/components/Log'
 import { getAllWindows, Window } from '@tauri-apps/api/window'
 
 const ActionBar: React.FC = () => {

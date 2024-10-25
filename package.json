@@ -16,6 +16,7 @@
     "@tauri-apps/plugin-clipboard-manager": "^2.0.0",
     "@tauri-apps/plugin-dialog": "^2.0.0",
     "@tauri-apps/plugin-shell": "^2.0.0",
+    "@tauri-apps/plugin-os": "^2.0.0",
     "Buffer": "^0.0.0",
     "ahooks": "^3.8.1",
     "antd": "^5.21.4",
@@ -25,7 +26,7 @@
     "i18next-browser-languagedetector": "^7.0.1",
     "less": "^4.2.0",
     "lodash": "^4.17.21",
-    "mac-scrollbar": "^0.10.7",
+    "mac-scrollbar": "^0.13.6",
     "mobx": "^6.9.0",
     "mobx-react-lite": "^3.4.3",
     "postcss": "^8.4.23",
@@ -55,7 +56,7 @@
     "@types/spark-md5": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.43.0",
     "@typescript-eslint/parser": "^5.0.1",
-    "@vitejs/plugin-react": "^3.0.0",
+    "@vitejs/plugin-react": "^4.3.3",
     "eslint": "^8.0.1",
     "eslint-config-standard-with-typescript": "^34.0.1",
     "eslint-plugin-import": "^2.25.2",
@@ -66,6 +67,6 @@
     "prettier": "^2.8.8",
     "tailwindcss": "^3.4.14",
     "typescript": "*",
-    "vite": "^4.2.1"
+    "vite": "^5.4.10"
   }
 }

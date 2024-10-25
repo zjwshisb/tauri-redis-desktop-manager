@@ -37,9 +37,9 @@ pub async fn bl_move<'r>(
         .await?;
     match v {
         Value::Nil => {
-            return Err(CusError::build("Timeout is reached."));
+            Err(CusError::build("Timeout is reached."))
         }
-        _ => return Ok(CValue::from_redis_value(&v)?),
+        _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
 
@@ -69,9 +69,9 @@ pub async fn blm_pop<'r>(
     let v: Value = manager.execute(cid, &mut cmd, args.db).await?;
     match v {
         Value::Nil => {
-            return Err(CusError::build("No element could be popped."));
+            Err(CusError::build("No element could be popped."))
         }
-        _ => return Ok(CValue::from_redis_value(&v)?),
+        _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
 
@@ -90,11 +90,11 @@ pub async fn bl_pop<'r>(
         .await?;
     match v {
         Value::Nil => {
-            return Err(CusError::build(
+            Err(CusError::build(
                 "No element could be popped and the timeout expired",
-            ));
+            ))
         }
-        _ => return Ok(CValue::from_redis_value(&v)?),
+        _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
 
@@ -113,11 +113,11 @@ pub async fn br_pop<'r>(
         .await?;
     match v {
         Value::Nil => {
-            return Err(CusError::build(
+            Err(CusError::build(
                 "No element could be popped and the timeout expired",
-            ));
+            ))
         }
-        _ => return Ok(CValue::from_redis_value(&v)?),
+        _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
 
@@ -139,9 +139,9 @@ pub async fn br_pop_lpush<'r>(
         .await?;
     match v {
         Value::Nil => {
-            return Err(CusError::build("Timeout is reached."));
+            Err(CusError::build("Timeout is reached."))
         }
-        _ => return Ok(CValue::from_redis_value(&v)?),
+        _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
 
@@ -185,9 +185,9 @@ pub async fn lm_pop<'r>(
     let v: Value = manager.execute(cid, &mut cmd, args.db).await?;
     match v {
         Value::Nil => {
-            return Err(CusError::build("No element could be popped."));
+            Err(CusError::build("No element could be popped."))
         }
-        _ => return Ok(CValue::from_redis_value(&v)?),
+        _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
 
@@ -236,9 +236,9 @@ pub async fn linsert<'r>(
         )
         .await?;
     match value {
-        0 => return Err(CusError::key_not_exists()),
-        -1 => return Err(CusError::App(String::from("the pivot wasn't found."))),
-        _ => return Ok(value),
+        0 => Err(CusError::key_not_exists()),
+        -1 => Err(CusError::App(String::from("the pivot wasn't found."))),
+        _ => Ok(value),
     }
 }
 
@@ -292,7 +292,7 @@ pub async fn lpush<'r>(
     cid: u32,
     manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
-    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
@@ -307,7 +307,7 @@ pub async fn lpush_x<'r>(
     cid: u32,
     manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
-    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
@@ -421,9 +421,9 @@ pub async fn rpop_lpush<'r>(
         .await?;
     match v {
         Value::Nil => {
-            return Err(CusError::build("The source list is empty."));
+            Err(CusError::build("The source list is empty."))
         }
-        _ => return Ok(CValue::from_redis_value(&v)?),
+        _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
 
@@ -432,7 +432,7 @@ pub async fn rpush<'r>(
     cid: u32,
     manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
-    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
         .execute(
             cid,
@@ -441,8 +441,8 @@ pub async fn rpush<'r>(
         )
         .await?;
     match value {
-        0 => return Err(CusError::key_not_exists()),
-        _ => return Ok(value),
+        0 => Err(CusError::key_not_exists()),
+        _ => Ok(value),
     }
 }
 
@@ -451,7 +451,7 @@ pub async fn rpushx<'r>(
     cid: u32,
     manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
-    let args: request::CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
+    let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,

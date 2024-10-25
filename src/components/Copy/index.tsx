@@ -32,12 +32,7 @@ const Copy: React.FC<
 
   const icon = React.useMemo(() => {
     if (showSuccess) {
-      return (
-        <CheckOutlined
-          className={classNames([className, 'text-green-600'])}
-          style={style}
-        />
-      )
+      return <CheckOutlined style={style} />
     }
     return (
       <CopyOutlined

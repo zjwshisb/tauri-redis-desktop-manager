@@ -25,7 +25,7 @@ export function useEventListen<T = string>(
 
   const eventNameRef = useLatest(async () => {
     if (isString(getNameFn)) {
-      return await Promise.resolve(getNameFn)
+      return getNameFn
     } else {
       return await getNameFn()
     }
@@ -65,7 +65,7 @@ export function useEventListen<T = string>(
 
   React.useEffect(() => {
     return () => {
-      clearFn()
+      clearFn().then()
     }
   }, [clearFn])
 

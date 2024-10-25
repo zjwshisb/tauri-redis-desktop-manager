@@ -14,7 +14,7 @@ pub async fn get_database<'r>(
     if let Some(d) = databases {
         return Ok(d.value);
     }
-    return Ok(FieldValue::Nil);
+    Ok(FieldValue::Nil)
 }
 
 pub async fn get_all<'r>(

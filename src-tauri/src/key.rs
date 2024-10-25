@@ -24,7 +24,7 @@ impl Key {
         manager: &tauri::State<'r, Manager>,
     ) -> Result<Key, CusError> {
         let mut key: Key = Key {
-            name: name,
+            name,
             types: "".into(),
             sub_types: "".into(),
             ttl: -2,
@@ -150,9 +150,9 @@ impl Key {
         self.types == "none"
     }
     pub fn get_type(&self) -> String {
-        return self.types.clone();
+        self.types.clone()
     }
     pub fn get_name(&self) -> String {
-        return self.name.clone();
+        self.name.clone()
     }
 }

@@ -25,14 +25,13 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "label": "main",
         "fullscreen": false,
         "resizable": true,
         "title": "Tauri Desktop Redis Manager",
         "width": 1400,
         "height": 1000,
         "titleBarStyle": "Overlay",
-        "decorations": true
+        "decorations": false
       }
     ],
     "security": {

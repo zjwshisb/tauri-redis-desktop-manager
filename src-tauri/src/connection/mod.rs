@@ -31,7 +31,7 @@ impl serde::Serialize for CValue {
     {
         match &self {
             CValue::Str(s) => {
-                return serializer.serialize_str(s);
+                serializer.serialize_str(s)
             }
             CValue::Vec(v) => v.serialize(serializer),
             CValue::Int(v) => v.serialize(serializer),
@@ -47,16 +47,16 @@ impl CValue {
     pub fn build(v: RedisValue) -> CValue {
         println!("{:?}", v);
         match v {
-            RedisValue::Okay => return Self::Str("Ok".to_string()),
+            RedisValue::Okay => Self::Str("Ok".to_string()),
             RedisValue::BulkString(s) => {
                 let result = String::from_utf8(s.clone());
                 match result {
                     Ok(ss) => {
-                        return Self::Str(ss);
+                        Self::Str(ss)
                     }
                     Err(_) => {
                         let ss = String::from_utf8_lossy(&s).to_string();
-                        return Self::Str(ss);
+                        Self::Str(ss)
                     }
                 }
             }
@@ -65,17 +65,17 @@ impl CValue {
                 for x in v {
                     vec.push(Self::build(x));
                 }
-                return Self::Vec(vec);
+                Self::Vec(vec)
             }
-            RedisValue::Nil => return Self::Nil,
-            RedisValue::SimpleString(s) => return Self::Str(s),
+            RedisValue::Nil => Self::Nil,
+            RedisValue::SimpleString(s) => Self::Str(s),
             RedisValue::Int(s) => return Self::Int(s),
             RedisValue::Map(v) => {
                 let mut vec = vec![];
                 for (x, y) in v {
                     vec.push((Self::build(x), Self::build(y)));
                 }
-                return Self::Map(vec);
+                Self::Map(vec)
             }
             RedisValue::Attribute { data, attributes } => todo!(),
             RedisValue::Set(v) => {
@@ -83,14 +83,14 @@ impl CValue {
                 for x in v {
                     vec.push(Self::build(x));
                 }
-                return Self::Vec(vec);
+                Self::Vec(vec)
             }
             RedisValue::Double(v) => Self::Float(v),
             RedisValue::Boolean(v) => Self::Bool(v),
             RedisValue::VerbatimString { format, text } => Self::Str(text),
-            RedisValue::BigNumber(big_int) => todo!(),
+            RedisValue::BigNumber(big_int) => Self::Str(big_int.to_string()),
             RedisValue::Push { kind, data } => todo!(),
-            RedisValue::ServerError(server_error) => todo!(),
+            RedisValue::ServerError(server_error) => Self::Str(server_error.code().to_string()),
         }
     }
 }
