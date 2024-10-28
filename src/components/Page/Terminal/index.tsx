@@ -6,6 +6,8 @@ import { Input, AutoComplete, Space } from 'antd'
 import { emit } from '@tauri-apps/api/event'
 import { useEventListen } from '@/hooks/useEventListen'
 import CusButton from '@/components/CusButton'
+import { getCurrentWindow } from '@tauri-apps/api/window'
+import { useTranslation } from 'react-i18next'
 
 interface EventName {
   send: string
@@ -16,7 +18,10 @@ const Terminal: React.FC<{
   connection: APP.Connection
   pageKey: string
 }> = ({ connection, pageKey }) => {
+
   const [event, setEvent] = React.useState<EventName>()
+
+  const {t} = useTranslation()
 
   const clear = React.useCallback(async () => {
     if (event !== undefined) {
@@ -47,6 +52,7 @@ const Terminal: React.FC<{
       }
       term.current?.scrollToBottom()
     },
+    getCurrentWindow(),
     clear
   )
 
@@ -138,11 +144,11 @@ const Terminal: React.FC<{
                 term.current?.clear()
               }}
             >
-              Clear
+              {t("Clear")}
             </CusButton>
           </span>
           <span>
-            Enter to execute command, Arrow Down/Arrow Up to switch history
+              {t("Enter to execute command, Arrow Down/Arrow Up to switch history")}
           </span>
         </Space>
       </div>

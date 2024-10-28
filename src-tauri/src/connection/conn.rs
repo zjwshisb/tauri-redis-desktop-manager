@@ -65,12 +65,12 @@ pub struct Connection {
 }
 
 impl SshProxy for Connection {
-    fn get_ssh_config(&self) -> Option<ssh::SshParams> {
-        self.params.ssh_params.clone()
-    }
     fn store_addr(&mut self, addr: SocketAddr, rx: Receiver<SshForwarderEnd>) {
         self.cancel_tunnel_rx = Some(rx);
         self.tunnel_addr = Some(addr);
+    }
+    fn get_ssh_config(&self) -> Option<ssh::SshParams> {
+        self.params.ssh_params.clone()
     }
     fn close_tunnel(&mut self) {
         if let Some(mut rx) = self.cancel_tunnel_rx.take() {
@@ -101,7 +101,7 @@ impl Connection {
         if let Some(addr) = self.tunnel_addr {
             return Some(format!("{}:{}", addr.ip().to_string(), addr.port()));
         }
-        return None;
+        None
     }
     // the server is cluster or not
     pub fn get_is_cluster(&self) -> bool {
@@ -133,10 +133,10 @@ impl Connection {
         let result = client.get_connection();
         match result {
             Ok(c) => {
-                return Ok(c);
+                Ok(c)
             }
             Err(e) => {
-                return Err(CusError::App(e.to_string()));
+                Err(CusError::App(e.to_string()))
             }
         }
     }
@@ -145,7 +145,7 @@ impl Connection {
         let params: ConnectedParam = self.get_connected_params();
         let client = ClusterClient::new(vec![params])?;
         let result = client.get_connection();
-        return match result {
+        match result {
             Ok(c) => {
                 Ok(c)
             }
@@ -170,19 +170,14 @@ impl Connection {
     pub async fn get_cluster(&mut self) -> Result<ClusterConnection, CusError> {
         ssh::create_tunnel(self).await?;
         let params = self.get_connected_params();
-        let client = ClusterClient::new(vec![params]).unwrap();
-        let rx = timeout(Duration::from_secs(2), client.get_async_connection()).await;
-        match rx {
-            Ok(conn_result) => match conn_result {
-                Ok(connection) => {
-                    return Ok(connection);
-                }
-                Err(e) => {
-                    return Err(CusError::App(e.to_string()));
-                }
+        let client = ClusterClient::new(vec![params])?;
+        let r= client.get_async_connection().await;
+        match r {
+            Ok(connection) =>  {
+                Ok(connection)
             },
             Err(_) => {
-                return Err(CusError::App(String::from("Connection Timeout")));
+                Err(CusError::App(String::from("Connection Timeout")))
             }
         }
     }
@@ -193,7 +188,7 @@ pub struct ConnectionWrapper {
     pub id: String,
     pub nodes: Vec<Node>,
     pub db: u8,
-    pub created_at: chrono::DateTime<Local>,
+    pub created_at: DateTime<Local>,
     pub model: Connection,
 }
 
@@ -223,7 +218,7 @@ impl ConnectionWrapper {
     }
 
     pub fn is_cluster(&self) -> bool {
-        return self.model.get_is_cluster();
+        self.model.get_is_cluster()
     }
 
     // execute the redis command

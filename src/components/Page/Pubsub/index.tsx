@@ -6,6 +6,7 @@ import Form, { type SubscribeForm } from './components/Form'
 import Page from '..'
 import XTerm, { type XTermAction } from '@/components/XTerm'
 import { useEventListen } from '@/hooks/useEventListen'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 
 const Pubsub: React.FC<{
   connection: APP.Connection
@@ -36,6 +37,7 @@ const Pubsub: React.FC<{
         term.current?.writeln(`3) "${message.data.payload}"`)
       } catch (e) {}
     },
+    getCurrentWindow(),
     async (name) => {
       return await request('pubsub/cancel', 0, {
         name
@@ -46,9 +48,9 @@ const Pubsub: React.FC<{
 
   React.useEffect(() => {
     if (form != null) {
-      listen()
+      listen().then()
       return () => {
-        clear()
+        clear().then()
       }
     }
   }, [clear, form, listen])

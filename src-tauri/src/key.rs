@@ -37,7 +37,6 @@ impl Key {
         key.types = manager.execute(cid, cmd("type").arg(&key.name), db).await?;
         key.get_sub_types(manager).await;
         if !key.is_none() {
-            // key.get_ttl(&manager).await?;
             key.get_memory(&manager).await?;
             key.get_length(&manager).await?;
         }

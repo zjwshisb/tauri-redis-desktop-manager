@@ -15,7 +15,7 @@ const TitleBar: React.FC = () => {
   }, [])
 
   return (
-    <div className="flex justify-between h-8">
+    <div className="flex justify-between h-9">
       {children}
     </div>
   )

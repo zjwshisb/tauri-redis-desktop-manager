@@ -37,7 +37,7 @@ const App: React.FC = () => {
 
   React.useEffect(() => {
     if (connection?.id !== undefined) {
-      store.connection.open(connection.id)
+      store.connection.open(connection.id).then()
     }
   }, [connection?.id, store.connection])
 

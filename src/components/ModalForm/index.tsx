@@ -7,7 +7,7 @@ import Link from '../Link'
 import { LinkOutlined } from '@ant-design/icons'
 import { isString } from 'lodash'
 import { useTranslation } from 'react-i18next'
-import CusButton from '../CusButton'
+import { useTrigger } from '@/components/ModalForm/useTrigger'
 
 const ModalForm: React.ForwardRefRenderFunction<
   FormInstance,
@@ -39,25 +39,18 @@ const ModalForm: React.ForwardRefRenderFunction<
     return title
   }, [t, title])
 
-  const trigger: React.ReactElement = React.useMemo(() => {
-    if (props.trigger !== undefined) {
-      if (isString(props.trigger)) {
-        return <CusButton>{props.trigger}</CusButton>
-      }
-      return props.trigger
-    } else {
-      if (isString(props.title)) {
-        return <CusButton>{props.title}</CusButton>
-      }
-    }
-    return <></>
-  }, [props.title, props.trigger])
+  const trigger: React.ReactElement = useTrigger(props.trigger, props.title)
 
   return (
     <CusModal
       forceRender={false}
       destroyOnClose
       onCancel={props.onCancel}
+      styles={{
+        body: {
+          padding: "10px"
+        }
+      }}
       showOkNotice={showOkNotice}
       width={width}
       afterClose={() => {

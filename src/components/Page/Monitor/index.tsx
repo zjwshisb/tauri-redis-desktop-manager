@@ -6,6 +6,7 @@ import Page from '..'
 import XTerm, { type XTermAction } from '@/components/XTerm'
 
 import { useEventListen } from '@/hooks/useEventListen'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 
 const Monitor: React.FC<{
   connection: APP.Connection
@@ -37,6 +38,7 @@ const Monitor: React.FC<{
         }
       } catch (e) {}
     },
+    getCurrentWindow(),
     async (name) => {
       return await request('pubsub/cancel', 0, {
         name

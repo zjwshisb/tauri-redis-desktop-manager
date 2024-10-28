@@ -10,6 +10,7 @@ import XTerm, { type XTermAction } from '../XTerm'
 import { useLatest } from 'ahooks'
 import { isString } from 'lodash'
 import CusButton from '../CusButton'
+import { useTrigger } from '@/components/ModalForm/useTrigger'
 
 interface ModalQueryFormProps<T> {
   defaultValue?: Record<string, any>
@@ -82,19 +83,7 @@ function ModalQueryForm<T>(
     form.resetFields()
   }, [form])
 
-  const trigger: React.ReactElement = React.useMemo(() => {
-    if (props.trigger !== undefined) {
-      if (isString(props.trigger)) {
-        return <CusButton>{props.trigger}</CusButton>
-      }
-      return props.trigger
-    } else {
-      if (isString(props.title)) {
-        return <CusButton>{props.title}</CusButton>
-      }
-    }
-    return <></>
-  }, [props.title, props.trigger])
+  const trigger: React.ReactElement = useTrigger(props.trigger, props.title)
 
   return (
     <CusModal

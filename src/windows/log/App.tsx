@@ -11,6 +11,7 @@ import { Checkbox, Input, Space } from 'antd'
 import { useEventListen } from '@/hooks/useEventListen'
 import { useTranslation } from 'react-i18next'
 import { SearchOutlined } from '@ant-design/icons'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 
 const App: React.FC = () => {
   const searchRef = React.useRef('')
@@ -43,6 +44,7 @@ const App: React.FC = () => {
         }
       }
     },
+    getCurrentWindow(),
     async () => {
       return await request('debug/cancel')
     }

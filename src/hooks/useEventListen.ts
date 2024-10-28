@@ -1,15 +1,14 @@
 import React from 'react'
-import { type UnlistenFn, type Event, TauriEvent } from '@tauri-apps/api/event'
+import { type UnlistenFn, type Event, listen } from '@tauri-apps/api/event'
 
 import { useLatest } from 'ahooks'
 import { isString } from 'lodash'
-import { isMainWindow } from '@/utils'
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
-const appWindow = getCurrentWebviewWindow()
+import { getCurrentWindow, Window } from '@tauri-apps/api/window'
 
 export function useEventListen<T = string>(
   getNameFn: string | (() => Promise<string>),
   eventHandle: (e: Event<T>) => void,
+  window?: Window,
   onUnListenCallback?: (name: string) => Promise<any>,
   immediately = true
 ) {
@@ -41,36 +40,40 @@ export function useEventListen<T = string>(
     await Promise.resolve()
   }, [callback])
 
-  const listen = React.useCallback(() => {
-    if (!isMainWindow()) {
-      appWindow.once(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-        await clearFn()
-        appWindow.close()
-      })
+  const listenFn = React.useCallback(async () => {
+    let currentWindow = getCurrentWindow()
+    if (window) {
+      currentWindow = window
     }
-    eventNameRef.current().then((r) => {
-      name.current = r
-      appWindow.listen(r, handleFn.current).then((f) => {
-        cancelFn.current = f
+    await currentWindow.onCloseRequested(async () => {
+        await clearFn()
       })
-    })
+    const r = await eventNameRef.current()
+    name.current = r
+    if (window) {
+      cancelFn.current = await window.listen(r, handleFn.current)
+    } else {
+      cancelFn.current = await  listen(r, handleFn.current)
+    }
   }, [clearFn, eventNameRef, handleFn])
 
   React.useEffect(() => {
     if (!init.current && immediately) {
       init.current = true
-      listen()
+      listenFn().then()
     }
-  }, [immediately, listen])
+  }, [immediately, listenFn])
 
   React.useEffect(() => {
-    return () => {
-      clearFn().then()
+    if (immediately) {
+      return () => {
+        clearFn().then()
+      }
     }
   }, [clearFn])
 
   return {
-    listen,
+    listen: listenFn,
     clear: clearFn
   }
 }

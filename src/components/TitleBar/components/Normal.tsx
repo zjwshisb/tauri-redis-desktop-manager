@@ -7,6 +7,7 @@ import { Icon } from '@iconify/react'
 import useAppName from '@/hooks/useAppName'
 
 const TitleBar: React.FC = () => {
+
   const window = getCurrentWindow()
 
   const windowItemClass = 'w-10 h-full flex items-center justify-center'
@@ -21,11 +22,12 @@ const TitleBar: React.FC = () => {
   }, [appName])
 
 
-
   return (
     <>
+      <div className={"flex-shrink-0 w-32 h-full"}>
+      </div>
       <div
-        className="flex-1 h-full cursor-move flex items-center pl-2"
+        className="flex-1 h-full cursor-move flex justify-center items-center text-ellipsis"
         onMouseDown={(e) => {
           if (e.buttons === 1) {
             e.detail === 2
@@ -38,7 +40,7 @@ const TitleBar: React.FC = () => {
       >
         <span>{title}</span>
       </div>
-      <div className="flex items-center w-22">
+      <div className="flex items-center justify-end w-32 flex-shrink-0 ">
         <div
           className={classNames(windowItemClass, 'hover:bg-gray-5 dark:hover:bg-gray-10')}
           onClick={(e) => {

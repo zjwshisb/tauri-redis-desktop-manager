@@ -12,13 +12,13 @@ import { StyleProvider } from '@ant-design/cssinjs'
 import enUS from 'antd/locale/en_US'
 import zhCN from 'antd/locale/zh_CN'
 import { type Locale } from 'antd/es/locale'
-import { listen, UnlistenFn } from '@tauri-apps/api/event'
 import classNames from 'classnames'
 import useStore from '@/hooks/useStore'
 import TitleBar from '../TitleBar'
 import WindowResize from './components/WindowResize'
 import { ArgsProps } from 'antd/es/notification'
-import { useAsyncEffect } from 'ahooks'
+import {ERROR_NOTIFICATION} from '@/consts/event'
+import { useEventListen } from '@/hooks/useEventListen'
 
 const langs: Record<string, Locale> = {
   zh_CN: zhCN,
@@ -38,24 +38,11 @@ const AppLayout: React.FC<
 
   const [notificationApi, contextHolder] = notification.useNotification();
 
-  React.useEffect(() => {
-    let unListen: UnlistenFn|undefined;
-    listen<ArgsProps>("error-notification", (e) =>{
+  useEventListen<ArgsProps>(ERROR_NOTIFICATION, (e) =>{
       if (e.payload.message) {
         notificationApi.error(e.payload)
       }
-    }).then(r => {
-      console.log(1)
-      unListen = r
-    }).catch(e => {
-    })
-    return () => {
-      if (unListen) {
-        unListen()
-      }
-    }
-  }, [])
-
+  })
 
   const locale = React.useMemo(() => {
     return langs[i18n.language]

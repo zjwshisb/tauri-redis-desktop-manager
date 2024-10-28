@@ -20,7 +20,6 @@ const ActionBar: React.FC = () => {
       setWindows(r)
     })
   }, [])
-
   useTauriEvent(TauriEvent.WINDOW_CREATED, () => {
     getAllWindows().then((r) => {
       setWindows(r)
@@ -37,7 +36,7 @@ const ActionBar: React.FC = () => {
       className="w-full flex-shrink-0 border-b flex flex-col"
       level={1}
     >
-      <div className="flex justify-between items-center flex-1 py-2">
+      <div className="flex justify-between items-center flex-1">
         <div className="flex px-4">
           <Space>
             <NewConnection />

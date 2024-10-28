@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { isObject, isString } from 'lodash'
 import  {emit} from '@tauri-apps/api/event'
+import {ERROR_NOTIFICATION} from '@/consts/event'
 
 export interface Response<T> {
   data: T
@@ -34,7 +35,7 @@ export default async function request<T = any>(
     return data as Response<T>
   } catch (err) {
     if (option.showNotice) {
-      emit("error-notification", {
+      emit(ERROR_NOTIFICATION, {
         message: err as string
       }).then()
     }
