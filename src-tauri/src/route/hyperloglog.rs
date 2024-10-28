@@ -8,10 +8,9 @@ pub async fn pfcount<'r>(
     manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: NameArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: i64 = manager
+    manager
         .execute(cid, redis::cmd("PFCOUNT").arg(args.name), args.db)
-        .await?;
-    Ok(value)
+        .await
 }
 
 pub async fn pfadd<'r>(
@@ -20,12 +19,11 @@ pub async fn pfadd<'r>(
     manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: i64 = manager
+    manager
         .execute(
             cid,
             redis::cmd("PFADD").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }

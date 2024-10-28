@@ -45,7 +45,7 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_config_with(pattern, conn).await;
         }
-        Err(CusError::reopen())
+        Err(CusError::connection_not_found())
     }
 
     pub async fn get_config_with(
@@ -63,20 +63,25 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_version_with(conn).await;
         }
-        Err(CusError::reopen())
+        Err(CusError::connection_not_found())
     }
 
     // get redis server version
     pub async fn get_version_with(&self, conn: &mut ConnectionWrapper) -> Result<String, CusError> {
-        let info = self.get_info_with(conn).await?;
-        for x in info.keys() {
-            if let Some(fields) = info.get(x) {
-                if let Some(version) = fields.get("redis_version") {
-                    return Ok(version.clone());
+        if let Some(version) = &conn.version {
+            Ok(version.clone())
+        } else {
+            let info = self.get_info_with(conn).await?;
+            for x in info.keys() {
+                if let Some(fields) = info.get(x) {
+                    if let Some(version) = fields.get("redis_version") {
+                        conn.version = Some(version.clone());
+                        return Ok(version.clone());
+                    }
                 }
             }
+            Err(CusError::reopen())
         }
-        Err(CusError::reopen())
     }
 
     pub async fn get_info(
@@ -86,7 +91,7 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
             return self.get_info_with(conn).await;
         }
-        Err(CusError::reopen())
+        Err(CusError::connection_not_found())
     }
 
     // get the server info
@@ -211,29 +216,17 @@ impl Manager {
         T: FromRedisValue,
     {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
-            if !conn.model.get_is_cluster() {
+            if !conn.is_cluster() {
                 if let Some(database) = db {
                     if database != conn.db {
-                        let result: Result<String, CusError> =
-                            self.execute_with(redis::cmd("select").arg(db), conn).await;
-                        if let Err(err) = result {
-                            return Err(err);
-                        }
+                        let _ = self.execute_with(redis::cmd("select").arg(db), conn).await?;
                         conn.db = database
                     }
                 }
             }
-            let result: Result<T, CusError> = self.execute_with(cmd, conn).await;
-            return match result {
-                Ok(value) => {
-                    Ok(value)
-                }
-                Err(err) => {
-                    Err(err)
-                }
-            }
+            return self.execute_with::<T>(cmd, conn).await;
         }
-        Err(CusError::reopen())
+        Err(CusError::connection_not_found())
     }
 
     pub async fn get_is_cluster(&self, cid: u32) -> bool {
@@ -247,7 +240,7 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
             return Ok(conn.model.get_sync_one().await?);
         }
-        Err(CusError::build("not found"))
+        Err(CusError::connection_not_found())
     }
 
     pub async fn get_sync_cluster_conn(
@@ -257,8 +250,9 @@ impl Manager {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
             return Ok(conn.model.get_sync_cluster_one().await?);
         }
-        Err(CusError::build("not found"))
+        Err(CusError::connection_not_found())
     }
+
 
     // get connected connections info
     pub async fn get_conns(&self) -> Vec<response::Conn> {

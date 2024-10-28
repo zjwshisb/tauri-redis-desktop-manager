@@ -31,6 +31,9 @@ impl CusError {
     pub fn reopen() -> Self {
         Self::App(String::from("Please reopen the connection"))
     }
+    pub fn connection_not_found() -> Self {
+        Self::App(String::from("Connection not found"))
+    }
     pub fn key_not_exists() -> Self {
         Self::App(String::from("Key not exists"))
     }

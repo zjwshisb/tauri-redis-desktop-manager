@@ -20,7 +20,7 @@ pub enum CValue {
 }
 impl FromRedisValue for CValue {
     fn from_redis_value(v: &RedisValue) -> RedisResult<Self> {
-        return Ok(CValue::build(v.clone()));
+        Ok(CValue::build(v.clone()))
     }
 }
 

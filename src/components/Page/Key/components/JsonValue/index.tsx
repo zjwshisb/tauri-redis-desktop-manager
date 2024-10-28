@@ -62,7 +62,10 @@ const JsonValue: React.FC<{
         </ModalForm>
       }
     >
-      <Card bodyStyle={{ padding: 8 }}>{children}</Card>
+      <Card styles={{
+          body: { padding: 8 }
+        }}
+      >{children}</Card>
     </ValueLayout>
   )
 }

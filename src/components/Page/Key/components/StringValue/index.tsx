@@ -47,7 +47,9 @@ const StringValue: React.FC<{
         </>
       }
     >
-      <Card bodyStyle={{ padding: 8 }}>
+      <Card styles={{
+          body: { padding: 8 }
+        }}>
         <FieldViewer content={keys.data}></FieldViewer>
       </Card>
     </ValueLayout>

@@ -209,26 +209,24 @@ pub async fn getdel<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<String, CusError> {
+) -> Result<CValue, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
-    let v: Vec<u8> = manager
+    manager
         .execute(cid, redis::cmd("GETDEL").arg(&args.name), args.db)
-        .await?;
-    Ok(String::from_utf8_lossy(&v).to_string())
+        .await
 }
 
 pub async fn getset<'r>(
     payload: String,
     cid: u32,
     manager: tauri::State<'r, Manager>,
-) -> Result<String, CusError> {
+) -> Result<CValue, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
-    let v: Vec<u8> = manager
+    manager
         .execute(
             cid,
             redis::cmd("GETSET").arg(&args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(String::from_utf8_lossy(&v).to_string())
+        .await
 }

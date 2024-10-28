@@ -96,7 +96,7 @@ impl Field {
                 return Some(x.clone());
             }
         }
-        return None;
+        None
     }
     pub fn build_by_bulk_vec(value_vec: &Vec<Value>) -> Result<Vec<Self>, CusError> {
         let mut r = vec![];

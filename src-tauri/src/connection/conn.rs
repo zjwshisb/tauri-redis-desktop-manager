@@ -19,9 +19,8 @@ use redis::{
 
 use ssh_jumper::model::SshForwarderEnd;
 use std::net::SocketAddr;
-use std::time::Duration;
+use redis::aio::Monitor;
 use tokio::sync::oneshot::Receiver;
-use tokio::time::timeout;
 
 #[derive(Clone, Debug)]
 pub struct ConnectedParam {
@@ -127,6 +126,20 @@ impl Connection {
         params
     }
 
+    pub async fn get_monitor(&self)  -> Result<Monitor, CusError>  {
+        let params = self.get_connected_params();
+        let client = Client::open(params)?;
+        let result = client.get_async_monitor().await;
+        match result {
+            Ok(c) => {
+                Ok(c)
+            }
+            Err(e) => {
+                Err(CusError::App(e.to_string()))
+            }
+        }
+    }
+
     pub async fn get_sync_one(&self) -> Result<RedisSyncConnection, CusError> {
         let params = self.get_connected_params();
         let client = Client::open(params)?;
@@ -190,6 +203,7 @@ pub struct ConnectionWrapper {
     pub db: u8,
     pub created_at: DateTime<Local>,
     pub model: Connection,
+    pub version: Option<String>
 }
 
 impl ConnectionWrapper {
@@ -209,6 +223,7 @@ impl ConnectionWrapper {
             created_at: Local::now(),
             model: connection,
             conn: b,
+            version: None,
         };
         Ok(r)
     }

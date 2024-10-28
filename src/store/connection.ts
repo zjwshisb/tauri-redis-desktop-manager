@@ -41,38 +41,45 @@ class ConnectionStore {
 
   async getInfo(connection: APP.Connection) {
     connection.loading = true
-    if (connection.is_cluster) {
-      const nodes = await request<APP.Node[]>('cluster/nodes', connection.id)
-      runInAction(() => {
-        connection.nodes = nodes.data.filter((v) => {
-          return v.flags.includes('master')
+    try {
+      if (connection.is_cluster) {
+        const nodes = await request<APP.Node[]>('cluster/nodes', connection.id)
+        runInAction(() => {
+          connection.nodes = nodes.data.filter((v) => {
+            return v.flags.includes('master')
+          })
         })
-      })
-    } else {
-      const db = await request<string>('config/databases', connection.id)
-      const count = parseInt(db.data)
-      const dbs: APP.Database[] = []
-      for (let i = 0; i < count; i++) {
-        const db = {
-          database: i,
-          count: 0
+      } else {
+        const db = await request<string>('config/databases', connection.id)
+        const count = parseInt(db.data)
+        const dbs: APP.Database[] = []
+        for (let i = 0; i < count; i++) {
+          const db = {
+            database: i,
+            count: 0
+          }
+          const res = await request<number>('db/dbsize', connection.id, {
+            db: db.database
+          })
+          db.count = res.data
+          dbs.push(db)
         }
-        const res = await request<number>('db/dbsize', connection.id, {
-          db: db.database
+        runInAction(() => {
+          connection.dbs = dbs
         })
-        db.count = res.data
-        dbs.push(db)
       }
+      const version = await request<string>('server/version', connection.id)
       runInAction(() => {
-        connection.dbs = dbs
+        connection.version = version.data
+        connection.open = true
+        connection.loading = false
       })
-    }
-    const version = await request<string>('server/version', connection.id)
-    runInAction(() => {
-      connection.version = version.data
-      connection.open = true
+    }catch (e) {
       connection.loading = false
-    })
+      connection.open = false
+      connection.err = e as string
+    }
+
   }
 
   async open(id: number) {

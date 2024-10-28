@@ -25,10 +25,9 @@ pub async fn add<'r>(
     manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
-    let i: i64 = manager
+    manager
         .execute(cid, cmd("CF.ADD").arg(args.name).arg(args.value), args.db)
-        .await?;
-    Ok(i)
+        .await
 }
 
 pub async fn insert<'r>(
@@ -37,14 +36,13 @@ pub async fn insert<'r>(
     manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let i: Vec<i64> = manager
+     manager
         .execute(
             cid,
             cmd("CF.INSERT").arg(args.name).arg(("ITEMS", args.value)),
             args.db,
         )
-        .await?;
-    Ok(i)
+        .await
 }
 
 pub async fn insertnx<'r>(
@@ -53,14 +51,11 @@ pub async fn insertnx<'r>(
     manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let i: Vec<i64> = manager
-        .execute(
+    manager.execute(
             cid,
             cmd("CF.INSERTNX").arg(args.name).arg(("ITEMS", args.value)),
             args.db,
-        )
-        .await?;
-    Ok(i)
+        ).await
 }
 
 pub async fn addnx<'r>(
@@ -107,11 +102,9 @@ pub async fn count<'r>(
     manager: tauri::State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
-
-    let value: i64 = manager
+    manager
         .execute(cid, cmd("CF.COUNT").arg(args.name).arg(args.value), args.db)
-        .await?;
-    Ok(value)
+        .await
 }
 
 pub async fn exists<'r>(
@@ -121,14 +114,13 @@ pub async fn exists<'r>(
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
 
-    let value: i64 = manager
+   manager
         .execute(
             cid,
             cmd("CF.EXISTS").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
 pub async fn mexists<'r>(
@@ -138,14 +130,13 @@ pub async fn mexists<'r>(
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
 
-    let value: Vec<i64> = manager
+    manager
         .execute(
             cid,
             cmd("CF.MEXISTS").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
 #[derive(Deserialize)]
@@ -175,5 +166,5 @@ pub async fn reserve<'r>(
     if let Some(i) = args.expansion {
         cmd.arg(("EXPANSION", i));
     }
-    Ok(manager.execute(cid, &mut cmd, args.db).await?)
+    manager.execute(cid, &mut cmd, args.db).await
 }

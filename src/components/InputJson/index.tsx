@@ -62,7 +62,11 @@ const InputJson: React.FC<InputJsonProps> = (props) => {
     } else {
       const onChange = readOnly ? undefined : onJsonChange
       return (
-        <Card bodyStyle={{ padding: 8 }}>
+        <Card styles={
+          {
+            body: { padding: 8 }
+          }
+        }>
           <JsonView
             style={{
               wordBreak: 'break-all'

@@ -11,7 +11,6 @@ use crate::{
 };
 use crate::{request, utils};
 
-use redis::FromRedisValue;
 use redis::Value;
 use serde::Deserialize;
 
@@ -192,17 +191,16 @@ pub async fn add<'r>(
     let args: AddArgs = serde_json::from_str(&payload)?;
     match args.types.as_str() {
         "string" => {
-            let v: Value = manager
+            return manager
                 .execute(
                     cid,
                     redis::cmd("set").arg(&args.name).arg(args.value),
                     Some(args.db),
                 )
-                .await?;
-            return Ok(String::from_redis_value(&v)?);
+                .await
         }
         "ReJSON-RL" => {
-            let v: String = manager
+            return manager
                 .execute(
                     cid,
                     redis::cmd("JSON.SET")
@@ -211,8 +209,7 @@ pub async fn add<'r>(
                         .arg(args.value),
                     Some(args.db),
                 )
-                .await?;
-            return Ok(v.to_string());
+                .await;
         }
         _ => {}
     }
@@ -257,15 +254,22 @@ pub async fn restore<'r>(
     manager.execute(cid, &mut cmd, Some(args.db)).await
 }
 
-pub async fn object<'r>(
+pub async fn object(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let version = manager.get_version(cid).await?;
     let mut resp: Vec<Field> = vec![];
+    let config = manager.get_config(cid, "maxmemory-policy").await?;
+    let mut maxmemory_policy = "noeviction".to_string();
+    if let Some(c) = config.get(0) {
+        if let FieldValue::Str(policy) = &c.value {
+            maxmemory_policy = policy.clone();
+        }
 
+    }
     if compare_version(&version, "2.2.3") > -1 {
         let s: CValue = manager
             .execute(
@@ -280,7 +284,7 @@ pub async fn object<'r>(
         })
     }
 
-    if compare_version(&version, "4.0.0") > -1 {
+    if compare_version(&version, "4.0.0") > -1 && maxmemory_policy.contains("lfu") {
         let s: CValue = manager
             .execute(
                 cid,
@@ -294,7 +298,7 @@ pub async fn object<'r>(
         })
     }
 
-    if compare_version(&version, "2.2.3") > -1 {
+    if compare_version(&version, "2.2.3") > -1 && !maxmemory_policy.contains("lfu"){
         let s: CValue = manager
             .execute(
                 cid,

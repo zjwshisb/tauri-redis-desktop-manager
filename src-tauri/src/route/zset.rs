@@ -440,7 +440,6 @@ struct ZRangeStoreArgs {
     min: String,
     max: String,
     order: Option<String>,
-    rev: Option<bool>,
     offset: Option<String>,
     count: Option<String>,
     db: Option<u8>,
