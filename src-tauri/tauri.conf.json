@@ -16,6 +16,7 @@
     ],
     "targets": "all"
   },
+  "$schema": "https://schema.tauri.app/config/2",
   "productName": "Tauri Desktop Redis Manager",
   "mainBinaryName": "Tauri Desktop Redis Manager",
   "version": "0.1.1",

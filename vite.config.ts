@@ -15,6 +15,7 @@ export default defineConfig(async () => ({
   build: {
     rollupOptions: {
       input: {
+        main: path.resolve(__dirname, 'index.html'),
         database: path.resolve(__dirname, 'src/windows/database/index.html'),
         detail: path.resolve(__dirname, 'src/windows/detail/index.html'),
         log: path.resolve(__dirname, 'src/windows/log/index.html'),
