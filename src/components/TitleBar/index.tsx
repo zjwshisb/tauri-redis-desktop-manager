@@ -15,7 +15,7 @@ const TitleBar: React.FC = () => {
   }, [platform])
 
   return (
-    <div className="flex justify-between h-9">
+    <div className="flex justify-between h-9 flex-shrink-0">
       {children}
     </div>
   )
