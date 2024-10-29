@@ -4,6 +4,7 @@ import { getAllWebviewWindows } from '@tauri-apps/api/webviewWindow'
 import pageStore from './page'
 import keysStore from './key'
 import collectionStore from './collection'
+import { versionCompare } from '@/utils'
 
 interface Form {
   open: boolean
@@ -69,6 +70,12 @@ class ConnectionStore {
         })
       }
       const version = await request<string>('server/version', connection.id)
+      if (versionCompare(version.data, "4.0.0")) {
+        const modules = await request<APP.Module[]>('server/module', connection.id)
+        runInAction(() =>{
+          connection.modules = modules.data
+        })
+      }
       runInAction(() => {
         connection.version = version.data
         connection.open = true

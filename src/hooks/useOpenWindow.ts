@@ -1,7 +1,6 @@
 import { openWindow } from '@/utils'
 import { WebviewLabel, WebviewOptions } from '@tauri-apps/api/webview'
 import { TauriEvent } from '@tauri-apps/api/event'
-import { Window } from '@tauri-apps/api/window'
 import React from 'react'
 export function useOpenWindow(
   label: WebviewLabel,
@@ -19,7 +18,7 @@ export function useOpenWindow(
       })
       return window
     })
-  }, [label, options])
+  }, [label, options, title])
 
   return {
     active,

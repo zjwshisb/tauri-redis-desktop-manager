@@ -158,7 +158,7 @@ impl Manager {
         &self,
         wrapper: &mut ConnectionWrapper,
     ) -> Result<Vec<Node>, CusError> {
-        if !wrapper.model.get_is_cluster() {
+        if !wrapper.model.is_cluster() {
             return Err(CusError::App(String::from("Not a Cluster Server")));
         }
         if wrapper.nodes.len() == 0 {
@@ -206,12 +206,7 @@ impl Manager {
         }
     }
     // execute redis cmd with cid
-    pub async fn execute<T>(
-        &self,
-        cid: u32,
-        cmd: &mut Cmd,
-        db: Option<u8>,
-    ) -> Result<T, CusError>
+    pub async fn execute<T>(&self, cid: u32, cmd: &mut Cmd, db: Option<u8>) -> Result<T, CusError>
     where
         T: FromRedisValue,
     {
@@ -219,7 +214,9 @@ impl Manager {
             if !conn.is_cluster() {
                 if let Some(database) = db {
                     if database != conn.db {
-                        let _ = self.execute_with(redis::cmd("select").arg(db), conn).await?;
+                        let _ = self
+                            .execute_with(redis::cmd("select").arg(db), conn)
+                            .await?;
                         conn.db = database
                     }
                 }
@@ -252,7 +249,6 @@ impl Manager {
         }
         Err(CusError::connection_not_found())
     }
-
 
     // get connected connections info
     pub async fn get_conns(&self) -> Vec<response::Conn> {

@@ -30,8 +30,6 @@ pub async fn kill<'r>(
         .await?;
     match count {
         0 => Err(CusError::build("Client has been kill")),
-        _ => {
-            Ok(count)
-        }
+        _ => Ok(count),
     }
 }

@@ -35,7 +35,9 @@ const Pubsub: React.FC<{
         term.current?.writeln('1) "message"')
         term.current?.writeln(`2) "${message.data.channel}"`)
         term.current?.writeln(`3) "${message.data.payload}"`)
-      } catch (e) {}
+      } catch (e) {
+        console.log(e)
+      }
     },
     getCurrentWindow(),
     async (name) => {

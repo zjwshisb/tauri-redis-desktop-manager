@@ -30,9 +30,7 @@ impl serde::Serialize for CValue {
         S: serde::Serializer,
     {
         match &self {
-            CValue::Str(s) => {
-                serializer.serialize_str(s)
-            }
+            CValue::Str(s) => serializer.serialize_str(s),
             CValue::Vec(v) => v.serialize(serializer),
             CValue::Int(v) => v.serialize(serializer),
             CValue::Nil => serializer.serialize_none(),
@@ -51,9 +49,7 @@ impl CValue {
             RedisValue::BulkString(s) => {
                 let result = String::from_utf8(s.clone());
                 match result {
-                    Ok(ss) => {
-                        Self::Str(ss)
-                    }
+                    Ok(ss) => Self::Str(ss),
                     Err(_) => {
                         let ss = String::from_utf8_lossy(&s).to_string();
                         Self::Str(ss)

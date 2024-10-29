@@ -268,7 +268,6 @@ pub async fn object(
         if let FieldValue::Str(policy) = &c.value {
             maxmemory_policy = policy.clone();
         }
-
     }
     if compare_version(&version, "2.2.3") > -1 {
         let s: CValue = manager
@@ -298,7 +297,7 @@ pub async fn object(
         })
     }
 
-    if compare_version(&version, "2.2.3") > -1 && !maxmemory_policy.contains("lfu"){
+    if compare_version(&version, "2.2.3") > -1 && !maxmemory_policy.contains("lfu") {
         let s: CValue = manager
             .execute(
                 cid,

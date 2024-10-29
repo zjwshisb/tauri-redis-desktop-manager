@@ -4,7 +4,7 @@ use serde::Deserialize;
 use crate::{
     connection::{CValue, Manager},
     err::CusError,
-    request::{self, CommonValueArgs, FieldValueArgs, NameArgs, RangeArgs},
+    request::{CommonValueArgs, FieldValueArgs, NameArgs, RangeArgs},
 };
 
 #[derive(Deserialize)]
@@ -36,9 +36,7 @@ pub async fn bl_move<'r>(
         )
         .await?;
     match v {
-        Value::Nil => {
-            Err(CusError::build("Timeout is reached."))
-        }
+        Value::Nil => Err(CusError::build("Timeout is reached.")),
         _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
@@ -68,9 +66,7 @@ pub async fn blm_pop<'r>(
     }
     let v: Value = manager.execute(cid, &mut cmd, args.db).await?;
     match v {
-        Value::Nil => {
-            Err(CusError::build("No element could be popped."))
-        }
+        Value::Nil => Err(CusError::build("No element could be popped.")),
         _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
@@ -89,11 +85,9 @@ pub async fn bl_pop<'r>(
         )
         .await?;
     match v {
-        Value::Nil => {
-            Err(CusError::build(
-                "No element could be popped and the timeout expired",
-            ))
-        }
+        Value::Nil => Err(CusError::build(
+            "No element could be popped and the timeout expired",
+        )),
         _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
@@ -112,11 +106,9 @@ pub async fn br_pop<'r>(
         )
         .await?;
     match v {
-        Value::Nil => {
-            Err(CusError::build(
-                "No element could be popped and the timeout expired",
-            ))
-        }
+        Value::Nil => Err(CusError::build(
+            "No element could be popped and the timeout expired",
+        )),
         _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
@@ -138,9 +130,7 @@ pub async fn br_pop_lpush<'r>(
         )
         .await?;
     match v {
-        Value::Nil => {
-            Err(CusError::build("Timeout is reached."))
-        }
+        Value::Nil => Err(CusError::build("Timeout is reached.")),
         _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
@@ -184,9 +174,7 @@ pub async fn lm_pop<'r>(
     }
     let v: Value = manager.execute(cid, &mut cmd, args.db).await?;
     match v {
-        Value::Nil => {
-            Err(CusError::build("No element could be popped."))
-        }
+        Value::Nil => Err(CusError::build("No element could be popped.")),
         _ => Ok(CValue::from_redis_value(&v)?),
     }
 }
@@ -420,9 +408,7 @@ pub async fn rpop_lpush<'r>(
         )
         .await?;
     match v {
-        Value::Nil => {
-            Err(CusError::build("The source list is empty."))
-        }
+        Value::Nil => Err(CusError::build("The source list is empty.")),
         _ => Ok(CValue::from_redis_value(&v)?),
     }
 }

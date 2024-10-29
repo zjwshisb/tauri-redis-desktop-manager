@@ -36,7 +36,7 @@ pub async fn insert<'r>(
     manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-     manager
+    manager
         .execute(
             cid,
             cmd("CF.INSERT").arg(args.name).arg(("ITEMS", args.value)),
@@ -51,11 +51,13 @@ pub async fn insertnx<'r>(
     manager: tauri::State<'r, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    manager.execute(
+    manager
+        .execute(
             cid,
             cmd("CF.INSERTNX").arg(args.name).arg(("ITEMS", args.value)),
             args.db,
-        ).await
+        )
+        .await
 }
 
 pub async fn addnx<'r>(
@@ -114,7 +116,7 @@ pub async fn exists<'r>(
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
 
-   manager
+    manager
         .execute(
             cid,
             cmd("CF.EXISTS").arg(args.name).arg(args.value),

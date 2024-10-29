@@ -101,12 +101,12 @@ class PageStore {
       await this.openPageInNewWindow(page)
       this.removePage(key)
     } else {
-      return await Promise.reject(new Error('Page Not Found'))
+      throw new Error('Page Not Found')
     }
   }
 
   async openPageInNewWindow(p: Page) {
-    let url = ''
+    let url : string;
     if (p.connection !== undefined) {
       url = `/src/windows/detail/index.html?type=${p.type}&cid=${
         p.connection?.id
@@ -166,7 +166,7 @@ class PageStore {
         url
       })
     } else {
-      return await Promise.reject(new Error('invalid page'))
+      throw new Error('invalid page')
     }
   }
 
@@ -178,7 +178,7 @@ class PageStore {
   ) {
     let key = `${name}|${type}`
     if (conn != null) {
-      key = `${conn.id}|` + key
+      key = `${conn.name}|` + key
     }
     if (db !== undefined && type === 'key') {
       key += `@${db}`
@@ -189,7 +189,7 @@ class PageStore {
   getPageLabel(page: Omit<Page, 'label'>) {
     let label = `${page.name}`
     if (page.connection !== undefined) {
-      label = `${page.connection.id}|${label}`
+      label = `${page.connection.name}|${label}`
     }
     if (page.db != null) {
       label += `@${page.db}`
@@ -202,7 +202,7 @@ class PageStore {
     if (window.isMultiWindow()) {
       this.addPage(page)
     } else {
-      this.openPageInNewWindow(page)
+      this.openPageInNewWindow(page).then()
     }
   }
 

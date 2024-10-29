@@ -84,7 +84,7 @@ export default function CusTable<T extends object>(
   React.useLayoutEffect(() => {
     const div = container.current
     if (div !== null) {
-      const observer = new ResizeObserver((entries) => {
+      const observer = new ResizeObserver(() => {
         getScrollX.run()
       })
       observer.observe(div)

@@ -7,9 +7,7 @@ import useStore from '@/hooks/useStore'
 import ResizableDiv from '@/components/ResizableDiv'
 import {
   ReloadOutlined,
-  KeyOutlined,
-  WindowsOutlined,
-  QuestionOutlined
+  WindowsOutlined
 } from '@ant-design/icons'
 import VirtualKeyList from './components/VirtualKeyList'
 import LoadMore from '@/components/LoadMore'
@@ -54,7 +52,7 @@ const Index: React.FC<{
   const getListHeight = React.useCallback(() => {
     const container = document.getElementById(id)
     if (container != null) {
-      setListHeight(container.clientHeight - 102 - 30)
+      setListHeight(container.clientHeight - 102 - 33)
     }
   }, [id])
 
@@ -71,7 +69,7 @@ const Index: React.FC<{
     return () => {
       window.removeEventListener('resize', getListHeightDb.run)
     }
-  }, [getListHeightDb])
+  }, [getListHeightDb.run])
 
   const { keys, getAllKeys, getKeys, more } = useKeyScan(
     info.connection,
@@ -91,7 +89,7 @@ const Index: React.FC<{
   )
 
   React.useEffect(() => {
-    getKeys(true)
+    getKeys(true).then()
   }, [getKeys])
 
   return (
@@ -177,7 +175,7 @@ const Index: React.FC<{
                       title: 'Refresh'
                     }}
                     onClick={() => {
-                      getKeys(true)
+                      getKeys(true).then()
                     }}
                     icon={<ReloadOutlined className="text-lg" />}
                   ></CusButton>
@@ -218,7 +216,7 @@ const Index: React.FC<{
                 loading={loading}
                 onGetAll={getAllKeys}
                 onGet={() => {
-                  getKeys()
+                  getKeys().then()
                 }}
               />
             </Container>

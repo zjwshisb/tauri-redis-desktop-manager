@@ -14,7 +14,7 @@ const TypeSelect: React.FC<{
 }> = (props) => {
   const { t } = useTranslation()
 
-  const keyTypes = useKeyTypes(true)
+  const keyTypes = useKeyTypes(props.connection, true)
 
   const options = React.useMemo(() => {
     return [

@@ -20,6 +20,14 @@ declare namespace APP {
     open?: boolean
     err?: string
     loading?: boolean
+    modules?: Module[]
+  }
+
+  interface Module {
+    name: string
+    ver: string
+    args: string
+    path: string
   }
 
   interface Database {

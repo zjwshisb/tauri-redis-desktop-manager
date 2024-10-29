@@ -36,7 +36,9 @@ const Monitor: React.FC<{
         } else {
           term.current?.writeln(message.data)
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log(e)
+      }
     },
     getCurrentWindow(),
     async (name) => {

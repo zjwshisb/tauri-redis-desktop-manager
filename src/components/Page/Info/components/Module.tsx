@@ -1,27 +1,13 @@
 import React from 'react'
 import { Card } from 'antd'
 import { useTranslation } from 'react-i18next'
-import request from '@/utils/request'
-import useRequest from '@/hooks/useRequest'
 import CusTable from '@/components/CusTable'
-
-interface ModuleInterface {
-  name: string
-  ver: string
-  args: string
-  path: string
-}
 
 const Module: React.FC<{
   connection: APP.Connection
 }> = ({ connection }) => {
+
   const { t } = useTranslation()
-
-  const { data } = useRequest<ModuleInterface[]>('server/module', connection.id)
-
-  React.useEffect(() => {
-    request('server/module', connection.id)
-  }, [connection])
 
   return (
     <Card title={t('Module')} className="w-full">
@@ -29,7 +15,7 @@ const Module: React.FC<{
         virtual={false}
         rowKey={'name'}
         showFooter={false}
-        dataSource={data}
+        dataSource={connection.modules || []}
         columns={[
           { dataIndex: 'name', title: 'name', align: 'center' },
           { dataIndex: 'ver', title: 'ver', align: 'center' },

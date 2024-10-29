@@ -55,7 +55,7 @@ export function useEventListen<T = string>(
     } else {
       cancelFn.current = await  listen(r, handleFn.current)
     }
-  }, [clearFn, eventNameRef, handleFn])
+  }, [clearFn, eventNameRef, handleFn, window])
 
   React.useEffect(() => {
     if (!init.current && immediately) {
@@ -70,7 +70,7 @@ export function useEventListen<T = string>(
         clearFn().then()
       }
     }
-  }, [clearFn])
+  }, [clearFn, immediately])
 
   return {
     listen: listenFn,

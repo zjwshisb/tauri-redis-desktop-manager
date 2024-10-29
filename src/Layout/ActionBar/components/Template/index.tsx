@@ -2,7 +2,6 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 
 import { useTranslation } from 'react-i18next'
-import classNames from 'classnames'
 import InteractiveContainer from '@/components/InteractiveContainer'
 const Template: React.FC<{
   icon: React.ReactElement
@@ -10,8 +9,9 @@ const Template: React.FC<{
   title: string
   active?: boolean
 }> = ({ icon, onClick, title, active }) => {
+ 
   const { t } = useTranslation()
-
+  
   return (
     <InteractiveContainer
       onClick={onClick}

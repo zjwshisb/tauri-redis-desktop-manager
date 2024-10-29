@@ -55,7 +55,6 @@ impl connection::Connectable for Connection {
         connection::ConnectionParams {
             redis_params,
             ssh_params,
-            model_name: String::from("connection"),
             is_cluster: self.is_cluster,
         }
     }

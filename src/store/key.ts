@@ -28,7 +28,7 @@ class KeysStore {
   newWindow(connection: APP.Connection, db: number = 0) {
     openWindow(`${connection.id}-${db}`, `${connection.name}@${db}`, {
       url: `src/windows/database/index.html?cid=${connection.id}&db=${db}`
-    })
+    }).then()
   }
 }
 const obj = new KeysStore()

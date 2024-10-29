@@ -2,7 +2,6 @@ import React from 'react'
 import { isString } from 'lodash'
 import CusButton from '@/components/CusButton'
 
-
 export function useTrigger(trigger?: React.ReactElement|string, title?: React.ReactNode){
   return React.useMemo(() => {
     if (trigger !== undefined) {

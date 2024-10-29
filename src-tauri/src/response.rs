@@ -170,19 +170,13 @@ impl Field {
                         Value::SimpleString(s) => {
                             f.value = FieldValue::Str(s.to_string());
                         }
-                        Value::Map(v) => {
-
-                        },
+                        Value::Map(v) => {}
                         Value::Attribute { data, attributes } => todo!(),
-                        Value::Set(v) => {
-
-                        },
+                        Value::Set(v) => {}
                         Value::Double(_) => todo!(),
                         Value::Boolean(_) => todo!(),
                         Value::VerbatimString { format, text } => todo!(),
-                        Value::BigNumber(big_int) => {
-                            f.value = FieldValue::Str(big_int.to_string())
-                        },
+                        Value::BigNumber(big_int) => f.value = FieldValue::Str(big_int.to_string()),
                         Value::Push { kind, data } => todo!(),
                         Value::ServerError(server_error) => todo!(),
                     }

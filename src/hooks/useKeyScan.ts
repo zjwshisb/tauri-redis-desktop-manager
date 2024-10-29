@@ -149,6 +149,7 @@ export default function useKeyScan(
     keys,
     getKeys,
     more,
-    getAllKeys
+    getAllKeys,
+    cursor
   }
 }

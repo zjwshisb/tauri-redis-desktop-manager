@@ -12,7 +12,7 @@ const TitleBar: React.FC = () => {
       default:
         return <Normal />
     }
-  }, [])
+  }, [platform])
 
   return (
     <div className="flex justify-between h-9">

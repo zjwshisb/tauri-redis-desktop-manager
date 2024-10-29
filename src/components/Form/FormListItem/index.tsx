@@ -24,7 +24,7 @@ const FormListItem: React.FC<FormListItemProps> = (p) => {
   return (
     <Form.Item {...others} label={label} className="!mb-0">
       <Form.List name={name}>
-        {(fields, { add, remove }, { errors }) => (
+        {(fields, { add, remove }) => (
           <>
             {fields.length === 0 && canBeZero && (
               <CusButton

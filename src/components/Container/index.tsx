@@ -13,7 +13,7 @@ const Container: React.FC<
   return (
     <div
       {...other}
-      // eslint-disable-next-line react/prop-types
+       
       className={classNames([
         level === 4 &&
           'bg-white dark:bg-gray-10 text-neutral-text-2 dark:text-neutral-text-2-dark',

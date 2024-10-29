@@ -5,12 +5,21 @@ interface KeyTypeItem {
   label: string
   value: APP.Key['sub_types']
   searchable: boolean
+  disabled?: boolean
 }
 
 export default function useKeyTypes(
-  searchable: boolean = false
+  connection: APP.Connection,
+  searchable: boolean = false,
 ): KeyTypeItem[] {
   const { t } = useTranslation()
+
+  const bloomDisabled = React.useMemo(() => {
+    return (connection.modules?.find(v => {
+      return v.name.toLowerCase().includes('bf')
+    })) == null
+  }, [connection.modules])
+
   return React.useMemo(() => {
     return [
       {
@@ -39,44 +48,55 @@ export default function useKeyTypes(
         searchable: true
       },
       {
+        label: t('HyperLogLog'),
+        value: 'HyperLogLog',
+        searchable: false
+      },
+      {
         label: t('JSON'),
         value: 'ReJSON-RL',
-        searchable: true
+        searchable: true,
+        disabled: (connection.modules?.find(v => {
+          return v.name.toLowerCase().includes('rejson')
+        })) == null
       },
       {
         label: t('Top-k'),
         value: 'TopK-TYPE',
-        searchable: true
+        searchable: true,
+        disabled: bloomDisabled
       },
       {
         label: t('Time Series'),
         value: 'TSDB-TYPE',
-        searchable: true
+        searchable: true,
+        disabled: (connection.modules?.find(v => {
+          return v.name.toLowerCase().includes('timeseries')
+        })) == null
       },
       {
         label: t('T-Digest'),
         value: 'TDIS-TYPE',
-        searchable: true
+        searchable: true,
+        disabled: bloomDisabled
       },
       {
         label: t('Bloom Filter'),
         value: 'MBbloom--',
-        searchable: true
+        searchable: true,
+        disabled: bloomDisabled
       },
       {
         label: t('Cuckoo Filter'),
         value: 'MBbloomCF',
-        searchable: true
+        searchable: true,
+        disabled: bloomDisabled
       },
       {
         label: t('Count-Min Sketch'),
         value: 'CMSk-TYPE',
-        searchable: true
-      },
-      {
-        label: t('HyperLogLog'),
-        value: 'HyperLogLog',
-        searchable: false
+        searchable: true,
+        disabled: bloomDisabled
       }
     ].filter((v) => {
       if (searchable) {
@@ -84,5 +104,5 @@ export default function useKeyTypes(
       }
       return true
     })
-  }, [t, searchable]) as KeyTypeItem[]
+  }, [t, bloomDisabled, connection.modules, searchable]) as KeyTypeItem[]
 }

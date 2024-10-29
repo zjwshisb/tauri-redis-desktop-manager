@@ -5,7 +5,6 @@ import {
   ReloadOutlined,
   WarningOutlined,
   LoadingOutlined,
-  RightSquareOutlined
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
@@ -72,7 +71,7 @@ const Connection: React.FC<{
 
   const height = React.useMemo(() => {
     if (connection.open === true && collapse) {
-      let count = 0
+      let count: number
       if (connection.is_cluster) {
         count = connection.nodes !== undefined ? connection.nodes.length : 0
       } else {

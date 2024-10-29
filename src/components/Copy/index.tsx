@@ -3,7 +3,6 @@ import React from 'react'
 import { App, type ButtonProps } from 'antd'
 import { useTranslation } from 'react-i18next'
 import CusButton from '../CusButton'
-import classNames from 'classnames'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 
 const Copy: React.FC<
@@ -28,7 +27,7 @@ const Copy: React.FC<
     setTimeout(() => {
       setShowSuccess(false)
     }, 1000)
-  }, [content, t])
+  }, [content, message, t])
 
   const icon = React.useMemo(() => {
     if (showSuccess) {

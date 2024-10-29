@@ -28,9 +28,7 @@ pub async fn set<'r>(
         )
         .await?;
     match v {
-        Value::Nil => {
-            Err(CusError::build("NX or XX conditions were not met"))
-        }
+        Value::Nil => Err(CusError::build("NX or XX conditions were not met")),
         _ => Ok(String::from_redis_value(&v)?),
     }
 }

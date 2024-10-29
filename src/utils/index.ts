@@ -3,7 +3,6 @@ import { WebviewLabel, WebviewOptions } from '@tauri-apps/api/webview'
 import { store } from '@/store'
 import { Window } from '@tauri-apps/api/window'
 import { Webview } from '@tauri-apps/api/webview'
-import _ from 'lodash'
 
 export function versionCompare(v1: string, v2: string) {
   const sources = v1.split('.')

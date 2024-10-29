@@ -25,7 +25,7 @@ const Plus: React.FC<{
   onSuccess: (name: string) => void
   info: KeyInfo
 }> = (props) => {
-  const keyTypes = useKeyTypes()
+  const keyTypes = useKeyTypes(props.info.connection)
 
   const form = React.useRef<FormInstance>(null)
 

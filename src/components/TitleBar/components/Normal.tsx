@@ -19,8 +19,7 @@ const TitleBar: React.FC = () => {
       return window.label
     }
     return appName
-  }, [appName])
-
+  }, [appName, window.label])
 
   return (
     <>
@@ -30,9 +29,11 @@ const TitleBar: React.FC = () => {
         className="flex-1 h-full cursor-move flex justify-center items-center text-ellipsis"
         onMouseDown={(e) => {
           if (e.buttons === 1) {
-            e.detail === 2
-              ? window.toggleMaximize() // Maximize on double click
-              : window.startDragging()
+            if (e.detail === 2) {
+              window.toggleMaximize().then()
+            } else {
+              window.startDragging().then()
+            }
           } else {
             e.preventDefault()
           }

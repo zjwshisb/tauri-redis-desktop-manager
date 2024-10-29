@@ -112,11 +112,11 @@ const KeyAnalysis: React.FC<{
 
   const continueAnalysis = React.useCallback(() => {
     if (isInit()) {
-      message.error('All Key Had Down')
+      message.error('All Key Had Down').then()
     } else {
       analysis(cacheRef.current, false)
     }
-  }, [analysis, isInit])
+  }, [analysis, isInit, message])
 
   const sortKeys = React.useMemo(() => {
     const number = sort === 'desc' ? -1 : 1

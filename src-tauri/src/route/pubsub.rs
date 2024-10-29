@@ -1,12 +1,12 @@
-use futures::StreamExt;
 use crate::connection::{Connectable, Connection, Manager};
-use crate::err::{CusError};
+use crate::err::CusError;
 use crate::pubsub::{PubsubItem, PubsubManager};
 use crate::response::EventResp;
 use crate::sqlite::Connection as ConnectionModel;
 use crate::utils;
+use futures::StreamExt;
 
-use redis::{FromRedisValue};
+use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
 
 use tauri::Emitter;
@@ -82,6 +82,8 @@ pub async fn subscribe<'r>(
                                     String::from(event_str),
                                 );
                                 let _ = window.emit(event_str, serde_json::to_string(&r)?);
+                            } else {
+                                break
                             }
                         }
                         Ok::<(), CusError>(())
@@ -109,7 +111,8 @@ pub async fn publish<'r>(
     manager: State<'r, Manager>,
 ) -> Result<i64, CusError> {
     let args: PublishArgs = serde_json::from_str(&payload)?;
-    manager.execute(
+    manager
+        .execute(
             cid,
             redis::cmd("publish").arg(args.channel).arg(args.value),
             Some(args.db),
@@ -123,7 +126,7 @@ pub async fn monitor<'r>(
     cid: u32,
 ) -> Result<String, CusError> {
     let model = ConnectionModel::first(cid)?;
-    let mut connection = Connection::new(model.get_params());
+    let connection = Connection::new(model.get_params());
 
     let event_name = utils::random_str(32);
     let event_name_resp = event_name.clone();

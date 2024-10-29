@@ -50,7 +50,8 @@ const CusButton: React.FC<
     return button
   }
 
-  let { title, placement = 'bottom', ...otherTooltipProps } = tooltip
+  const { placement = 'bottom', ...otherTooltipProps } = tooltip
+  let title = tooltip.title
 
   if (isString(title)) {
     title = t(title)

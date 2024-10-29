@@ -21,7 +21,6 @@ export function CusFormItem<T extends Record<string, any>>(
     requiredMsg = 'Please enter {{name}}',
     label = '',
     render,
-    inputProps,
     tooltip = undefined,
     span,
     ...other

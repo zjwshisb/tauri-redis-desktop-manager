@@ -59,9 +59,7 @@ const ConnectionSelect: React.FC<{
                 if (conn !== undefined) {
                   setConnection(conn)
                   if (conn.open !== true) {
-                    try {
-                      await store.connection.open(conn.id)
-                    } catch (e) {}
+                    await store.connection.open(conn.id)
                   }
                 }
               }

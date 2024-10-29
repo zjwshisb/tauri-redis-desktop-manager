@@ -17,9 +17,9 @@ use redis::{
     AsyncConnectionConfig,
 };
 
+use redis::aio::Monitor;
 use ssh_jumper::model::SshForwarderEnd;
 use std::net::SocketAddr;
-use redis::aio::Monitor;
 use tokio::sync::oneshot::Receiver;
 
 #[derive(Clone, Debug)]
@@ -49,7 +49,6 @@ impl redis::IntoConnectionInfo for ConnectedParam {
 pub struct ConnectionParams {
     pub redis_params: ConnectedParam,
     pub ssh_params: Option<ssh::SshParams>,
-    pub model_name: String,
     pub is_cluster: bool,
 }
 
@@ -103,7 +102,7 @@ impl Connection {
         None
     }
     // the server is cluster or not
-    pub fn get_is_cluster(&self) -> bool {
+    pub fn is_cluster(&self) -> bool {
         self.params.is_cluster
     }
     // get the connection host
@@ -126,17 +125,13 @@ impl Connection {
         params
     }
 
-    pub async fn get_monitor(&self)  -> Result<Monitor, CusError>  {
+    pub async fn get_monitor(&self) -> Result<Monitor, CusError> {
         let params = self.get_connected_params();
         let client = Client::open(params)?;
         let result = client.get_async_monitor().await;
         match result {
-            Ok(c) => {
-                Ok(c)
-            }
-            Err(e) => {
-                Err(CusError::App(e.to_string()))
-            }
+            Ok(c) => Ok(c),
+            Err(e) => Err(CusError::App(e.to_string())),
         }
     }
 
@@ -145,12 +140,8 @@ impl Connection {
         let client = Client::open(params)?;
         let result = client.get_connection();
         match result {
-            Ok(c) => {
-                Ok(c)
-            }
-            Err(e) => {
-                Err(CusError::App(e.to_string()))
-            }
+            Ok(c) => Ok(c),
+            Err(e) => Err(CusError::App(e.to_string())),
         }
     }
 
@@ -159,12 +150,8 @@ impl Connection {
         let client = ClusterClient::new(vec![params])?;
         let result = client.get_connection();
         match result {
-            Ok(c) => {
-                Ok(c)
-            }
-            Err(e) => {
-                Err(CusError::App(e.to_string()))
-            }
+            Ok(c) => Ok(c),
+            Err(e) => Err(CusError::App(e.to_string())),
         }
     }
 
@@ -184,14 +171,10 @@ impl Connection {
         ssh::create_tunnel(self).await?;
         let params = self.get_connected_params();
         let client = ClusterClient::new(vec![params])?;
-        let r= client.get_async_connection().await;
+        let r = client.get_async_connection().await;
         match r {
-            Ok(connection) =>  {
-                Ok(connection)
-            },
-            Err(_) => {
-                Err(CusError::App(String::from("Connection Timeout")))
-            }
+            Ok(connection) => Ok(connection),
+            Err(_) => Err(CusError::App(String::from("Connection Timeout"))),
         }
     }
 }
@@ -203,7 +186,7 @@ pub struct ConnectionWrapper {
     pub db: u8,
     pub created_at: DateTime<Local>,
     pub model: Connection,
-    pub version: Option<String>
+    pub version: Option<String>,
 }
 
 impl ConnectionWrapper {
@@ -233,7 +216,7 @@ impl ConnectionWrapper {
     }
 
     pub fn is_cluster(&self) -> bool {
-        self.model.get_is_cluster()
+        self.model.is_cluster()
     }
 
     // execute the redis command

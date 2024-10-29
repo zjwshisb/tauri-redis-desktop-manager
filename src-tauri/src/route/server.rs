@@ -23,7 +23,7 @@ pub async fn ping<'r>(
     let params: Connection = serde_json::from_str(payload.as_str())?;
     let mut conn = ConnectionWrapper::build(params).await?;
     let _ = manager
-        .execute_with(&mut redis::cmd("ping"), &mut conn)
+        .execute_with::<String>(&mut redis::cmd("ping"), &mut conn)
         .await?;
     Ok(String::from("PONG"))
 }

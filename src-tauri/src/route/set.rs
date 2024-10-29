@@ -37,12 +37,8 @@ pub async fn sadd<'r>(
         )
         .await?;
     match value {
-        0 => {
-            Err(CusError::build("Value already exists in Set"))
-        }
-        _ => {
-            Ok(value)
-        }
+        0 => Err(CusError::build("Value already exists in Set")),
+        _ => Ok(value),
     }
 }
 
@@ -60,12 +56,8 @@ pub async fn srem<'r>(
         )
         .await?;
     match value {
-        0 => {
-            Err(CusError::build("Member not exists in Set"))
-        }
-        _ => {
-            Ok(value)
-        }
+        0 => Err(CusError::build("Member not exists in Set")),
+        _ => Ok(value),
     }
 }
 
@@ -198,11 +190,9 @@ pub async fn smove<'r>(
         )
         .await?;
     match v {
-        0 => {
-            Err(CusError::build(
-                "element is not a member of source and no operation was performed",
-            ))
-        }
+        0 => Err(CusError::build(
+            "element is not a member of source and no operation was performed",
+        )),
         i => Ok(i),
     }
 }

@@ -30,7 +30,9 @@ const InputJson: React.FC<InputJsonProps> = (props) => {
           setJsonValue(json)
           setTypes('json')
         }
-      } catch (err) {}
+      } catch (err) {
+        console.log(err)
+      }
     }
   }, [defaultValue])
 
@@ -40,7 +42,9 @@ const InputJson: React.FC<InputJsonProps> = (props) => {
         if (onChange !== undefined) {
           onChange(JSON.stringify(e.updated_src))
         }
-      } catch (err) {}
+      } catch (err) {
+        console.log(err)
+      }
     },
     [onChange]
   )
@@ -102,7 +106,9 @@ const InputJson: React.FC<InputJsonProps> = (props) => {
             } else {
               try {
                 setJsonValue(JSON.parse(value))
-              } catch (e) {}
+              } catch (e) {
+                console.log(e)
+              }
             }
           }}
           value={types}

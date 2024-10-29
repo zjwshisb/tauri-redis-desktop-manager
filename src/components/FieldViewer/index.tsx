@@ -61,16 +61,18 @@ const FieldViewer: React.FC<{
         if (lodash.isObject(u)) {
           type = 'json'
         }
-      } catch (_) {}
+      } catch (e) {
+        console.log(e)
+      }
       setTypes(type)
-      change(type, content)
+      change(type, content).then()
       setInit(true)
     }
   }, [change, content, init])
 
   React.useEffect(() => {
     if (init) {
-      change(types, content)
+      change(types, content).then()
     }
   }, [content, change, types, init])
 

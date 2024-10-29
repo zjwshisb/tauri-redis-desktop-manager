@@ -39,7 +39,7 @@ const MExists: React.FC<{
           label="Item"
           required
           name="value"
-          renderItem={({ key, name, ...restField }) => {
+          renderItem={({ name, ...restField }) => {
             return (
               <FormInputJsonItem {...restField} name={[name]} required={true} />
             )

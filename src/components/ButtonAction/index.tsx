@@ -37,7 +37,9 @@ const ButtonAction: React.FC<
     try {
       await onSubmit()
       message.success(t('Success'))
-    } catch (e) {}
+    } catch (e) {
+      console.log(e)
+    }
     if (loading) {
       setTimeout(() => {
         setLoading(false)

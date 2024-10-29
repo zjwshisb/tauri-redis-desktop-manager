@@ -14,8 +14,6 @@ const App: React.FC = () => {
     store.window.setName('main')
   }, [store.window])
 
-
-
   return (
     <AppLayout header={<ActionBar />}>
       <ConnectionForm />
