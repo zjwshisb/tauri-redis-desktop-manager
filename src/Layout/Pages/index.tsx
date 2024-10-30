@@ -57,7 +57,7 @@ const Index: React.FC = () => {
     </StickyBox>
   )
 
-  const items = computed(() =>
+  const items = computed<TabsProps['items']>(() =>
     store.page.pages.map((v, index) => {
       return {
         label: (
@@ -104,6 +104,7 @@ const Index: React.FC = () => {
           </Dropdown>
         ),
         key: v.pageKey,
+        forceRender: false,
         children: <DetailPage {...v} />
       }
     })

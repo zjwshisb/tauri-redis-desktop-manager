@@ -33,7 +33,7 @@ const ActionBar: React.FC = () => {
 
   return (
     <Container
-      className="w-full flex-shrink-0 border-b flex flex-col"
+      className="w-full flex-shrink-0 border-b flex flex-col pb-2"
       level={1}
     >
       <div className="flex justify-between items-center flex-1">

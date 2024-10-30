@@ -26,16 +26,8 @@ const BloomFilterValue: React.FC<{
 
   return (
     <ValueLayout
-      readonlyAction={
-        <>
-          <Exists keys={keys} />
-        </>
-      }
-      actions={
-        <>
-          <Add keys={keys} onSuccess={onRefresh} />
-        </>
-      }
+      readonlyAction={<Exists keys={keys} />}
+      actions={<Add keys={keys} onSuccess={onRefresh} />}
       header={
         info !== undefined && (
           <Descriptions

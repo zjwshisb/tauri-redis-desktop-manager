@@ -4,12 +4,12 @@ import {
   DisconnectOutlined,
   ReloadOutlined,
   WarningOutlined,
-  LoadingOutlined,
+  LoadingOutlined
 } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import useStore from '@/hooks/useStore'
 import { useThrottleFn } from 'ahooks'
-import { Spin, Tooltip } from 'antd'
+import { Tooltip } from 'antd'
 import DBItem from './components/DBItem'
 import NodeItem from './components/NodeItem'
 import CurlMenu from './components/CurlMenu'
@@ -19,6 +19,7 @@ import { computed } from 'mobx'
 import InteractiveContainer from '../InteractiveContainer'
 import CusButton from '../CusButton'
 import { Icon } from '@iconify/react'
+import Collapse from '@/components/Collapse'
 
 const Connection: React.FC<{
   connection: APP.Connection
@@ -53,13 +54,14 @@ const Connection: React.FC<{
       if (connection.open !== true) {
         try {
           await store.connection.open(connection.id)
-          store.page.addPage({
-            type: 'info',
-            name: 'info',
-            connection
-          })
-
-          setCollapse(true)
+          setTimeout(() => {
+            store.page.addPage({
+              type: 'info',
+              name: 'info',
+              connection
+            })
+            setCollapse(true)
+          }, 200)
         } catch {}
       }
     }
@@ -68,26 +70,6 @@ const Connection: React.FC<{
   const onItemClickTh = useThrottleFn(openConnection, {
     wait: 300
   })
-
-  const height = React.useMemo(() => {
-    if (connection.open === true && collapse) {
-      let count: number
-      if (connection.is_cluster) {
-        count = connection.nodes !== undefined ? connection.nodes.length : 0
-      } else {
-        count = connection.dbs !== undefined ? connection.dbs.length : 0
-      }
-      return (24 * count).toString() + 'px'
-    } else {
-      return 0
-    }
-  }, [
-    connection.open,
-    connection.is_cluster,
-    connection.nodes,
-    connection.dbs,
-    collapse
-  ])
 
   const children = computed(() => {
     if (connection.is_cluster) {
@@ -120,7 +102,7 @@ const Connection: React.FC<{
   }).get()
 
   return (
-    <div className={'box-border'}>
+    <div className={'box-border select-none'}>
       <InteractiveContainer
         className={'flex justify-between text-lg px-2  py-1'}
       >
@@ -173,14 +155,13 @@ const Connection: React.FC<{
           />
         </div>
       </InteractiveContainer>
-      <div
-        className="overflow-hidden transition-all"
-        style={{
-          height
-        }}
+      <Collapse
+        collapse={collapse}
+        defaultHeight={0}
+        className={'overflow-hidden'}
       >
-        <Spin spinning={connection.loading}>{children}</Spin>
-      </div>
+        {children}
+      </Collapse>
     </div>
   )
 }

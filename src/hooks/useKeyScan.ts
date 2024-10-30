@@ -82,7 +82,7 @@ export default function useKeyScan(
 
   const [keys, setKeys] = React.useState<string[]>([])
 
-  const [more, setMore] = React.useState(true)
+  const [more, setMore] = React.useState(false)
 
   const opts = useLatest(options)
 

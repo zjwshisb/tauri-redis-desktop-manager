@@ -35,6 +35,8 @@ const Index: React.FC<{
 
   const listRef = React.useRef<ListRef>(null)
 
+  const [init, setInit] = React.useState(false)
+
   const [state, dispatch] = React.useReducer(reducer, {
     filter: {
       types: '',
@@ -43,18 +45,19 @@ const Index: React.FC<{
     }
   })
 
-  const id = React.useId()
+  const containerRef= React.useRef<HTMLDivElement>(null)
 
   const [loading, setLoading] = React.useState(false)
 
   const [listHeight, setListHeight] = React.useState(0)
 
   const getListHeight = React.useCallback(() => {
-    const container = document.getElementById(id)
-    if (container != null) {
-      setListHeight(container.clientHeight - 102 - 33)
+    if (containerRef.current != null) {
+      setListHeight(containerRef.current.clientHeight - 102 - 33)
+      console.log("test")
+      setInit(true)
     }
-  }, [id])
+  }, [])
 
   const getListHeightDb = useDebounceFn(getListHeight, {
     wait: 100
@@ -92,6 +95,10 @@ const Index: React.FC<{
     getKeys(true).then()
   }, [getKeys])
 
+  React.useEffect(() => {
+    console.log(init)
+  }, [init])
+
   return (
     <ResizableDiv
       className={
@@ -102,126 +109,128 @@ const Index: React.FC<{
       maxWidth={800}
     >
       <Context.Provider value={[state, dispatch]}>
-        <Container
-          className="flex flex-col h-full overflow-hidden"
-          id={id}
-          level={3}
-        >
-          <Spin spinning={loading}>
-            <Container className="border-b" level={5}>
-              <Container
-                className="p-2 flex justify-between items-center border-b"
-                level={5}
-              >
-                <div className="flex">
-                  <Editable connection={info.connection}>
-                    <Add
-                      onSuccess={(name: string) => {
-                        store.page.addPage({
-                          type: 'key',
-                          connection: info.connection,
-                          name,
-                          db: info.db
-                        })
-                      }}
-                      info={info}
-                    />
-                  </Editable>
-                  <CusButton
-                    onClick={() => {
-                      request<string>('key/randomkey', info.connection.id, {
-                        db: info.db
-                      }).then((res) => {
-                        store.page.addPage({
-                          type: 'key',
-                          name: res.data,
-                          connection: info.connection
-                        })
-                      })
-                    }}
-                    tooltip={{
-                      title: 'Random Key'
-                    }}
-                    icon={<Icon icon={'mingcute:random-line'} fontSize={18} />}
-                  ></CusButton>
-                  <Editable connection={info.connection}>
-                    <Restore
-                      info={info}
-                      onSuccess={(name: string) => {
-                        store.page.addPage({
-                          type: 'key',
-                          connection: info.connection,
-                          name,
-                          db: info.db
-                        })
-                      }}
-                    />
-                  </Editable>
-                  {isMain && (
-                    <CusButton
-                      onClick={() => {
-                        store.keyInfo.newWindow(info.connection, info.db)
-                      }}
-                      icon={
-                        <WindowsOutlined className="text-lg"></WindowsOutlined>
-                      }
-                      tooltip={{
-                        title: 'Open In New Window'
-                      }}
-                    ></CusButton>
-                  )}
-                  <CusButton
-                    tooltip={{
-                      title: 'Refresh'
-                    }}
-                    onClick={() => {
-                      getKeys(true).then()
-                    }}
-                    icon={<ReloadOutlined className="text-lg" />}
-                  ></CusButton>
-                </div>
-                <div>
-                  <ConfigProvider
-                    theme={{
-                      components: {
-                        Statistic: {
-                          contentFontSize: 14
-                        }
-                      }
-                    }}
-                  >
-                    <Statistic
-                      prefix={
-                        <Icon
-                          icon={'fluent:key-multiple-16-regular'}
-                          fontSize={14}
-                        />
-                      }
-                      value={keys.length}
-                    ></Statistic>
-                  </ConfigProvider>
-                </div>
-              </Container>
-              <Filter connection={info.connection} />
-            </Container>
-            <VirtualKeyList
-              info={info}
-              keys={keys}
-              height={listHeight}
-              listRef={listRef}
-            />
-            <Container className="p-2 border-t">
-              <LoadMore
-                disabled={!more}
-                loading={loading}
-                onGetAll={getAllKeys}
-                onGet={() => {
-                  getKeys().then()
-                }}
-              />
-            </Container>
-          </Spin>
-        </Container>
+       <Container
+            ref={containerRef}
+            className="flex flex-col h-full overflow-hidden"
+            level={3}
+          >
+         {
+           init &&  <Spin spinning={loading}>
+             <Container className="border-b" level={5}>
+               <Container
+                 className="p-2 flex justify-between items-center border-b"
+                 level={5}
+               >
+                 <div className="flex">
+                   <Editable connection={info.connection}>
+                     <Add
+                       onSuccess={(name: string) => {
+                         store.page.addPage({
+                           type: 'key',
+                           connection: info.connection,
+                           name,
+                           db: info.db
+                         })
+                       }}
+                       info={info}
+                     />
+                   </Editable>
+                   <CusButton
+                     onClick={() => {
+                       request<string>('key/randomkey', info.connection.id, {
+                         db: info.db
+                       }).then((res) => {
+                         store.page.addPage({
+                           type: 'key',
+                           name: res.data,
+                           connection: info.connection
+                         })
+                       })
+                     }}
+                     tooltip={{
+                       title: 'Random Key'
+                     }}
+                     icon={<Icon icon={'mingcute:random-line'} fontSize={18} />}
+                   ></CusButton>
+                   <Editable connection={info.connection}>
+                     <Restore
+                       info={info}
+                       onSuccess={(name: string) => {
+                         store.page.addPage({
+                           type: 'key',
+                           connection: info.connection,
+                           name,
+                           db: info.db
+                         })
+                       }}
+                     />
+                   </Editable>
+                   {isMain && (
+                     <CusButton
+                       onClick={() => {
+                         store.keyInfo.newWindow(info.connection, info.db)
+                       }}
+                       icon={
+                         <WindowsOutlined className="text-lg"></WindowsOutlined>
+                       }
+                       tooltip={{
+                         title: 'Open In New Window'
+                       }}
+                     ></CusButton>
+                   )}
+                   <CusButton
+                     tooltip={{
+                       title: 'Refresh'
+                     }}
+                     onClick={() => {
+                       getKeys(true).then()
+                     }}
+                     icon={<ReloadOutlined className="text-lg" />}
+                   ></CusButton>
+                 </div>
+                 <div>
+                   <ConfigProvider
+                     theme={{
+                       components: {
+                         Statistic: {
+                           contentFontSize: 14
+                         }
+                       }
+                     }}
+                   >
+                     <Statistic
+                       prefix={
+                         <Icon
+                           icon={'fluent:key-multiple-16-regular'}
+                           fontSize={14}
+                         />
+                       }
+                       value={keys.length}
+                     ></Statistic>
+                   </ConfigProvider>
+                 </div>
+               </Container>
+               <Filter connection={info.connection} />
+             </Container>
+             <VirtualKeyList
+               info={info}
+               keys={keys}
+               height={listHeight}
+               listRef={listRef}
+             />
+             <Container className="p-2 border-t">
+               <LoadMore
+                 disabled={!more}
+                 loading={loading}
+                 onGetAll={getAllKeys}
+                 onGet={() => {
+                   getKeys().then()
+                 }}
+               />
+             </Container>
+           </Spin>
+         }
+          </Container>
       </Context.Provider>
     </ResizableDiv>
   )

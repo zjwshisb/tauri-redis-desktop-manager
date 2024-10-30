@@ -70,9 +70,12 @@ class ConnectionStore {
         })
       }
       const version = await request<string>('server/version', connection.id)
-      if (versionCompare(version.data, "4.0.0")) {
-        const modules = await request<APP.Module[]>('server/module', connection.id)
-        runInAction(() =>{
+      if (versionCompare(version.data, '4.0.0')) {
+        const modules = await request<APP.Module[]>(
+          'server/module',
+          connection.id
+        )
+        runInAction(() => {
           connection.modules = modules.data
         })
       }
@@ -81,21 +84,20 @@ class ConnectionStore {
         connection.open = true
         connection.loading = false
       })
-    }catch (e) {
-      connection.loading = false
-      connection.open = false
-      connection.err = e as string
+    } catch (e) {
+      runInAction(() => {
+        connection.loading = false
+        connection.open = false
+        connection.err = e as string
+      })
     }
-
   }
 
   async open(id: number) {
     const connection = this.getById(id)
     if (connection !== undefined) {
       try {
-        runInAction(() => {
-          connection.loading = true
-        })
+        connection.loading = true
         await request('connections/open', connection.id)
         runInAction(() => {
           if (connection.err !== undefined) {
@@ -103,11 +105,10 @@ class ConnectionStore {
           }
           connection.loading = false
         })
-        await this.getInfo(connection)
+        return await this.getInfo(connection)
       } catch (err) {
         runInAction(() => {
           connection.loading = false
-
           connection.err = err as string
         })
         throw err

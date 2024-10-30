@@ -24,7 +24,7 @@ const DetailPage: React.FC<
 > = (props) => {
   const { connection, pageKey, type, db, name } = props
 
-  const children = React.useMemo(() => {
+  return React.useMemo(() => {
     let node = <Result title="Connection Not Found"></Result>
     if (connection !== undefined) {
       switch (type) {
@@ -94,8 +94,6 @@ const DetailPage: React.FC<
     }
     return node
   }, [connection, db, pageKey, name, type])
-
-  return children
 }
 
 export default observer(DetailPage)

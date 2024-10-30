@@ -77,7 +77,7 @@ const DBItem: React.FC<{
                     await request('db/flush', connection.id, {
                       db: item.database
                     })
-                    store.connection.getInfo(connection)
+                    await store.connection.getInfo(connection)
                     message.success(t('Success'))
                   }
                 })

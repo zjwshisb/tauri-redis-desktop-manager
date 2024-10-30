@@ -9,14 +9,13 @@ const Template: React.FC<{
   title: string
   active?: boolean
 }> = ({ icon, onClick, title, active }) => {
- 
   const { t } = useTranslation()
-  
+
   return (
     <InteractiveContainer
       onClick={onClick}
       active={active}
-      className="flex flex-col items-center  rounded-lg p-2 min-w-[50px] h-[50px] justify-center overflow-hidden"
+      className="flex flex-col items-center  rounded-lg px-2 py-2   min-w-[50px]  justify-center overflow-hidden"
     >
       <div className="text-md flex mb-1">{icon}</div>
       <div className="text-[10px] leading-[12px] break-all overflow-hidden truncate">

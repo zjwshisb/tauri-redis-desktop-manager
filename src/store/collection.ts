@@ -1,7 +1,7 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import pageObj from './page'
-import request from '@/utils/request'
 import { listen, emit } from '@tauri-apps/api/event'
+import request from '@/utils/request'
 
 const COLLECTION_CHANGE = 'collection_change'
 
@@ -13,14 +13,12 @@ class CollectionStore {
     this.getAll()
     listen(COLLECTION_CHANGE, () => {
       this.getAll()
-    })
+    }).then()
   }
 
   getAll() {
     request<APP.Collection[]>('collections').then((res) => {
-      runInAction(() => {
-        this.items = res.data
-      })
+      this.items = res.data
     })
   }
 
@@ -31,7 +29,7 @@ class CollectionStore {
       request('collections/del', 0, {
         id: i[0].id
       }).then(() => {
-        emit(COLLECTION_CHANGE)
+        emit(COLLECTION_CHANGE).then()
       })
     }
   }
@@ -46,7 +44,7 @@ class CollectionStore {
         key,
         db: page.db
       }).then(() => {
-        emit(COLLECTION_CHANGE)
+        emit(COLLECTION_CHANGE).then()
       })
     }
   }

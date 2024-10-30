@@ -42,6 +42,7 @@ const ConnectionForm: React.FC = () => {
       form.setFieldsValue({
         ssh: isSsh
       })
+      setTestLoading(false)
     }
   }, [form, formItem.item, formItem.open, isSsh])
 
@@ -107,7 +108,9 @@ const ConnectionForm: React.FC = () => {
                       setTestLoading(false)
                     })
                 })
-                .catch(() => {})
+                .catch(() => {
+                  setTestLoading(false)
+                })
             }}
           >
             Test Connection
@@ -132,7 +135,7 @@ const ConnectionForm: React.FC = () => {
                   }
                 )
                 if (formItem.item.open === true) {
-                  store.connection.close(formItem.item.id)
+                  await store.connection.close(formItem.item.id)
                 }
                 store.connection.update(formItem.item.id, res.data)
               }
@@ -263,10 +266,8 @@ const ConnectionForm: React.FC = () => {
                         value == null &&
                         getFieldValue('ssh_private_key') == null
                       ) {
-                        return await Promise.reject(
-                          new Error(
-                            t('Password Or Private Key Required').toString()
-                          )
+                        throw new Error(
+                          t('Password Or Private Key Required').toString()
                         )
                       }
                       await Promise.resolve()

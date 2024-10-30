@@ -1,19 +1,17 @@
-import React from 'react'
+import React, {forwardRef} from 'react'
 import classNames from 'classnames'
-const Container: React.FC<
-  React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLDivElement>,
-    HTMLDivElement
-  > & {
-    level?: 1 | 2 | 3 | 4 | 5
-  }
-> = (props) => {
-  const { level = 5, ...other } = props
 
+const Container = forwardRef<HTMLDivElement, React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+> & {
+  level?: 1 | 2 | 3 | 4 | 5
+}>((props, ref) => {
+  const { level = 5, ...other } = props
   return (
     <div
       {...other}
-       
+      ref={ref}
       className={classNames([
         level === 4 &&
           'bg-white dark:bg-gray-10 text-neutral-text-2 dark:text-neutral-text-2-dark',
@@ -29,5 +27,6 @@ const Container: React.FC<
       ])}
     ></div>
   )
-}
+})
+Container.displayName = "Container"
 export default Container

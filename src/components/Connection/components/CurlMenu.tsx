@@ -7,11 +7,6 @@ import { useTranslation } from 'react-i18next'
 import CusButton from '@/components/CusButton'
 import { Icon } from '@iconify/react'
 
-export interface DBType {
-  db: number
-  count: number
-}
-
 const Index: React.FC<{
   connection: APP.Connection
   onOpen: (c: APP.Connection) => void
@@ -83,7 +78,7 @@ const Index: React.FC<{
                     name: t('Connection')
                   }),
                   async onOk() {
-                    store.connection.remove(connection.id)
+                    await store.connection.remove(connection.id)
                     message.success(t('Success'))
                   }
                 })
@@ -95,7 +90,7 @@ const Index: React.FC<{
                     title: t('Notice'),
                     content: t('You must close the connection before editing'),
                     onOk: () => {
-                      store.connection.close(connection.id)
+                      store.connection.close(connection.id).then()
                       store.connection.openForm(connection)
                     }
                   })
@@ -111,7 +106,7 @@ const Index: React.FC<{
                 break
               }
               case 'close': {
-                store.connection.close(connection.id)
+                store.connection.close(connection.id).then()
                 break
               }
             }
@@ -120,7 +115,7 @@ const Index: React.FC<{
         }}
       >
         <CusButton
-          icon={<Icon icon={'material-symbols:edit-outline'}></Icon>}
+          icon={<Icon icon={'si:more-horiz-square-line'} fontSize={18}></Icon>}
         ></CusButton>
       </Dropdown>
     </>

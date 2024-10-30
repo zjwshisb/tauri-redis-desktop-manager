@@ -201,7 +201,7 @@ const Key: React.FC<{
                 />
               </Space>
             </div>
-            {showObjectInfo === true && <ObjectInfo keys={item} />}
+            <ObjectInfo visible={showObjectInfo} keys={item} />
             {value}
           </div>
         )}

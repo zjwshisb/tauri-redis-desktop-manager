@@ -33,7 +33,7 @@ class SettingStore {
     if (!isMainWindow()) {
       listen<AppSetting>(SETTING_CHANGE, (e) => {
         this.update(e.payload)
-      })
+      }).then()
     }
     makeAutoObservable(this)
   }
@@ -41,7 +41,7 @@ class SettingStore {
   update(data: Partial<AppSetting>) {
     if (data.locale !== undefined) {
       this.setting.locale = data.locale
-      i18n.changeLanguage(this.setting.locale)
+      i18n.changeLanguage(this.setting.locale).then()
     }
     if (data.dark_mode !== undefined) {
       const htmls = document.getElementsByTagName('html')
@@ -56,8 +56,7 @@ class SettingStore {
         }
         getAllWindows().then((r) => {
           r.forEach((v) => {
-            console.log('111')
-            v.setTheme(theme)
+            v.setTheme(theme).then()
           })
         })
       }
@@ -67,7 +66,7 @@ class SettingStore {
       ...data
     }
     if (isMainWindow()) {
-      emit(SETTING_CHANGE, this.setting)
+      emit(SETTING_CHANGE, this.setting).then()
     }
     localStorage.setItem(SETTING_CACHE_KEY, JSON.stringify(this.setting))
   }
