@@ -66,7 +66,7 @@ export default function CusTable<T extends object>(
   const getScrollX = useDebounceFn(
     () => {
       if (container.current !== null) {
-        let containerWith = container.current?.clientWidth - 1
+        let containerWith = container.current?.clientWidth - 100
         if (containerWith <= 800) {
           containerWith = 800
         }
@@ -101,9 +101,7 @@ export default function CusTable<T extends object>(
         x: scrollX
       }
     } else {
-      return {
-        x: 'auto'
-      }
+      return undefined
     }
   }, [scrollX, virtual])
 
@@ -126,7 +124,6 @@ export default function CusTable<T extends object>(
       <Table
         virtual={virtual}
         size="small"
-        className="w-full"
         pagination={false}
         footer={footer}
         bordered

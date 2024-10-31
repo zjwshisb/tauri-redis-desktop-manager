@@ -4,6 +4,7 @@ use crate::request::{CommonValueArgs, FieldValueItem, NameArgs};
 use crate::response::{Field, FieldValue};
 use redis::{FromRedisValue, Value};
 use serde::Deserialize;
+use crate::response;
 
 #[derive(Deserialize)]
 struct ReserveArgs {
@@ -14,10 +15,10 @@ struct ReserveArgs {
     depth: i64,
     decay: f32,
 }
-pub async fn reserve<'r>(
+pub async fn reserve(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: ReserveArgs = serde_json::from_str(&payload)?;
     let v: String = manager
@@ -35,10 +36,10 @@ pub async fn reserve<'r>(
     Ok(v)
 }
 
-pub async fn list<'r>(
+pub async fn list(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let v: Vec<Value> = manager
@@ -67,45 +68,38 @@ pub async fn list<'r>(
     Ok(resp)
 }
 
-pub async fn info<'r>(
+pub async fn info(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let v: Vec<Value> = manager
         .execute(cid, redis::cmd("TOPK.INFO").arg(args.name), args.db)
         .await?;
-    Ok(Field::build_vec(&v)?)
+    response::build_fields(&v)
 }
 
-pub async fn add<'r>(
+pub async fn add(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
-    let v: Value = manager
+    manager
         .execute(
             cid,
             redis::cmd("TOPK.ADD").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    match v {
-        Value::Okay => return Ok(String::from("OK")),
-        Value::Nil => {
-            return Ok(String::from("nil"));
-        }
-        _ => {}
-    }
-    Ok(String::from("OK"))
+        .await
+    
 }
 
-pub async fn incrby<'r>(
+pub async fn incrby(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Vec<FieldValueItem<i64>>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("TOPK.INCRBY");
@@ -116,10 +110,10 @@ pub async fn incrby<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn query<'r>(
+pub async fn query(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -131,10 +125,10 @@ pub async fn query<'r>(
         .await
 }
 
-pub async fn count<'r>(
+pub async fn count(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager

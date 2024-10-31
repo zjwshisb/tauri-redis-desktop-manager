@@ -1,4 +1,10 @@
 {
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Tauri Desktop Redis Manager",
+  "mainBinaryName": "Tauri Desktop Redis Manager",
+  "version": "0.1.2",
+  "identifier": "zjwshisb.com.github",
+  "plugins": {},
   "build": {
     "beforeDevCommand": "yarn dev",
     "beforeBuildCommand": "yarn build",
@@ -16,12 +22,6 @@
     ],
     "targets": "all"
   },
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Tauri Desktop Redis Manager",
-  "mainBinaryName": "Tauri Desktop Redis Manager",
-  "version": "0.1.1",
-  "identifier": "zjwshisb.com.github",
-  "plugins": {},
   "app": {
     "withGlobalTauri": true,
     "windows": [

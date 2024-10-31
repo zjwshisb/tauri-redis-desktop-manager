@@ -1,11 +1,6 @@
 use redis::{cmd, Value};
 
-use crate::{
-    connection::Manager,
-    err::CusError,
-    request::{CommonValueArgs, NameArgs},
-    response::Field,
-};
+use crate::{connection::Manager, err::CusError, request::{CommonValueArgs, NameArgs}, response, response::Field};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -14,10 +9,10 @@ struct CreateArgs {
     db: u8,
     compression: Option<i64>,
 }
-pub async fn create<'r>(
+pub async fn create(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: CreateArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TDIGEST.CREATE");
@@ -25,171 +20,158 @@ pub async fn create<'r>(
     if let Some(v) = args.compression {
         cmd.arg(("COMPRESSION", v));
     }
-    let value: String = manager.execute(cid, &mut cmd, Some(args.db)).await?;
-    Ok(value)
+     manager.execute(cid, &mut cmd, Some(args.db)).await
 }
 
-pub async fn info<'r>(
+pub async fn info(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
 
     let value: Vec<Value> = manager
         .execute(cid, cmd("TDIGEST.INFO").arg(args.name), args.db)
         .await?;
-    Ok(Field::build_vec(&value)?)
+    response::build_fields(&value)
 }
 
-pub async fn add<'r>(
+pub async fn add(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: String = manager
+    manager
         .execute(
             cid,
             cmd("TDIGEST.ADD").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn rank<'r>(
+pub async fn rank(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: Vec<i64> = manager
+    manager
         .execute(
             cid,
             cmd("TDIGEST.RANK").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn by_rank<'r>(
+pub async fn by_rank(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: Vec<String> = manager
+    manager
         .execute(
             cid,
             cmd("TDIGEST.BYRANK").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn rev_rank<'r>(
+pub async fn rev_rank(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: Vec<i64> = manager
+    manager
         .execute(
             cid,
             cmd("TDIGEST.REVRANK").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn by_rev_rank<'r>(
+pub async fn by_rev_rank(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: Vec<String> = manager
+    manager
         .execute(
             cid,
             cmd("TDIGEST.BYREVRANK").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn cdf<'r>(
+pub async fn cdf(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: Vec<String> = manager
+    manager
         .execute(
             cid,
             cmd("TDIGEST.CDF").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn quantile<'r>(
+pub async fn quantile(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<String>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
-    let value: Vec<String> = manager
+     manager
         .execute(
             cid,
             cmd("TDIGEST.QUANTILE").arg(args.name).arg(args.value),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn reset<'r>(
+pub async fn reset(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
-
-    let value: String = manager
+    manager
         .execute(cid, cmd("TDIGEST.RESET").arg(args.name), args.db)
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn min<'r>(
+pub async fn min(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
-
-    let value: String = manager
+    manager
         .execute(cid, cmd("TDIGEST.MIN").arg(args.name), args.db)
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn max<'r>(
+pub async fn max(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
-    let value: String = manager
+    manager
         .execute(cid, cmd("TDIGEST.MAX").arg(args.name), args.db)
-        .await?;
-    Ok(value)
+        .await
 }
 
 #[derive(Deserialize)]
@@ -200,13 +182,13 @@ struct TrimmedMeanArgs {
     high_cut_quantile: String,
 }
 
-pub async fn trimmed_mean<'r>(
+pub async fn trimmed_mean(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: TrimmedMeanArgs = serde_json::from_str(&payload)?;
-    let value: String = manager
+    manager
         .execute(
             cid,
             cmd("TDIGEST.TRIMMED_MEAN")
@@ -215,6 +197,5 @@ pub async fn trimmed_mean<'r>(
                 .arg(args.high_cut_quantile),
             Some(args.db),
         )
-        .await?;
-    Ok(value)
+        .await
 }

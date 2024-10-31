@@ -2,8 +2,8 @@ use tauri::Emitter;
 
 use crate::{connection::Manager, err::CusError, model::Command, pubsub::PubsubManager, response};
 
-pub async fn log<'r>(
-    manager: tauri::State<'r, Manager>,
+pub async fn log(
+    manager: tauri::State<'_, Manager>,
     window: tauri::Window,
 ) -> Result<(), CusError> {
     let (tx, mut rx) = tokio::sync::mpsc::channel::<Command>(32);
@@ -16,14 +16,14 @@ pub async fn log<'r>(
     Ok(())
 }
 
-pub async fn cancel<'r>(manager: tauri::State<'r, Manager>) -> Result<(), CusError> {
+pub async fn cancel(manager: tauri::State<'_, Manager>) -> Result<(), CusError> {
     manager.remove_tx().await;
     Ok(())
 }
 
-pub async fn clients<'r>(
-    manager: tauri::State<'r, Manager>,
-    pubsub: tauri::State<'r, PubsubManager>,
+pub async fn clients(
+    manager: tauri::State<'_, Manager>,
+    pubsub: tauri::State<'_, PubsubManager>,
 ) -> Result<Vec<response::Conn>, CusError> {
     let mut r = vec![];
     let mut m = manager.get_conns().await;

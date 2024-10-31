@@ -109,7 +109,7 @@ const ListValue: React.FC<{
 
   React.useEffect(() => {
     index.current = 0
-    getFields(true)
+    getFields(true).then()
   }, [getFields])
 
   return (
@@ -183,10 +183,10 @@ const ListValue: React.FC<{
         }}
         columns={[
           {
-            title: 'Index',
+            title: '#',
             dataIndex: 'index',
             align: 'center',
-            width: 100
+            width: 50
           },
           {
             dataIndex: 'value',

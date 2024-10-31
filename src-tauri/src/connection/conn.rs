@@ -28,7 +28,6 @@ pub struct ConnectedParam {
     pub tcp_port: u16,
     pub username: Option<String>,
     pub password: Option<String>,
-    pub is_cluster: bool,
 }
 
 impl redis::IntoConnectionInfo for ConnectedParam {
@@ -97,7 +96,7 @@ impl Connection {
     // get the ssl proxy
     pub fn get_proxy(&self) -> Option<String> {
         if let Some(addr) = self.tunnel_addr {
-            return Some(format!("{}:{}", addr.ip().to_string(), addr.port()));
+            return Some(format!("{}:{}", addr.ip(), addr.port()));
         }
         None
     }

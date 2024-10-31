@@ -14,10 +14,10 @@ use crate::{request, utils};
 use redis::Value;
 use serde::Deserialize;
 
-pub async fn scan<'r>(
+pub async fn scan(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<ScanLikeResult<String, String>, CusError> {
     let args: request::ScanLikeArgs<String> = serde_json::from_str(&payload)?;
 
@@ -38,8 +38,8 @@ pub async fn scan<'r>(
     if let Some(types) = args.types {
         cmd.arg(&["TYPE", &types]);
     }
-    let value: Vec<Value> = manager.execute(cid, &mut cmd, args.db).await?;
-    Ok(ScanLikeResult::<String, String>::build(value)?)
+    let value = manager.execute::<Vec<Value>>(cid, &mut cmd, args.db).await?;
+    ScanLikeResult::<String, String>::build(value)
 }
 
 #[derive(Deserialize)]
@@ -51,10 +51,10 @@ struct CopyArgs {
     replace: bool,
 }
 
-pub async fn copy<'r>(
+pub async fn copy(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CopyArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("COPY");
@@ -68,10 +68,10 @@ pub async fn copy<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn get<'r>(
+pub async fn get(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Key, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let mut key: Key = Key::build(args.name, args.db, cid, &manager).await?;
@@ -97,10 +97,10 @@ struct DelArgs {
     db: Option<u8>,
 }
 
-pub async fn del<'r>(
+pub async fn del(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: DelArgs = serde_json::from_str(&payload)?;
     manager
@@ -115,10 +115,10 @@ struct ExpireArgs {
     db: u8,
     option: Option<String>,
 }
-pub async fn expire<'r>(
+pub async fn expire(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ExpireArgs = serde_json::from_str(&payload)?;
     let mut cmd: redis::Cmd;
@@ -135,10 +135,10 @@ pub async fn expire<'r>(
     manager.execute(cid, &mut cmd, Some(args.db)).await
 }
 
-pub async fn ttl<'r>(
+pub async fn ttl(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -154,10 +154,10 @@ struct RenameArgs {
     command: String,
 }
 
-pub async fn rename<'r>(
+pub async fn rename(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: RenameArgs = serde_json::from_str(&payload)?;
     let v: CValue = manager
@@ -183,10 +183,10 @@ struct AddArgs {
     value: Option<String>,
 }
 
-pub async fn add<'r>(
+pub async fn add(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: AddArgs = serde_json::from_str(&payload)?;
     match args.types.as_str() {
@@ -216,10 +216,10 @@ pub async fn add<'r>(
     Err(err::new_normal())
 }
 
-pub async fn dump<'r>(
+pub async fn dump(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let v: Vec<u8> = manager
@@ -237,10 +237,10 @@ struct RestoreArgs {
     value: String,
 }
 
-pub async fn restore<'r>(
+pub async fn restore(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: RestoreArgs = serde_json::from_str(&payload)?;
     let v = utils::redis_str_to_binary(args.value);
@@ -327,10 +327,10 @@ pub async fn object(
     Ok(resp)
 }
 
-pub async fn move_key<'r>(
+pub async fn move_key(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<i64> = serde_json::from_str(&payload)?;
     manager
@@ -342,10 +342,10 @@ pub async fn move_key<'r>(
         .await
 }
 
-pub async fn random_key<'r>(
+pub async fn random_key(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: DBArgs = serde_json::from_str(&payload)?;
     manager

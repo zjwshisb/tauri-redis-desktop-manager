@@ -24,9 +24,9 @@ struct Message {
     payload: String,
 }
 
-pub async fn subscribe<'r>(
+pub async fn subscribe(
     window: tauri::Window,
-    pubsub_manager: State<'r, PubsubManager>,
+    pubsub_manager: State<'_, PubsubManager>,
     payload: String,
     cid: u32,
 ) -> Result<String, CusError> {
@@ -105,10 +105,10 @@ struct PublishArgs {
     value: String,
 }
 
-pub async fn publish<'r>(
+pub async fn publish(
     payload: String,
     cid: u32,
-    manager: State<'r, Manager>,
+    manager: State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: PublishArgs = serde_json::from_str(&payload)?;
     manager
@@ -120,9 +120,9 @@ pub async fn publish<'r>(
         .await
 }
 
-pub async fn monitor<'r>(
+pub async fn monitor(
     window: tauri::Window,
-    pubsub_manager: State<'r, PubsubManager>,
+    pubsub_manager: State<'_, PubsubManager>,
     cid: u32,
 ) -> Result<String, CusError> {
     let model = ConnectionModel::first(cid)?;
@@ -176,9 +176,9 @@ pub async fn monitor<'r>(
 struct CancelArgs {
     name: String,
 }
-pub async fn cancel<'r>(
+pub async fn cancel(
     payload: String,
-    pubsub_manager: State<'r, PubsubManager>,
+    pubsub_manager: State<'_, PubsubManager>,
 ) -> Result<String, CusError> {
     let args: CancelArgs = serde_json::from_str(&payload)?;
     pubsub_manager.close(&args.name);

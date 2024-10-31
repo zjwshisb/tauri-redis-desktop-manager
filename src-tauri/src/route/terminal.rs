@@ -13,11 +13,11 @@ pub struct OpenArgs {
     receive: String,
 }
 
-pub async fn open<'r>(
+pub async fn open(
     cid: u32,
     window: Window,
-    manager: tauri::State<'r, Manager>,
-    event: tauri::State<'r, EventManager>,
+    manager: tauri::State<'_, Manager>,
+    event: tauri::State<'_, EventManager>,
 ) -> Result<OpenArgs, CusError> {
     let receive_event_name = utils::random_str(32);
     let send_event_name = utils::random_str(32);
@@ -32,7 +32,7 @@ pub async fn open<'r>(
         let item: EventResp<Vec<String>> = serde_json::from_str(s).unwrap();
         let cmd_vec = item.data;
         let mut resp_item: EventResp<CValue> = EventResp::new(CValue::Nil, String::new());
-        if let Some(first) = cmd_vec.get(0) {
+        if let Some(first) = cmd_vec.first() {
             if first.to_lowercase() == "monitor" || first.to_lowercase() == "subscribe" {
                 resp_item.success = false;
                 resp_item.data = CValue::Str("not support this command".to_string());
@@ -41,7 +41,7 @@ pub async fn open<'r>(
                 let mut i = 1;
                 while i < cmd_vec.len() {
                     cmd.arg(cmd_vec.get(i).unwrap());
-                    i = i + 1;
+                    i += 1;
                 }
                 let result = func(cmd);
                 match result {
@@ -68,7 +68,7 @@ pub async fn open<'r>(
         let event_id = window.listen(inner_send_event_name.as_str(), move |event: Event| {
             let mut resp_item = cmd_handle(event.payload(), |cmd| {
                 let mut conn = cell_conn.borrow_mut();
-                return cmd.query(&mut conn);
+                cmd.query(&mut conn)
             });
             resp_item.event = inner_receive_event_name.clone();
             window_copy
@@ -81,7 +81,7 @@ pub async fn open<'r>(
         let event_handle = window.listen(inner_send_event_name.as_str(), move |event| {
             let mut resp_item = cmd_handle(event.payload(), |cmd| {
                 let mut conn = cell_conn.borrow_mut();
-                return cmd.query(&mut conn);
+                cmd.query(&mut conn)
             });
             resp_item.event = inner_receive_event_name.clone();
             window_copy
@@ -98,10 +98,10 @@ pub async fn open<'r>(
     })
 }
 
-pub async fn cancel<'r>(
+pub async fn cancel(
     payload: String,
     window: Window,
-    event: tauri::State<'r, EventManager>,
+    event: tauri::State<'_, EventManager>,
 ) -> Result<(), CusError> {
     let args: IdArgs<String> = serde_json::from_str(&payload)?;
     if let Some(handle) = event.take(args.id).await {

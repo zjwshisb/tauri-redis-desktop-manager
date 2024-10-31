@@ -4,10 +4,10 @@ use crate::request::{CommonValueArgs, FieldValueArgs, FieldValueItem, ItemScanAr
 use crate::response::{Field, ScanLikeResult};
 use redis::Value;
 
-pub async fn hscan<'r>(
+pub async fn hscan(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<ScanLikeResult<Field, String>, CusError> {
     let args: ItemScanArgs = serde_json::from_str(&payload)?;
     let mut cmd: redis::Cmd = redis::cmd("HSCAN");
@@ -22,10 +22,10 @@ pub async fn hscan<'r>(
     ScanLikeResult::<Field, String>::build(value)
 }
 
-pub async fn hset<'r>(
+pub async fn hset(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Vec<FieldValueItem<String>>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("HSET");
@@ -36,10 +36,10 @@ pub async fn hset<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn hdel<'r>(
+pub async fn hdel(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -51,10 +51,10 @@ pub async fn hdel<'r>(
         .await
 }
 
-pub async fn hexists<'r>(
+pub async fn hexists(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
     manager
@@ -66,10 +66,10 @@ pub async fn hexists<'r>(
         .await
 }
 
-pub async fn hget<'r>(
+pub async fn hget(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
     manager
@@ -81,10 +81,10 @@ pub async fn hget<'r>(
         .await
 }
 
-pub async fn hget_all<'r>(
+pub async fn hget_all(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     manager
@@ -92,10 +92,10 @@ pub async fn hget_all<'r>(
         .await
 }
 
-pub async fn hincrby<'r>(
+pub async fn hincrby(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: FieldValueArgs<i64, String> = serde_json::from_str(&payload)?;
     manager
@@ -110,10 +110,10 @@ pub async fn hincrby<'r>(
         .await
 }
 
-pub async fn hincrby_float<'r>(
+pub async fn hincrby_float(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: FieldValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -128,10 +128,10 @@ pub async fn hincrby_float<'r>(
         .await
 }
 
-pub async fn hkeys<'r>(
+pub async fn hkeys(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     manager
@@ -139,10 +139,10 @@ pub async fn hkeys<'r>(
         .await
 }
 
-pub async fn hlen<'r>(
+pub async fn hlen(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     manager
@@ -150,10 +150,10 @@ pub async fn hlen<'r>(
         .await
 }
 
-pub async fn hmget<'r>(
+pub async fn hmget(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -165,10 +165,10 @@ pub async fn hmget<'r>(
         .await
 }
 
-pub async fn hrand_field<'r>(
+pub async fn hrand_field(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: FieldValueArgs<Option<i64>, Option<bool>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("HRANDFIELD");
@@ -181,10 +181,10 @@ pub async fn hrand_field<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn hsetnx<'r>(
+pub async fn hsetnx(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: FieldValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -199,10 +199,10 @@ pub async fn hsetnx<'r>(
         .await
 }
 
-pub async fn hstr_len<'r>(
+pub async fn hstr_len(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -214,10 +214,10 @@ pub async fn hstr_len<'r>(
         .await
 }
 
-pub async fn hvals<'r>(
+pub async fn hvals(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     manager

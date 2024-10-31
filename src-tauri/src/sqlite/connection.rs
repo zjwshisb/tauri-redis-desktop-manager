@@ -28,7 +28,6 @@ impl connection::Connectable for Connection {
             tcp_port: self.port,
             username: self.username.clone(),
             password: self.password.clone(),
-            is_cluster: self.is_cluster,
         };
         let mut ssh_params = None;
         if let Some(ssh_host) = &self.ssh_host {
@@ -127,7 +126,7 @@ impl Connection {
         if self.readonly {
             readonly = 1;
         }
-        if let None = self.name {
+        if self.name.is_none() {
             self.name = Some(format!("{}:{}", self.host, self.port))
         }
         if let Some(id) = self.id {

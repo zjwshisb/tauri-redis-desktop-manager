@@ -11,10 +11,10 @@ pub struct SetArgs {
     db: Option<u8>,
 }
 
-pub async fn set<'r>(
+pub async fn set(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: SetArgs = serde_json::from_str(&payload)?;
     let v: Value = manager

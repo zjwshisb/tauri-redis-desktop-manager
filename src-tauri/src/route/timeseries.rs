@@ -3,27 +3,28 @@ use crate::{
     err::CusError,
     request::{FieldValueArgs, FieldValueItem, NameArgs, RangeArgs},
     response::Field,
+    response
 };
 use redis::cmd;
 use serde::Deserialize;
 
-pub async fn info<'r>(
+pub async fn info(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let value: Vec<redis::Value> = manager
         .execute(cid, cmd("TS.INFO").arg(args.name).arg("DEBUG"), args.db)
         .await?;
-    let resp = Field::build_vec(&value)?;
+    let resp = response::build_fields(&value)?;
     Ok(resp)
 }
 
-pub async fn range<'r>(
+pub async fn range(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let value: Vec<redis::Value> = manager
@@ -33,45 +34,43 @@ pub async fn range<'r>(
             args.db,
         )
         .await?;
-    Ok(Field::build_by_bulk_vec(&value)?)
+    response::build_simple_fields(&value)
 }
 
-pub async fn add<'r>(
+pub async fn add(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
-    let args: FieldValueArgs<i64> = serde_json::from_str(&payload)?;
-    let value: i64 = manager
+    let args: FieldValueArgs<i64, i64> = serde_json::from_str(&payload)?;
+    manager
         .execute(
             cid,
             cmd("TS.ADD").arg(args.name).arg(args.value).arg(args.field),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn del<'r>(
+pub async fn del(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: RangeArgs = serde_json::from_str(&payload)?;
-    let value: i64 = manager
+    manager
         .execute(
             cid,
             cmd("TS.DEL").arg(args.name).arg(args.start).arg(args.end),
             args.db,
         )
-        .await?;
-    Ok(value)
+        .await
 }
 
-pub async fn incrby<'r>(
+pub async fn incrby(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: FieldValueArgs<Option<i64>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("TS.INCRBY");
@@ -79,14 +78,13 @@ pub async fn incrby<'r>(
     if let Some(i) = args.value {
         cmd.arg(("TIMESTAMP", i));
     }
-    let value: i64 = manager.execute(cid, &mut cmd, args.db).await?;
-    Ok(value)
+    manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn decrby<'r>(
+pub async fn decrby(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: FieldValueArgs<Option<i64>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("TS.DECRBY");
@@ -94,8 +92,7 @@ pub async fn decrby<'r>(
     if let Some(i) = args.value {
         cmd.arg(("TIMESTAMP", i));
     }
-    let value: i64 = manager.execute(cid, &mut cmd, args.db).await?;
-    Ok(value)
+     manager.execute(cid, &mut cmd, args.db).await
 }
 
 #[derive(Deserialize)]
@@ -109,10 +106,10 @@ struct AlterArgs {
     labels: Option<Vec<FieldValueItem<String>>>,
 }
 
-pub async fn alter<'r>(
+pub async fn alter(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: AlterArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TS.ALTER");
@@ -135,14 +132,13 @@ pub async fn alter<'r>(
 
         cmd.arg(("LABELS", labels));
     }
-    let r: String = manager.execute(cid, &mut cmd, Some(args.db)).await?;
-    Ok(r)
+    manager.execute(cid, &mut cmd, Some(args.db)).await
 }
 
-pub async fn create<'r>(
+pub async fn create(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: AlterArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TS.CREATE");
@@ -167,8 +163,7 @@ pub async fn create<'r>(
         }
         cmd.arg(("LABELS", labels));
     }
-    let r: String = manager.execute(cid, &mut cmd, Some(args.db)).await?;
-    Ok(r)
+    manager.execute(cid, &mut cmd, Some(args.db)).await
 }
 
 #[derive(Deserialize)]
@@ -181,10 +176,10 @@ struct CreateRuleArgs {
     align_timestamp: Option<i64>,
 }
 
-pub async fn create_rule<'r>(
+pub async fn create_rule(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: CreateRuleArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TS.CREATERULE");
@@ -196,8 +191,7 @@ pub async fn create_rule<'r>(
     if let Some(v) = args.align_timestamp {
         cmd.arg(v);
     }
-    let r: String = manager.execute(cid, &mut cmd, Some(args.db)).await?;
-    Ok(r)
+    manager.execute(cid, &mut cmd, Some(args.db)).await
 }
 
 #[derive(Deserialize)]
@@ -206,14 +200,13 @@ struct DeleteRuleArgs {
     dest_key: String,
     db: u8,
 }
-pub async fn delete_rule<'r>(
+pub async fn delete_rule(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: DeleteRuleArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("TS.DELETERULE");
     cmd.arg(args.source_key).arg(args.dest_key);
-    let r: String = manager.execute(cid, &mut cmd, Some(args.db)).await?;
-    Ok(r)
+    manager.execute(cid, &mut cmd, Some(args.db)).await
 }

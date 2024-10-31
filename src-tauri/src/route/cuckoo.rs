@@ -1,28 +1,23 @@
-use crate::{
-    connection::Manager,
-    err::CusError,
-    request::{CommonValueArgs, NameArgs},
-    response::Field,
-};
+use crate::{connection::Manager, err::CusError, request::{CommonValueArgs, NameArgs}, response, response::Field};
 use redis::{cmd, Value};
 use serde::Deserialize;
 
-pub async fn info<'r>(
+pub async fn info(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let values: Vec<Value> = manager
         .execute(cid, cmd("CF.INFO").arg(args.name), args.db)
         .await?;
-    Ok(Field::build_vec(&values)?)
+    response::build_fields(&values)
 }
 
-pub async fn add<'r>(
+pub async fn add(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
     manager
@@ -30,10 +25,10 @@ pub async fn add<'r>(
         .await
 }
 
-pub async fn insert<'r>(
+pub async fn insert(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -45,10 +40,10 @@ pub async fn insert<'r>(
         .await
 }
 
-pub async fn insertnx<'r>(
+pub async fn insertnx(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -60,48 +55,42 @@ pub async fn insertnx<'r>(
         .await
 }
 
-pub async fn addnx<'r>(
+pub async fn addnx(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
     let i: i64 = manager
         .execute(cid, cmd("CF.ADDNX").arg(args.name).arg(args.value), args.db)
         .await?;
-    match i {
-        0 => {
-            return Err(CusError::build(
-                "the item's fingerprint already exist in the filter",
-            ));
-        }
-        _ => {}
+    if i == 0 {
+        return Err(CusError::build(
+            "the item's fingerprint already exist in the filter",
+        ));
     }
     Ok(i)
 }
 
-pub async fn del<'r>(
+pub async fn del(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
     let i: i64 = manager
         .execute(cid, cmd("CF.DEL").arg(args.name).arg(args.value), args.db)
         .await?;
-    match i {
-        0 => {
-            return Err(CusError::build("Such item was not found in the filter"));
-        }
-        _ => {}
+    if i == 0 {
+        return Err(CusError::build("Such item was not found in the filter"));
     }
     Ok(i)
 }
 
-pub async fn count<'r>(
+pub async fn count(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
     manager
@@ -109,10 +98,10 @@ pub async fn count<'r>(
         .await
 }
 
-pub async fn exists<'r>(
+pub async fn exists(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(&payload)?;
 
@@ -125,10 +114,10 @@ pub async fn exists<'r>(
         .await
 }
 
-pub async fn mexists<'r>(
+pub async fn mexists(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<i64>, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
 
@@ -151,10 +140,10 @@ struct ReserveArgs {
     db: Option<u8>,
 }
 
-pub async fn reserve<'r>(
+pub async fn reserve(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: ReserveArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("CF.RESERVE");

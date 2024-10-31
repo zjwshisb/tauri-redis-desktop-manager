@@ -28,14 +28,14 @@ pub fn update(payload: String) -> Result<Connection, CusError> {
     Ok(conn)
 }
 
-pub async fn open<'r>(cid: u32, manager: State<'r, Manager>) -> Result<(), CusError> {
+pub async fn open(cid: u32, manager: State<'_, Manager>) -> Result<(), CusError> {
     let connection = Connection::first(cid)?;
     let conn = ConnectionWrapper::build(connection).await?;
     manager.add(cid, conn).await;
     Ok(())
 }
 
-pub async fn close<'r>(cid: u32, manager: State<'r, Manager>) -> Result<(), CusError> {
+pub async fn close(cid: u32, manager: State<'_, Manager>) -> Result<(), CusError> {
     manager.remove(cid).await;
     Ok(())
 }

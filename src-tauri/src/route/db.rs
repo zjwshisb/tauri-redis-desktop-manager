@@ -1,4 +1,4 @@
-use crate::connection::Manager;
+use crate::connection::{Manager};
 use crate::err::CusError;
 use redis::{self};
 use serde::Deserialize;
@@ -8,10 +8,10 @@ struct DBSizeArgs {
     db: u8,
 }
 
-pub async fn dbsize<'r>(
+pub async fn dbsize(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: DBSizeArgs = serde_json::from_str(&payload)?;
     manager
@@ -19,10 +19,10 @@ pub async fn dbsize<'r>(
         .await
 }
 
-pub async fn flush<'r>(
+pub async fn flush(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: DBSizeArgs = serde_json::from_str(&payload)?;
     manager

@@ -6,10 +6,10 @@ use crate::err::CusError;
 use crate::request::{CommonValueArgs, FieldValueArgs, ItemScanArgs, NameArgs, SingleValueArgs};
 use crate::{connection::Manager, response::ScanLikeResult};
 
-pub async fn sscan<'r>(
+pub async fn sscan(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<ScanLikeResult<String, String>, CusError> {
     let args: ItemScanArgs = serde_json::from_str(&payload)?;
     let mut cmd = cmd("sscan");
@@ -23,10 +23,10 @@ pub async fn sscan<'r>(
     ScanLikeResult::<String, String>::build(values)
 }
 
-pub async fn sadd<'r>(
+pub async fn sadd(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
@@ -42,10 +42,10 @@ pub async fn sadd<'r>(
     }
 }
 
-pub async fn srem<'r>(
+pub async fn srem(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
     let value: i64 = manager
@@ -61,10 +61,10 @@ pub async fn srem<'r>(
     }
 }
 
-pub async fn sdiff<'r>(
+pub async fn sdiff(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: SingleValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
     manager
@@ -72,10 +72,10 @@ pub async fn sdiff<'r>(
         .await
 }
 
-pub async fn sdiff_store<'r>(
+pub async fn sdiff_store(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
     manager
@@ -87,10 +87,10 @@ pub async fn sdiff_store<'r>(
         .await
 }
 
-pub async fn sinter<'r>(
+pub async fn sinter(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: SingleValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
     manager
@@ -98,10 +98,10 @@ pub async fn sinter<'r>(
         .await
 }
 
-pub async fn sinter_store<'r>(
+pub async fn sinter_store(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
     manager
@@ -121,10 +121,10 @@ struct SInterCardArgs {
     db: Option<u8>,
 }
 
-pub async fn sinter_card<'r>(
+pub async fn sinter_card(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: SInterCardArgs = serde_json::from_str(payload.as_str())?;
     let mut cmd = cmd("SINTERCARD");
@@ -135,10 +135,10 @@ pub async fn sinter_card<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn sis_member<'r>(
+pub async fn sis_member(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<String> = serde_json::from_str(payload.as_str())?;
     manager
@@ -150,10 +150,10 @@ pub async fn sis_member<'r>(
         .await
 }
 
-pub async fn sm_is_member<'r>(
+pub async fn sm_is_member(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
     manager
@@ -165,10 +165,10 @@ pub async fn sm_is_member<'r>(
         .await
 }
 
-pub async fn smembers<'r>(
+pub async fn smembers(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: NameArgs = serde_json::from_str(payload.as_str())?;
     manager
@@ -176,10 +176,10 @@ pub async fn smembers<'r>(
         .await
 }
 
-pub async fn smove<'r>(
+pub async fn smove(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: FieldValueArgs = serde_json::from_str(payload.as_str())?;
     let v: i64 = manager
@@ -197,10 +197,10 @@ pub async fn smove<'r>(
     }
 }
 
-pub async fn spop<'r>(
+pub async fn spop(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Option<i64>> = serde_json::from_str(payload.as_str())?;
     manager
@@ -208,10 +208,10 @@ pub async fn spop<'r>(
         .await
 }
 
-pub async fn srand_member<'r>(
+pub async fn srand_member(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Option<i64>> = serde_json::from_str(payload.as_str())?;
     manager
@@ -223,10 +223,10 @@ pub async fn srand_member<'r>(
         .await
 }
 
-pub async fn sunion<'r>(
+pub async fn sunion(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: SingleValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
     manager
@@ -234,10 +234,10 @@ pub async fn sunion<'r>(
         .await
 }
 
-pub async fn sunion_store<'r>(
+pub async fn sunion_store(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(payload.as_str())?;
     manager

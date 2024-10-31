@@ -65,7 +65,7 @@ impl CValue {
             }
             RedisValue::Nil => Self::Nil,
             RedisValue::SimpleString(s) => Self::Str(s),
-            RedisValue::Int(s) => return Self::Int(s),
+            RedisValue::Int(s) => Self::Int(s),
             RedisValue::Map(v) => {
                 let mut vec = vec![];
                 for (x, y) in v {
@@ -73,7 +73,7 @@ impl CValue {
                 }
                 Self::Map(vec)
             }
-            RedisValue::Attribute { data, attributes } => todo!(),
+            // RedisValue::Attribute { data, attributes } => todo!(),
             RedisValue::Set(v) => {
                 let mut vec = vec![];
                 for x in v {
@@ -83,10 +83,13 @@ impl CValue {
             }
             RedisValue::Double(v) => Self::Float(v),
             RedisValue::Boolean(v) => Self::Bool(v),
-            RedisValue::VerbatimString { format, text } => Self::Str(text),
+            RedisValue::VerbatimString { format: _format, text } => Self::Str(text),
             RedisValue::BigNumber(big_int) => Self::Str(big_int.to_string()),
-            RedisValue::Push { kind, data } => todo!(),
+            // RedisValue::Push { kind, data } => todo!(),
             RedisValue::ServerError(server_error) => Self::Str(server_error.code().to_string()),
+            _ => {
+                CValue::Nil
+            }
         }
     }
 }

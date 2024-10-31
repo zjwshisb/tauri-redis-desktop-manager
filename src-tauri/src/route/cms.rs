@@ -1,12 +1,7 @@
 use redis::Value;
 use serde::Deserialize;
 
-use crate::{
-    connection::{CValue, Manager},
-    err::CusError,
-    request::{CommonValueArgs, FieldValueItem, NameArgs},
-    response::Field,
-};
+use crate::{connection::{CValue, Manager}, err::CusError, request::{CommonValueArgs, FieldValueItem, NameArgs}, response, response::Field};
 
 #[derive(Deserialize)]
 struct InitArgs {
@@ -19,10 +14,10 @@ struct InitArgs {
     probability: Option<String>,
 }
 
-pub async fn init<'r>(
+pub async fn init(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: InitArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd(&args.command);
@@ -35,22 +30,22 @@ pub async fn init<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn info<'r>(
+pub async fn info(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<Field>, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     let values: Vec<Value> = manager
         .execute(cid, redis::cmd("CMS.INFO").arg(args.name), args.db)
         .await?;
-    Ok(Field::build_vec(&values)?)
+    response::build_fields(&values)
 }
 
-pub async fn incrby<'r>(
+pub async fn incrby(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Vec<FieldValueItem<String>>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("CMS.INCRBY");
@@ -61,10 +56,10 @@ pub async fn incrby<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn query<'r>(
+pub async fn query(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -85,10 +80,10 @@ struct MergeArgs {
     weight: Option<Vec<String>>,
 }
 
-pub async fn merge<'r>(
+pub async fn merge(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: MergeArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("CMS.MERGE");

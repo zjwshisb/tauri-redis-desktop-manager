@@ -17,8 +17,9 @@ import useStore from '@/hooks/useStore'
 import TitleBar from '../TitleBar'
 import WindowResize from './components/WindowResize'
 import { ArgsProps } from 'antd/es/notification'
-import {ERROR_NOTIFICATION} from '@/consts/event'
+import { ERROR_NOTIFICATION } from '@/consts/event'
 import { useEventListen } from '@/hooks/useEventListen'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 
 const langs: Record<string, Locale> = {
   zh_CN: zhCN,
@@ -36,13 +37,17 @@ const AppLayout: React.FC<
 
   const store = useStore()
 
-  const [notificationApi, contextHolder] = notification.useNotification();
+  const [notificationApi, contextHolder] = notification.useNotification()
 
-  useEventListen<ArgsProps>(ERROR_NOTIFICATION, (e) =>{
+  useEventListen<ArgsProps>(
+    ERROR_NOTIFICATION,
+    (e) => {
       if (e.payload.message) {
         notificationApi.error(e.payload)
       }
-  })
+    },
+    getCurrentWindow()
+  )
 
   const locale = React.useMemo(() => {
     return langs[i18n.language]

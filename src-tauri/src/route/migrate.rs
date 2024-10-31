@@ -23,10 +23,10 @@ pub struct ItemResult {
     pub message: String,
 }
 
-pub async fn migrate<'r>(
+pub async fn migrate(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<Vec<ItemResult>, CusError> {
     let args: MigrateArgs = serde_json::from_str(&payload)?;
     let mut result = vec![];

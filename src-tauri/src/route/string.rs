@@ -7,10 +7,10 @@ use crate::request::{
     CommonValueArgs, FieldValueArgs, FieldValueItem, NameArgs, RangeArgs, SingleValueArgs,
 };
 
-pub async fn set<'r>(
+pub async fn set(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -22,10 +22,10 @@ pub async fn set<'r>(
         .await
 }
 
-pub async fn mset<'r>(
+pub async fn mset(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: SingleValueArgs<Vec<FieldValueItem>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("mset");
@@ -35,10 +35,10 @@ pub async fn mset<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn append<'r>(
+pub async fn append(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -50,10 +50,10 @@ pub async fn append<'r>(
         .await
 }
 
-pub async fn decr<'r>(
+pub async fn decr(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: NameArgs<String> = serde_json::from_str(&payload)?;
     manager
@@ -61,25 +61,25 @@ pub async fn decr<'r>(
         .await
 }
 
-pub async fn decrby<'r>(
+pub async fn decrby(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<i64> = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
-            redis::cmd("DECRBY").arg(&args.name).arg(&args.value),
+            redis::cmd("DECRBY").arg(&args.name).arg(args.value),
             args.db,
         )
         .await
 }
 
-pub async fn incr<'r>(
+pub async fn incr(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: NameArgs<String> = serde_json::from_str(&payload)?;
     manager
@@ -87,40 +87,40 @@ pub async fn incr<'r>(
         .await
 }
 
-pub async fn incrby<'r>(
+pub async fn incrby(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<i64> = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
-            redis::cmd("INCRBY").arg(&args.name).arg(&args.value),
+            redis::cmd("INCRBY").arg(&args.name).arg(args.value),
             args.db,
         )
         .await
 }
 
-pub async fn incrby_float<'r>(
+pub async fn incrby_float(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: CommonValueArgs<f64> = serde_json::from_str(&payload)?;
     manager
         .execute(
             cid,
-            redis::cmd("INCRBYFLOAT").arg(&args.name).arg(&args.value),
+            redis::cmd("INCRBYFLOAT").arg(&args.name).arg(args.value),
             args.db,
         )
         .await
 }
 
-pub async fn get_range<'r>(
+pub async fn get_range(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: RangeArgs<i64> = serde_json::from_str(&payload)?;
     let v: Vec<u8> = manager
@@ -136,10 +136,10 @@ pub async fn get_range<'r>(
     Ok(String::from_utf8_lossy(&v).to_string())
 }
 
-pub async fn set_range<'r>(
+pub async fn set_range(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: FieldValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -165,10 +165,10 @@ struct LcsArgs {
     db: Option<u8>,
 }
 
-pub async fn lcs<'r>(
+pub async fn lcs(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: LcsArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("lcs");
@@ -194,10 +194,10 @@ pub async fn lcs<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn mget<'r>(
+pub async fn mget(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: NameArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -205,10 +205,10 @@ pub async fn mget<'r>(
         .await
 }
 
-pub async fn getdel<'r>(
+pub async fn getdel(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     manager
@@ -216,10 +216,10 @@ pub async fn getdel<'r>(
         .await
 }
 
-pub async fn getset<'r>(
+pub async fn getset(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
     manager

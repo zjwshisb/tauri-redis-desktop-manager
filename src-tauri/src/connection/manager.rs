@@ -56,7 +56,7 @@ impl Manager {
         let value: Vec<Value> = self
             .execute_with(redis::cmd("config").arg("get").arg(pattern), conn)
             .await?;
-        Ok(Field::build_vec(&value)?)
+        response::build_fields(&value)
     }
 
     pub async fn get_version(&self, id: u32) -> Result<String, CusError> {
@@ -108,14 +108,14 @@ impl Manager {
             for v in arr {
                 if v.contains(":") {
                     let key_value: Vec<&str> = v.split(":").collect();
-                    if let Some(key) = key_value.get(0) {
+                    if let Some(key) = key_value.first() {
                         if let Some(value) = key_value.get(1) {
                             kv.insert(key.to_string(), value.to_string());
                         }
                     }
                 }
             }
-            return kv;
+            kv
         };
         let mut result: HashMap<String, HashMap<String, String>> = HashMap::new();
         match v {
@@ -126,17 +126,13 @@ impl Manager {
             }
             Value::Array(vv) => {
                 for vvv in vv {
-                    match &vvv {
-                        Value::Array(vvvv) => {
-                            if let Some(h) = vvvv.get(0) {
-                                let host = String::from_redis_value(h)?;
-
-                                if let Some(s) = vvvv.get(1) {
-                                    result.insert(host, format_fn(String::from_redis_value(s)?));
-                                }
+                    if let Value::Array(vvvv) = &vvv {
+                        if let Some(h) = vvvv.first() {
+                            let host = String::from_redis_value(h)?;
+                            if let Some(s) = vvvv.get(1) {
+                                result.insert(host, format_fn(String::from_redis_value(s)?));
                             }
                         }
-                        _ => {}
                     }
                 }
             }
@@ -148,7 +144,7 @@ impl Manager {
     // get cluster server nodes
     pub async fn get_nodes(&self, id: u32) -> Result<Vec<Node>, CusError> {
         if let Some(conn) = self.map.lock().await.get_mut(&id) {
-            return Ok(self.get_nodes_with(conn).await?);
+            return self.get_nodes_with(conn).await;
         }
         Err(CusError::reopen())
     }
@@ -161,7 +157,7 @@ impl Manager {
         if !wrapper.model.is_cluster() {
             return Err(CusError::App(String::from("Not a Cluster Server")));
         }
-        if wrapper.nodes.len() == 0 {
+        if wrapper.nodes.is_empty() {
             let params = wrapper.model.get_params();
             let values = self
                 .execute_with(redis::cmd("CLUSTER").arg("NODES"), wrapper)
@@ -214,8 +210,8 @@ impl Manager {
             if !conn.is_cluster() {
                 if let Some(database) = db {
                     if database != conn.db {
-                        let _ = self
-                            .execute_with(redis::cmd("select").arg(db), conn)
+                        self
+                            .execute_with::<String>(redis::cmd("select").arg(db), conn)
                             .await?;
                         conn.db = database
                     }
@@ -235,7 +231,7 @@ impl Manager {
 
     pub async fn get_sync_conn(&self, cid: u32) -> Result<RedisSyncConnection, CusError> {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
-            return Ok(conn.model.get_sync_one().await?);
+            return conn.model.get_sync_one().await;
         }
         Err(CusError::connection_not_found())
     }
@@ -245,7 +241,7 @@ impl Manager {
         cid: u32,
     ) -> Result<RedisSyncClusterConnection, CusError> {
         if let Some(conn) = self.map.lock().await.get_mut(&cid) {
-            return Ok(conn.model.get_sync_cluster_one().await?);
+            return conn.model.get_sync_cluster_one().await;
         }
         Err(CusError::connection_not_found())
     }

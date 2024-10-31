@@ -17,10 +17,10 @@ struct MoveArgs<T = f64> {
     db: Option<u8>,
 }
 
-pub async fn bl_move<'r>(
+pub async fn bl_move(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: MoveArgs = serde_json::from_str(&payload)?;
     let v: Value = manager
@@ -50,10 +50,10 @@ struct LMPopArgs {
     timeout: Option<f64>,
     db: Option<u8>,
 }
-pub async fn blm_pop<'r>(
+pub async fn blm_pop(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: LMPopArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("BLMPOP");
@@ -71,10 +71,10 @@ pub async fn blm_pop<'r>(
     }
 }
 
-pub async fn bl_pop<'r>(
+pub async fn bl_pop(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<f64, Vec<String>> = serde_json::from_str(&payload)?;
     let v: Value = manager
@@ -92,10 +92,10 @@ pub async fn bl_pop<'r>(
     }
 }
 
-pub async fn br_pop<'r>(
+pub async fn br_pop(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<f64, Vec<String>> = serde_json::from_str(&payload)?;
     let v: Value = manager
@@ -113,10 +113,10 @@ pub async fn br_pop<'r>(
     }
 }
 
-pub async fn br_pop_lpush<'r>(
+pub async fn br_pop_lpush(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: MoveArgs<i64> = serde_json::from_str(&payload)?;
     let v: Value = manager
@@ -135,10 +135,10 @@ pub async fn br_pop_lpush<'r>(
     }
 }
 
-pub async fn lindex<'r>(
+pub async fn lindex(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<i64> = serde_json::from_str(&payload)?;
     manager
@@ -150,10 +150,10 @@ pub async fn lindex<'r>(
         .await
 }
 
-pub async fn llen<'r>(
+pub async fn llen(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: NameArgs = serde_json::from_str(&payload)?;
     manager
@@ -161,10 +161,10 @@ pub async fn llen<'r>(
         .await
 }
 
-pub async fn lm_pop<'r>(
+pub async fn lm_pop(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: LMPopArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("LMPOP");
@@ -179,10 +179,10 @@ pub async fn lm_pop<'r>(
     }
 }
 
-pub async fn lmove<'r>(
+pub async fn lmove(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: MoveArgs = serde_json::from_str(&payload)?;
     manager
@@ -206,10 +206,10 @@ struct InsertArgs {
     value: String,
     pivot: String,
 }
-pub async fn linsert<'r>(
+pub async fn linsert(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: InsertArgs = serde_json::from_str(&payload)?;
     let value: i64 = manager
@@ -230,10 +230,10 @@ pub async fn linsert<'r>(
     }
 }
 
-pub async fn lpop<'r>(
+pub async fn lpop(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Option<i64>> = serde_json::from_str(&payload)?;
     manager
@@ -255,10 +255,10 @@ struct LPosArgs {
     len: Option<i64>,
 }
 
-pub async fn lpos<'r>(
+pub async fn lpos(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: LPosArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("LPOS");
@@ -275,10 +275,10 @@ pub async fn lpos<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn lpush<'r>(
+pub async fn lpush(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -290,10 +290,10 @@ pub async fn lpush<'r>(
         .await
 }
 
-pub async fn lpush_x<'r>(
+pub async fn lpush_x(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -305,10 +305,10 @@ pub async fn lpush_x<'r>(
         .await
 }
 
-pub async fn lrange<'r>(
+pub async fn lrange(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: RangeArgs = serde_json::from_str(&payload)?;
     manager
@@ -323,10 +323,10 @@ pub async fn lrange<'r>(
         .await
 }
 
-pub async fn lrem<'r>(
+pub async fn lrem(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: FieldValueArgs<i64> = serde_json::from_str(&payload)?;
     manager
@@ -341,10 +341,10 @@ pub async fn lrem<'r>(
         .await
 }
 
-pub async fn lset<'r>(
+pub async fn lset(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: FieldValueArgs<String, i64> = serde_json::from_str(&payload)?;
     manager
@@ -359,10 +359,10 @@ pub async fn lset<'r>(
         .await
 }
 
-pub async fn ltrim<'r>(
+pub async fn ltrim(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: RangeArgs = serde_json::from_str(&payload)?;
     manager
@@ -377,10 +377,10 @@ pub async fn ltrim<'r>(
         .await
 }
 
-pub async fn rpop<'r>(
+pub async fn rpop(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<String, CusError> {
     let args: CommonValueArgs<Option<i64>> = serde_json::from_str(&payload)?;
     manager
@@ -392,10 +392,10 @@ pub async fn rpop<'r>(
         .await
 }
 
-pub async fn rpop_lpush<'r>(
+pub async fn rpop_lpush(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: MoveArgs<i64> = serde_json::from_str(&payload)?;
     let v: Value = manager
@@ -413,10 +413,10 @@ pub async fn rpop_lpush<'r>(
     }
 }
 
-pub async fn rpush<'r>(
+pub async fn rpush(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let value: i64 = manager
@@ -432,10 +432,10 @@ pub async fn rpush<'r>(
     }
 }
 
-pub async fn rpushx<'r>(
+pub async fn rpushx(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     manager

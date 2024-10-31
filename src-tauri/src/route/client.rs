@@ -5,20 +5,20 @@ use crate::{
 };
 use redis::{self};
 
-pub async fn list<'r>(
+pub async fn list(
     _payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     manager
         .execute(cid, redis::cmd("CLIENT").arg("LIST"), None)
         .await
 }
 
-pub async fn kill<'r>(
+pub async fn kill(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: request::IdArgs<String> = serde_json::from_str(&payload)?;
     let count: i64 = manager

@@ -5,10 +5,10 @@ use crate::{connection::Manager, err::CusError};
 use redis::Value;
 use serde::Deserialize;
 
-pub async fn zscan<'r>(
+pub async fn zscan(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<ScanLikeResult<Field, String>, CusError> {
     let args: ItemScanArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZSCAN");
@@ -22,10 +22,10 @@ pub async fn zscan<'r>(
     ScanLikeResult::<Field, String>::build(values)
 }
 
-pub async fn zrem<'r>(
+pub async fn zrem(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -48,10 +48,10 @@ struct ZAddArgs {
     incr: Option<bool>,
 }
 
-pub async fn zadd<'r>(
+pub async fn zadd(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZAddArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZADD");
@@ -84,10 +84,10 @@ struct MPopArgs {
     db: Option<u8>,
 }
 
-pub async fn bzmpop<'r>(
+pub async fn bzmpop(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: MPopArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("BZMPOP");
@@ -101,10 +101,10 @@ pub async fn bzmpop<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn bzpop_max<'r>(
+pub async fn bzpop_max(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<String, Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -116,10 +116,10 @@ pub async fn bzpop_max<'r>(
         .await
 }
 
-pub async fn bzpop_min<'r>(
+pub async fn bzpop_min(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<String, Vec<String>> = serde_json::from_str(&payload)?;
     manager
@@ -131,10 +131,10 @@ pub async fn bzpop_min<'r>(
         .await
 }
 
-pub async fn zcount<'r>(
+pub async fn zcount(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: RangeArgs<String> = serde_json::from_str(&payload)?;
     manager
@@ -156,10 +156,10 @@ struct ZDiffArgs {
     with_scores: Option<bool>,
     db: Option<u8>,
 }
-pub async fn zdiff<'r>(
+pub async fn zdiff(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZDiffArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZDIFF");
@@ -179,10 +179,10 @@ struct ZDiffStoreArgs {
     destination: String,
     db: Option<u8>,
 }
-pub async fn zdiff_store<'r>(
+pub async fn zdiff_store(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZDiffStoreArgs = serde_json::from_str(&payload)?;
     manager
@@ -197,10 +197,10 @@ pub async fn zdiff_store<'r>(
         .await
 }
 
-pub async fn zincr_by<'r>(
+pub async fn zincr_by(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: FieldValueArgs = serde_json::from_str(&payload)?;
     manager
@@ -225,10 +225,10 @@ struct ZInterArgs {
     db: Option<u8>,
 }
 
-pub async fn zinter<'r>(
+pub async fn zinter(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZInterArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZINTER");
@@ -255,10 +255,10 @@ struct ZInterCardArgs {
     db: Option<u8>,
 }
 
-pub async fn zinter_card<'r>(
+pub async fn zinter_card(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZInterCardArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZINTERCARD");
@@ -279,10 +279,10 @@ struct ZInterStoreArgs {
     db: Option<u8>,
 }
 
-pub async fn zinter_store<'r>(
+pub async fn zinter_store(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZInterStoreArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZINTERSTORE");
@@ -296,10 +296,10 @@ pub async fn zinter_store<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zlex_count<'r>(
+pub async fn zlex_count(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: RangeArgs<String> = serde_json::from_str(&payload)?;
     manager
@@ -314,10 +314,10 @@ pub async fn zlex_count<'r>(
         .await
 }
 
-pub async fn zmpop<'r>(
+pub async fn zmpop(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: MPopArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZMPOP");
@@ -328,10 +328,10 @@ pub async fn zmpop<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zmscore<'r>(
+pub async fn zmscore(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Vec<String>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZMSCORE");
@@ -339,10 +339,10 @@ pub async fn zmscore<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zpop_max<'r>(
+pub async fn zpop_max(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Option<String>, String> = serde_json::from_str(&payload)?;
     manager
@@ -354,10 +354,10 @@ pub async fn zpop_max<'r>(
         .await
 }
 
-pub async fn zpop_min<'r>(
+pub async fn zpop_min(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs<Option<String>, String> = serde_json::from_str(&payload)?;
     manager
@@ -377,10 +377,10 @@ struct ZRandMemberArgs {
     db: Option<u8>,
 }
 
-pub async fn zrand_member<'r>(
+pub async fn zrand_member(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZRandMemberArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZRANDMEMBER");
@@ -409,10 +409,10 @@ struct ZRangeArgs {
     db: Option<u8>,
 }
 
-pub async fn zrange<'r>(
+pub async fn zrange(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZRangeArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZRANGE");
@@ -445,10 +445,10 @@ struct ZRangeStoreArgs {
     db: Option<u8>,
 }
 
-pub async fn zrange_store<'r>(
+pub async fn zrange_store(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZRangeStoreArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZRANGESTORE");
@@ -465,10 +465,10 @@ pub async fn zrange_store<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zrank<'r>(
+pub async fn zrank(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: FieldValueArgs<Option<bool>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZRANK");
@@ -482,10 +482,10 @@ pub async fn zrank<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zrem_range_by_lex<'r>(
+pub async fn zrem_range_by_lex(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: RangeArgs<String> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZREMRANGEBYLEX");
@@ -493,10 +493,10 @@ pub async fn zrem_range_by_lex<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zrem_range_by_rank<'r>(
+pub async fn zrem_range_by_rank(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: RangeArgs<String> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZREMRANGEBYRANK");
@@ -504,10 +504,10 @@ pub async fn zrem_range_by_rank<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zrem_range_by_score<'r>(
+pub async fn zrem_range_by_score(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: RangeArgs<String> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZREMRANGEBYSCORE");
@@ -515,10 +515,10 @@ pub async fn zrem_range_by_score<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zrev_rank<'r>(
+pub async fn zrev_rank(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: FieldValueArgs<Option<bool>> = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZREVRANK");
@@ -532,10 +532,10 @@ pub async fn zrev_rank<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zscore<'r>(
+pub async fn zscore(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: CommonValueArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZSCORE");
@@ -544,10 +544,10 @@ pub async fn zscore<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zunion<'r>(
+pub async fn zunion(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZInterArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZUNION");
@@ -566,10 +566,10 @@ pub async fn zunion<'r>(
     manager.execute(cid, &mut cmd, args.db).await
 }
 
-pub async fn zunion_store<'r>(
+pub async fn zunion_store(
     payload: String,
     cid: u32,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<CValue, CusError> {
     let args: ZInterStoreArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZUNIONSTORE");

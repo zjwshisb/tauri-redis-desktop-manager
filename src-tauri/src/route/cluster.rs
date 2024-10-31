@@ -8,10 +8,10 @@ use crate::{
 };
 use redis::{FromRedisValue, Value};
 
-pub async fn scan<'r>(
+pub async fn scan(
     cid: u32,
     payload: String,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<ScanLikeResult<String, Vec<HashMap<String, String>>>, CusError> {
     let args: request::ScanLikeArgs<Vec<HashMap<String, String>>> =
         serde_json::from_str(payload.as_str())?;
@@ -55,12 +55,12 @@ pub async fn scan<'r>(
     Ok(resp)
 }
 
-pub async fn node_size<'r>(
+pub async fn node_size(
     cid: u32,
     payload: String,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<i64, CusError> {
-    let args: IdArgs<String> = serde_json::from_str(&payload.as_str())?;
+    let args: IdArgs<String> = serde_json::from_str(payload.as_str())?;
     let nodes: Vec<Node> = manager.get_nodes(cid).await?;
     for n in nodes {
         if n.id == args.id {
@@ -74,14 +74,14 @@ pub async fn node_size<'r>(
     Ok(0)
 }
 
-pub async fn node<'r>(cid: u32, manager: tauri::State<'r, Manager>) -> Result<Vec<Node>, CusError> {
+pub async fn node(cid: u32, manager: tauri::State<'_, Manager>) -> Result<Vec<Node>, CusError> {
     manager.get_nodes(cid).await
 }
 
-pub async fn analysis<'r>(
+pub async fn analysis(
     cid: u32,
     payload: String,
-    manager: tauri::State<'r, Manager>,
+    manager: tauri::State<'_, Manager>,
 ) -> Result<ScanLikeResult<KeyWithMemory, Vec<HashMap<String, String>>>, CusError> {
     let args: request::ScanLikeArgs<Vec<HashMap<String, String>>> =
         serde_json::from_str(payload.as_str())?;

@@ -1,6 +1,6 @@
 use crate::{err::CusError, request::IdArgs, sqlite::Collection};
 
-pub async fn all() -> Result<Vec<Collection>, crate::err::CusError> {
+pub async fn all() -> Result<Vec<Collection>, CusError> {
     Collection::all()
 }
 

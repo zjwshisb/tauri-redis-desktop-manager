@@ -70,7 +70,7 @@ class ConnectionStore {
         })
       }
       const version = await request<string>('server/version', connection.id)
-      if (versionCompare(version.data, '4.0.0')) {
+      if (versionCompare(version.data, '4.0.0') >= 0) {
         const modules = await request<APP.Module[]>(
           'server/module',
           connection.id
