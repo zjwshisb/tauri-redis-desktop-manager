@@ -1,6 +1,5 @@
 use std::string::FromUtf8Error;
 
-use thiserror;
 
 pub fn new_normal() -> CusError {
     CusError::App("something go wrong".into())

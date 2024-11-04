@@ -7,6 +7,7 @@ import { useLatest } from 'ahooks'
 export interface UseKeyScanOptions {
   beforeGet?: (rest: boolean) => void
   afterGet?: (rest: boolean) => void
+  onErr?: () => void
 }
 
 export interface UseKeyScanFilter {
@@ -98,30 +99,37 @@ export default function useKeyScan(
       if (connection.is_cluster) {
         path = 'cluster/scan'
       }
-      return await request<APP.ScanLikeResp>(path, connection.id, {
-        cursor: cursor.current,
-        count: store.setting.setting.key_count,
-        db,
-        ...params
-      }).then((res) => {
-        const hasMore = isMore(res.data)
-        setMore(hasMore)
-        setCursor(res.data)
-        if (opts.current?.afterGet != null) {
-          opts.current.afterGet(reset)
+      try {
+        return await request<APP.ScanLikeResp>(path, connection.id, {
+          cursor: cursor.current,
+          count: store.setting.setting.key_count,
+          db,
+          ...params
+        }).then((res) => {
+          const hasMore = isMore(res.data)
+          setMore(hasMore)
+          setCursor(res.data)
+          if (opts.current?.afterGet != null) {
+            opts.current.afterGet(reset)
+          }
+          if (reset) {
+            setKeys(res.data.values)
+          } else {
+            setKeys((pre) => {
+              return [...pre].concat(res.data.values)
+            })
+          }
+          return {
+            data: res.data,
+            hasMore
+          }
+        })
+      } catch (e) {
+        if (opts.current && opts.current.onErr) {
+          opts.current.onErr()
         }
-        if (reset) {
-          setKeys(res.data.values)
-        } else {
-          setKeys((pre) => {
-            return [...pre].concat(res.data.values)
-          })
-        }
-        return {
-          data: res.data,
-          hasMore
-        }
-      })
+        throw e
+      }
     },
     [
       opts,

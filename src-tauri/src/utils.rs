@@ -6,8 +6,8 @@ use std::net::Ipv6Addr;
 use std::net::{IpAddr, Ipv4Addr};
 
 pub fn compare_version(version1: &str, version2: &str) -> i8 {
-    let arr1: Vec<_> = version1.split(".").into_iter().collect();
-    let arr2: Vec<_> = version2.split(".").into_iter().collect();
+    let arr1: Vec<_> = version1.split(".").collect();
+    let arr2: Vec<_> = version2.split(".").collect();
     let mut len = arr1.len();
     if arr2.len() > len {
         len = arr2.len()
@@ -26,16 +26,17 @@ pub fn compare_version(version1: &str, version2: &str) -> i8 {
         }
         if v1_num > v2_num {
             return 1;
-        } else if v1_num < v2_num {
+        }
+        if v1_num < v2_num {
             return -1;
         }
-        i = i + 1
+        i += 1
     }
-    return 0;
+    0
 }
 
 pub fn random_str(length: usize) -> String {
-    let mut rng = rand::thread_rng();
+    let mut rng = thread_rng();
     Alphanumeric
         .sample_iter(&mut rng)
         .take(length)
@@ -45,7 +46,7 @@ pub fn random_str(length: usize) -> String {
 
 pub fn binary_to_redis_str(v: &Vec<u8>) -> String {
     let mut s = String::new();
-    v.into_iter().for_each(|u| {
+    v.iter().for_each(|u| {
         if *u >= 32 && *u <= 126 {
             s.push(*u as char)
         } else {
@@ -68,19 +69,19 @@ pub fn redis_str_to_binary(s: String) -> Vec<u8> {
                         r.push(s[0]);
                     }
                 }
-                start = start + 4;
+                start += 4;
             } else {
                 r.push(v.as_bytes()[0]);
-                start = start + 1;
+                start += 1;
             }
         }
     }
     r
 }
 
-pub fn string_to_ip(s: &String) -> Result<IpAddr, CusError> {
+pub fn string_to_ip(s: &str) -> Result<IpAddr, CusError> {
     let err = Err(CusError::App(String::from("not ip")));
-    let vec: Vec<_> = s.as_str().split(".").collect();
+    let vec: Vec<_> = s.split(".").collect();
     if vec.len() == 4 {
         let mut ip: [u8; 4] = [0; 4];
         for i in 0..vec.len() {

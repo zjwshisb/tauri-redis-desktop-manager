@@ -51,10 +51,10 @@ pub async fn create_tunnel<T: SshProxy>(t: &mut T) -> Result<Option<()>, CusErro
         if let Some(p) = config.passphrase {
             passphrase_str = p
         }
-        if passphrase_str != "" {
+        if !passphrase_str.is_empty() {
             passphrase = Some(Cow::from(passphrase_str.as_str()));
         }
-        if private_key != "" {
+        if !private_key.is_empty() {
             auth = JumpHostAuthParams::key_pair(
                 Cow::from(config.username.as_str()),
                 Cow::from(Path::new(private_key.as_str())),

@@ -12,7 +12,7 @@ pub async fn zscan(
 ) -> Result<ScanLikeResult<Field, String>, CusError> {
     let args: ItemScanArgs = serde_json::from_str(&payload)?;
     let mut cmd = redis::cmd("ZSCAN");
-    cmd.arg(String::from(args.name))
+    cmd.arg(args.name)
         .arg(args.cursor)
         .arg(&["COUNT", args.count.to_string().as_str()]);
     if let Some(search) = args.search {
@@ -402,7 +402,6 @@ struct ZRangeArgs {
     min: String,
     max: String,
     order: Option<String>,
-    rev: Option<bool>,
     offset: Option<String>,
     count: Option<String>,
     withscores: Option<bool>,

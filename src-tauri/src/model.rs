@@ -27,9 +27,9 @@ pub struct SlowLog {
 }
 
 impl SlowLog {
-    pub fn build(s: &Vec<RedisValue>) -> Self {
+    pub fn build(s: &[RedisValue]) -> Self {
         let mut log = Self::default();
-        if let Some(v) = s.get(0) {
+        if let Some(v) = s.first() {
             log.id = i64::from_redis_value(v).unwrap();
         }
         if let Some(v) = s.get(1) {
@@ -43,10 +43,10 @@ impl SlowLog {
             log.cmd = cmd.join(" ")
         }
         if let Some(v) = s.get(4) {
-            log.client_ip = String::from_redis_value(&v).unwrap();
+            log.client_ip = String::from_redis_value(v).unwrap();
         }
         if let Some(v) = s.get(5) {
-            log.client_name = String::from_redis_value(&v).unwrap();
+            log.client_name = String::from_redis_value(v).unwrap();
         }
         log.uid = random_str(32);
         log
